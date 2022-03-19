@@ -49,12 +49,11 @@ install:
   stage: install
   image: golang:alpine
   script:
-    - apk add --no-cache --no-progress make
+    - apk add --no-cache --no-progress make git
     - make install
   artifacts:
     paths:
       - vendor/
-    expire_in: 30 minutes
   tags:
     - docker
 
@@ -64,23 +63,22 @@ build:
   before_script:
     - cd ${APP_FOLDER}
   script:
-    - apk add --no-cache --no-progress make
+    - apk add --no-cache --no-progress make git
     - make -j4 build
     - ./dist/${APP_BINARY} --help
   artifacts:
     paths:
       - ${APP_FOLDER}/dist/
-    expire_in: 30 minutes
   parallel:
     matrix:
       - APP_FOLDER: ./docker
-        APP_BINARY: ws-pipes-docker
+        APP_BINARY: gitlab-pipes-docker
 
       - APP_FOLDER: ./node
-        APP_BINARY: ws-pipes-node
+        APP_BINARY: gitlab-pipes-node
 
       - APP_FOLDER: ./gl-artifacts
-        APP_BINARY: ws-pipes-gl-artifacts
+        APP_BINARY: gitlab-pipes-gl-artifacts
   tags:
     - docker
 
@@ -88,8 +86,8 @@ publish-docker:
   extends: .publish-docker-common
   parallel:
     matrix:
-      - APP_BINARY: ws-pipes-docker
-        CONTAINER_IMAGE: ws-pipes-docker:latest
+      - APP_BINARY: gitlab-pipes-docker
+        CONTAINER_IMAGE: gitlab-pipes-docker:latest
   only:
     changes:
       - "docker/**/*"
@@ -103,7 +101,7 @@ publish-node:
   extends: .publish-node-common
   parallel:
     matrix:
-      - CONTAINER_IMAGE: ws-pipes-node:${NODE_VERSION}
+      - CONTAINER_IMAGE: gitlab-pipes-node:${NODE_VERSION}
         NODE_VERSION:
           - 16
           - 16-alpine
@@ -120,7 +118,7 @@ publish-gl-artifacts:
   extends: .publish-gl-artifacts-common
   parallel:
     matrix:
-      - CONTAINER_IMAGE: ws-pipes-gl-artifacts:latest
+      - CONTAINER_IMAGE: gitlab-pipes-gl-artifacts:latest
   only:
     changes:
       - "gl-artifacts/**/*"
