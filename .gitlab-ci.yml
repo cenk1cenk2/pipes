@@ -97,6 +97,7 @@ publish-docker:
       - .gitlab-ci.yml
     refs:
       - master
+      - main
 
 publish-node:
   extends: .publish-node-common
@@ -114,6 +115,7 @@ publish-node:
       - .gitlab-ci.yml
     refs:
       - master
+      - main
 
 publish-gl-artifacts:
   extends: .publish-gl-artifacts-common
@@ -128,3 +130,4 @@ publish-gl-artifacts:
       - .gitlab-ci.yml
     refs:
       - master
+      - main
