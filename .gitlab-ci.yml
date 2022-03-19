@@ -38,7 +38,6 @@ stages:
 
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  CI_DEBUG_TRACE: "true"
 
 cache:
   paths:
