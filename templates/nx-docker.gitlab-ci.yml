@@ -14,7 +14,7 @@ stages:
 
 prepare:
   stage: prepare
-  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-gl-artifacts:${PIPES_VERSION}
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-gl-artifacts:${PIPES_VERSION}
   script:
     - pipe
   artifacts:
@@ -28,7 +28,7 @@ prepare:
 
 build-docker-image:
   stage: docker
-  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-docker:${PIPES_VERSION}
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-docker:${PIPES_VERSION}
   script:
     - pipe
   tags:

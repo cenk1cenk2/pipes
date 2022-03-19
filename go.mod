@@ -1,4 +1,4 @@
-module gitlab.kilic.dev/bdsm/gitlab-pipes
+module gitlab.kilic.dev/devops/gitlab-pipes
 
 go 1.17
 

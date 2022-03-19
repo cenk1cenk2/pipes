@@ -4,11 +4,11 @@ import (
 	"github.com/urfave/cli/v2"
 
 	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
-	build "gitlab.kilic.dev/bdsm/gitlab-pipes/node/build"
-	install "gitlab.kilic.dev/bdsm/gitlab-pipes/node/install"
-	login "gitlab.kilic.dev/bdsm/gitlab-pipes/node/login"
-	pipe "gitlab.kilic.dev/bdsm/gitlab-pipes/node/pipe"
-	run "gitlab.kilic.dev/bdsm/gitlab-pipes/node/run"
+	build "gitlab.kilic.dev/devops/gitlab-pipes/node/build"
+	install "gitlab.kilic.dev/devops/gitlab-pipes/node/install"
+	login "gitlab.kilic.dev/devops/gitlab-pipes/node/login"
+	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
+	run "gitlab.kilic.dev/devops/gitlab-pipes/node/run"
 )
 
 func main() {

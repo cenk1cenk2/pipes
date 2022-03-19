@@ -3,7 +3,7 @@ package install
 import (
 	"os/exec"
 
-	pipe "gitlab.kilic.dev/bdsm/gitlab-pipes/node/pipe"
+	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
 	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
 )
 

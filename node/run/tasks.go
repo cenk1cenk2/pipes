@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
-	"gitlab.kilic.dev/bdsm/gitlab-pipes/node/pipe"
+	"gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
 )
 
 type Ctx struct {

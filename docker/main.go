@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
-	pipe "gitlab.kilic.dev/bdsm/gitlab-pipes/docker/pipe"
+	pipe "gitlab.kilic.dev/devops/gitlab-pipes/docker/pipe"
 )
 
 func main() {

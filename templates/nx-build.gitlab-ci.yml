@@ -11,7 +11,7 @@ cache:
 
 install:
   stage: install
-  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
   script:
     - pipe install
   artifacts:
@@ -23,7 +23,7 @@ install:
 
 lint:
   stage: build
-  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
   script:
     - pipe run ${NODE_LINT_COMMAND}
   tags:
@@ -33,7 +33,7 @@ lint:
 
 test:
   stage: build
-  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
   script:
     - pipe run ${NODE_TEST_COMMAND}
   tags:
@@ -43,7 +43,7 @@ test:
 
 build:
   stage: build
-  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
   script:
     - pipe build
   artifacts:

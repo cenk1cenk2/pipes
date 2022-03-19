@@ -97,7 +97,6 @@ publish-docker:
       - go.sum
       - .gitlab-ci.yml
     refs:
-      - master
       - main
 
 publish-node:
@@ -115,7 +114,6 @@ publish-node:
       - go.sum
       - .gitlab-ci.yml
     refs:
-      - master
       - main
 
 publish-gl-artifacts:
@@ -130,5 +128,4 @@ publish-gl-artifacts:
       - go.sum
       - .gitlab-ci.yml
     refs:
-      - master
       - main

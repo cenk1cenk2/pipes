@@ -12,7 +12,7 @@ import (
 
 	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
 	"github.com/nochso/gomd/eol"
-	"gitlab.kilic.dev/bdsm/gitlab-pipes/node/pipe"
+	"gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
 )
 
 type Ctx struct {
