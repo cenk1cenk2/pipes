@@ -1,0 +1,54 @@
+variables:
+  PIPES_VERSION: latest
+  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  NODE_VERSION: 16-alpine
+  NODE_LINT_COMMAND: lint:check
+
+cache:
+  paths:
+    - node_modules/
+    - .cache/
+
+install:
+  stage: install
+  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  script:
+    - pipe install
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 30 minutes
+  tags:
+    - node
+
+lint:
+  stage: build
+  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  script:
+    - pipe run ${NODE_LINT_COMMAND}
+  tags:
+    - node
+  rules:
+    - if: $NODE_LINT_COMMAND
+
+test:
+  stage: build
+  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  script:
+    - pipe run ${NODE_TEST_COMMAND}
+  tags:
+    - node
+  rules:
+    - if: $NODE_TEST_COMMAND
+
+build:
+  stage: build
+  image: $CI_REGISTRY/bdsm/gitlab-pipes/gitlab-pipes-node:${PIPES_VERSION}-${NODE_VERSION}
+  script:
+    - pipe build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 30 minutes
+  tags:
+    - node
