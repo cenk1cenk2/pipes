@@ -1,12 +1,6 @@
 variables:
   PIPES_VERSION: latest
-  DOCKER_REGISTRY: $CI_REGISTRY
-  DOCKER_REGISTRY_USERNAME: $CI_REGISTRY_USER
-  DOCKER_REGISTRY_PASSWORD: $CI_BUILD_TOKEN
-  IMAGE_NAME: $CI_PROJECT_PATH/$DOCKER_IMAGE_NAME
-  IMAGE_TAGS: $CI_BUILD_REF_NAME
   PARENT_DOWNLOAD_ARTIFACTS: "build"
-  DOCKERFILE_CONTEXT: ""
 
 stages:
   - prepare
@@ -20,16 +14,12 @@ prepare:
   artifacts:
     paths:
       - dist/
-    expire_in: 30 minutes
   tags:
     - docker
   rules:
     - if: $PARENT_DOWNLOAD_ARTIFACTS
 
-build-docker-image:
-  stage: docker
-  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-docker:${PIPES_VERSION}
-  script:
-    - pipe
-  tags:
-    - docker
+include:
+  - project: devops/gitlab-pipes
+    file: /templates/docker-build.gitlab-ci.yml
+    ref: master
