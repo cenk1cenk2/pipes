@@ -102,8 +102,8 @@ publish-node:
     matrix:
       - CONTAINER_IMAGE: gitlab-pipes-node:${NODE_VERSION}
         NODE_VERSION:
-          - 16
-          - 16-alpine
+          - latest-16
+          - latest-16-alpine
   only:
     changes:
       - "node/**/*"
