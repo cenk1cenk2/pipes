@@ -10,7 +10,7 @@ var Flags = []cli.Flag{
 		Usage:       "Preferred Package manager for nodejs.",
 		Required:    false,
 		EnvVars:     []string{"NODE_PACKAGE_MANAGER"},
-		Value:       "npm",
+		Value:       "yarn",
 		Destination: &Pipe.Node.PackageManager,
 	},
 }
