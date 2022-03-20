@@ -22,4 +22,4 @@ prepare:
 include:
   - project: devops/gitlab-pipes
     file: /templates/docker-build.gitlab-ci.yml
-    ref: master
+    ref: main
