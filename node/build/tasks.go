@@ -82,13 +82,14 @@ func InjectEnvironmentVariables() utils.Task {
 		Context: "env-vars",
 		Skip:    len(Pipe.NodeBuild.EnvironmentFiles.Value()) == 0,
 	}, Task: func(t *utils.Task) error {
+		environmentFiles := Pipe.NodeBuild.EnvironmentFiles.Value()
 		var wg sync.WaitGroup
-		wg.Add(len(Pipe.NodeBuild.EnvironmentFiles.Value()))
+		wg.Add(len(environmentFiles))
 
 		errs := []error{}
 		EOL := eol.OSDefault().String()
 
-		for i, file := range Pipe.NodeBuild.EnvironmentFiles.Value() {
+		for i, file := range utils.DeleteEmptyStringsFromSlice(environmentFiles) {
 			go func(i int, file string) {
 				defer wg.Done()
 
