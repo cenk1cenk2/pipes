@@ -18,7 +18,7 @@ install:
     paths:
       - node_modules/
   tags:
-    - node
+    - docker
 
 lint:
   stage: build
@@ -26,7 +26,7 @@ lint:
   script:
     - pipe run ${NODE_LINT_COMMAND}
   tags:
-    - node
+    - docker
   rules:
     - if: $NODE_LINT_COMMAND
 
@@ -36,7 +36,7 @@ test:
   script:
     - pipe run ${NODE_TEST_COMMAND}
   tags:
-    - node
+    - docker
   rules:
     - if: $NODE_TEST_COMMAND
 
@@ -49,4 +49,4 @@ build:
     paths:
       - dist/
   tags:
-    - node
+    - docker
