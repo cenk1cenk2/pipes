@@ -9,7 +9,7 @@ var Flags = []cli.Flag{
 		Name:        "gl.token",
 		Usage:       "Token for gitlab api authentication.",
 		Required:    true,
-		EnvVars:     []string{"GL_TOKEN", "BANDAID_API_TOKEN"},
+		EnvVars:     []string{"GL_TOKEN"},
 		Value:       "https://gitlab.kilic.dev",
 		Destination: &Pipe.Gitlab.Token,
 	},
