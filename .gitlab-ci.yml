@@ -8,8 +8,8 @@ stages:
   before_script:
     - cd ./docker
   script:
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
     - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
     - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
   tags:
     - docker
@@ -19,8 +19,8 @@ stages:
   before_script:
     - cd ./node
   script:
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE --build-arg NODE_VERSION=${NODE_VERSION} .
     - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE --build-arg NODE_VERSION=${NODE_VERSION} .
     - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
   tags:
     - docker
@@ -30,8 +30,8 @@ stages:
   before_script:
     - cd ./gl-artifacts
   script:
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
     - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
     - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
   tags:
     - docker
