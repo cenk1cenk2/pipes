@@ -100,10 +100,10 @@ publish-node:
   extends: .publish-node-common
   parallel:
     matrix:
-      - CONTAINER_IMAGE: gitlab-pipes-node:${NODE_VERSION}
+      - CONTAINER_IMAGE: gitlab-pipes-node:latest-${NODE_VERSION}
         NODE_VERSION:
-          - latest-16
-          - latest-16-alpine
+          - 16
+          - 16-alpine
   only:
     changes:
       - "node/**/*"
