@@ -68,7 +68,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:        "docker_registry.username",
 		Usage:       "Docker registry username.",
-		Required:    true,
+		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY_USERNAME"},
 		Destination: &Pipe.DockerRegistry.Username,
 	},
@@ -76,7 +76,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:        "docker_registry.password",
 		Usage:       "Docker registry password.",
-		Required:    true,
+		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY_PASSWORD"},
 		Destination: &Pipe.DockerRegistry.Password,
 	},
