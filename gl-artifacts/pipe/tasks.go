@@ -73,7 +73,7 @@ func TaskVerifyVariables() utils.Task {
 }
 
 func TaskDiscoverArtifacts() utils.Task {
-	metadata := utils.TaskMetadata{Context: "discover artifacts"}
+	metadata := utils.TaskMetadata{Context: "discover"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		Context.StepIds = []StepId{}
@@ -119,7 +119,7 @@ func TaskDiscoverArtifacts() utils.Task {
 }
 
 func TaskDownloadArtifacts() utils.Task {
-	metadata := utils.TaskMetadata{Context: "download artifacts"}
+	metadata := utils.TaskMetadata{Context: "download"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		url := fmt.Sprintf(
@@ -171,7 +171,7 @@ func TaskDownloadArtifacts() utils.Task {
 
 func TaskUnarchiveArtifacts() utils.Task {
 	metadata := utils.TaskMetadata{
-		Context:        "unarchive artifacts",
+		Context:        "unarchive",
 		StdOutLogLevel: logrus.DebugLevel,
 	}
 

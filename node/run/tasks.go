@@ -19,7 +19,7 @@ var Context Ctx
 
 func VerifyVariables() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify script"},
+		Metadata: utils.TaskMetadata{Context: "verify-script"},
 		Task: func(t *utils.Task) error {
 			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
 
@@ -34,7 +34,7 @@ func VerifyVariables() utils.Task {
 
 func RunNodeScript() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "node script"},
+		Metadata: utils.TaskMetadata{Context: "script"},
 		Task: func(t *utils.Task) error {
 			args := []string{}
 

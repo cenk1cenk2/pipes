@@ -25,7 +25,7 @@ var Context Ctx
 
 func VerifyVariables() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify build"},
+		Metadata: utils.TaskMetadata{Context: "verify-build"},
 		Task: func(t *utils.Task) error {
 			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
 
@@ -79,7 +79,7 @@ func VerifyVariables() utils.Task {
 
 func InjectEnvironmentVariables() utils.Task {
 	return utils.Task{Metadata: utils.TaskMetadata{
-		Context: "env-vars",
+		Context: "variables",
 		Skip: len(
 			utils.DeleteEmptyStringsFromSlice(Pipe.NodeBuild.EnvironmentFiles.Value()),
 		) == 0,
@@ -187,7 +187,7 @@ func InjectEnvironmentVariables() utils.Task {
 
 func BuildNodeApplication() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "node build"},
+		Metadata: utils.TaskMetadata{Context: "build"},
 		Task: func(t *utils.Task) error {
 			args := []string{}
 

@@ -3,8 +3,8 @@ package install
 import (
 	"os/exec"
 
-	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
 	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
+	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
 )
 
 type Ctx struct {
@@ -14,7 +14,7 @@ var Context Ctx
 
 func VerifyVariables() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify install"},
+		Metadata: utils.TaskMetadata{Context: "verify-install"},
 		Task: func(t *utils.Task) error {
 			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
 
@@ -28,7 +28,7 @@ func VerifyVariables() utils.Task {
 
 func InstallNodeDependencies() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "node install"},
+		Metadata: utils.TaskMetadata{Context: "install"},
 		Task: func(t *utils.Task) error {
 			var args []string
 

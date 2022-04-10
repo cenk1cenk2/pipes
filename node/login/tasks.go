@@ -21,7 +21,7 @@ var Context Ctx
 
 func VerifyVariables() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify login", Skip: Pipe.Npm.Login == ""},
+		Metadata: utils.TaskMetadata{Context: "verify-login", Skip: Pipe.Npm.Login == ""},
 		Task: func(t *utils.Task) error {
 			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
 
@@ -72,7 +72,7 @@ func VerifyVariables() utils.Task {
 func VerifyNpmLogin() utils.Task {
 	return utils.Task{
 		Metadata: utils.TaskMetadata{
-			Context:        "npm login",
+			Context:        "login",
 			Skip:           Pipe.Npm.Login == "",
 			StdOutLogLevel: logrus.DebugLevel,
 		},
@@ -119,7 +119,7 @@ func VerifyNpmLogin() utils.Task {
 
 func GenerateNpmRc() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "generate .npmrc", Skip: Pipe.Npm.Login == ""},
+		Metadata: utils.TaskMetadata{Context: "generate-npmrc", Skip: Pipe.Npm.Login == ""},
 		Task: func(t *utils.Task) error {
 			var wg sync.WaitGroup
 			wg.Add(len(Context.NpmLogin))

@@ -125,7 +125,7 @@ func VerifyVariables() utils.Task {
 
 func DockerVersion() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "docker version"},
+		Metadata: utils.TaskMetadata{Context: "version"},
 		Task: func(t *utils.Task) error {
 			cmd := exec.Command(DOCKER_EXE, "--version")
 
@@ -139,7 +139,12 @@ func DockerVersion() utils.Task {
 
 func DockerLogin() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "docker login", StdOutLogLevel: logrus.DebugLevel},
+		Metadata: utils.TaskMetadata{
+			Context:        "login",
+			StdOutLogLevel: logrus.DebugLevel,
+			Skip: Pipe.DockerRegistry.Username == "" ||
+				Pipe.DockerRegistry.Password == "",
+		},
 		Task: func(t *utils.Task) error {
 			t.Log.Infoln(
 				fmt.Sprintf("Logging in to Docker registry: %s", Pipe.DockerRegistry.Registry),
@@ -165,7 +170,7 @@ func DockerLogin() utils.Task {
 }
 
 func DockerBuild() utils.Task {
-	return utils.Task{Metadata: utils.TaskMetadata{Context: "docker build"},
+	return utils.Task{Metadata: utils.TaskMetadata{Context: "build"},
 		Task: func(t *utils.Task) error {
 			t.Log.Infoln(
 				fmt.Sprintf(
@@ -206,7 +211,7 @@ func DockerBuild() utils.Task {
 
 func DockerPush() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "docker push"},
+		Metadata: utils.TaskMetadata{Context: "push"},
 		Task: func(t *utils.Task) error {
 			t.Commands = []utils.Command{}
 
@@ -232,7 +237,7 @@ func DockerPush() utils.Task {
 
 func DockerInspect() utils.Task {
 	return utils.Task{Metadata: utils.TaskMetadata{
-		Context:        "docker inspect",
+		Context:        "inspect",
 		Skip:           !Pipe.DockerImage.Inspect,
 		StdOutLogLevel: logrus.DebugLevel,
 	},
