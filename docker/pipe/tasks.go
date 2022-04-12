@@ -142,27 +142,40 @@ func DockerLogin() utils.Task {
 		Metadata: utils.TaskMetadata{
 			Context:        "login",
 			StdOutLogLevel: logrus.DebugLevel,
-			Skip: Pipe.DockerRegistry.Username == "" ||
-				Pipe.DockerRegistry.Password == "",
 		},
 		Task: func(t *utils.Task) error {
-			t.Log.Infoln(
-				fmt.Sprintf("Logging in to Docker registry: %s", Pipe.DockerRegistry.Registry),
+			if Pipe.DockerRegistry.Username != "" && Pipe.DockerRegistry.Password != "" {
+				t.Log.Infoln(
+					fmt.Sprintf("Logging in to Docker registry: %s", Pipe.DockerRegistry.Registry),
+				)
+
+				cmd := exec.Command(DOCKER_EXE, "login")
+
+				cmd.Args = append(cmd.Args, Pipe.DockerRegistry.Registry)
+				cmd.Args = append(
+					cmd.Args,
+					"--username",
+					Pipe.DockerRegistry.Username,
+					"--password-stdin",
+				)
+
+				cmd.Stdin = strings.NewReader(Pipe.DockerRegistry.Password)
+
+				t.Commands = append(t.Commands, cmd)
+			}
+
+			t.Log.Debugln(
+				fmt.Sprintf(
+					"Will verify authentication in to Docker registry: %s",
+					Pipe.DockerRegistry.Registry,
+				),
 			)
 
 			cmd := exec.Command(DOCKER_EXE, "login")
 
 			cmd.Args = append(cmd.Args, Pipe.DockerRegistry.Registry)
-			cmd.Args = append(
-				cmd.Args,
-				"--username",
-				Pipe.DockerRegistry.Username,
-				"--password-stdin",
-			)
 
-			cmd.Stdin = strings.NewReader(Pipe.DockerRegistry.Password)
-
-			t.Command = cmd
+			t.Commands = append(t.Commands, cmd)
 
 			return nil
 		},
