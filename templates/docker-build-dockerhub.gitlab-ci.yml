@@ -1,0 +1,19 @@
+variables:
+  PIPES_VERSION: latest
+  DOCKER_REGISTRY: ""
+  DOCKER_REGISTRY_USERNAME: "$DOCKER_REGISTRY_USERNAME"
+  DOCKER_REGISTRY_PASSWORD: "$DOCKER_REGISTRY_PASSWORD"
+  IMAGE_NAME: $DOCKER_IMAGE_NAME
+  IMAGE_TAGS: $CI_BUILD_REF_NAME
+  DOCKERFILE_CONTEXT: ""
+
+stages:
+  - docker
+
+build-docker-image:
+  stage: docker
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-docker:${PIPES_VERSION}
+  script:
+    - pipe
+  tags:
+    - docker

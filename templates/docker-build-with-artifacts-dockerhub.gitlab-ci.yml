@@ -1,0 +1,25 @@
+variables:
+  PIPES_VERSION: latest
+  PARENT_DOWNLOAD_ARTIFACTS: "build"
+
+stages:
+  - prepare
+  - docker
+
+prepare:
+  stage: prepare
+  image: $CI_REGISTRY/devops/gitlab-pipes/gitlab-pipes-gl-artifacts:${PIPES_VERSION}
+  script:
+    - pipe
+  artifacts:
+    paths:
+      - dist/
+  tags:
+    - docker
+  rules:
+    - if: $PARENT_DOWNLOAD_ARTIFACTS
+
+include:
+  - project: devops/gitlab-pipes
+    file: /templates/docker-build-dockerhub.gitlab-ci.yml
+    ref: main
