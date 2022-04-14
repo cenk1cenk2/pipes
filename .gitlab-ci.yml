@@ -50,7 +50,7 @@ variables:
 
 include:
   project: devops/gitlab-pipes
-  file: /templates/go-install.gitlab.ci.yml
+  file: /templates/go-install.gitlab-ci.yml
   ref: main
 
 build:
