@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/cavaliergopher/grab/v3"
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/dustin/go-humanize"
 	"github.com/google/uuid"
 )

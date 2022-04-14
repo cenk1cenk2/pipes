@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
 	pipe "gitlab.kilic.dev/devops/gitlab-pipes/_template/pipe"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
 )
 

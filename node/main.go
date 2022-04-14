@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	build "gitlab.kilic.dev/devops/gitlab-pipes/node/build"
 	install "gitlab.kilic.dev/devops/gitlab-pipes/node/install"
 	login "gitlab.kilic.dev/devops/gitlab-pipes/node/login"

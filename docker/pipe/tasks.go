@@ -7,8 +7,9 @@ import (
 	"regexp"
 	"strings"
 
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
 	"github.com/sirupsen/logrus"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	u "gitlab.kilic.dev/libraries/go-utils/utils"
 )
 
 type Ctx struct {
@@ -25,7 +26,7 @@ func VerifyVariables() utils.Task {
 			TagAsLatestForTagsRegex := []string{}
 			TagAsLatestForBranchesRegex := []string{}
 
-			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(Pipe.DockerImage.Tags.Value())) {
+			for _, v := range u.RemoveDuplicateStr(u.DeleteEmptyStringsFromSlice(Pipe.DockerImage.Tags.Value())) {
 				tag, err := AddDockerTag(v)
 
 				if err != nil {
@@ -114,8 +115,8 @@ func VerifyVariables() utils.Task {
 				}
 			}
 
-			Context.Tags = utils.RemoveDuplicateStr(
-				utils.DeleteEmptyStringsFromSlice(Context.Tags),
+			Context.Tags = u.RemoveDuplicateStr(
+				u.DeleteEmptyStringsFromSlice(Context.Tags),
 			)
 
 			return nil

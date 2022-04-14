@@ -3,8 +3,8 @@ package install
 import (
 	"os/exec"
 
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
 	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 type Ctx struct {

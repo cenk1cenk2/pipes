@@ -10,9 +10,10 @@ import (
 	"strings"
 	"sync"
 
-	utils "github.com/cenk1cenk2/ci-cd-pipes/utils"
 	"github.com/nochso/gomd/eol"
 	"gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	u "gitlab.kilic.dev/libraries/go-utils/utils"
 )
 
 type Ctx struct {
@@ -81,7 +82,7 @@ func InjectEnvironmentVariables() utils.Task {
 	return utils.Task{Metadata: utils.TaskMetadata{
 		Context: "variables",
 		Skip: len(
-			utils.DeleteEmptyStringsFromSlice(Pipe.NodeBuild.EnvironmentFiles.Value()),
+			u.DeleteEmptyStringsFromSlice(Pipe.NodeBuild.EnvironmentFiles.Value()),
 		) == 0,
 	}, Task: func(t *utils.Task) error {
 		var wg sync.WaitGroup
@@ -140,7 +141,7 @@ func InjectEnvironmentVariables() utils.Task {
 						variables[i]))
 				}
 
-				variables = utils.DeleteEmptyStringsFromSlice(variables)
+				variables = u.DeleteEmptyStringsFromSlice(variables)
 
 				if len(variables) > 0 {
 					t.Log.Debugln(
