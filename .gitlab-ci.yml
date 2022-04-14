@@ -144,7 +144,7 @@ publish-node:
   parallel:
     matrix:
       - IMAGE_TAGS: ${NODE_VERSION}
-        BUILD_ARGS: --build-arg NODE_VERSION=${NODE_VERSION}
+        BUILD_ARGS: NODE_VERSION="${NODE_VERSION}"
         NODE_VERSION:
           - 16
           - 16-alpine

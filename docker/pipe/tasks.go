@@ -196,7 +196,9 @@ func DockerBuild() utils.Task {
 
 			cmd := exec.Command(DOCKER_EXE, "build")
 
-			cmd.Args = append(cmd.Args, Pipe.DockerImage.BuildArgs.Value()...)
+			for _, v := range Pipe.DockerImage.BuildArgs.Value() {
+				cmd.Args = append(cmd.Args, "--build-arg", v)
+			}
 
 			if Pipe.DockerImage.Pull {
 				cmd.Args = append(cmd.Args, "--pull")
