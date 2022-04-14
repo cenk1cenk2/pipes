@@ -1,21 +1,25 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 type (
-	Gitlab struct {
-		Token             string
-		JobToken          string
-		ParentProjectId   string
-		ParentPipelineId  string
-		DownloadArtifacts cli.StringSlice
+	DockerHub struct {
+		Username string
+		Password string
+		Address  string
+	}
+
+	Readme struct {
+		Repository  string
+		File        string
+		Description string
 	}
 
 	Plugin struct {
-		Gitlab Gitlab
+		DockerHub DockerHub
+		Readme    Readme
 	}
 )
 
@@ -25,9 +29,8 @@ func (p Plugin) Exec() error {
 	utils.AddTasks(
 		[]utils.Task{
 			VerifyVariables(),
-			DiscoverArtifacts(),
-			DownloadArtifacts(),
-			UnarchiveArtifacts(),
+			LoginToDockerHubRegistry(),
+			UpdateDockerReadme(),
 		},
 	)
 

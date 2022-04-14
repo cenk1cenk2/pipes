@@ -6,16 +6,13 @@ import (
 )
 
 type (
-	Gitlab struct {
-		Token             string
-		JobToken          string
-		ParentProjectId   string
-		ParentPipelineId  string
-		DownloadArtifacts cli.StringSlice
+	Markdown struct {
+		Patterns  cli.StringSlice
+		Arguments string
 	}
 
 	Plugin struct {
-		Gitlab Gitlab
+		Markdown Markdown
 	}
 )
 
@@ -24,10 +21,8 @@ var Pipe Plugin = Plugin{}
 func (p Plugin) Exec() error {
 	utils.AddTasks(
 		[]utils.Task{
-			VerifyVariables(),
-			DiscoverArtifacts(),
-			DownloadArtifacts(),
-			UnarchiveArtifacts(),
+			FindMarkdownFiles(),
+			RunMarkdownToc(),
 		},
 	)
 

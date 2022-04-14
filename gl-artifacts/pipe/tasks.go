@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"sync"
 
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/sirupsen/logrus"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 type Ctx struct {
@@ -20,7 +20,7 @@ type Ctx struct {
 
 var Context Ctx
 
-func TaskVerifyVariables() utils.Task {
+func VerifyVariables() utils.Task {
 	metadata := utils.TaskMetadata{Context: "verify"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
@@ -72,7 +72,7 @@ func TaskVerifyVariables() utils.Task {
 	}}
 }
 
-func TaskDiscoverArtifacts() utils.Task {
+func DiscoverArtifacts() utils.Task {
 	metadata := utils.TaskMetadata{Context: "discover"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
@@ -118,7 +118,7 @@ func TaskDiscoverArtifacts() utils.Task {
 	}}
 }
 
-func TaskDownloadArtifacts() utils.Task {
+func DownloadArtifacts() utils.Task {
 	metadata := utils.TaskMetadata{Context: "download"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
@@ -169,7 +169,7 @@ func TaskDownloadArtifacts() utils.Task {
 	}}
 }
 
-func TaskUnarchiveArtifacts() utils.Task {
+func UnarchiveArtifacts() utils.Task {
 	metadata := utils.TaskMetadata{
 		Context:        "unarchive",
 		StdOutLogLevel: logrus.DebugLevel,

@@ -1,10 +1,11 @@
 stages:
   - install
   - build
+  - publish-first
   - publish
 
 .publish-docker-common:
-  stage: publish
+  stage: publish-first
   before_script:
     - cd ./docker
   script:
@@ -14,27 +15,23 @@ stages:
   tags:
     - docker
 
-.publish-node-common:
+.publish-docker-to-private:
   stage: publish
-  before_script:
-    - cd ./node
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE --build-arg NODE_VERSION=${NODE_VERSION} .
-    - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
-  tags:
-    - docker
+  trigger:
+    include:
+      - project: devops/gitlab-pipes
+        file: /templates/docker-build-with-artifacts.gitlab-ci.yml
+        ref: main
+    strategy: depend
 
-.publish-gl-artifacts-common:
+.publish-docker-to-public:
   stage: publish
-  before_script:
-    - cd ./gl-artifacts
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
-  tags:
-    - docker
+  trigger:
+    include:
+      - project: devops/gitlab-pipes
+        file: /templates/docker-build-with-artifacts-dockerhub.gitlab-ci.yml
+        ref: main
+    strategy: depend
 
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
@@ -78,15 +75,20 @@ build:
 
       - APP_FOLDER: ./gl-artifacts
         APP_BINARY: gitlab-pipes-gl-artifacts
+
+      - APP_FOLDER: ./markdown-toc
+        APP_BINARY: markdown-toc
+
+      - APP_FOLDER: ./update-docker-hub-readme
+        APP_BINARY: update-docker-hub-readme
   tags:
     - docker
 
-publish-docker:
+publish-first-docker:
   extends: .publish-docker-common
-  parallel:
-    matrix:
-      - APP_BINARY: gitlab-pipes-docker
-        CONTAINER_IMAGE: gitlab-pipes-docker:latest
+  variables:
+    APP_BINARY: gitlab-pipes-docker
+    CONTAINER_IMAGE: gitlab-pipes-docker:latest
   only:
     changes:
       - "docker/**/*"
@@ -96,11 +98,31 @@ publish-docker:
     refs:
       - main
 
+publish-docker:
+  extends: .publish-docker-to-private
+  variables:
+    DOCKERFILE_CONTEXT: ./docker
+    DOCKER_IMAGE_NAME: gitlab-pipes-docker
+    IMAGE_TAGS: latest
+  only:
+    changes:
+      - "docker/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
 publish-node:
-  extends: .publish-node-common
+  extends: .publish-docker-to-private
+  variables:
+    DOCKERFILE_CONTEXT: ./node
+    DOCKER_IMAGE_NAME: gitlab-pipes-node
   parallel:
     matrix:
-      - CONTAINER_IMAGE: gitlab-pipes-node:latest-${NODE_VERSION}
+      - IMAGE_TAGS: ${NODE_VERSION}
+        BUILD_ARGS: --build-arg NODE_VERSION=${NODE_VERSION}
         NODE_VERSION:
           - 16
           - 16-alpine
@@ -114,10 +136,11 @@ publish-node:
       - main
 
 publish-gl-artifacts:
-  extends: .publish-gl-artifacts-common
-  parallel:
-    matrix:
-      - CONTAINER_IMAGE: gitlab-pipes-gl-artifacts:latest
+  extends: .publish-docker-to-private
+  variables:
+    DOCKERFILE_CONTEXT: ./gl-artifacts
+    DOCKER_IMAGE_NAME: gitlab-pipes-gl-artifacts
+    IMAGE_TAGS: latest
   only:
     changes:
       - "gl-artifacts/**/*"
@@ -126,3 +149,36 @@ publish-gl-artifacts:
       - .gitlab-ci.yml
     refs:
       - main
+      - tags
+
+publish-markdown-toc-artifacts:
+  extends: .publish-docker-to-public
+  variables:
+    DOCKERFILE_CONTEXT: ./markdown-toc
+    DOCKER_IMAGE_NAME: pipe-markdown-toc
+    IMAGE_TAGS: latest
+  only:
+    changes:
+      - "markdown-toc/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
+publish-update-docker-hub-readme:
+  extends: .publish-docker-to-public
+  variables:
+    DOCKERFILE_CONTEXT: ./update-docker-hub-readme
+    DOCKER_IMAGE_NAME: pipe-update-docker-hub-readme
+    IMAGE_TAGS: latest
+  only:
+    changes:
+      - "update-docker-hub-readme/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
