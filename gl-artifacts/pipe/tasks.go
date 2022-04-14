@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+	"strings"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -100,13 +101,26 @@ func DiscoverArtifacts() utils.Task {
 				}
 
 				if !found {
-					utils.Log.Fatalln(
+					utils.Log.Errorln(
 						fmt.Sprintf(
 							"Job with name is not found so artifacts are not downloaded: %s ",
 							step,
 						),
 					)
 
+					var available []string = []string{}
+
+					for _, v := range Context.StepsResponse {
+						available = append(available, v.Name)
+
+					}
+
+					utils.Log.Fatalln(
+						fmt.Sprintf(
+							"Available steps are: %s",
+							strings.Join(available, ", "),
+						),
+					)
 				}
 
 			}(step)
