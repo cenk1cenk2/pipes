@@ -26,10 +26,10 @@ func DownloadArtifact(url string) (string, error) {
 	client := grab.NewClient()
 	req, _ := grab.NewRequest(path, url)
 
-	if Pipe.Gitlab.JobToken != "" {
-		req.HTTPRequest.Header.Set("JOB-TOKEN", Pipe.Gitlab.JobToken)
-	} else {
+	if Pipe.Gitlab.Token != "" {
 		req.HTTPRequest.Header.Set("PRIVATE-TOKEN", Pipe.Gitlab.Token)
+	} else {
+		req.HTTPRequest.Header.Set("JOB-TOKEN", Pipe.Gitlab.JobToken)
 	}
 
 	// start download
