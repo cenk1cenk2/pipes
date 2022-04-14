@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
@@ -11,7 +10,7 @@ type (
 		JobToken          string
 		ParentProjectId   string
 		ParentPipelineId  string
-		DownloadArtifacts cli.StringSlice
+		DownloadArtifacts string
 	}
 
 	Plugin struct {

@@ -17,6 +17,7 @@ type Ctx struct {
 	StepIds             []StepId
 	Client              *http.Client
 	DownloadedArtifacts []DownloadedArtifact
+	JobNames            []string
 }
 
 var Context Ctx
@@ -79,10 +80,12 @@ func DiscoverArtifacts() utils.Task {
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		Context.StepIds = []StepId{}
 
-		var wg sync.WaitGroup
-		wg.Add(len(Pipe.Gitlab.DownloadArtifacts.Value()))
+		Context.JobNames = strings.Split(Pipe.Gitlab.DownloadArtifacts, "|")
 
-		for _, step := range Pipe.Gitlab.DownloadArtifacts.Value() {
+		var wg sync.WaitGroup
+		wg.Add(len(Context.JobNames))
+
+		for _, step := range Context.JobNames {
 			go func(step string) {
 				defer wg.Done()
 

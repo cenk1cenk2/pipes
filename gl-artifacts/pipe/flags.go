@@ -41,7 +41,7 @@ var Flags = []cli.Flag{
 		Destination: &Pipe.Gitlab.ParentPipelineId,
 	},
 
-	&cli.StringSliceFlag{
+	&cli.StringFlag{
 		Name:        "gl_pipeline.download_artifacts",
 		Usage:       "Names of the jobs that yield artifacts from the parent job.",
 		Required:    true,
