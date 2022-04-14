@@ -1,0 +1,16 @@
+cache:
+  paths:
+    - vendor/
+  key: ${CI_COMMIT_REF_SLUG}
+
+install:
+  stage: install
+  image: golang:alpine
+  script:
+    - apk add --no-cache --no-progress make git
+    - make install
+  artifacts:
+    paths:
+      - vendor/
+  tags:
+    - docker
