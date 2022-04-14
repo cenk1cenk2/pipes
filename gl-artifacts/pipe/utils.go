@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/cavaliergopher/grab/v3"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/dustin/go-humanize"
 	"github.com/google/uuid"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 func DownloadArtifact(url string) (string, error) {
@@ -34,6 +34,10 @@ func DownloadArtifact(url string) (string, error) {
 
 	// start download
 	res := client.Do(req)
+
+	if res.Filename == "" {
+		res.Filename = fmt.Sprintf("%s.zip", uuid.New().String())
+	}
 
 	utils.Log.Infoln(fmt.Sprintf("Downloading file: %s -> %s", url, res.Filename))
 
