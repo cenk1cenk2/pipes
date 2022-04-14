@@ -4,10 +4,21 @@ stages:
   - publish-first
   - publish
 
-.publish-docker-common:
+.publish-first-docker:
   stage: publish-first
   before_script:
     - cd ./docker
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
+    - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
+  tags:
+    - docker
+
+.publish-first-gl-artifacts:
+  stage: publish-first
+  before_script:
+    - cd ./gl-artifacts
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
     - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
@@ -85,13 +96,27 @@ build:
     - docker
 
 publish-first-docker:
-  extends: .publish-docker-common
+  extends: .publish-first-docker
   variables:
     APP_BINARY: gitlab-pipes-docker
     CONTAINER_IMAGE: gitlab-pipes-docker:latest
   only:
     changes:
       - "docker/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+
+publish-first-gl-artifacts:
+  extends: .publish-first-gl-artifacts
+  variables:
+    APP_BINARY: gl-artifacts
+    CONTAINER_IMAGE: gitlab-pipes-gl-artifacts:latest
+  only:
+    changes:
+      - "gl-artifacts/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml
