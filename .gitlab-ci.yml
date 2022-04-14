@@ -11,7 +11,7 @@ variables:
 .publish-first-docker:
   stage: publish-first
   before_script:
-    - cd ./docker
+    - cd $DOCKER_CONTEXT
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
     - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
@@ -89,6 +89,7 @@ build:
 publish-first-docker:
   extends: .publish-first-docker
   variables:
+    DOCKER_CONTEXT: ./docker
     APP_BINARY: gitlab-pipes-docker
     CONTAINER_IMAGE: gitlab-pipes-docker:latest
   only:
@@ -101,8 +102,9 @@ publish-first-docker:
       - main
 
 publish-first-gl-artifacts:
-  extends: .publish-first-gl-artifacts
+  extends: .publish-first-docker
   variables:
+    DOCKER_CONTEXT: ./gl-artifacts
     APP_BINARY: gl-artifacts
     CONTAINER_IMAGE: gitlab-pipes-gl-artifacts:latest
   only:
