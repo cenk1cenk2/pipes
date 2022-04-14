@@ -129,7 +129,7 @@ publish-docker:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: gitlab-pipes-docker
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./docker, gitlab-pipes-docker]"
+    PARENT_DOWNLOAD_ARTIFACTS: "'build: [./docker, gitlab-pipes-docker]'"
   only:
     changes:
       - "docker/**/*"
@@ -145,7 +145,7 @@ publish-node:
   variables:
     DOCKERFILE_CONTEXT: ./node
     DOCKER_IMAGE_NAME: gitlab-pipes-node
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node, gitlab-pipes-node]"
+    PARENT_DOWNLOAD_ARTIFACTS: "'build: [./node, gitlab-pipes-node]'"
   parallel:
     matrix:
       - IMAGE_TAGS: ${NODE_VERSION}
@@ -168,7 +168,7 @@ publish-gl-artifacts:
     DOCKERFILE_CONTEXT: ./gl-artifacts
     DOCKER_IMAGE_NAME: gitlab-pipes-gl-artifacts
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts, gitlab-pipes-gl-artifacts]"
+    PARENT_DOWNLOAD_ARTIFACTS: "'build: [./gl-artifacts, gitlab-pipes-gl-artifacts]'"
   only:
     changes:
       - "gl-artifacts/**/*"
@@ -185,7 +185,7 @@ publish-markdown-toc-artifacts:
     DOCKERFILE_CONTEXT: ./markdown-toc
     DOCKER_IMAGE_NAME: pipe-markdown-toc
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc, markdown-toc]"
+    PARENT_DOWNLOAD_ARTIFACTS: "'build: [./markdown-toc, markdown-toc]'"
   only:
     changes:
       - "markdown-toc/**/*"
@@ -202,7 +202,7 @@ publish-update-docker-hub-readme:
     DOCKERFILE_CONTEXT: ./update-docker-hub-readme
     DOCKER_IMAGE_NAME: pipe-update-docker-hub-readme
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./update-docker-hub-readme, update-docker-hub-readme]"
+    PARENT_DOWNLOAD_ARTIFACTS: "'build: [./update-docker-hub-readme, update-docker-hub-readme]'"
   only:
     changes:
       - "update-docker-hub-readme/**/*"
