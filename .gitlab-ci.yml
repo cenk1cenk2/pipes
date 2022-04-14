@@ -84,6 +84,8 @@ build:
   tags:
     - docker
 
+# to stop depending on itself
+
 publish-first-docker:
   extends: .publish-first-docker
   variables:
@@ -111,6 +113,8 @@ publish-first-gl-artifacts:
       - .gitlab-ci.yml
     refs:
       - main
+
+# private images
 
 publish-docker:
   extends: .publish-docker-to-private
@@ -167,6 +171,8 @@ publish-gl-artifacts:
     refs:
       - main
       - tags
+
+# public images
 
 publish-markdown-toc-artifacts:
   extends: .publish-docker-to-public
