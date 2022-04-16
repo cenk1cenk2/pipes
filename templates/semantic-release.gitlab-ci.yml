@@ -1,0 +1,13 @@
+variables:
+  PIPES_VERSION: latest
+
+stages:
+  - publish
+
+build-docker-image:
+  stage: docker
+  image: cenk1cenk2/pipe-semantic-release:latest
+  script:
+    - pipe
+  tags:
+    - docker
