@@ -6,7 +6,7 @@ stages:
 
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  LOG_LEVEL: debug
+  LOG_LEVEL: info
 
 .publish-first-docker:
   stage: publish-first
@@ -179,7 +179,7 @@ publish-gl-artifacts:
 
 # public images
 
-publish-markdown-toc-artifacts:
+publish-markdown-toc:
   extends: .publish-docker-to-public
   variables:
     DOCKERFILE_CONTEXT: ./markdown-toc
