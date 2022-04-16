@@ -4,6 +4,8 @@ RUN \
   apk add --no-cache --no-progress git && \
   yarn global add semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec
 
-COPY dist/semantic-release /pipe
+COPY ./dist/semantic-release /usr/bin/pipe
 
-RUN chmod +x /pipe
+RUN chmod +x /usr/bin/pipe && \
+  # smoke test
+  pipe --help
