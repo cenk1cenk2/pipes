@@ -10,9 +10,16 @@ type Ctx struct {
 var Context Ctx
 
 func VerifyVariables() utils.Task {
-	metadata := utils.TaskMetadata{Context: "verify"}
+	return utils.Task{
+		Metadata: utils.TaskMetadata{Context: "verify"},
+		Task: func(t *utils.Task) error {
+			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
 
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
-		return nil
-	}}
+			if err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
 }
