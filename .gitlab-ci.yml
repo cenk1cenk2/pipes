@@ -222,7 +222,7 @@ publish-semantic-release:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./semantic-release, semantic-release]"
   only:
     changes:
-      - "semantiic-release/**/*"
+      - "semantic-release/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml
