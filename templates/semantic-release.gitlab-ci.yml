@@ -4,8 +4,8 @@ variables:
 stages:
   - publish
 
-build-docker-image:
-  stage: docker
+semantic-release:
+  stage: publish
   image: cenk1cenk2/pipe-semantic-release:latest
   script:
     - pipe
