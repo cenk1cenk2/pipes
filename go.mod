@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.0.2
-	github.com/cenk1cenk2/ci-cd-pipes v0.0.0-20220209133649-f50edc05ddd1
 	github.com/docker/docker v20.10.14+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/google/uuid v1.3.0
@@ -15,7 +14,6 @@ require (
 )
 
 require (
-	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/containerd/containerd v1.6.2 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
@@ -23,6 +21,9 @@ require (
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
