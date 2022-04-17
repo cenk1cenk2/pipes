@@ -21,5 +21,6 @@ semantic-release:
       - alpha
       - beta
       - rc
+      - next
   tags:
     - docker
