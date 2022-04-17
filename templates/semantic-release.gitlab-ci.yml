@@ -1,5 +1,10 @@
 variables:
   PIPES_VERSION: latest
+  GIT_AUTHOR_NAME: semantic-release [bot]
+  GIT_AUTHOR_EMAIL: gitlab@kilic.dev
+  GIT_COMMITTER_NAME: semantic-release [bot]
+  GIT_COMMITTER_EMAIL: gitlab@kilic.dev
+  NPM_TOKEN: $NPM_TOKEN
 
 stages:
   - publish
