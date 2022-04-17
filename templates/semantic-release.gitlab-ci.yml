@@ -14,5 +14,12 @@ semantic-release:
   image: cenk1cenk2/pipe-semantic-release:latest
   script:
     - pipe
+  only:
+    refs:
+      - master
+      - main
+      - alpha
+      - beta
+      - rc
   tags:
     - docker
