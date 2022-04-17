@@ -192,7 +192,7 @@ func UpdateDockerReadme() utils.Task {
 			)
 		default:
 			if !b.CanEdit {
-				log.Fatalln(
+				log.Errorln(
 					fmt.Sprintf(
 						"Given user credentials do not have permission to edit repository: %s/%s",
 						Pipe.DockerHub.Address,

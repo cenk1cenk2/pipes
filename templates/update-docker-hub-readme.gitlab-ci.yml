@@ -9,7 +9,7 @@ update-docker-hub-readme:
   stage: post
   image: cenk1cenk2/pipe-update-docker-hub-readme:latest
   script:
-    - pipe
+    - echo "Disabled for now!"
   only:
     refs:
       - master
