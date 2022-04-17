@@ -1,4 +1,4 @@
-module gitlab.kilic.dev/devops/gitlab-pipes
+module gitlab.kilic.dev/devops/pipes
 
 go 1.17
 

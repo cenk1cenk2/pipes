@@ -4,11 +4,11 @@ import (
 	"github.com/urfave/cli/v2"
 
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
-	build "gitlab.kilic.dev/devops/gitlab-pipes/node/build"
-	install "gitlab.kilic.dev/devops/gitlab-pipes/node/install"
-	login "gitlab.kilic.dev/devops/gitlab-pipes/node/login"
-	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
-	run "gitlab.kilic.dev/devops/gitlab-pipes/node/run"
+	build "gitlab.kilic.dev/devops/pipes/node/build"
+	install "gitlab.kilic.dev/devops/pipes/node/install"
+	login "gitlab.kilic.dev/devops/pipes/node/login"
+	pipe "gitlab.kilic.dev/devops/pipes/node/pipe"
+	run "gitlab.kilic.dev/devops/pipes/node/run"
 )
 
 func main() {

@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/nochso/gomd/eol"
-	"gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
+	"gitlab.kilic.dev/devops/pipes/node/pipe"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	u "gitlab.kilic.dev/libraries/go-utils/utils"
 )

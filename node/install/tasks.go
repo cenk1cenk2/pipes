@@ -3,7 +3,7 @@ package install
 import (
 	"os/exec"
 
-	pipe "gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
+	pipe "gitlab.kilic.dev/devops/pipes/node/pipe"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 

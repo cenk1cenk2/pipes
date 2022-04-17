@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	pipe "github.com/cenk1cenk2/ci-cd-pipes/semantic-release/pipe"
+	pipe "gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 

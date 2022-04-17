@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
-	"gitlab.kilic.dev/devops/gitlab-pipes/node/pipe"
+	"gitlab.kilic.dev/devops/pipes/node/pipe"
 )
 
 type Ctx struct {
