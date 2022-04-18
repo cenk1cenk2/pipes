@@ -278,6 +278,8 @@ func DockerBuild() utils.Task {
 				err := cmd.Run()
 
 				if err != nil {
+					t.Log.Debugln("Creating a new buildx instance failed, trying to use the existing one.")
+
 					cmd = exec.Command(DOCKER_EXE, "buildx", "use", "gitlab")
 
 					err := cmd.Run()
