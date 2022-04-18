@@ -249,9 +249,10 @@ func DockerBuild() utils.Task {
 					cmd.Args = append(cmd.Args, "--build-arg", v)
 				}
 
-				if Pipe.DockerImage.Pull {
-					cmd.Args = append(cmd.Args, "--pull")
-				}
+				// TODO: it does not like the pull flag eventhough it is defined in documentation
+				// if Pipe.DockerImage.Pull {
+				// 	cmd.Args = append(cmd.Args, "--pull")
+				// }
 
 				cmd.Args = append(cmd.Args, "--push")
 
