@@ -130,17 +130,37 @@ func VerifyVariables() utils.Task {
 					return err
 				}
 
-				Context.Tags = strings.Split(string(content), ",")
+				tags := strings.Split(string(content), ",")
+
+				Context.Tags = []string{}
 
 				re := regexp.MustCompile(`\r?\n`)
-				for i, v := range Context.Tags {
-					Context.Tags[i] = re.ReplaceAllString(v, "")
+
+				errs := []error{}
+
+				for _, v := range tags {
+					tag, err := AddDockerTag(re.ReplaceAllString(v, ""))
+
+					if err != nil {
+						errs = append(errs, err)
+					}
+
+					Context.Tags = append(Context.Tags, tag)
+
+				}
+
+				if len(errs) > 0 {
+					for _, v := range errs {
+						t.Log.Errorln(v)
+					}
+
+					return fmt.Errorf("Errors encountered while injecting environment variables.")
 				}
 			} else if errors.Is(err, os.ErrNotExist) {
 				if Pipe.DockerImage.TagsFile != "" {
 					t.Log.Warnln(fmt.Sprintf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile))
 
-					t.Log.Info("Nothing to do. Exitting...")
+					t.Log.Warnln("Nothing to do. Exitting...")
 					os.Exit(0)
 				} else {
 					t.Log.Debugln(fmt.Sprintf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile))
@@ -229,8 +249,41 @@ func DockerLogin() utils.Task {
 	}
 }
 
-func DockerBuild() utils.Task {
-	return utils.Task{Metadata: utils.TaskMetadata{Context: "build"},
+func DockerSetupBuildx() utils.Task {
+	metadata := utils.TaskMetadata{Context: "setup-buildx", Skip: Pipe.Docker.UseBuildx}
+
+	return utils.Task{
+		Metadata: metadata,
+		Task: func(t *utils.Task) error {
+			t.Log.Infoln("Creating a new instance of docker buildx.")
+
+			cmd := exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "gitlab")
+
+			err := utils.ExecuteAndPipeToLogger(cmd, metadata)
+
+			if err != nil {
+				t.Log.Warnln(
+					"Creating a new docker buildx instance failed, trying to use the existing one.",
+				)
+				cmd = exec.Command(DOCKER_EXE, "buildx", "use", "gitlab")
+
+				err := utils.ExecuteAndPipeToLogger(cmd, metadata)
+
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
+	}
+}
+
+func DockerBuildx() utils.Task {
+	metadata := utils.TaskMetadata{Context: "buildx", Skip: Pipe.Docker.UseBuildx}
+
+	return utils.Task{
+		Metadata: metadata,
 		Task: func(t *utils.Task) error {
 			t.Log.Infoln(
 				fmt.Sprintf(
@@ -240,92 +293,98 @@ func DockerBuild() utils.Task {
 				),
 			)
 
-			if !Pipe.Docker.UseBuildx {
-				cmd := exec.Command(DOCKER_EXE, "build")
+			t.Log.Infoln("Using Docker Buildx for building the Docker image.")
 
-				for _, v := range Pipe.DockerImage.BuildArgs.Value() {
-					cmd.Args = append(cmd.Args, "--build-arg", v)
-				}
+			cmd := exec.Command(
+				DOCKER_EXE,
+				"run",
+				"--rm",
+				"--privileged",
+				"multiarch/qemu-user-static",
+				"--reset",
+				"-p",
+				"yes",
+			)
 
-				if Pipe.DockerImage.Pull {
-					cmd.Args = append(cmd.Args, "--pull")
-				}
+			t.Commands = append(t.Commands, cmd)
 
-				for _, tag := range Context.Tags {
-					cmd.Args = append(cmd.Args, "-t", tag)
-				}
+			cmd = exec.Command(DOCKER_EXE, "buildx", "inspect", "--bootstrap")
 
-				cmd.Dir = Pipe.DockerFile.Context
-				t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+			t.Commands = append(t.Commands, cmd)
 
-				cmd.Args = append(
-					cmd.Args,
-					"--file",
-					Pipe.DockerFile.Name,
-					".",
-				)
+			cmd = exec.Command(DOCKER_EXE, "buildx", "build")
 
-				t.Commands = append(t.Commands, cmd)
-			} else {
-				t.Log.Infoln("Using Docker Buildx for building the Docker image.")
-
-				cmd := exec.Command(DOCKER_EXE, "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes")
-
-				t.Commands = append(t.Commands, cmd)
-
-				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "gitlab")
-
-				err := cmd.Run()
-
-				if err != nil {
-					t.Log.Debugln("Creating a new buildx instance failed, trying to use the existing one.")
-
-					cmd = exec.Command(DOCKER_EXE, "buildx", "use", "gitlab")
-
-					err := cmd.Run()
-
-					if err != nil {
-						return err
-					}
-				}
-
-				cmd = exec.Command(DOCKER_EXE, "buildx", "inspect", "--bootstrap")
-
-				t.Commands = append(t.Commands, cmd)
-
-				cmd = exec.Command(DOCKER_EXE, "buildx", "build")
-
-				for _, v := range Pipe.DockerImage.BuildArgs.Value() {
-					cmd.Args = append(cmd.Args, "--build-arg", v)
-				}
-
-				if Pipe.DockerImage.Pull {
-					cmd.Args = append(cmd.Args, "--pull")
-				}
-
-				cmd.Args = append(cmd.Args, "--push")
-
-				if Pipe.Docker.BuildxPlatforms != "" {
-					cmd.Args = append(cmd.Args, "--platform", Pipe.Docker.BuildxPlatforms)
-				}
-
-				for _, tag := range Context.Tags {
-					cmd.Args = append(cmd.Args, "-t", tag)
-				}
-
-				cmd.Dir = Pipe.DockerFile.Context
-				t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
-
-				cmd.Args = append(
-					cmd.Args,
-					"--file",
-					Pipe.DockerFile.Name,
-					".",
-				)
-
-				t.Commands = append(t.Commands, cmd)
-
+			for _, v := range Pipe.DockerImage.BuildArgs.Value() {
+				cmd.Args = append(cmd.Args, "--build-arg", v)
 			}
+
+			if Pipe.DockerImage.Pull {
+				cmd.Args = append(cmd.Args, "--pull")
+			}
+
+			cmd.Args = append(cmd.Args, "--push")
+
+			if Pipe.Docker.BuildxPlatforms != "" {
+				cmd.Args = append(cmd.Args, "--platform", Pipe.Docker.BuildxPlatforms)
+			}
+
+			for _, tag := range Context.Tags {
+				cmd.Args = append(cmd.Args, "-t", tag)
+			}
+
+			cmd.Dir = Pipe.DockerFile.Context
+			t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+
+			cmd.Args = append(
+				cmd.Args,
+				"--file",
+				Pipe.DockerFile.Name,
+				".",
+			)
+
+			t.Commands = append(t.Commands, cmd)
+
+			return nil
+		},
+	}
+}
+
+func DockerBuild() utils.Task {
+	return utils.Task{Metadata: utils.TaskMetadata{Context: "build", Skip: !Pipe.Docker.UseBuildx},
+		Task: func(t *utils.Task) error {
+			t.Log.Infoln(
+				fmt.Sprintf(
+					"Building Docker image: %s in %s",
+					Pipe.DockerFile.Name,
+					Pipe.DockerFile.Context,
+				),
+			)
+
+			cmd := exec.Command(DOCKER_EXE, "build")
+
+			for _, v := range Pipe.DockerImage.BuildArgs.Value() {
+				cmd.Args = append(cmd.Args, "--build-arg", v)
+			}
+
+			if Pipe.DockerImage.Pull {
+				cmd.Args = append(cmd.Args, "--pull")
+			}
+
+			for _, tag := range Context.Tags {
+				cmd.Args = append(cmd.Args, "-t", tag)
+			}
+
+			cmd.Dir = Pipe.DockerFile.Context
+			t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+
+			cmd.Args = append(
+				cmd.Args,
+				"--file",
+				Pipe.DockerFile.Name,
+				".",
+			)
+
+			t.Commands = append(t.Commands, cmd)
 
 			return nil
 		}}
