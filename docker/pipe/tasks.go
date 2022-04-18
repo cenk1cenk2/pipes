@@ -258,7 +258,7 @@ func DockerSetupBuildx() utils.Task {
 
 			cmd := exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "gitlab")
 
-			err := utils.ExecuteAndPipeToLogger(cmd, metadata)
+			err := cmd.Run()
 
 			if err != nil {
 				t.Log.Warnln(
@@ -266,7 +266,7 @@ func DockerSetupBuildx() utils.Task {
 				)
 				cmd = exec.Command(DOCKER_EXE, "buildx", "use", "gitlab")
 
-				err := utils.ExecuteAndPipeToLogger(cmd, metadata)
+				err := cmd.Run()
 
 				if err != nil {
 					return err
