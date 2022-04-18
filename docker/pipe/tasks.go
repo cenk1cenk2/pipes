@@ -135,7 +135,7 @@ func DockerVersion() utils.Task {
 			if Pipe.Docker.UseBuildx {
 				t.Log.Infoln("Docker Buildx is enabled.")
 
-				cmd := exec.Command(DOCKER_EXE, "buildx", "--version")
+				cmd := exec.Command(DOCKER_EXE, "buildx", "version")
 
 				t.Commands = append(t.Commands, cmd)
 			}
