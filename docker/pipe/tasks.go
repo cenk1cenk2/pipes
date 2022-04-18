@@ -250,7 +250,7 @@ func DockerLogin() utils.Task {
 }
 
 func DockerSetupBuildx() utils.Task {
-	metadata := utils.TaskMetadata{Context: "setup-buildx", Skip: Pipe.Docker.UseBuildx}
+	metadata := utils.TaskMetadata{Context: "setup-buildx", Skip: !Pipe.Docker.UseBuildx}
 
 	return utils.Task{
 		Metadata: metadata,
@@ -280,7 +280,7 @@ func DockerSetupBuildx() utils.Task {
 }
 
 func DockerBuildx() utils.Task {
-	metadata := utils.TaskMetadata{Context: "buildx", Skip: Pipe.Docker.UseBuildx}
+	metadata := utils.TaskMetadata{Context: "buildx", Skip: !Pipe.Docker.UseBuildx}
 
 	return utils.Task{
 		Metadata: metadata,
@@ -350,7 +350,7 @@ func DockerBuildx() utils.Task {
 }
 
 func DockerBuild() utils.Task {
-	return utils.Task{Metadata: utils.TaskMetadata{Context: "build", Skip: !Pipe.Docker.UseBuildx},
+	return utils.Task{Metadata: utils.TaskMetadata{Context: "build", Skip: Pipe.Docker.UseBuildx},
 		Task: func(t *utils.Task) error {
 			t.Log.Infoln(
 				fmt.Sprintf(
