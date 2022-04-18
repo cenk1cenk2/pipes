@@ -268,9 +268,19 @@ func DockerBuild() utils.Task {
 
 				t.Commands = append(t.Commands, cmd)
 
-				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--node", "builder", "--name", "builder", "--append")
+				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "gitlab")
 
-				t.Commands = append(t.Commands, cmd)
+				err := cmd.Run()
+
+				if err != nil {
+					cmd = exec.Command(DOCKER_EXE, "buildx", "use", "gitlab")
+
+					err := cmd.Run()
+
+					if err != nil {
+						return err
+					}
+				}
 
 				cmd = exec.Command(DOCKER_EXE, "buildx", "inspect", "--bootstrap")
 
