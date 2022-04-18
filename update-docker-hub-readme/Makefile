@@ -21,6 +21,6 @@ clean:
 build: build-linux-amd64
 
 build-linux-amd64:
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 $(GOBUILD) -mod=readonly -o $(BINARY_FOLDER)/$(BINARY_NAME)
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -mod=readonly -o $(BINARY_FOLDER)/$(BINARY_NAME)
 
 .PHONY: build
