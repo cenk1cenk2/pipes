@@ -17,6 +17,7 @@ semantic-release:
   artifacts:
     paths:
       - .tags
+      - "**/.tags"
   only:
     refs:
       - master
