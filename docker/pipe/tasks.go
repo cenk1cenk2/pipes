@@ -261,12 +261,7 @@ func DockerBuild() utils.Task {
 
 				t.Commands = append(t.Commands, cmd)
 
-				re, err := regexp.Compile(`[^\w]`)
-				if err != nil {
-					return err
-				}
-
-				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", fmt.Sprintf("%s_%s", re.ReplaceAllString(os.Getenv("CI_PROJECT_PATH"), "_"), os.Getenv("CI_COMMIT_SHA")))
+				cmd = exec.Command(DOCKER_EXE, "buildx", "use")
 
 				t.Commands = append(t.Commands, cmd)
 
