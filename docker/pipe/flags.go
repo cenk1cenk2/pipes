@@ -126,6 +126,15 @@ var Flags = []cli.Flag{
 		Destination: &Pipe.DockerImage.Pull,
 	},
 
+	&cli.StringFlag{
+		Name:        "docker_image.tags_file",
+		Usage:       "Read tags from a file.",
+		Required:    false,
+		EnvVars:     []string{"TAGS_FILE"},
+		Value:       ".tags",
+		Destination: &Pipe.DockerImage.TagsFile,
+	},
+
 	&cli.BoolFlag{
 		Name:        "docker_image.inspect",
 		Usage:       "Inspect after pushing the image.",

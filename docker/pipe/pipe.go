@@ -21,6 +21,7 @@ type (
 		Tags                        cli.StringSlice
 		TagAsLatestForTagsRegex     string
 		TagAsLatestForBranchesRegex string
+		TagsFile                    string
 		Pull                        bool
 		Inspect                     bool
 		BuildArgs                   cli.StringSlice

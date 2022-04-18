@@ -14,6 +14,9 @@ semantic-release:
   image: cenk1cenk2/pipe-semantic-release:latest
   script:
     - pipe
+  artifacts:
+    paths:
+      - .tags
   only:
     refs:
       - master

@@ -2,7 +2,9 @@ package pipe
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -40,7 +42,6 @@ func VerifyVariables() utils.Task {
 			}
 
 			if Pipe.DockerImage.TagAsLatestForTagsRegex != "" {
-
 				err := json.Unmarshal(
 					[]byte(Pipe.DockerImage.TagAsLatestForTagsRegex),
 					&TagAsLatestForTagsRegex,
@@ -116,8 +117,32 @@ func VerifyVariables() utils.Task {
 				}
 			}
 
+			if _, err := os.Stat(Pipe.DockerImage.TagsFile); err == nil {
+				t.Log.Infoln(
+					fmt.Sprintf(
+						"Tags file does exists, will use it instead: %s",
+						Pipe.DockerImage.TagsFile,
+					),
+				)
+
+				content, err := ioutil.ReadFile(Pipe.DockerImage.TagsFile)
+				if err != nil {
+					return err
+				}
+
+				Context.Tags = strings.Split(string(content), ",")
+			} else if errors.Is(err, os.ErrNotExist) {
+				t.Log.Debugln(fmt.Sprintf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile))
+			} else {
+				t.Log.Warnln(fmt.Sprintf("Can not read the tags file: %s", Pipe.DockerImage.TagsFile))
+			}
+
 			Context.Tags = u.RemoveDuplicateStr(
 				u.DeleteEmptyStringsFromSlice(Context.Tags),
+			)
+
+			t.Log.Debugln(
+				fmt.Sprintf("Image tags: %s", strings.Join(Context.Tags, ", ")),
 			)
 
 			return nil
@@ -236,7 +261,12 @@ func DockerBuild() utils.Task {
 
 				t.Commands = append(t.Commands, cmd)
 
-				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", fmt.Sprintf("%s_%s", os.Getenv("CI_PROJECT_PATH"), os.Getenv("CI_COMMIT_SHA")))
+				re, err := regexp.Compile(`[^\w]`)
+				if err != nil {
+					return err
+				}
+
+				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", fmt.Sprintf("%s_%s", re.ReplaceAllString(os.Getenv("CI_PROJECT_PATH"), "_"), os.Getenv("CI_COMMIT_SHA")))
 
 				t.Commands = append(t.Commands, cmd)
 
