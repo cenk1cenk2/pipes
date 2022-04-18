@@ -131,7 +131,7 @@ var Flags = []cli.Flag{
 		Usage:       "Read tags from a file.",
 		Required:    false,
 		EnvVars:     []string{"TAGS_FILE"},
-		Value:       ".tags",
+		Value:       "",
 		Destination: &Pipe.DockerImage.TagsFile,
 	},
 
