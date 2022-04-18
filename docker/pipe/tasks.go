@@ -120,7 +120,7 @@ func VerifyVariables() utils.Task {
 			if _, err := os.Stat(Pipe.DockerImage.TagsFile); err == nil {
 				t.Log.Infoln(
 					fmt.Sprintf(
-						"Tags file does exists, will use it instead: %s",
+						"Tags file does exists, will override: %s",
 						Pipe.DockerImage.TagsFile,
 					),
 				)
@@ -146,7 +146,6 @@ func VerifyVariables() utils.Task {
 					}
 
 					Context.Tags = append(Context.Tags, tag)
-
 				}
 
 				if len(errs) > 0 {
@@ -173,7 +172,7 @@ func VerifyVariables() utils.Task {
 				u.DeleteEmptyStringsFromSlice(Context.Tags),
 			)
 
-			t.Log.Debugln(
+			t.Log.Infoln(
 				fmt.Sprintf("Image tags: %s", strings.Join(Context.Tags, ", ")),
 			)
 
