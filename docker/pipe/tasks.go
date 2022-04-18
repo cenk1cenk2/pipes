@@ -131,6 +131,11 @@ func VerifyVariables() utils.Task {
 				}
 
 				Context.Tags = strings.Split(string(content), ",")
+
+				re := regexp.MustCompile(`\r?\n`)
+				for i, v := range Context.Tags {
+					Context.Tags[i] = re.ReplaceAllString(v, "")
+				}
 			} else if errors.Is(err, os.ErrNotExist) {
 				if Pipe.DockerImage.TagsFile != "" {
 					t.Log.Warnln(fmt.Sprintf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile))
