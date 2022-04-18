@@ -1,14 +1,19 @@
 package pipe
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/urfave/cli/v2"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 type (
 	Git struct {
 		Branch string
 		Tag    string
+	}
+
+	Docker struct {
+		UseBuildx       bool
+		BuildxPlatforms string
 	}
 
 	DockerImage struct {
@@ -33,10 +38,11 @@ type (
 	}
 
 	Plugin struct {
-		Git            Git
-		DockerImage    DockerImage
-		DockerFile     DockerFile
-		DockerRegistry DockerRegistry
+		Git
+		Docker
+		DockerImage
+		DockerFile
+		DockerRegistry
 	}
 )
 

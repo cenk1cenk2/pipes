@@ -81,6 +81,24 @@ var Flags = []cli.Flag{
 		Destination: &Pipe.DockerRegistry.Password,
 	},
 
+	&cli.BoolFlag{
+		Name:        "docker.use_buildx",
+		Usage:       "Use docker buildx builder.",
+		Required:    false,
+		EnvVars:     []string{"DOCKER_USE_BUILDX"},
+		Value:       false,
+		Destination: &Pipe.Docker.UseBuildx,
+	},
+
+	&cli.StringFlag{
+		Name:        "docker.buildx_platforms",
+		Usage:       "Platform arguments for docker buildx.",
+		Required:    false,
+		EnvVars:     []string{"DOCKER_BUILDX_PLATFORMS"},
+		Value:       "",
+		Destination: &Pipe.Docker.BuildxPlatforms,
+	},
+
 	&cli.StringFlag{
 		Name:        "docker_image.tag_as_latest_for_tags_regex",
 		Usage:       "Regex pattern to tag the image as latest. format: json(string[])",

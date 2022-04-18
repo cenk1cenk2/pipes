@@ -130,7 +130,15 @@ func DockerVersion() utils.Task {
 		Task: func(t *utils.Task) error {
 			cmd := exec.Command(DOCKER_EXE, "--version")
 
-			t.Command = cmd
+			t.Commands = append(t.Commands, cmd)
+
+			if Pipe.Docker.UseBuildx {
+				t.Log.Infoln("Docker Buildx is enabled.")
+
+				cmd := exec.Command(DOCKER_EXE, "buildx", "--version")
+
+				t.Commands = append(t.Commands, cmd)
+			}
 
 			return nil
 		},
@@ -194,32 +202,78 @@ func DockerBuild() utils.Task {
 				),
 			)
 
-			cmd := exec.Command(DOCKER_EXE, "build")
+			if !Pipe.Docker.UseBuildx {
+				cmd := exec.Command(DOCKER_EXE, "build")
 
-			for _, v := range Pipe.DockerImage.BuildArgs.Value() {
-				cmd.Args = append(cmd.Args, "--build-arg", v)
+				for _, v := range Pipe.DockerImage.BuildArgs.Value() {
+					cmd.Args = append(cmd.Args, "--build-arg", v)
+				}
+
+				if Pipe.DockerImage.Pull {
+					cmd.Args = append(cmd.Args, "--pull")
+				}
+
+				for _, tag := range Context.Tags {
+					cmd.Args = append(cmd.Args, "-t", tag)
+				}
+
+				cmd.Dir = Pipe.DockerFile.Context
+				t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+
+				cmd.Args = append(
+					cmd.Args,
+					"--file",
+					Pipe.DockerFile.Name,
+					".",
+				)
+
+				t.Commands = append(t.Commands, cmd)
+			} else {
+				t.Log.Infoln("Using Docker Buildx for building the Docker image.")
+
+				cmd := exec.Command(DOCKER_EXE, "run", "--rm", "--privileged", "multiarch/qemu-user-static", "--reset", "-p", "yes")
+
+				t.Commands = append(t.Commands, cmd)
+
+				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "builder")
+
+				t.Commands = append(t.Commands, cmd)
+
+				cmd = exec.Command(DOCKER_EXE, "buildx", "inspect", "--bootstrap")
+
+				t.Commands = append(t.Commands, cmd)
+
+				for _, v := range Pipe.DockerImage.BuildArgs.Value() {
+					cmd.Args = append(cmd.Args, "--build-arg", v)
+				}
+
+				if Pipe.DockerImage.Pull {
+					cmd.Args = append(cmd.Args, "--pull")
+				}
+
+				cmd.Args = append(cmd.Args, "--push")
+
+				if Pipe.Docker.BuildxPlatforms != "" {
+					cmd.Args = append(cmd.Args, "--platform", Pipe.Docker.BuildxPlatforms)
+				}
+
+				for _, tag := range Context.Tags {
+					cmd.Args = append(cmd.Args, "-t", tag)
+				}
+
+				cmd.Dir = Pipe.DockerFile.Context
+				t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+
+				cmd.Args = append(
+					cmd.Args,
+					"--file",
+					Pipe.DockerFile.Name,
+					".",
+				)
+
+				t.Commands = append(t.Commands, cmd)
+
 			}
-
-			if Pipe.DockerImage.Pull {
-				cmd.Args = append(cmd.Args, "--pull")
-			}
-
-			for _, tag := range Context.Tags {
-				cmd.Args = append(cmd.Args, "-t", tag)
-			}
-
-			cmd.Dir = Pipe.DockerFile.Context
-
-			cmd.Args = append(
-				cmd.Args,
-				"--file",
-				Pipe.DockerFile.Name,
-				".",
-			)
-
-			t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
-
-			t.Command = cmd
 
 			return nil
 		}}
@@ -227,7 +281,7 @@ func DockerBuild() utils.Task {
 
 func DockerPush() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "push"},
+		Metadata: utils.TaskMetadata{Context: "push", Skip: Pipe.Docker.UseBuildx},
 		Task: func(t *utils.Task) error {
 			t.Commands = []utils.Command{}
 
