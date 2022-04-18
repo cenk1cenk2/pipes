@@ -3,6 +3,7 @@ package pipe
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -235,7 +236,7 @@ func DockerBuild() utils.Task {
 
 				t.Commands = append(t.Commands, cmd)
 
-				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--append", "--name", "builder")
+				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", fmt.Sprintf("%s_%s", os.Getenv("CI_PROJECT_PATH"), os.Getenv("CI_COMMIT_SHA")))
 
 				t.Commands = append(t.Commands, cmd)
 
