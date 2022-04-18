@@ -133,7 +133,10 @@ func VerifyVariables() utils.Task {
 				Context.Tags = strings.Split(string(content), ",")
 			} else if errors.Is(err, os.ErrNotExist) {
 				if Pipe.DockerImage.TagsFile != "" {
-					return fmt.Errorf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile)
+					t.Log.Warnln(fmt.Sprintf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile))
+
+					t.Log.Info("Nothing to do. Exitting...")
+					os.Exit(0)
 				} else {
 					t.Log.Debugln(fmt.Sprintf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile))
 				}
