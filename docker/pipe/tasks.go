@@ -235,7 +235,7 @@ func DockerBuild() utils.Task {
 
 				t.Commands = append(t.Commands, cmd)
 
-				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "builder")
+				cmd = exec.Command(DOCKER_EXE, "buildx", "create", "--append", "--name", "builder")
 
 				t.Commands = append(t.Commands, cmd)
 
