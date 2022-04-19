@@ -122,6 +122,8 @@ func GenerateNpmRc() utils.Task {
 				go func(i int, file string) {
 					defer wg.Done()
 
+					t.Log.Debugln(fmt.Sprintf("Creating npmrc file: %s", file))
+
 					f, err := os.OpenFile(file,
 						os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
