@@ -95,7 +95,7 @@ var Flags = []cli.Flag{
 		Usage:       "Platform arguments for docker buildx.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_BUILDX_PLATFORMS"},
-		Value:       "",
+		Value:       "linux/amd64",
 		Destination: &Pipe.Docker.BuildxPlatforms,
 	},
 
