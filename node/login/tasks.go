@@ -21,7 +21,7 @@ var Context Ctx
 
 func VerifyVariables() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify-login", Skip: Pipe.Npm.Login == ""},
+		Metadata: utils.TaskMetadata{Context: "verify", Skip: Pipe.Npm.Login == ""},
 		Task: func(t *utils.Task) error {
 			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
 
@@ -63,54 +63,6 @@ func VerifyVariables() utils.Task {
 
 				t.Log.Fatalln("Errors encountered while validation.")
 			}
-
-			return nil
-		},
-	}
-}
-
-func VerifyNpmLogin() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{
-			Context:        "login",
-			Skip:           Pipe.Npm.Login == "",
-			StdOutLogLevel: logrus.DebugLevel,
-		},
-		Task: func(t *utils.Task) error {
-			var wg sync.WaitGroup
-			wg.Add(len(Context.NpmLogin))
-
-			for i, v := range Context.NpmLogin {
-				go func(i int, v NpmLoginJson) {
-					defer wg.Done()
-
-					t.Log.Infoln(
-						fmt.Sprintf("Checking login credentials for Npm registry: %s", v.Registry),
-					)
-
-					cmd := exec.Command("npm", "whoami")
-
-					var url string
-
-					if v.UseHttps {
-						url = fmt.Sprintf("https://%s", v.Registry)
-					} else {
-						url = fmt.Sprintf("http://%s", v.Registry)
-					}
-
-					cmd.Args = append(
-						cmd.Args,
-						"--configfile",
-						Pipe.Npm.NpmRcFile,
-						"--registry",
-						url,
-					)
-
-					t.Commands = append(t.Commands, cmd)
-				}(i, v)
-			}
-
-			wg.Wait()
 
 			return nil
 		},
@@ -171,6 +123,54 @@ func GenerateNpmRc() utils.Task {
 			if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
 				return err
 			}
+
+			return nil
+		},
+	}
+}
+
+func VerifyNpmLogin() utils.Task {
+	return utils.Task{
+		Metadata: utils.TaskMetadata{
+			Context:        "verify-login",
+			Skip:           Pipe.Npm.Login == "",
+			StdOutLogLevel: logrus.DebugLevel,
+		},
+		Task: func(t *utils.Task) error {
+			var wg sync.WaitGroup
+			wg.Add(len(Context.NpmLogin))
+
+			for i, v := range Context.NpmLogin {
+				go func(i int, v NpmLoginJson) {
+					defer wg.Done()
+
+					t.Log.Infoln(
+						fmt.Sprintf("Checking login credentials for Npm registry: %s", v.Registry),
+					)
+
+					cmd := exec.Command("npm", "whoami")
+
+					var url string
+
+					if v.UseHttps {
+						url = fmt.Sprintf("https://%s", v.Registry)
+					} else {
+						url = fmt.Sprintf("http://%s", v.Registry)
+					}
+
+					cmd.Args = append(
+						cmd.Args,
+						"--configfile",
+						Pipe.Npm.NpmRcFile,
+						"--registry",
+						url,
+					)
+
+					t.Commands = append(t.Commands, cmd)
+				}(i, v)
+			}
+
+			wg.Wait()
 
 			return nil
 		},
