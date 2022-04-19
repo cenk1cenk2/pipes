@@ -14,12 +14,12 @@ var Flags = []cli.Flag{
 		Destination: &Pipe.Npm.Login,
 	},
 
-	&cli.StringFlag{
+	&cli.StringSliceFlag{
 		Name:        "npm.npmrc_file",
 		Usage:       ".npmrc file to use.",
 		Required:    false,
 		EnvVars:     []string{"NPM_NPMRC_FILE"},
-		Value:       ".npmrc",
+		Value:       cli.NewStringSlice(".npmrc"),
 		Destination: &Pipe.Npm.NpmRcFile,
 	},
 

@@ -1,13 +1,14 @@
 package login
 
 import (
+	"github.com/urfave/cli/v2"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 type (
 	Npm struct {
 		Login     string `validate:"json"`
-		NpmRcFile string
+		NpmRcFile cli.StringSlice
 		NpmRc     string
 	}
 

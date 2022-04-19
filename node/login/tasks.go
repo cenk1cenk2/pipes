@@ -76,7 +76,9 @@ func GenerateNpmRc() utils.Task {
 			Skip:    Pipe.Npm.Login == "" && Pipe.Npm.NpmRc == "",
 		},
 		Task: func(t *utils.Task) error {
-			t.Log.Debugln(fmt.Sprintf(".npmrc file: %s", Pipe.Npm.NpmRcFile))
+			t.Log.Debugln(
+				fmt.Sprintf(".npmrc file: %s", strings.Join(Pipe.Npm.NpmRcFile.Value(), ", ")),
+			)
 
 			npmrc := []string{}
 
@@ -107,21 +109,44 @@ func GenerateNpmRc() utils.Task {
 			}
 
 			if Pipe.Npm.NpmRc != "" {
-				t.Log.Infoln("Appending given npmrc file.")
+				t.Log.Infoln("Appending the given npmrc file.")
 
 				npmrc = append(npmrc, strings.Split(Pipe.Npm.NpmRc, eol.OSDefault().String())...)
 			}
 
-			f, err := os.OpenFile(Pipe.Npm.NpmRcFile,
-				os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			errs := make(chan error, len(Pipe.Npm.NpmRcFile.Value()))
+			for i, v := range Pipe.Npm.NpmRcFile.Value() {
+				go func(errs chan error, i int, file string) {
+					f, err := os.OpenFile(file,
+						os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
-			if err != nil {
-				return err
+					if err != nil {
+						errs <- err
+
+						return
+					}
+
+					defer f.Close()
+					if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
+						errs <- err
+
+						return
+					}
+
+					errs <- nil
+				}(errs, i, v)
 			}
 
-			defer f.Close()
-			if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
-				return err
+			success := true
+			for err := range errs {
+				if err != nil {
+					success = false
+					t.Log.Errorln(err)
+				}
+			}
+
+			if !success {
+				t.Log.Fatalln("Encountered errors while generating npmrc files.")
 			}
 
 			return nil
@@ -161,7 +186,7 @@ func VerifyNpmLogin() utils.Task {
 					cmd.Args = append(
 						cmd.Args,
 						"--configfile",
-						Pipe.Npm.NpmRcFile,
+						Pipe.Npm.NpmRcFile.Value()[0],
 						"--registry",
 						url,
 					)
