@@ -114,7 +114,7 @@ func GenerateNpmRc() utils.Task {
 				npmrc = append(npmrc, strings.Split(Pipe.Npm.NpmRc, eol.OSDefault().String())...)
 			}
 
-			var wg *sync.WaitGroup
+			var wg sync.WaitGroup
 			wg.Add(len(Pipe.Npm.NpmRcFile.Value()))
 			errs := []error{}
 
