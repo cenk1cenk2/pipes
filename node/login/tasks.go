@@ -8,9 +8,9 @@ import (
 	"strings"
 	"sync"
 
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/nochso/gomd/eol"
 	"github.com/sirupsen/logrus"
+	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
 type Ctx struct {
@@ -101,7 +101,7 @@ func VerifyNpmLogin() utils.Task {
 					cmd.Args = append(
 						cmd.Args,
 						"--configfile",
-						Pipe.Npm.NpmRc,
+						Pipe.Npm.NpmRcFile,
 						"--registry",
 						url,
 					)
@@ -119,33 +119,48 @@ func VerifyNpmLogin() utils.Task {
 
 func GenerateNpmRc() utils.Task {
 	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "generate-npmrc", Skip: Pipe.Npm.Login == ""},
+		Metadata: utils.TaskMetadata{
+			Context: "generate-npmrc",
+			Skip:    Pipe.Npm.Login == "" && Pipe.Npm.NpmRc == "",
+		},
 		Task: func(t *utils.Task) error {
-			var wg sync.WaitGroup
-			wg.Add(len(Context.NpmLogin))
-
-			t.Log.Debugln(fmt.Sprintf(".npmrc file: %s", Pipe.Npm.NpmRc))
+			t.Log.Debugln(fmt.Sprintf(".npmrc file: %s", Pipe.Npm.NpmRcFile))
 
 			npmrc := []string{}
 
-			for i, v := range Context.NpmLogin {
-				go func(i int, v NpmLoginJson) {
-					defer wg.Done()
+			if Pipe.Npm.Login != "" {
+				t.Log.Infoln("Logging in to given registries with credentials.")
 
-					t.Log.Infoln(
-						fmt.Sprintf(
-							"Generating login credentials for Npm registry: %s",
-							v.Registry,
-						),
-					)
+				var wg sync.WaitGroup
+				wg.Add(len(Context.NpmLogin))
+				for i, v := range Context.NpmLogin {
+					go func(i int, v NpmLoginJson) {
+						defer wg.Done()
 
-					npmrc = append(npmrc, fmt.Sprintf("//%s/:_authToken=%s", v.Registry, v.Token))
-				}(i, v)
+						t.Log.Infoln(
+							fmt.Sprintf(
+								"Generating login credentials for the registry: %s",
+								v.Registry,
+							),
+						)
+
+						npmrc = append(
+							npmrc,
+							fmt.Sprintf("//%s/:_authToken=%s", v.Registry, v.Token),
+						)
+					}(i, v)
+				}
+
+				wg.Wait()
 			}
 
-			wg.Wait()
+			if Pipe.Npm.NpmRc != "" {
+				t.Log.Infoln("Appending given npmrc file.")
 
-			f, err := os.OpenFile(Pipe.Npm.NpmRc,
+				npmrc = append(npmrc, strings.Split(Pipe.Npm.NpmRc, eol.OSDefault().String())...)
+			}
+
+			f, err := os.OpenFile(Pipe.Npm.NpmRcFile,
 				os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 			if err != nil {

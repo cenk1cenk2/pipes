@@ -20,6 +20,15 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NPM_NPMRC_FILE"},
 		Value:       ".npmrc",
+		Destination: &Pipe.Npm.NpmRcFile,
+	},
+
+	&cli.StringFlag{
+		Name:        "npm.npmrc",
+		Usage:       "Pass direct contents of the NPMRC file.",
+		Required:    false,
+		EnvVars:     []string{"NPM_NPMRC"},
+		Value:       "",
 		Destination: &Pipe.Npm.NpmRc,
 	},
 }

@@ -6,8 +6,9 @@ import (
 
 type (
 	Npm struct {
-		Login string `validate:"json"`
-		NpmRc string
+		Login     string `validate:"json"`
+		NpmRcFile string
+		NpmRc     string
 	}
 
 	Plugin struct {
