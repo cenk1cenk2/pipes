@@ -114,39 +114,40 @@ func GenerateNpmRc() utils.Task {
 				npmrc = append(npmrc, strings.Split(Pipe.Npm.NpmRc, eol.OSDefault().String())...)
 			}
 
-			errs := make(chan error, len(Pipe.Npm.NpmRcFile.Value()))
+			var wg *sync.WaitGroup
+			wg.Add(len(Pipe.Npm.NpmRcFile.Value()))
+			errs := []error{}
+
 			for i, v := range Pipe.Npm.NpmRcFile.Value() {
-				go func(errs chan error, i int, file string) {
+				go func(i int, file string) {
+					defer wg.Done()
+
 					f, err := os.OpenFile(file,
 						os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 					if err != nil {
-						errs <- err
+						errs = append(errs, err)
 
 						return
 					}
 
 					defer f.Close()
 					if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
-						errs <- err
+						errs = append(errs, err)
 
 						return
 					}
-
-					errs <- nil
-				}(errs, i, v)
+				}(i, v)
 			}
 
-			success := true
-			for err := range errs {
-				if err != nil {
-					success = false
-					t.Log.Errorln(err)
+			wg.Wait()
+
+			if len(errs) > 0 {
+				for _, v := range errs {
+					t.Log.Errorln(v)
 				}
-			}
 
-			if !success {
-				t.Log.Fatalln("Encountered errors while generating npmrc files.")
+				t.Log.Fatalln("Errors encountered while creating npmrc files.")
 			}
 
 			return nil
