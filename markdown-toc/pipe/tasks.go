@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	u "gitlab.kilic.dev/libraries/go-utils/utils"
 
 	glob "github.com/bmatcuk/doublestar/v4"
 )
@@ -53,6 +54,8 @@ func FindMarkdownFiles() utils.Task {
 				),
 			)
 		}
+
+		matches = u.RemoveDuplicateStr(matches)
 
 		log.Debugln(fmt.Sprintf("Paths matched for given pattern: %s", strings.Join(matches, ", ")))
 
