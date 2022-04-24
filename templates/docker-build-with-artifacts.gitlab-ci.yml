@@ -6,6 +6,10 @@ stages:
   - prepare
   - docker
 
+include:
+  - project: devops/pipes
+    file: /templates/docker-build.gitlab-ci.yml
+
 prepare:
   stage: prepare
   image: $CI_REGISTRY/devops/pipes/gitlab-pipes-gl-artifacts:${PIPES_VERSION}
@@ -19,8 +23,3 @@ prepare:
     - docker
   rules:
     - if: $PARENT_DOWNLOAD_ARTIFACTS
-
-include:
-  - project: devops/pipes
-    file: /templates/docker-build.gitlab-ci.yml
-    ref: main

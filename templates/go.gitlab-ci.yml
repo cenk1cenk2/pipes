@@ -1,0 +1,13 @@
+stages:
+  - install
+  - build
+
+include:
+  - project: devops/pipes
+    file: /templates/go-install.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/go-build.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/go-test.gitlab-ci.yml
