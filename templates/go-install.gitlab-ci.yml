@@ -1,3 +1,6 @@
+variables:
+  GO_IMAGE: alpine
+
 cache:
   paths:
     - vendor/
@@ -5,7 +8,7 @@ cache:
 
 install:
   stage: install
-  image: golang:alpine
+  image: golang:$GO_IMAGE
   script:
     - apk add --no-cache --no-progress make git
     - make install
