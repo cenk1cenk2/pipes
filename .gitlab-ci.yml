@@ -72,9 +72,6 @@ build:
       - APP_FOLDER: ./node
         APP_BINARY: gitlab-pipes-node
 
-      - APP_FOLDER: ./node-typedoc
-        APP_BINARY: node-typedoc
-
       - APP_FOLDER: ./gl-artifacts
         APP_BINARY: gitlab-pipes-gl-artifacts
 
@@ -193,23 +190,6 @@ publish-markdown-toc:
   only:
     changes:
       - "markdown-toc/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-publish-node-typedoc:
-  extends: .publish-docker-to-public
-  variables:
-    DOCKERFILE_CONTEXT: ./node-typedoc
-    IMAGE_NAME: cenk1cenk2/pipe-node-typedoc
-    IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node-typedoc, node-typedoc]"
-  only:
-    changes:
-      - "node-typedoc/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml
