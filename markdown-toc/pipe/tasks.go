@@ -31,7 +31,10 @@ func FindMarkdownFiles() utils.Task {
 
 		fs := os.DirFS(cwd)
 
-		log.Debugf("Trying to match patterns: %s", Pipe.Markdown.Patterns)
+		log.Debugf(
+			"Trying to match patterns: %s",
+			strings.Join(Pipe.Markdown.Patterns.Value(), ", "),
+		)
 
 		matches := []string{}
 
@@ -48,7 +51,7 @@ func FindMarkdownFiles() utils.Task {
 		if len(matches) == 0 {
 			log.Fatalf(
 				"Can not match any files with the given pattern: %s",
-				Pipe.Markdown.Patterns,
+				strings.Join(Pipe.Markdown.Patterns.Value(), ", "),
 			)
 		}
 

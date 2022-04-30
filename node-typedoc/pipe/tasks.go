@@ -31,7 +31,10 @@ func FindPackages() utils.Task {
 
 		fs := os.DirFS(cwd)
 
-		log.Debugf("Trying to match patterns: %s", Pipe.TypeDoc.Patterns)
+		log.Debugf(
+			"Trying to match patterns: %s",
+			strings.Join(Pipe.TypeDoc.Patterns.Value(), ", "),
+		)
 
 		matches := []string{}
 
@@ -48,7 +51,7 @@ func FindPackages() utils.Task {
 		if len(matches) == 0 {
 			log.Fatalf(
 				"Can not match any files with the given pattern: %s",
-				Pipe.TypeDoc.Patterns,
+				strings.Join(Pipe.TypeDoc.Patterns.Value(), ", "),
 			)
 		}
 
@@ -68,7 +71,7 @@ func RunTypeDoc() utils.Task {
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 
 		for _, match := range Context.Matches {
-			cmd := exec.Command(TYPEDOC_COMMAND, Pipe.TypeDoc.Arguments)
+			cmd := exec.Command("yarn", "exec", TYPEDOC_COMMAND, Pipe.TypeDoc.Arguments)
 
 			cmd.Dir = match
 
