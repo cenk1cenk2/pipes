@@ -32,7 +32,7 @@ func VerifyVariables() utils.Task {
 			Pipe.Gitlab.ParentPipelineId,
 		)
 
-		utils.Log.Debugln(fmt.Sprintf("Pipeline steps API request URL: %s", reqUrl))
+		utils.Log.Debugf("Pipeline steps API request URL: %s", reqUrl)
 
 		req, err := http.NewRequest(
 			http.MethodGet,
@@ -93,8 +93,8 @@ func DiscoverArtifacts() utils.Task {
 
 				for _, v := range Context.StepsResponse {
 					if v.Name == step {
-						utils.Log.Debugln(
-							fmt.Sprintf("Adding step artifacts: %s with id %d", step, v.ID),
+						utils.Log.Debugf(
+							"Adding step artifacts: %s with id %d", step, v.ID,
 						)
 
 						Context.StepIds = append(Context.StepIds, StepId{id: v.ID, name: step})
@@ -104,11 +104,9 @@ func DiscoverArtifacts() utils.Task {
 				}
 
 				if !found {
-					utils.Log.Errorln(
-						fmt.Sprintf(
-							"Job with name is not found so artifacts are not downloaded: %s ",
-							step,
-						),
+					utils.Log.Errorf(
+						"Job with name is not found so artifacts are not downloaded: %s ",
+						step,
 					)
 
 					var available []string = []string{}
@@ -118,11 +116,9 @@ func DiscoverArtifacts() utils.Task {
 
 					}
 
-					utils.Log.Fatalln(
-						fmt.Sprintf(
-							"Available steps are: %s",
-							strings.Join(available, ", "),
-						),
+					utils.Log.Fatalf(
+						"Available steps are: %s",
+						strings.Join(available, ", "),
 					)
 				}
 
@@ -152,24 +148,20 @@ func DownloadArtifacts() utils.Task {
 			go func(stepId StepId) {
 				defer wg.Done()
 
-				utils.Log.Debugln(
-					fmt.Sprintf(
-						"Will download artifact with parent job: %s -> %d",
-						stepId.name,
-						stepId.id,
-					),
+				utils.Log.Debugf(
+					"Will download artifact with parent job: %s -> %d",
+					stepId.name,
+					stepId.id,
 				)
 
 				path, err := DownloadArtifact(fmt.Sprintf(url, stepId.id))
 
 				if err != nil {
-					utils.Log.Fatalln(
-						fmt.Sprintf(
-							"Can not download artifacts from stage: %s -> %d with error: %s",
-							stepId.name,
-							stepId.id,
-							err,
-						),
+					utils.Log.Fatalf(
+						"Can not download artifacts from stage: %s -> %d with error: %s",
+						stepId.name,
+						stepId.id,
+						err,
 					)
 				}
 
@@ -202,12 +194,10 @@ func UnarchiveArtifacts() utils.Task {
 			go func(artifact DownloadedArtifact) {
 				defer wg.Done()
 
-				utils.Log.Debugln(
-					fmt.Sprintf(
-						"Will Decompres artifact: %s -> %s",
-						artifact.name,
-						artifact.path,
-					),
+				utils.Log.Debugf(
+					"Will Decompres artifact: %s -> %s",
+					artifact.name,
+					artifact.path,
 				)
 
 				cmd := exec.Command("unzip", "-o")

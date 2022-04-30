@@ -1,26 +1,32 @@
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-GOVENDOR=$(GOCMD) mod vendor
+GO_VERSION=1.18
+
+GO_CMD=go
+GO_BUILD=$(GO_CMD) build
+GO_RUN=$(GO_CMD) run .
+GO_CLEAN=$(GO_CMD) clean
+GO_TEST=$(GO_CMD) test
+GO_GET=$(GO_CMD) get
+GO_VENDOR=$(GO_CMD) mod vendor
+
+GO_OPTION_C=0
+
 BINARY_FOLDER=dist
 BINARY_NAME=gitlab-pipes-docker
 
 all: test build
 
 test:
-	$(GOTEST) -v ./...
+	CGO_ENABLED=$(GO_OPTION_C) $(GO_TEST) -v -p 1 ./...
 
 clean:
-	$(GOCLEAN)
+	$(GO_CLEAN)
 	rm -f $(BINARY_FOLDER)/$(BINARY_NAME)*
+
+.PHONY: build
 
 # Cross compilation
 
 build: build-linux-amd64
 
 build-linux-amd64:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GOBUILD) -mod=readonly -o $(BINARY_FOLDER)/$(BINARY_NAME)
-
-.PHONY: build
+	CGO_ENABLED=$(GO_OPTION_C) GOOS=linux GOARCH=amd64 $(GO_BUILD) -mod=readonly -o $(BINARY_FOLDER)/$(BINARY_NAME)

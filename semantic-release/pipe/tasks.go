@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 
@@ -36,11 +35,9 @@ func InstallPackages() utils.Task {
 			apks := Pipe.Apk.Value()
 
 			if len(apks) > 0 {
-				t.Log.Debugln(
-					fmt.Sprintf(
-						"Will install packages from APK repository: %s",
-						strings.Join(apks, ", "),
-					),
+				t.Log.Debugf(
+					"Will install packages from APK repository: %s",
+					strings.Join(apks, ", "),
 				)
 
 				cmd := exec.Command("apk", "--no-cache")
@@ -53,11 +50,9 @@ func InstallPackages() utils.Task {
 			packages := Pipe.Node.Value()
 
 			if len(packages) > 0 {
-				t.Log.Debugln(
-					fmt.Sprintf(
-						"Will install packages from NPM repository: %s",
-						strings.Join(packages, ", "),
-					),
+				t.Log.Debugf(
+					"Will install packages from NPM repository: %s",
+					strings.Join(packages, ", "),
 				)
 
 				cmd := exec.Command("yarn", "global", "add")

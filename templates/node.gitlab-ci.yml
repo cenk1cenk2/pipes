@@ -1,0 +1,22 @@
+variables:
+  PIPES_VERSION: latest
+  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  NODE_VERSION: 16-alpine
+  NODE_LINT_COMMAND: lint:check
+
+stages:
+  - install
+  - build
+
+include:
+  - project: devops/pipes
+    file: /templates/node-install.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/node-lint.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/node-test.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/node-build.gitlab-ci.yml

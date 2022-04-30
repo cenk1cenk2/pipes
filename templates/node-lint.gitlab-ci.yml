@@ -1,11 +1,9 @@
-build:
+lint:
   stage: build
   image: $CI_REGISTRY/devops/pipes/gitlab-pipes-node:${NODE_VERSION}
   script:
-    - pipe build
-  artifacts:
-    paths:
-      - dist/
-      - "**/dist/"
+    - pipe run ${NODE_LINT_COMMAND}
   tags:
     - docker
+  rules:
+    - if: $NODE_LINT_COMMAND

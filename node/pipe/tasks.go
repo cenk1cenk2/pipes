@@ -1,8 +1,6 @@
 package pipe
 
 import (
-	"fmt"
-
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 
@@ -27,7 +25,7 @@ func VerifyVariables() utils.Task {
 				Commands: PackageManagers[Pipe.Node.PackageManager],
 			}
 
-			t.Log.Debugln(fmt.Sprintf("Using package manager: %s", Pipe.Node.PackageManager))
+			t.Log.Debugf("Using package manager: %s", Pipe.Node.PackageManager)
 
 			return nil
 		},

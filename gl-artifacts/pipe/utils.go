@@ -39,7 +39,7 @@ func DownloadArtifact(url string) (string, error) {
 		res.Filename = fmt.Sprintf("%s.zip", uuid.New().String())
 	}
 
-	utils.Log.Infoln(fmt.Sprintf("Downloading file: %s -> %s", url, res.Filename))
+	utils.Log.Infof("Downloading file: %s -> %s", url, res.Filename)
 
 	code, err := strconv.Atoi(strings.Split(res.HTTPResponse.Status, " ")[0])
 
@@ -61,24 +61,21 @@ Loop:
 	for {
 		select {
 		case <-t.C:
-			utils.Log.Infoln(fmt.Sprintf("%s -> %s: transferred %s / %s (%.2f%%) [%s]",
+			utils.Log.Infof("%s -> %s: transferred %s / %s (%.2f%%) [%s]",
 				url,
 				res.Filename,
 				humanize.Bytes(uint64(res.BytesComplete())),
 				humanize.Bytes(uint64(res.Size())),
 				100*res.Progress(),
 				humanize.Bytes(uint64(res.BytesPerSecond())),
-			),
 			)
 
 		case <-res.Done:
-			utils.Log.Infoln(
-				fmt.Sprintf(
-					"Download completed: %s to %s in %s",
-					url,
-					res.Filename,
-					res.Duration(),
-				),
+			utils.Log.Infof(
+				"Download completed: %s to %s in %s",
+				url,
+				res.Filename,
+				res.Duration(),
 			)
 
 			break Loop
@@ -97,7 +94,7 @@ func ParseGLApiResponseCode(url string, code int) error {
 	case http.StatusNotFound:
 		return fmt.Errorf("Given API path is not found.")
 	default:
-		utils.Log.Debugln(fmt.Sprintf("Status code: %d from %s", code, url))
+		utils.Log.Debugf("Status code: %d from %s", code, url)
 	}
 
 	return nil

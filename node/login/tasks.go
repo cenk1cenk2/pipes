@@ -76,8 +76,8 @@ func GenerateNpmRc() utils.Task {
 			Skip:    Pipe.Npm.Login == "" && Pipe.Npm.NpmRc == "",
 		},
 		Task: func(t *utils.Task) error {
-			t.Log.Debugln(
-				fmt.Sprintf(".npmrc file: %s", strings.Join(Pipe.Npm.NpmRcFile.Value(), ", ")),
+			t.Log.Debugf(
+				".npmrc file: %s", strings.Join(Pipe.Npm.NpmRcFile.Value(), ", "),
 			)
 
 			npmrc := []string{}
@@ -91,11 +91,9 @@ func GenerateNpmRc() utils.Task {
 					go func(i int, v NpmLoginJson) {
 						defer wg.Done()
 
-						t.Log.Infoln(
-							fmt.Sprintf(
-								"Generating login credentials for the registry: %s",
-								v.Registry,
-							),
+						t.Log.Infof(
+							"Generating login credentials for the registry: %s",
+							v.Registry,
 						)
 
 						npmrc = append(
@@ -122,7 +120,7 @@ func GenerateNpmRc() utils.Task {
 				go func(i int, file string) {
 					defer wg.Done()
 
-					t.Log.Debugln(fmt.Sprintf("Creating npmrc file: %s", file))
+					t.Log.Debugf("Creating npmrc file: %s", file)
 
 					f, err := os.OpenFile(file,
 						os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -172,8 +170,8 @@ func VerifyNpmLogin() utils.Task {
 				go func(i int, v NpmLoginJson) {
 					defer wg.Done()
 
-					t.Log.Infoln(
-						fmt.Sprintf("Checking login credentials for Npm registry: %s", v.Registry),
+					t.Log.Infof(
+						"Checking login credentials for Npm registry: %s", v.Registry,
 					)
 
 					cmd := exec.Command("npm", "whoami")

@@ -28,11 +28,9 @@ func VerifyVariables() utils.Task {
 		log := utils.Log.WithField("context", t.Metadata.Context)
 
 		if len(Pipe.Readme.Description) > 100 {
-			log.Fatalln(
-				fmt.Sprintf(
-					"Readme short description can only be 100 characters long while you have: %d",
-					len(Pipe.Readme.Description),
-				),
+			log.Fatalf(
+				"Readme short description can only be 100 characters long while you have: %d",
+				len(Pipe.Readme.Description),
 			)
 		}
 
@@ -91,7 +89,7 @@ func UpdateDockerReadme() utils.Task {
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		log := utils.Log.WithField("context", t.Metadata.Context)
 
-		log.Debugln(fmt.Sprintf("Trying to read file: %s", Pipe.Readme.File))
+		log.Debugf("Trying to read file: %s", Pipe.Readme.File)
 
 		content, err := ioutil.ReadFile(Pipe.Readme.File)
 
@@ -101,13 +99,11 @@ func UpdateDockerReadme() utils.Task {
 
 		readme := string(content)
 
-		log.Debugln(fmt.Sprintf("File read: %s", Pipe.Readme.File))
-		log.Debugln(
-			fmt.Sprintf(
-				"Running against repository: %s/%s",
-				Pipe.DockerHub.Address,
-				Pipe.Readme.Repository,
-			),
+		log.Debugf("File read: %s", Pipe.Readme.File)
+		log.Debugf(
+			"Running against repository: %s/%s",
+			Pipe.DockerHub.Address,
+			Pipe.Readme.Repository,
 		)
 
 		update := DockerHubUpdateReadmeRequest{
@@ -143,7 +139,7 @@ func UpdateDockerReadme() utils.Task {
 			return err
 		}
 
-		log.Debugln(fmt.Sprintf("Status Code: %d", res.StatusCode))
+		log.Debugf("Status Code: %d", res.StatusCode)
 
 		defer res.Body.Close()
 
@@ -153,13 +149,13 @@ func UpdateDockerReadme() utils.Task {
 			return err
 		}
 
-		log.Debugln(fmt.Sprintf("Response body: %s", string(body)))
+		log.Debugf("Response body: %s", string(body))
 
 		b := DockerHubUpdateReadmeResponse{}
 		err = json.Unmarshal(body, &b)
 
 		if err != nil {
-			log.Errorln(fmt.Sprintf("Response unexpected: %s", string(body)))
+			log.Errorf("Response unexpected: %s", string(body))
 
 			return err
 		}
@@ -174,38 +170,30 @@ func UpdateDockerReadme() utils.Task {
 				log.Fatalln("Uploaded README does not match with current repository README file.")
 			}
 
-			log.Infoln(
-				fmt.Sprintf(
-					"Successfully pushed readme file to: %s -> %s/%s",
-					Pipe.Readme.File,
-					Pipe.DockerHub.Address,
-					Pipe.Readme.Repository,
-				),
+			log.Infof(
+				"Successfully pushed readme file to: %s -> %s/%s",
+				Pipe.Readme.File,
+				Pipe.DockerHub.Address,
+				Pipe.Readme.Repository,
 			)
 		case 404:
-			log.Fatalln(
-				fmt.Sprintf(
-					"Repository does not exists: %s/%s",
-					Pipe.DockerHub.Address,
-					Pipe.Readme.Repository,
-				),
+			log.Fatalf(
+				"Repository does not exists: %s/%s",
+				Pipe.DockerHub.Address,
+				Pipe.Readme.Repository,
 			)
 		default:
 			if !b.CanEdit {
-				log.Errorln(
-					fmt.Sprintf(
-						"Given user credentials do not have permission to edit repository: %s/%s",
-						Pipe.DockerHub.Address,
-						Pipe.Readme.Repository,
-					),
+				log.Errorf(
+					"Given user credentials do not have permission to edit repository: %s/%s",
+					Pipe.DockerHub.Address,
+					Pipe.Readme.Repository,
 				)
 			}
 
-			log.Fatalln(
-				fmt.Sprintf(
-					"Pushing readme failed with code: %d",
-					res.StatusCode,
-				),
+			log.Fatalf(
+				"Pushing readme failed with code: %d",
+				res.StatusCode,
 			)
 		}
 

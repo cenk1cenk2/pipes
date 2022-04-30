@@ -36,9 +36,9 @@ func VerifyVariables() utils.Task {
 					return err
 				}
 
-				t.Log.Debugln(fmt.Sprintf("Docker image tag: %s",
+				t.Log.Debugf("Docker image tag: %s",
 					tag,
-				))
+				)
 			}
 
 			if Pipe.DockerImage.TagAsLatestForTagsRegex != "" {
@@ -66,11 +66,9 @@ func VerifyVariables() utils.Task {
 								return err
 							}
 
-							t.Log.Infoln(
-								fmt.Sprintf(
-									"Will tag image as latest since tag regex matches: %s",
-									tag,
-								),
+							t.Log.Infof(
+								"Will tag image as latest since tag regex matches: %s",
+								tag,
 							)
 
 							break
@@ -104,11 +102,9 @@ func VerifyVariables() utils.Task {
 								return err
 							}
 
-							t.Log.Infoln(
-								fmt.Sprintf(
-									"Will tag image as latest since branch regex matches: %s",
-									tag,
-								),
+							t.Log.Infof(
+								"Will tag image as latest since branch regex matches: %s",
+								tag,
 							)
 
 							break
@@ -118,11 +114,9 @@ func VerifyVariables() utils.Task {
 			}
 
 			if _, err := os.Stat(Pipe.DockerImage.TagsFile); err == nil {
-				t.Log.Infoln(
-					fmt.Sprintf(
-						"Tags file does exists, will override: %s",
-						Pipe.DockerImage.TagsFile,
-					),
+				t.Log.Infof(
+					"Tags file does exists, will override: %s",
+					Pipe.DockerImage.TagsFile,
 				)
 
 				content, err := ioutil.ReadFile(Pipe.DockerImage.TagsFile)
@@ -157,23 +151,23 @@ func VerifyVariables() utils.Task {
 				}
 			} else if errors.Is(err, os.ErrNotExist) {
 				if Pipe.DockerImage.TagsFile != "" {
-					t.Log.Warnln(fmt.Sprintf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile))
+					t.Log.Warnf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile)
 
 					t.Log.Warnln("Nothing to do. Exitting...")
 					os.Exit(0)
 				} else {
-					t.Log.Debugln(fmt.Sprintf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile))
+					t.Log.Debugf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile)
 				}
 			} else {
-				t.Log.Warnln(fmt.Sprintf("Can not read the tags file: %s", Pipe.DockerImage.TagsFile))
+				t.Log.Warnf("Can not read the tags file: %s", Pipe.DockerImage.TagsFile)
 			}
 
 			Context.Tags = u.RemoveDuplicateStr(
 				u.DeleteEmptyStringsFromSlice(Context.Tags),
 			)
 
-			t.Log.Infoln(
-				fmt.Sprintf("Image tags: %s", strings.Join(Context.Tags, ", ")),
+			t.Log.Infof(
+				"Image tags: %s", strings.Join(Context.Tags, ", "),
 			)
 
 			return nil
@@ -211,8 +205,8 @@ func DockerLogin() utils.Task {
 		},
 		Task: func(t *utils.Task) error {
 			if Pipe.DockerRegistry.Username != "" && Pipe.DockerRegistry.Password != "" {
-				t.Log.Infoln(
-					fmt.Sprintf("Logging in to Docker registry: %s", Pipe.DockerRegistry.Registry),
+				t.Log.Infof(
+					"Logging in to Docker registry: %s", Pipe.DockerRegistry.Registry,
 				)
 
 				cmd := exec.Command(DOCKER_EXE, "login")
@@ -230,11 +224,9 @@ func DockerLogin() utils.Task {
 				t.Commands = append(t.Commands, cmd)
 			}
 
-			t.Log.Debugln(
-				fmt.Sprintf(
-					"Will verify authentication in to Docker registry: %s",
-					Pipe.DockerRegistry.Registry,
-				),
+			t.Log.Debugf(
+				"Will verify authentication in to Docker registry: %s",
+				Pipe.DockerRegistry.Registry,
 			)
 
 			cmd := exec.Command(DOCKER_EXE, "login")
@@ -284,12 +276,10 @@ func DockerBuildx() utils.Task {
 	return utils.Task{
 		Metadata: metadata,
 		Task: func(t *utils.Task) error {
-			t.Log.Infoln(
-				fmt.Sprintf(
-					"Building Docker image: %s in %s",
-					Pipe.DockerFile.Name,
-					Pipe.DockerFile.Context,
-				),
+			t.Log.Infof(
+				"Building Docker image: %s in %s",
+				Pipe.DockerFile.Name,
+				Pipe.DockerFile.Context,
 			)
 
 			t.Log.Infoln("Using Docker Buildx for building the Docker image.")
@@ -332,7 +322,7 @@ func DockerBuildx() utils.Task {
 			}
 
 			cmd.Dir = Pipe.DockerFile.Context
-			t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+			t.Log.Debugf("CWD set as: %s", cmd.Dir)
 
 			cmd.Args = append(
 				cmd.Args,
@@ -351,12 +341,10 @@ func DockerBuildx() utils.Task {
 func DockerBuild() utils.Task {
 	return utils.Task{Metadata: utils.TaskMetadata{Context: "build", Skip: Pipe.Docker.UseBuildx},
 		Task: func(t *utils.Task) error {
-			t.Log.Infoln(
-				fmt.Sprintf(
-					"Building Docker image: %s in %s",
-					Pipe.DockerFile.Name,
-					Pipe.DockerFile.Context,
-				),
+			t.Log.Infof(
+				"Building Docker image: %s in %s",
+				Pipe.DockerFile.Name,
+				Pipe.DockerFile.Context,
 			)
 
 			cmd := exec.Command(DOCKER_EXE, "build")
@@ -374,7 +362,7 @@ func DockerBuild() utils.Task {
 			}
 
 			cmd.Dir = Pipe.DockerFile.Context
-			t.Log.Debugln(fmt.Sprintf("CWD set as: %s", cmd.Dir))
+			t.Log.Debugf("CWD set as: %s", cmd.Dir)
 
 			cmd.Args = append(
 				cmd.Args,
@@ -396,11 +384,9 @@ func DockerPush() utils.Task {
 			t.Commands = []utils.Command{}
 
 			for _, tag := range Context.Tags {
-				t.Log.Infoln(
-					fmt.Sprintf(
-						"Pushing Docker image: %s",
-						tag,
-					),
+				t.Log.Infof(
+					"Pushing Docker image: %s",
+					tag,
 				)
 
 				cmd := exec.Command(DOCKER_EXE, "push")
@@ -425,11 +411,9 @@ func DockerInspect() utils.Task {
 			t.Commands = []utils.Command{}
 
 			for _, tag := range Context.Tags {
-				t.Log.Infoln(
-					fmt.Sprintf(
-						"Inspecting Docker image: %s",
-						tag,
-					),
+				t.Log.Infof(
+					"Inspecting Docker image: %s",
+					tag,
 				)
 
 				cmd := exec.Command(DOCKER_EXE, "manifest", "inspect")

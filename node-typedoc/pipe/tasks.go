@@ -17,7 +17,7 @@ type Ctx struct {
 
 var Context Ctx
 
-func FindMarkdownFiles() utils.Task {
+func FindPackages() utils.Task {
 	metadata := utils.TaskMetadata{Context: "discover"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
@@ -31,11 +31,11 @@ func FindMarkdownFiles() utils.Task {
 
 		fs := os.DirFS(cwd)
 
-		log.Debugf("Trying to match patterns: %s", Pipe.Markdown.Patterns)
+		log.Debugf("Trying to match patterns: %s", Pipe.TypeDoc.Patterns)
 
 		matches := []string{}
 
-		for _, v := range Pipe.Markdown.Patterns.Value() {
+		for _, v := range Pipe.TypeDoc.Patterns.Value() {
 			match, err := glob.Glob(fs, v)
 
 			if err != nil {
@@ -48,7 +48,7 @@ func FindMarkdownFiles() utils.Task {
 		if len(matches) == 0 {
 			log.Fatalf(
 				"Can not match any files with the given pattern: %s",
-				Pipe.Markdown.Patterns,
+				Pipe.TypeDoc.Patterns,
 			)
 		}
 
@@ -62,15 +62,15 @@ func FindMarkdownFiles() utils.Task {
 	}}
 }
 
-func RunMarkdownToc() utils.Task {
+func RunTypeDoc() utils.Task {
 	metadata := utils.TaskMetadata{Context: "generate"}
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 
 		for _, match := range Context.Matches {
-			cmd := exec.Command(MARKDOWN_TOC_COMMAND, Pipe.Markdown.Arguments, "-i")
+			cmd := exec.Command(TYPEDOC_COMMAND, Pipe.TypeDoc.Arguments)
 
-			cmd.Args = append(cmd.Args, match)
+			cmd.Dir = match
 
 			utils.AddTask(utils.Task{Metadata: metadata, Command: cmd})
 		}
