@@ -153,6 +153,8 @@ publish-node:
         NODE_VERSION:
           - 16
           - 16-alpine
+          - 18
+          - 18-alpine
   only:
     changes:
       - "node/**/*"
