@@ -11,7 +11,7 @@ GO_VENDOR=$(GO_CMD) mod vendor
 GO_OPTION_C=0
 
 install:
-	$(GO_GET)
+	$(GO_VENDOR)
 
 update:
 	$(GO_GET) -u all
