@@ -71,7 +71,7 @@ func RunTypeDoc() utils.Task {
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 
 		for _, match := range Context.Matches {
-			cmd := exec.Command("yarn", "exec", TYPEDOC_COMMAND, Pipe.TypeDoc.Arguments)
+			cmd := exec.Command("yarn", "exec", "--", TYPEDOC_COMMAND, Pipe.TypeDoc.Arguments)
 
 			cmd.Dir = match
 
