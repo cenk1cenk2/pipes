@@ -75,7 +75,7 @@ func RunMarkdownToc() utils.Task {
 
 			cmd.Args = append(cmd.Args, match)
 
-			utils.AddTask(utils.Task{Metadata: metadata, Command: cmd})
+			t.Commands = append(t.Commands, cmd)
 		}
 
 		return nil

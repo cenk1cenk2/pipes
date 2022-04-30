@@ -75,7 +75,7 @@ func RunTypeDoc() utils.Task {
 
 			cmd.Dir = match
 
-			utils.AddTask(utils.Task{Metadata: metadata, Command: cmd})
+			t.Commands = append(t.Commands, cmd)
 		}
 
 		return nil
