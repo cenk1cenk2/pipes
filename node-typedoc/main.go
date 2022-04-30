@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	pipe "gitlab.kilic.dev/devops/pipes/markdown-toc/pipe"
+	pipe "gitlab.kilic.dev/devops/pipes/node-typedoc/pipe"
 	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 )
 

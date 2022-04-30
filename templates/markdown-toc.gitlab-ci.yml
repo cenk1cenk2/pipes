@@ -9,7 +9,7 @@ update-markdown-toc:
   artifacts:
     paths:
       - README.md
-      - "**/README.md"
+      - "packages/*/README.md"
   only:
     refs:
       - master

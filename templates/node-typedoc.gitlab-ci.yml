@@ -9,7 +9,7 @@ typedoc:
   artifacts:
     paths:
       - docs/
-      - "**/docs/"
+      - "packages/*/docs/"
   only:
     refs:
       - master

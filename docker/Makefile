@@ -30,3 +30,9 @@ build: build-linux-amd64
 
 build-linux-amd64:
 	CGO_ENABLED=$(GO_OPTION_C) GOOS=linux GOARCH=amd64 $(GO_BUILD) -mod=readonly -o $(BINARY_FOLDER)/$(BINARY_NAME)
+
+dev:
+	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) -- --utils.log debug $(ARGS)
+
+help:
+	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) --help
