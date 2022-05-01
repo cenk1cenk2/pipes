@@ -8,21 +8,10 @@ variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   LOG_LEVEL: info
 
-.publish-first-docker:
+.publish-first:
   stage: publish-first
   before_script:
     - cd $DOCKER_CONTEXT
-  script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
-  tags:
-    - docker
-
-.publish-first-gl-artifacts:
-  stage: publish-first
-  before_script:
-    - cd ./gl-artifacts
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
     - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
@@ -89,7 +78,7 @@ build:
 # to stop depending on itself
 
 publish-first-docker:
-  extends: .publish-first-docker
+  extends: .publish-first
   variables:
     DOCKER_CONTEXT: ./docker
     APP_BINARY: gitlab-pipes-docker
@@ -104,7 +93,7 @@ publish-first-docker:
       - main
 
 publish-first-gl-artifacts:
-  extends: .publish-first-docker
+  extends: .publish-first
   variables:
     DOCKER_CONTEXT: ./gl-artifacts
     APP_BINARY: gl-artifacts
