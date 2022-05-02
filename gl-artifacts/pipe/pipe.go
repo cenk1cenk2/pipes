@@ -6,7 +6,6 @@ import (
 
 type (
 	Gitlab struct {
-		Url               string
 		ApiUrl            string
 		Token             string
 		JobToken          string

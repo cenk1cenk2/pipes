@@ -6,15 +6,6 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name:        "gl.url",
-		Usage:       "Gitlab URL of the instance.",
-		Required:    true,
-		EnvVars:     []string{"CI_SERVER_URL"},
-		Value:       "",
-		Destination: &Pipe.Gitlab.Url,
-	},
-
-	&cli.StringFlag{
 		Name:        "gl.api_url",
 		Usage:       "Gitlab API URL of the instance.",
 		Required:    true,

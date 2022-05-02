@@ -27,8 +27,7 @@ func VerifyVariables() utils.Task {
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		reqUrl := fmt.Sprintf(
-			"%s%s/projects/%s/pipelines/%s/jobs/?scope=success",
-			Pipe.Gitlab.Url,
+			"%s/projects/%s/pipelines/%s/jobs/?scope=success",
 			Pipe.Gitlab.ApiUrl,
 			Pipe.Gitlab.ParentProjectId,
 			Pipe.Gitlab.ParentPipelineId,
@@ -138,8 +137,7 @@ func DownloadArtifacts() utils.Task {
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		url := fmt.Sprintf(
-			"%s%s/projects/%s/jobs/%s/artifacts/",
-			Pipe.Gitlab.Url,
+			"%s/projects/%s/jobs/%s/artifacts/",
 			Pipe.Gitlab.ApiUrl,
 			Pipe.Gitlab.ParentProjectId,
 			"%d",
