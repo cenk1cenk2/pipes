@@ -6,11 +6,29 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
+		Name:        "gl.url",
+		Usage:       "Gitlab URL of the instance.",
+		Required:    true,
+		EnvVars:     []string{"CI_SERVER_URL"},
+		Value:       "",
+		Destination: &Pipe.Gitlab.Url,
+	},
+
+	&cli.StringFlag{
+		Name:        "gl.api_url",
+		Usage:       "Gitlab API URL of the instance.",
+		Required:    true,
+		EnvVars:     []string{"CI_API_V4_URL"},
+		Value:       "",
+		Destination: &Pipe.Gitlab.ApiUrl,
+	},
+
+	&cli.StringFlag{
 		Name:        "gl.token",
 		Usage:       "Token for gitlab api authentication.",
 		Required:    true,
 		EnvVars:     []string{"GL_TOKEN"},
-		Value:       "https://gitlab.kilic.dev",
+		Value:       "",
 		Destination: &Pipe.Gitlab.Token,
 	},
 
@@ -19,7 +37,7 @@ var Flags = []cli.Flag{
 		Usage:       "Job token coming from the build job.",
 		Required:    false,
 		EnvVars:     []string{"CI_JOB_TOKEN"},
-		Value:       "https://gitlab.kilic.dev",
+		Value:       "",
 		Destination: &Pipe.Gitlab.JobToken,
 	},
 

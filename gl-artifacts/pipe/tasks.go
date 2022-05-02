@@ -27,7 +27,9 @@ func VerifyVariables() utils.Task {
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		reqUrl := fmt.Sprintf(
-			"https://gitlab.kilic.dev/api/v4/projects/%s/pipelines/%s/jobs/?scope=success",
+			"%s%s/projects/%s/pipelines/%s/jobs/?scope=success",
+			Pipe.Gitlab.Url,
+			Pipe.Gitlab.ApiUrl,
 			Pipe.Gitlab.ParentProjectId,
 			Pipe.Gitlab.ParentPipelineId,
 		)
@@ -136,7 +138,9 @@ func DownloadArtifacts() utils.Task {
 
 	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
 		url := fmt.Sprintf(
-			"https://gitlab.kilic.dev/api/v4/projects/%s/jobs/%s/artifacts/",
+			"%s%s/projects/%s/jobs/%s/artifacts/",
+			Pipe.Gitlab.Url,
+			Pipe.Gitlab.ApiUrl,
 			Pipe.Gitlab.ParentProjectId,
 			"%d",
 		)

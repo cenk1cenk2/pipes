@@ -3,6 +3,7 @@ variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   NODE_VERSION: 16-alpine
   NODE_LINT_COMMAND: lint:check
+  NODE_TEST_COMMAND: ""
 
 stages:
   - install
