@@ -59,7 +59,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Name:        "docker_registry.registry",
-		Usage:       "Docke registry to login to.",
+		Usage:       "Docker registry to login to.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY"},
 		Destination: &Pipe.DockerRegistry.Registry,
