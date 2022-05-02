@@ -89,6 +89,7 @@ publish-first-docker:
       - .gitlab-ci.yml
     refs:
       - main
+      - tags
 
 publish-first-gl-artifacts:
   extends: .publish-first
@@ -104,6 +105,7 @@ publish-first-gl-artifacts:
       - .gitlab-ci.yml
     refs:
       - main
+      - tags
 
 # private images
 
@@ -147,6 +149,7 @@ publish-node:
       - .gitlab-ci.yml
     refs:
       - main
+      - tags
 
 publish-gl-artifacts:
   extends: .publish-docker-to-private
