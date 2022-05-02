@@ -3,50 +3,26 @@ variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   NODE_VERSION: 16-alpine
   NODE_LINT_COMMAND: lint:check
+  NODE_TEST_COMMAND: ""
+
+stages:
+  - install
+  - build
 
 cache:
   paths:
     - node_modules/
     - .cache/
 
-install:
-  stage: install
-  image: $CI_REGISTRY/devops/pipes/gitlab-pipes-node:${NODE_VERSION}
-  script:
-    - pipe install
-  artifacts:
-    paths:
-      - node_modules/
-  tags:
-    - docker
+include:
+  - project: bdsm/gitlab-pipes
+    file: /templates/node-install.gitlab-ci.yml
 
-lint:
-  stage: build
-  image: $CI_REGISTRY/devops/pipes/gitlab-pipes-node:${NODE_VERSION}
-  script:
-    - pipe run ${NODE_LINT_COMMAND}
-  tags:
-    - docker
-  rules:
-    - if: $NODE_LINT_COMMAND
+  - project: bdsm/gitlab-pipes
+    file: /templates/node-lint.gitlab-ci.yml
 
-test:
-  stage: build
-  image: $CI_REGISTRY/devops/pipes/gitlab-pipes-node:${NODE_VERSION}
-  script:
-    - pipe run ${NODE_TEST_COMMAND}
-  tags:
-    - docker
-  rules:
-    - if: $NODE_TEST_COMMAND
+  - project: bdsm/gitlab-pipes
+    file: /templates/node-test.gitlab-ci.yml
 
-build:
-  stage: build
-  image: $CI_REGISTRY/devops/pipes/gitlab-pipes-node:${NODE_VERSION}
-  script:
-    - pipe build
-  artifacts:
-    paths:
-      - dist/
-  tags:
-    - docker
+  - project: bdsm/gitlab-pipes
+    file: /templates/node-build.gitlab-ci.yml
