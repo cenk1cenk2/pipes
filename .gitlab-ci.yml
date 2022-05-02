@@ -25,7 +25,6 @@ variables:
     include:
       - project: devops/pipes
         file: /templates/docker-build-with-artifacts.gitlab-ci.yml
-        ref: main
     strategy: depend
 
 .publish-docker-to-public:
@@ -34,7 +33,6 @@ variables:
     include:
       - project: devops/pipes
         file: /templates/docker-build-with-artifacts-dockerhub.gitlab-ci.yml
-        ref: main
     strategy: depend
 
 include:
