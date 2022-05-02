@@ -11,7 +11,7 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/sirupsen/logrus v1.8.1
 	github.com/urfave/cli/v2 v2.5.1
-	gitlab.kilic.dev/libraries/go-utils v1.1.0
+	gitlab.kilic.dev/libraries/go-utils v1.1.1
 )
 
 require (
