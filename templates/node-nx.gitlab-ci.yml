@@ -15,14 +15,14 @@ cache:
     - .cache/
 
 include:
-  - project: bdsm/gitlab-pipes
+  - project: devops/pipes
     file: /templates/node-install.gitlab-ci.yml
 
-  - project: bdsm/gitlab-pipes
+  - project: devops/pipes
     file: /templates/node-lint.gitlab-ci.yml
 
-  - project: bdsm/gitlab-pipes
+  - project: devops/pipes
     file: /templates/node-test.gitlab-ci.yml
 
-  - project: bdsm/gitlab-pipes
+  - project: devops/pipes
     file: /templates/node-build.gitlab-ci.yml
