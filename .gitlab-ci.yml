@@ -177,7 +177,7 @@ publish-gh-release-tracker:
   extends: .publish-docker-to-public
   variables:
     DOCKERFILE_CONTEXT: ./gh-release-tracker
-    DOCKER_IMAGE_NAME: pipe-gh-release-tracker
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
     IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./gh-release-tracker, gh-release-tracker]"
   only:
