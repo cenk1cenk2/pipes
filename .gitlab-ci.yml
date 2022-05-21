@@ -56,6 +56,9 @@ build:
       - APP_FOLDER: ./docker
         APP_BINARY: gitlab-pipes-docker
 
+      - APP_FOLDER: ./gh-release-tracker
+        APP_BINARY: gh-release-tracker
+
       - APP_FOLDER: ./node
         APP_BINARY: gitlab-pipes-node
 
@@ -169,6 +172,23 @@ publish-gl-artifacts:
       - tags
 
 # public images
+
+publish-gh-release-tracker:
+  extends: .publish-docker-to-public
+  variables:
+    DOCKERFILE_CONTEXT: ./gh-release-tracker
+    DOCKER_IMAGE_NAME: pipe-gh-release-tracker
+    IMAGE_TAGS: latest
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gh-release-tracker, gh-release-tracker]"
+  only:
+    changes:
+      - "gh-release-tracker/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
 
 publish-markdown-toc:
   extends: .publish-docker-to-public
