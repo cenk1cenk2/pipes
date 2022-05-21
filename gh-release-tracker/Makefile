@@ -11,7 +11,7 @@ GO_VENDOR=$(GO_CMD) mod vendor
 GO_OPTION_C=0
 
 BINARY_FOLDER=dist
-BINARY_NAME=gh-reelase-tracker
+BINARY_NAME=gh-release-tracker
 
 all: test build
 
