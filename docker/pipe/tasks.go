@@ -41,6 +41,55 @@ func VerifyVariables() utils.Task {
 				)
 			}
 
+			if _, err := os.Stat(Pipe.DockerImage.TagsFile); err == nil {
+				t.Log.Infof(
+					"Tags file does exists, will overwrite current tags: %s",
+					Pipe.DockerImage.TagsFile,
+				)
+
+				content, err := ioutil.ReadFile(Pipe.DockerImage.TagsFile)
+				if err != nil {
+					return err
+				}
+
+				tags := strings.Split(string(content), ",")
+
+				Context.Tags = []string{}
+
+				re := regexp.MustCompile(`\r?\n`)
+
+				errs := []error{}
+
+				for _, v := range tags {
+					tag, err := AddDockerTag(re.ReplaceAllString(v, ""))
+
+					if err != nil {
+						errs = append(errs, err)
+					}
+
+					Context.Tags = append(Context.Tags, tag)
+				}
+
+				if len(errs) > 0 {
+					for _, v := range errs {
+						t.Log.Errorln(v)
+					}
+
+					return fmt.Errorf("Errors encountered while injecting environment variables.")
+				}
+			} else if errors.Is(err, os.ErrNotExist) {
+				if Pipe.DockerImage.TagsFile != "" {
+					t.Log.Warnf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile)
+
+					t.Log.Warnln("Nothing to do. Exitting...")
+					os.Exit(0)
+				} else {
+					t.Log.Debugf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile)
+				}
+			} else {
+				t.Log.Warnf("Can not read the tags file: %s", Pipe.DockerImage.TagsFile)
+			}
+
 			if Pipe.DockerImage.TagAsLatestForTagsRegex != "" {
 				err := json.Unmarshal(
 					[]byte(Pipe.DockerImage.TagAsLatestForTagsRegex),
@@ -111,55 +160,6 @@ func VerifyVariables() utils.Task {
 						}
 					}
 				}
-			}
-
-			if _, err := os.Stat(Pipe.DockerImage.TagsFile); err == nil {
-				t.Log.Infof(
-					"Tags file does exists, will override: %s",
-					Pipe.DockerImage.TagsFile,
-				)
-
-				content, err := ioutil.ReadFile(Pipe.DockerImage.TagsFile)
-				if err != nil {
-					return err
-				}
-
-				tags := strings.Split(string(content), ",")
-
-				Context.Tags = []string{}
-
-				re := regexp.MustCompile(`\r?\n`)
-
-				errs := []error{}
-
-				for _, v := range tags {
-					tag, err := AddDockerTag(re.ReplaceAllString(v, ""))
-
-					if err != nil {
-						errs = append(errs, err)
-					}
-
-					Context.Tags = append(Context.Tags, tag)
-				}
-
-				if len(errs) > 0 {
-					for _, v := range errs {
-						t.Log.Errorln(v)
-					}
-
-					return fmt.Errorf("Errors encountered while injecting environment variables.")
-				}
-			} else if errors.Is(err, os.ErrNotExist) {
-				if Pipe.DockerImage.TagsFile != "" {
-					t.Log.Warnf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile)
-
-					t.Log.Warnln("Nothing to do. Exitting...")
-					os.Exit(0)
-				} else {
-					t.Log.Debugf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile)
-				}
-			} else {
-				t.Log.Warnf("Can not read the tags file: %s", Pipe.DockerImage.TagsFile)
 			}
 
 			Context.Tags = u.RemoveDuplicateStr(
