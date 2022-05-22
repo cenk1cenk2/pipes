@@ -27,9 +27,14 @@ var Flags = []cli.Flag{
 		Destination: &Pipe.DockerHub.Address,
 	},
 	&cli.StringFlag{
-		Name:        "readme.repository",
-		Usage:       "Repository for applying the readme on.",
-		EnvVars:     []string{"IMAGE_NAME", "README_REPOSITORY", "PLUGIN_README_REPOSITORY"},
+		Name:  "readme.repository",
+		Usage: "Repository for applying the readme on.",
+		EnvVars: []string{
+			"DOCKER_IMAGE_NAME",
+			"IMAGE_NAME",
+			"README_REPOSITORY",
+			"PLUGIN_README_REPOSITORY",
+		},
 		Required:    true,
 		Destination: &Pipe.Readme.Repository,
 	},
