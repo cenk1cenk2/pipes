@@ -1,7 +1,3 @@
-variables:
-  DOCKER_USERNAME: $DOCKER_REGISTRY_USERNAME
-  DOCKER_PASSWORD: $DOCKER_REGISTRY_API_PASSWORD
-
 stages:
   - post
 
@@ -10,6 +6,9 @@ update-docker-hub-readme:
   image: cenk1cenk2/pipe-update-docker-hub-readme:latest
   script:
     - pipe
+  variables:
+    DOCKER_USERNAME: $DOCKERHUB_USERNAME
+    DOCKER_PASSWORD: $DOCKER_HUB_API_PASSWORD
   only:
     refs:
       - master
