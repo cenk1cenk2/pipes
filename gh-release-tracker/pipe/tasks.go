@@ -91,7 +91,7 @@ func FetchLatestTag() utils.Task {
 
 			Context.LatestTag = latest
 
-			t.Log.Debugf("Latest tag: %s", latest.GetName())
+			t.Log.Infoln("Latest tag: %s", latest.GetName())
 
 			return nil
 		},
