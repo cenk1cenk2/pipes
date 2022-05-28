@@ -2,9 +2,7 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
-
-	login "gitlab.kilic.dev/devops/pipes/node/login"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type (
@@ -18,28 +16,22 @@ type (
 		UseMulti bool
 	}
 
-	Plugin struct {
+	Pipe struct {
 		Packages
 		SemanticRelease
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var P = TaskList[Pipe, Ctx]{
+	Pipe:    Pipe{},
+	Context: Ctx{},
+}
 
-func (p Plugin) Exec() error {
-	if err := login.Pipe.Exec(); err != nil {
-		return err
-	}
-
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			InstallPackages(),
-			RunSemanticRelease(),
-		},
+func New(a *App) *TaskList[Pipe, Ctx] {
+	return P.New(a).SetTasks(
+		P.JobSequence(
+			InstallPackages(&P).Job(),
+			RunSemanticRelease(&P).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }

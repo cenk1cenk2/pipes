@@ -7,7 +7,7 @@ RUN \
   npm i -g npm@8.4
 
 
-COPY ./dist/semantic-release /usr/bin/pipe
+COPY ./dist/pipe /usr/bin/pipe
 
 RUN chmod +x /usr/bin/pipe && \
   # smoke test

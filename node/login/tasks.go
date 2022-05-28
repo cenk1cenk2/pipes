@@ -150,6 +150,6 @@ func VerifyNpmLogin(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
 
 		return nil
 	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
-		return t.TaskList.RunJobs(t.GetCommandJobAsJobParallel())
+		return t.RunCommandJobAsJobParallel()
 	})
 }

@@ -1,96 +1,92 @@
 package pipe
 
 import (
-	"os/exec"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	"github.com/workanator/go-floc/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type Ctx struct {
+	Exe string
 }
 
-var Context Ctx
+func InstallPackages(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify"},
-		Task: func(t *utils.Task) error {
-			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
+	return t.New(tl, "install").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		apks := t.Pipe.Apk.Value()
 
-			if err != nil {
-				return err
+		if len(apks) > 0 {
+			t.Log.Debugf(
+				"Will install packages from APK repository: %s",
+				strings.Join(apks, ", "),
+			)
+
+			cmd := Command[Pipe, Ctx]{}
+
+			cmd.New(t, "apk", "--no-cache").Set(func(c *Command[Pipe, Ctx]) error {
+				c.AppendArgs(apks...)
+
+				return nil
+			})
+
+			t.AddCommands(cmd)
+		}
+
+		packages := t.Pipe.Node.Value()
+
+		if len(packages) > 0 {
+			t.Log.Debugf(
+				"Will install packages from NPM repository: %s",
+				strings.Join(packages, ", "),
+			)
+
+			cmd := Command[Pipe, Ctx]{}
+
+			cmd.New(t, "yarn", "global", "add").Set(func(c *Command[Pipe, Ctx]) error {
+				c.AppendArgs(packages...)
+
+				return nil
+			})
+
+			t.AddCommands(cmd)
+		}
+
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.RunCommandJobAsJobParallel()
+	})
+}
+
+func RunSemanticRelease(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
+
+	return t.New(tl, "release").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		if t.Pipe.UseMulti {
+			t.Context.Exe = MULTI_SEMANTIC_RELEASE_EXE
+		} else {
+			t.Context.Exe = SEMANTIC_RELEASE_EXE
+		}
+
+		cmd := Command[Pipe, Ctx]{}
+
+		cmd.New(t, t.Context.Exe).Set(func(c *Command[Pipe, Ctx]) error {
+			if t.Pipe.SemanticRelease.IsDryRun {
+				c.AppendArgs("--dry-run")
+			}
+
+			if t.App.Environment.Debug {
+				c.AppendArgs("--debug")
 			}
 
 			return nil
-		},
-	}
-}
+		})
 
-func InstallPackages() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "install"},
-		Task: func(t *utils.Task) error {
-			apks := Pipe.Apk.Value()
+		t.AddCommands(cmd)
 
-			if len(apks) > 0 {
-				t.Log.Debugf(
-					"Will install packages from APK repository: %s",
-					strings.Join(apks, ", "),
-				)
-
-				cmd := exec.Command("apk", "--no-cache")
-
-				cmd.Args = append(cmd.Args, apks...)
-
-				t.Commands = append(t.Commands, cmd)
-			}
-
-			packages := Pipe.Node.Value()
-
-			if len(packages) > 0 {
-				t.Log.Debugf(
-					"Will install packages from NPM repository: %s",
-					strings.Join(packages, ", "),
-				)
-
-				cmd := exec.Command("yarn", "global", "add")
-
-				cmd.Args = append(cmd.Args, packages...)
-
-				t.Commands = append(t.Commands, cmd)
-			}
-
-			return nil
-		},
-	}
-}
-
-func RunSemanticRelease() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "semantic-release"},
-		Task: func(t *utils.Task) error {
-			var exe string
-			if Pipe.UseMulti {
-				exe = MULTI_SEMANTIC_RELEASE_EXE
-			} else {
-				exe = SEMANTIC_RELEASE_EXE
-			}
-
-			cmd := exec.Command(exe)
-
-			if Pipe.SemanticRelease.IsDryRun {
-				cmd.Args = append(cmd.Args, "--dry-run")
-			}
-
-			if t.Log.Logger.Level == logrus.DebugLevel {
-				cmd.Args = append(cmd.Args, "--debug")
-			}
-
-			t.Commands = append(t.Commands, cmd)
-
-			return nil
-		},
-	}
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.RunCommandJobAsJobSequence()
+	})
 }
