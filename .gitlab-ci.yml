@@ -60,7 +60,7 @@ build:
         APP_BINARY: gh-release-tracker
 
       - APP_FOLDER: ./node
-        APP_BINARY: gitlab-pipes-node
+        APP_BINARY: pipe
 
       - APP_FOLDER: ./gl-artifacts
         APP_BINARY: gitlab-pipes-gl-artifacts
@@ -134,7 +134,7 @@ publish-node:
   variables:
     DOCKERFILE_CONTEXT: ./node
     DOCKER_IMAGE_NAME: gitlab-pipes-node
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node, gitlab-pipes-node]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node, pipe]"
   parallel:
     matrix:
       - IMAGE_TAGS: ${NODE_VERSION}

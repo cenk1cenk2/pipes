@@ -11,7 +11,7 @@ GO_VENDOR=$(GO_CMD) mod vendor
 GO_OPTION_C=0
 
 BINARY_FOLDER=dist
-BINARY_NAME=gitlab-pipes-node
+BINARY_NAME=pipe
 
 all: test build
 
