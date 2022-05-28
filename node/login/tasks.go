@@ -16,10 +16,10 @@ type Ctx struct {
 	NpmLogin []NpmLoginJson
 }
 
-func Unmarshal(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+func Decode(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
 	t := Task[Pipe, Ctx]{}
 
-	return t.New(tl, "unmarshal").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
+	return t.New(tl, "decode").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
 		return t.Pipe.Npm.Login == ""
 	}).Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
 		// unmarshal npm logins and use the default registry for ones that are not defined

@@ -26,7 +26,7 @@ var P = TaskList[Pipe, Ctx]{
 func New(a *App) *TaskList[Pipe, Ctx] {
 	return P.New(a).SetTasks(
 		P.JobSequence(
-			Unmarshal(&P).Job(),
+			Decode(&P).Job(),
 			GenerateNpmRc(&P).Job(),
 			VerifyNpmLogin(&P).Job(),
 		),
