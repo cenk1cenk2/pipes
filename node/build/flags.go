@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_COMMIT_REF_NAME"},
 		Value:       "",
-		Destination: &Pipe.Git.Branch,
+		Destination: &P.Pipe.Git.Branch,
 	},
 
 	&cli.StringFlag{
@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_COMMIT_TAG"},
 		Value:       "",
-		Destination: &Pipe.Git.Tag,
+		Destination: &P.Pipe.Git.Tag,
 	},
 
 	&cli.StringFlag{
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_SCRIPT"},
 		Value:       "build",
-		Destination: &Pipe.NodeBuild.Script,
+		Destination: &P.Pipe.NodeBuild.Script,
 	},
 
 	&cli.StringFlag{
@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_SCRIPT_ARGS"},
 		Value:       "",
-		Destination: &Pipe.NodeBuild.ScriptArgs,
+		Destination: &P.Pipe.NodeBuild.ScriptArgs,
 	},
 
 	&cli.StringFlag{
@@ -47,7 +47,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_CWD"},
 		Value:       ".",
-		Destination: &Pipe.NodeBuild.Cwd,
+		Destination: &P.Pipe.NodeBuild.Cwd,
 	},
 
 	&cli.StringSliceFlag{
@@ -56,7 +56,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_FILES"},
 		Value:       &cli.StringSlice{},
-		Destination: &Pipe.NodeBuild.EnvironmentFiles,
+		Destination: &P.Pipe.NodeBuild.EnvironmentFiles,
 	},
 
 	&cli.StringFlag{
@@ -65,7 +65,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_CONDITIONS"},
 		Value:       `{ "production": "^v\\d*\\.\\d*\\.\\d*$", "stage": "^v\\d*\\.\\d*\\.\\d*-.*$" }`,
-		Destination: &Pipe.NodeBuild.EnvironmentConditions,
+		Destination: &P.Pipe.NodeBuild.EnvironmentConditions,
 	},
 
 	&cli.StringFlag{
@@ -74,6 +74,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_FALLBACK"},
 		Value:       "develop",
-		Destination: &Pipe.NodeBuild.EnvironmentFallback,
+		Destination: &P.Pipe.NodeBuild.EnvironmentFallback,
 	},
 }

@@ -2,18 +2,16 @@ package build
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
-	"sync"
 
 	"github.com/nochso/gomd/eol"
-	"gitlab.kilic.dev/devops/pipes/node/pipe"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
-	u "gitlab.kilic.dev/libraries/go-utils/utils"
+	"github.com/workanator/go-floc/v3"
+	"gitlab.kilic.dev/devops/pipes/node/setup"
+	"gitlab.kilic.dev/libraries/go-utils/utils"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type Ctx struct {
@@ -22,189 +20,181 @@ type Ctx struct {
 	FallbackEnvironment  string
 }
 
-var Context Ctx
+func SelectEnvironment(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify-build"},
-		Task: func(t *utils.Task) error {
-			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
+	return t.New(tl, "environment").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
+		return len(utils.DeleteEmptyStringsFromSlice(t.Pipe.NodeBuild.EnvironmentFiles.Value())) == 0
+	}).Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		t.Lock.Lock()
+		t.Context.EnvironmentVariables = []string{}
+		t.Lock.Unlock()
+
+		if t.Pipe.Git.Tag != "" {
+			var envConditions map[string]string
+			err := json.Unmarshal([]byte(t.Pipe.NodeBuild.EnvironmentConditions), &envConditions)
 
 			if err != nil {
 				return err
 			}
 
-			Context.EnvironmentVariables = []string{}
-
-			if Pipe.Git.Tag != "" {
-				var envConditions map[string]string
-				err := json.Unmarshal([]byte(Pipe.NodeBuild.EnvironmentConditions), &envConditions)
+			for name, re := range envConditions {
+				m, err := regexp.Match(re, []byte(t.Pipe.Git.Tag))
 
 				if err != nil {
 					return err
 				}
 
-				for name, re := range envConditions {
-					m, err := regexp.Match(re, []byte(Pipe.Git.Tag))
+				if m {
+					t.Lock.Lock()
+					t.Context.SelectedEnvironment = name
+					t.Lock.Unlock()
+				}
+			}
+		} else if t.Pipe.Git.Branch != "" {
+			t.Lock.Lock()
+			t.Context.SelectedEnvironment = t.Pipe.Git.Branch
+			t.Lock.Unlock()
+		} else {
+			return fmt.Errorf("Can not set selected environment. Either tag name or branch name environment variable should be present.")
+		}
+
+		t.Log.Debugf("Selected environment set: %s", t.Context.SelectedEnvironment)
+
+		if t.Pipe.NodeBuild.EnvironmentFallback != "" {
+			t.Lock.Lock()
+			t.Context.FallbackEnvironment = t.Pipe.NodeBuild.EnvironmentFallback
+			t.Lock.Unlock()
+		} else if t.Pipe.Git.Branch != "" {
+			t.Lock.Lock()
+			t.Context.FallbackEnvironment = t.Pipe.Git.Branch
+			t.Lock.Unlock()
+		} else {
+			t.Log.Fatalln("Can not set fallback environment. Either manual fallback parameter should be set or brannch name environment variable should be present.")
+		}
+
+		t.Log.Debugf("Fallback environment set: %s", t.Context.FallbackEnvironment)
+
+		return nil
+	})
+}
+
+func InjectEnvironmentVariables(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
+
+	return t.New(tl, "variables").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
+		return len(utils.DeleteEmptyStringsFromSlice(t.Pipe.NodeBuild.EnvironmentFiles.Value())) == 0
+	}).Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		EOL := eol.OSDefault().String()
+
+		for _, file := range t.Pipe.NodeBuild.EnvironmentFiles.Value() {
+			st := Task[Pipe, Ctx]{}
+
+			st.New(tl, "inject").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+				t.Log.Infof("Injecting environment variables from: %s", file)
+
+				cmd := Command[Pipe, Ctx]{}
+
+				cmd.New(t, "ta-gitlab-env").Set(func(c *Command[Pipe, Ctx]) error {
+					c.AppendArgs(
+						"--yml-file",
+						file,
+						"--prefix",
+						t.Context.SelectedEnvironment,
+						"--fallback",
+						t.Context.FallbackEnvironment,
+					)
+
+					output, err := c.Command.CombinedOutput()
 
 					if err != nil {
 						return err
 					}
 
-					if m {
-						Context.SelectedEnvironment = name
-					}
-				}
-			} else if Pipe.Git.Branch != "" {
-				Context.SelectedEnvironment = Pipe.Git.Branch
-			} else {
-				t.Log.Fatalln("Can not set selected environment. Either tag name or branch name environment variable should be present.")
-			}
+					variables := strings.Split(string(output), EOL)
 
-			t.Log.Debugf("Selected environment set: %s", Context.SelectedEnvironment)
+					for i, v := range variables {
+						v := strings.TrimSpace(v)
 
-			if Pipe.NodeBuild.EnvironmentFallback != "" {
-				Context.FallbackEnvironment = Pipe.NodeBuild.EnvironmentFallback
-			} else if Pipe.Git.Branch != "" {
-				Context.FallbackEnvironment = Pipe.Git.Branch
-			} else {
-				t.Log.Fatalln("Can not set fallback environment. Either manual fallback parameter should be set or brannch name environment variable should be present.")
-			}
+						if v == "" {
+							continue
+						}
 
-			t.Log.Debugf("Fallback environment set: %s", Context.FallbackEnvironment)
+						m := regexp.MustCompile(`^export ([^=]*)="([^"]*)"$`)
 
-			return nil
-		},
-	}
-}
+						matches := m.FindStringSubmatch(v)
 
-func InjectEnvironmentVariables() utils.Task {
-	return utils.Task{Metadata: utils.TaskMetadata{
-		Context: "variables",
-		Skip: len(
-			u.DeleteEmptyStringsFromSlice(Pipe.NodeBuild.EnvironmentFiles.Value()),
-		) == 0,
-	}, Task: func(t *utils.Task) error {
-		var wg sync.WaitGroup
-		wg.Add(len(Pipe.NodeBuild.EnvironmentFiles.Value()))
+						if len(matches) != 3 {
+							t.Log.Fatalf(
+								"Can not fetch the environment variable from: %s", v,
+							)
+						}
 
-		errs := []error{}
-		EOL := eol.OSDefault().String()
+						variables[i] = fmt.Sprintf("%s=%s", matches[1], matches[2])
 
-		for i, file := range Pipe.NodeBuild.EnvironmentFiles.Value() {
-			go func(i int, file string) {
-				defer wg.Done()
-
-				t.Log.Infof("Injecting environment variables from: %s", file)
-
-				cmd := exec.Command("ta-gitlab-env")
-
-				cmd.Args = append(
-					cmd.Args,
-					"--yml-file",
-					file,
-					"--prefix",
-					Context.SelectedEnvironment,
-					"--fallback",
-					Context.FallbackEnvironment,
-				)
-
-				output, err := cmd.CombinedOutput()
-
-				if err != nil {
-					errs = append(errs, errors.New(string(output)))
-				}
-
-				variables := strings.Split(string(output), EOL)
-
-				for i, v := range variables {
-					v := strings.TrimSpace(v)
-
-					if v == "" {
-						continue
+						t.Log.Debugf("Matched from environment variable: %s -> %s",
+							v,
+							variables[i])
 					}
 
-					m := regexp.MustCompile(`^export ([^=]*)="([^"]*)"$`)
+					variables = utils.DeleteEmptyStringsFromSlice(variables)
 
-					matches := m.FindStringSubmatch(v)
-
-					if len(matches) != 3 {
-						t.Log.Fatalf(
-							"Can not fetch the environment variable from: %s", v,
+					if len(variables) > 0 {
+						t.Log.Debugf(
+							"Injected Variables from environment file: %s%s%s",
+							file,
+							EOL,
+							strings.Join(variables, EOL),
 						)
+					} else {
+						t.Log.Warningf("No variables are injected from environment file: %s", file)
 					}
 
-					variables[i] = fmt.Sprintf("%s=%s", matches[1], matches[2])
+					t.Lock.Lock()
+					t.Context.EnvironmentVariables = append(t.Context.EnvironmentVariables, variables...)
+					t.Lock.Unlock()
 
-					t.Log.Debugf("Matched from environment variable: %s -> %s",
-						v,
-						variables[i])
-				}
+					return nil
+				})
 
-				variables = u.DeleteEmptyStringsFromSlice(variables)
+				return nil
+			})
 
-				if len(variables) > 0 {
-					t.Log.Debugf(
-						"Injected Variables from environment file: %s%s%s",
-						file,
-						EOL,
-						strings.Join(variables, EOL),
-					)
-				} else {
-					t.Log.Warningf("No variables are injected from environment file: %s", file)
-				}
-
-				Context.EnvironmentVariables = append(Context.EnvironmentVariables, variables...)
-			}(i, file)
-		}
-
-		wg.Wait()
-
-		if len(errs) > 0 {
-			for _, v := range errs {
-				t.Log.Errorln(v)
-			}
-
-			t.Log.Fatalln("Errors encountered while injecting environment variables.")
-		}
-
-		if len(Context.EnvironmentVariables) > 0 {
-			t.Log.Debugf(
-				"Injected Environment Variables:%s%s",
-				EOL,
-				strings.Join(Context.EnvironmentVariables, EOL),
-			)
-		} else {
-			t.Log.Warningf("No variables are injected from any of the environment files: %s", strings.Join(Pipe.NodeBuild.EnvironmentFiles.Value(), ", "))
+			t.ExtendSubtask(func(j floc.Job) floc.Job {
+				return t.TaskList.JobParallel(j, st.Job())
+			})
 		}
 
 		return nil
-	}}
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.RunSubtasks()
+	})
 }
 
-func BuildNodeApplication() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "build"},
-		Task: func(t *utils.Task) error {
-			args := []string{}
+func BuildNodeApplication(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-			cmd := exec.Command(pipe.Context.PackageManager.Exe)
+	return t.New(tl, "build").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		cmd := Command[Pipe, Ctx]{}
 
-			args = append(args, pipe.Context.PackageManager.Commands.Run...)
-			args = append(args, Pipe.NodeBuild.Script)
-			args = append(args, pipe.Context.PackageManager.Commands.RunDelimitter...)
-			args = append(args, strings.Split(Pipe.NodeBuild.ScriptArgs, " ")...)
+		cmd.New(t, setup.P.Context.PackageManager.Exe).Set(func(c *Command[Pipe, Ctx]) error {
+			c.AppendArgs(setup.P.Context.PackageManager.Commands.Run...).
+				AppendArgs(t.Pipe.NodeBuild.Script).
+				AppendArgs(setup.P.Context.PackageManager.Commands.RunDelimitter...).
+				AppendArgs(strings.Split(t.Pipe.NodeBuild.ScriptArgs, " ")...)
 
-			cmd.Args = append(cmd.Args, args...)
+			c.SetDir(t.Pipe.NodeBuild.Cwd)
 
-			cmd.Dir = Pipe.NodeBuild.Cwd
-
-			cmd.Env = append(cmd.Env, os.Environ()...)
-			cmd.Env = append(cmd.Env, Context.EnvironmentVariables...)
-
-			t.Command = cmd
+			c.AppendDirectEnvironment(os.Environ()...).
+				AppendDirectEnvironment(t.Context.EnvironmentVariables...)
 
 			return nil
-		},
-	}
+		})
+
+		t.AddCommands(cmd)
+
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.TaskList.RunJobs(t.GetCommandJobAsJobSequence())
+	})
 }

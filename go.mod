@@ -11,14 +11,15 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/sirupsen/logrus v1.8.1
-	github.com/urfave/cli/v2 v2.7.1
+	github.com/urfave/cli/v2 v2.8.1
+	github.com/workanator/go-floc/v3 v3.0.1
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
+	gitlab.kilic.dev/libraries/plumber/v2 v2.3.2
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
-	github.com/antzucaro/matchr v0.0.0-20210222213004-b04723ef80f0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/creasty/defaults v1.6.0 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
@@ -38,7 +39,8 @@ require (
 	github.com/opencontainers/image-spec v1.0.3-0.20211202183452-c5a74bcca799 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	golang.org/x/crypto v0.0.0-20220518034528-6f7dac969898 // indirect
+	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
+	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
@@ -47,3 +49,5 @@ require (
 	google.golang.org/protobuf v1.25.0 // indirect
 	gotest.tools/v3 v3.2.0 // indirect
 )
+
+// replace gitlab.kilic.dev/libraries/plumber/v2 => /home/cenk/development/plumber

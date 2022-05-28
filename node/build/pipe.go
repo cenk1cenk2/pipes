@@ -1,8 +1,8 @@
 package build
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/urfave/cli/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type (
@@ -20,24 +20,23 @@ type (
 		EnvironmentConditions string `validate:"json"`
 	}
 
-	Plugin struct {
-		Git       Git
-		NodeBuild NodeBuild
+	Pipe struct {
+		Git
+		NodeBuild
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var P = TaskList[Pipe, Ctx]{
+	Pipe:    Pipe{},
+	Context: Ctx{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			InjectEnvironmentVariables(),
-			BuildNodeApplication(),
-		},
+func New(a *App) *TaskList[Pipe, Ctx] {
+	return P.New(a).SetTasks(
+		P.JobSequence(
+			SelectEnvironment(&P).Job(),
+			InjectEnvironmentVariables(&P).Job(),
+			BuildNodeApplication(&P).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }

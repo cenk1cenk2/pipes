@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_INSTALL_CWD"},
 		Value:       ".",
-		Destination: &Pipe.NodeInstall.Cwd,
+		Destination: &P.Pipe.NodeInstall.Cwd,
 	},
 
 	&cli.BoolFlag{
@@ -20,6 +20,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_INSTALL_USE_LOCK_FILE"},
 		Value:       true,
-		Destination: &Pipe.NodeInstall.UseLockFile,
+		Destination: &P.Pipe.NodeInstall.UseLockFile,
 	},
 }

@@ -1,4 +1,4 @@
-package pipe
+package setup
 
 import (
 	"github.com/urfave/cli/v2"
@@ -11,6 +11,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_PACKAGE_MANAGER"},
 		Value:       "yarn",
-		Destination: &Pipe.Node.PackageManager,
+		Destination: &P.Pipe.Node.PackageManager,
 	},
 }

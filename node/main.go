@@ -3,99 +3,79 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
-	build "gitlab.kilic.dev/devops/pipes/node/build"
-	install "gitlab.kilic.dev/devops/pipes/node/install"
-	login "gitlab.kilic.dev/devops/pipes/node/login"
-	pipe "gitlab.kilic.dev/devops/pipes/node/pipe"
-	run "gitlab.kilic.dev/devops/pipes/node/run"
+	"gitlab.kilic.dev/devops/pipes/node/build"
+	"gitlab.kilic.dev/devops/pipes/node/install"
+	"gitlab.kilic.dev/devops/pipes/node/login"
+	"gitlab.kilic.dev/devops/pipes/node/run"
+	"gitlab.kilic.dev/devops/pipes/node/setup"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 func main() {
-	utils.CliCreate(
-		&cli.App{
-			Name:        CLI_NAME,
-			Version:     VERSION,
-			Usage:       DESCRIPTION,
-			Description: DESCRIPTION,
-			Action: func(c *cli.Context) error {
-				utils.CliGreet(c)
+	a := App{}
 
-				err := cli.ShowAppHelp(c)
+	a.New(
+		func(a *App) *cli.App {
+			return &cli.App{
+				Name:        CLI_NAME,
+				Version:     VERSION,
+				Usage:       DESCRIPTION,
+				Description: DESCRIPTION,
+				Commands: cli.Commands{
+					{
+						Name:  "login",
+						Flags: a.AppendFlags(setup.Flags, login.Flags),
+						Action: func(c *cli.Context) error {
+							return login.P.RunJobs(
+								login.P.JobSequence(
+									setup.New(a).Job(c),
+									login.New(a).Job(c),
+								),
+							)
+						},
+					},
 
-				if err != nil {
-					return err
-				}
+					{
+						Name:  "install",
+						Flags: a.AppendFlags(setup.Flags, login.Flags, install.Flags),
+						Action: func(c *cli.Context) error {
+							return install.P.RunJobs(
+								install.P.JobSequence(
+									setup.New(a).Job(c),
+									login.New(a).Job(c),
+									install.New(a).Job(c),
+								),
+							)
+						},
+					},
 
-				utils.Log.Fatalln("Need a subcommand to run!")
+					{
+						Name:  "build",
+						Flags: a.AppendFlags(setup.Flags, build.Flags),
+						Action: func(c *cli.Context) error {
+							return build.P.RunJobs(
+								build.P.JobSequence(
+									setup.New(a).Job(c),
+									build.New(a).Job(c),
+								),
+							)
+						},
+					},
 
-				return nil
-			},
-			Commands: cli.Commands{
-				{
-					Name: "login",
-					Flags: append(
-						append(utils.CliDefaultFlags, pipe.Flags...),
-						login.Flags...),
-					Action: func(c *cli.Context) error {
-						utils.CliGreet(c)
-
-						if err := pipe.Pipe.Exec(); err != nil {
-							return err
-						}
-
-						return login.Pipe.Exec()
+					{
+						Name:  "run",
+						Flags: a.AppendFlags(setup.Flags, run.Flags),
+						Action: func(c *cli.Context) error {
+							return run.P.RunJobs(
+								run.P.JobSequence(
+									setup.New(a).Job(c),
+									run.New(a).Job(c),
+								),
+							)
+						},
 					},
 				},
-
-				{
-					Name: "install",
-					Flags: append(
-						append(append(utils.CliDefaultFlags, pipe.Flags...), install.Flags...),
-						login.Flags...),
-					Action: func(c *cli.Context) error {
-						utils.CliGreet(c)
-
-						if err := pipe.Pipe.Exec(); err != nil {
-							return err
-						}
-
-						if err := login.Pipe.Exec(); err != nil {
-							return err
-						}
-
-						return install.Pipe.Exec()
-					},
-				},
-
-				{
-					Name:  "build",
-					Flags: append(append(utils.CliDefaultFlags, pipe.Flags...), build.Flags...),
-					Action: func(c *cli.Context) error {
-						utils.CliGreet(c)
-
-						if err := pipe.Pipe.Exec(); err != nil {
-							return err
-						}
-
-						return build.Pipe.Exec()
-					},
-				},
-
-				{
-					Name:  "run",
-					Flags: append(append(utils.CliDefaultFlags, pipe.Flags...), run.Flags...),
-					Action: func(c *cli.Context) error {
-						utils.CliGreet(c)
-
-						if err := pipe.Pipe.Exec(); err != nil {
-							return err
-						}
-
-						return run.Pipe.Exec(c)
-					},
-				},
-			},
+			}
 		},
-	)
+	).Run()
 }

@@ -17,3 +17,7 @@ update:
 	$(GO_GET) -u all
 	$(GO_VENDOR)
 	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
+
+tidy:
+	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
+	$(GO_VENDOR)
