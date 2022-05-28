@@ -1,4 +1,4 @@
-package pipe
+package setup
 
 var (
 	PackageManagers = AvailablePackageManagerCommands{

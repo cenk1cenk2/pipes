@@ -4,201 +4,152 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
-	"sync"
 
 	"github.com/nochso/gomd/eol"
 	"github.com/sirupsen/logrus"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	"github.com/workanator/go-floc/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type Ctx struct {
 	NpmLogin []NpmLoginJson
 }
 
-var Context Ctx
+func Unmarshal(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify", Skip: Pipe.Npm.Login == ""},
-		Task: func(t *utils.Task) error {
-			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
+	return t.New(tl, "unmarshal").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
+		return t.Pipe.Npm.Login == ""
+	}).Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		// unmarshal npm logins and use the default registry for ones that are not defined
+		t.Log.Debugln("Npm login credentials are specified, initiating login context.")
 
-			if err != nil {
-				return err
-			}
+		if err := json.Unmarshal([]byte(t.Pipe.Npm.Login), &t.Context.NpmLogin); err != nil {
+			t.Log.Fatalln("Can not decode Npm registry login credentials.")
+		}
 
-			// unmarshal npm logins and use the default registry for ones that are not defined
-			t.Log.Debugln("Npm login credentials are specified, initiating login context.")
+		for i := range t.Context.NpmLogin {
+			st := Task[Pipe, Ctx]{}
 
-			err = json.Unmarshal([]byte(Pipe.Npm.Login), &Context.NpmLogin)
+			st.New(tl, "validate").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+				return t.TaskList.Validate(&t.Context.NpmLogin[i])
+			})
 
-			if err != nil {
-				t.Log.Fatalln("Can not decode Npm registry login credentials.")
-			}
+			t.SetSubtask(st.Job())
+		}
 
-			var wg sync.WaitGroup
-			wg.Add(len(Context.NpmLogin))
-			errs := []error{}
-
-			for i, v := range Context.NpmLogin {
-				go func(i int, v NpmLoginJson) {
-					defer wg.Done()
-
-					err := utils.ValidateAndSetDefaults(t.Metadata, &Context.NpmLogin[i])
-
-					if err != nil {
-						errs = append(errs, err)
-					}
-				}(i, v)
-			}
-
-			wg.Wait()
-
-			if len(errs) > 0 {
-				for _, v := range errs {
-					t.Log.Errorln(v)
-				}
-
-				t.Log.Fatalln("Errors encountered while validation.")
-			}
-
-			return nil
-		},
-	}
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.RunSubtasks()
+	})
 }
 
-func GenerateNpmRc() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{
-			Context: "generate-npmrc",
-			Skip:    Pipe.Npm.Login == "" && Pipe.Npm.NpmRc == "",
-		},
-		Task: func(t *utils.Task) error {
-			t.Log.Debugf(
-				".npmrc file: %s", strings.Join(Pipe.Npm.NpmRcFile.Value(), ", "),
-			)
+func GenerateNpmRc(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-			npmrc := []string{}
+	return t.New(tl, "npmrc").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
+		return t.Pipe.Npm.Login == "" && t.Pipe.Npm.NpmRc == ""
+	}).Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		t.Log.Debugf(
+			".npmrc file: %s", strings.Join(t.Pipe.Npm.NpmRcFile.Value(), ", "),
+		)
 
-			if Pipe.Npm.Login != "" {
-				t.Log.Infoln("Logging in to given registries with credentials.")
+		npmrc := []string{}
 
-				var wg sync.WaitGroup
-				wg.Add(len(Context.NpmLogin))
-				for i, v := range Context.NpmLogin {
-					go func(i int, v NpmLoginJson) {
-						defer wg.Done()
+		if t.Pipe.Npm.Login != "" {
+			t.Log.Infoln("Logging in to given registries with credentials.")
 
-						t.Log.Infof(
-							"Generating login credentials for the registry: %s",
-							v.Registry,
-						)
+			for _, v := range t.Context.NpmLogin {
+				t.Log.Infof(
+					"Generating login credentials for the registry: %s",
+					v.Registry,
+				)
 
-						npmrc = append(
-							npmrc,
-							fmt.Sprintf("//%s/:_authToken=%s", v.Registry, v.Token),
-						)
-					}(i, v)
+				npmrc = append(
+					npmrc,
+					fmt.Sprintf("//%s/:_authToken=%s", v.Registry, v.Token),
+				)
+			}
+		}
+
+		if t.Pipe.Npm.NpmRc != "" {
+			t.Log.Infoln("Appending directly to the given npmrc file.")
+
+			npmrc = append(npmrc, strings.Split(t.Pipe.Npm.NpmRc, eol.OSDefault().String())...)
+		}
+
+		for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
+			st := Task[Pipe, Ctx]{}
+
+			st.New(tl, "generate").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+				t.Log.Debugf("Creating npmrc file: %s", file)
+
+				f, err := os.OpenFile(file,
+					os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+				if err != nil {
+
+					return err
 				}
 
-				wg.Wait()
-			}
-
-			if Pipe.Npm.NpmRc != "" {
-				t.Log.Infoln("Appending the given npmrc file.")
-
-				npmrc = append(npmrc, strings.Split(Pipe.Npm.NpmRc, eol.OSDefault().String())...)
-			}
-
-			var wg sync.WaitGroup
-			wg.Add(len(Pipe.Npm.NpmRcFile.Value()))
-			errs := []error{}
-
-			for i, v := range Pipe.Npm.NpmRcFile.Value() {
-				go func(i int, file string) {
-					defer wg.Done()
-
-					t.Log.Debugf("Creating npmrc file: %s", file)
-
-					f, err := os.OpenFile(file,
-						os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-
-					if err != nil {
-						errs = append(errs, err)
-
-						return
-					}
-
-					defer f.Close()
-					if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
-						errs = append(errs, err)
-
-						return
-					}
-				}(i, v)
-			}
-
-			wg.Wait()
-
-			if len(errs) > 0 {
-				for _, v := range errs {
-					t.Log.Errorln(v)
+				defer f.Close()
+				if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
+					return err
 				}
 
-				t.Log.Fatalln("Errors encountered while creating npmrc files.")
-			}
+				return nil
+			})
 
-			return nil
-		},
-	}
+			t.ExtendSubtask(func(j floc.Job) floc.Job {
+				return t.TaskList.JobParallel(j, st.Job())
+			})
+		}
+
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.RunSubtasks()
+	})
 }
 
-func VerifyNpmLogin() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{
-			Context:        "verify-login",
-			Skip:           Pipe.Npm.Login == "",
-			StdOutLogLevel: logrus.DebugLevel,
-		},
-		Task: func(t *utils.Task) error {
-			var wg sync.WaitGroup
-			wg.Add(len(Context.NpmLogin))
+func VerifyNpmLogin(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-			for i, v := range Context.NpmLogin {
-				go func(i int, v NpmLoginJson) {
-					defer wg.Done()
+	return t.New(tl, "login").ShouldDisable(func(t *Task[Pipe, Ctx]) bool {
+		return t.Pipe.Npm.Login == ""
+	}).Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		for _, v := range t.Context.NpmLogin {
+			cmd := Command[Pipe, Ctx]{}
 
-					t.Log.Infof(
-						"Checking login credentials for Npm registry: %s", v.Registry,
-					)
+			cmd.New(t, "npm", "whoami").SetLogLevel(logrus.DebugLevel, 0).Set(func(c *Command[Pipe, Ctx]) error {
 
-					cmd := exec.Command("npm", "whoami")
+				t.Log.Infof(
+					"Checking login credentials for Npm registry: %s", v.Registry,
+				)
 
-					var url string
+				var url string
 
-					if v.UseHttps {
-						url = fmt.Sprintf("https://%s", v.Registry)
-					} else {
-						url = fmt.Sprintf("http://%s", v.Registry)
-					}
+				if v.UseHttps {
+					url = fmt.Sprintf("https://%s", v.Registry)
+				} else {
+					url = fmt.Sprintf("http://%s", v.Registry)
+				}
 
-					cmd.Args = append(
-						cmd.Args,
-						"--configfile",
-						Pipe.Npm.NpmRcFile.Value()[0],
-						"--registry",
-						url,
-					)
+				c.AppendArgs(
+					"--configfile",
+					t.Pipe.Npm.NpmRcFile.Value()[0],
+					"--registry",
+					url,
+				)
 
-					t.Commands = append(t.Commands, cmd)
-				}(i, v)
-			}
+				return nil
+			})
 
-			wg.Wait()
+			t.AddCommands(cmd)
+		}
 
-			return nil
-		},
-	}
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.TaskList.RunJobs(t.GetCommandJobAsJobParallel())
+	})
 }

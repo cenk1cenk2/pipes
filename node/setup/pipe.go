@@ -1,17 +1,16 @@
-package install
+package setup
 
 import (
 	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type (
-	NodeInstall struct {
-		Cwd         string `validate:"dir"`
-		UseLockFile bool
+	Node struct {
+		PackageManager string `validate:"oneof=npm yarn"`
 	}
 
 	Pipe struct {
-		NodeInstall NodeInstall
+		Node Node
 	}
 )
 
@@ -22,8 +21,6 @@ var P = TaskList[Pipe, Ctx]{
 
 func New(a *App) *TaskList[Pipe, Ctx] {
 	return P.New(a).SetTasks(
-		P.JobSequence(
-			InstallNodeDependencies(&P).Job(),
-		),
+		SetupPackageManager(&P).Job(),
 	)
 }

@@ -1,4 +1,4 @@
-package pipe
+package setup
 
 type (
 	PackageManagerCommands struct {

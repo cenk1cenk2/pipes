@@ -1,55 +1,40 @@
 package install
 
 import (
-	"os/exec"
-
-	pipe "gitlab.kilic.dev/devops/pipes/node/pipe"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	"github.com/workanator/go-floc/v3"
+	pipe "gitlab.kilic.dev/devops/pipes/node/setup"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type Ctx struct {
 }
 
-var Context Ctx
+func InstallNodeDependencies(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
+	t := Task[Pipe, Ctx]{}
 
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify-install"},
-		Task: func(t *utils.Task) error {
-			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
+	return t.New(tl, "install").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		cmd := Command[Pipe, Ctx]{}
 
-			if err != nil {
-				return err
-			}
-
-			return nil
-		}}
-}
-
-func InstallNodeDependencies() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "install"},
-		Task: func(t *utils.Task) error {
-			var args []string
-
-			if Pipe.NodeInstall.UseLockFile {
-				args = pipe.Context.PackageManager.Commands.InstallWithLock
+		cmd.New(t, pipe.P.Context.PackageManager.Exe).Set(func(c *Command[Pipe, Ctx]) error {
+			if P.Pipe.NodeInstall.UseLockFile {
+				c.AppendArgs(pipe.P.Context.PackageManager.Commands.InstallWithLock...)
 
 				t.Log.Debugln("Using lockfile for installation.")
 			} else {
-				args = pipe.Context.PackageManager.Commands.Install
+				c.AppendArgs(pipe.P.Context.PackageManager.Commands.Install...)
 
 				t.Log.Debugln("Installing dependencies without a lockfile.")
 			}
 
-			cmd := exec.Command(pipe.Context.PackageManager.Exe)
-			cmd.Args = append(cmd.Args, args...)
-
-			cmd.Dir = Pipe.NodeInstall.Cwd
-
-			t.Command = cmd
+			c.SetDir(P.Pipe.NodeInstall.Cwd)
 
 			return nil
-		},
-	}
+		})
+
+		t.AddCommands(cmd)
+
+		return nil
+	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
+		return t.TaskList.RunJobs(t.GetCommandJobAsJobSequence())
+	})
 }

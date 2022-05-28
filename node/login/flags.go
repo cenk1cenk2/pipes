@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NPM_LOGIN"},
 		Value:       "",
-		Destination: &Pipe.Npm.Login,
+		Destination: &P.Pipe.Npm.Login,
 	},
 
 	&cli.StringSliceFlag{
@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NPM_NPMRC_FILE"},
 		Value:       cli.NewStringSlice(".npmrc"),
-		Destination: &Pipe.Npm.NpmRcFile,
+		Destination: &P.Pipe.Npm.NpmRcFile,
 	},
 
 	&cli.StringFlag{
@@ -29,6 +29,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NPM_NPMRC"},
 		Value:       "",
-		Destination: &Pipe.Npm.NpmRc,
+		Destination: &P.Pipe.Npm.NpmRc,
 	},
 }

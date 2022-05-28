@@ -3,8 +3,8 @@ package run
 import (
 	"strings"
 
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
 	"github.com/urfave/cli/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type (
@@ -14,25 +14,23 @@ type (
 		Cwd        string `validate:"dir"`
 	}
 
-	Plugin struct {
+	Pipe struct {
 		NodeCommand NodeCommand
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var P = TaskList[Pipe, Ctx]{
+	Pipe:    Pipe{},
+	Context: Ctx{},
+}
 
-func (p Plugin) Exec(c *cli.Context) error {
-	args := c.Args().Slice()
-	Pipe.NodeCommand.Script, Pipe.NodeCommand.ScriptArgs = args[0], strings.Join(args[1:], " ")
+func New(a *App) *TaskList[Pipe, Ctx] {
+	return P.New(a).ShouldRunBefore(func(tl *TaskList[Pipe, Ctx], ctx *cli.Context) error {
+		args := ctx.Args().Slice()
+		P.Pipe.NodeCommand.Script, P.Pipe.NodeCommand.ScriptArgs = args[0], strings.Join(args[1:], " ")
 
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			RunNodeScript(),
-		},
+		return nil
+	}).SetTasks(
+		P.JobSequence(),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }

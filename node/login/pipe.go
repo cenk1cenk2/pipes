@@ -2,29 +2,33 @@ package login
 
 import (
 	"github.com/urfave/cli/v2"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type (
 	Npm struct {
-		Login     string `validate:"json"`
+		Login     string
 		NpmRcFile cli.StringSlice
 		NpmRc     string
 	}
 
-	Plugin struct {
+	Pipe struct {
 		Npm Npm
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var P = TaskList[Pipe, Ctx]{
+	Pipe:    Pipe{},
+	Context: Ctx{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{VerifyVariables(), GenerateNpmRc(), VerifyNpmLogin()},
+func New(a *App) *TaskList[Pipe, Ctx] {
+	return P.New(a).SetTasks(
+		P.JobSequence(
+			Unmarshal(&P).Job(),
+			GenerateNpmRc(&P).Job(),
+			VerifyNpmLogin(&P).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }
