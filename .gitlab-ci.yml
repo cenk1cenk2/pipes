@@ -53,6 +53,9 @@ build:
       - ${APP_FOLDER}/dist/
   parallel:
     matrix:
+      - APP_FOLDER: ./_template
+        APP_BINARY: pipe
+
       - APP_FOLDER: ./docker
         APP_BINARY: gitlab-pipes-docker
 

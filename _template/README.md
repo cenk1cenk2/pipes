@@ -1,14 +1,48 @@
-# template
+<!-- clidocs -->
 
-## Description
+# NAME
 
-## Usage
+template - template-cli
 
-```bash
-GLOBAL OPTIONS:
-   --utils.ci value     Indicates this is running inside a CI/CD environment to act accordingly. [$CI]
-   --utils.debug value  Set the log level debug for the application. [$DEBUG, $PLUGIN_DEBUG]
-   --utils.log value    Define the log level for the application. (default: "info") [$LOG_LEVEL, $PLUGIN_LOG_LEVEL]
-   --help, -h           show help
-   --version, -v        print the version
+# SYNOPSIS
+
+template
+
 ```
+[--ci]
+[--debug]
+[--help|-h]
+[--log-level]=[value]
+[--version|-v]
+```
+
+# DESCRIPTION
+
+template-cli
+
+**Usage**:
+
+```
+template [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+```
+
+# GLOBAL OPTIONS
+
+**--ci**: Sets whether this is running inside a CI/CD environment.
+
+**--debug**: Enable debugging for the application.
+
+**--help, -h**: show help
+
+**--log-level**="": Define the log level for the application. (default: info)
+
+**--version, -v**: print the version
+
+
+# COMMANDS
+
+## help, h
+
+Shows a list of commands or help for one command
+
+<!-- clidocsstop -->

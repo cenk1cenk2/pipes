@@ -1,25 +1,27 @@
 package pipe
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	"github.com/workanator/go-floc/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type Ctx struct {
 }
 
-var Context Ctx
+func DefaultTask(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("default").
+		Set(func(t *Task[Pipe], c floc.Control) error {
+			t.CreateCommand("echo").
+				Set(func(c *Command[Pipe]) error {
+					c.AppendArgs("hello")
 
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify"},
-		Task: func(t *utils.Task) error {
-			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
-
-			if err != nil {
-				return err
-			}
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
-		},
-	}
+		}).
+		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+			return t.RunCommandJobAsJobSequence()
+		})
 }

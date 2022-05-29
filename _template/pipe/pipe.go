@@ -1,22 +1,23 @@
 package pipe
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
 type (
-	Plugin struct {
+	Pipe struct {
+		Ctx
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var P = TaskList[Pipe]{
+	Pipe: Pipe{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{},
+func New(a *App) *TaskList[Pipe] {
+	return P.New(a).SetTasks(
+		P.JobSequence(
+			DefaultTask(&P).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }
