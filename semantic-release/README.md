@@ -13,6 +13,10 @@ semantic-release
 [--debug]
 [--help|-h]
 [--log-level]=[value]
+[--packages.apk]=[value]
+[--packages.node]=[value]
+[--semantic_release.dry_run]
+[--semantic_release.run_multi]
 [--version|-v]
 ```
 
@@ -36,8 +40,15 @@ semantic-release [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
 
 **--log-level**="": Define the log level for the application. (default: info)
 
-**--version, -v**: print the version
+**--packages.apk**="": APK applications to install before running semantic-release. (default: [])
 
+**--packages.node**="": Node packages to install before running semantic-release. (default: [])
+
+**--semantic_release.dry_run**: Node packages to install before running semantic-release.
+
+**--semantic_release.run_multi**: Uses @qiwi/multi-semantic-release package to do a workspace release.
+
+**--version, -v**: print the version
 
 # COMMANDS
 
