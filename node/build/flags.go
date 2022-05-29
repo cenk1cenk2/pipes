@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_COMMIT_REF_NAME"},
 		Value:       "",
-		Destination: &P.Pipe.Git.Branch,
+		Destination: &TL.Pipe.Git.Branch,
 	},
 
 	&cli.StringFlag{
@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_COMMIT_TAG"},
 		Value:       "",
-		Destination: &P.Pipe.Git.Tag,
+		Destination: &TL.Pipe.Git.Tag,
 	},
 
 	&cli.StringFlag{
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_SCRIPT"},
 		Value:       "build",
-		Destination: &P.Pipe.NodeBuild.Script,
+		Destination: &TL.Pipe.NodeBuild.Script,
 	},
 
 	&cli.StringFlag{
@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_SCRIPT_ARGS"},
 		Value:       "",
-		Destination: &P.Pipe.NodeBuild.ScriptArgs,
+		Destination: &TL.Pipe.NodeBuild.ScriptArgs,
 	},
 
 	&cli.StringFlag{
@@ -47,7 +47,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_CWD"},
 		Value:       ".",
-		Destination: &P.Pipe.NodeBuild.Cwd,
+		Destination: &TL.Pipe.NodeBuild.Cwd,
 	},
 
 	&cli.StringSliceFlag{
@@ -56,7 +56,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_FILES"},
 		Value:       &cli.StringSlice{},
-		Destination: &P.Pipe.NodeBuild.EnvironmentFiles,
+		Destination: &TL.Pipe.NodeBuild.EnvironmentFiles,
 	},
 
 	&cli.StringFlag{
@@ -65,7 +65,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_CONDITIONS"},
 		Value:       `{ "production": "^v\\d*\\.\\d*\\.\\d*$", "stage": "^v\\d*\\.\\d*\\.\\d*-.*$" }`,
-		Destination: &P.Pipe.NodeBuild.EnvironmentConditions,
+		Destination: &TL.Pipe.NodeBuild.EnvironmentConditions,
 	},
 
 	&cli.StringFlag{
@@ -74,6 +74,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_FALLBACK"},
 		Value:       "develop",
-		Destination: &P.Pipe.NodeBuild.EnvironmentFallback,
+		Destination: &TL.Pipe.NodeBuild.EnvironmentFallback,
 	},
 }

@@ -19,16 +19,16 @@ type (
 	}
 )
 
-var P = TaskList[Pipe]{
+var TL = TaskList[Pipe]{
 	Pipe: Pipe{},
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return P.New(p).SetTasks(
-		P.JobSequence(
-			Decode(&P).Job(),
-			GenerateNpmRc(&P).Job(),
-			VerifyNpmLogin(&P).Job(),
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			Decode(&TL).Job(),
+			GenerateNpmRc(&TL).Job(),
+			VerifyNpmLogin(&TL).Job(),
 		),
 	)
 }

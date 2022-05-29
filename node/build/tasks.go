@@ -169,11 +169,11 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("build").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(setup.P.Pipe.Ctx.PackageManager.Exe).
+			t.CreateCommand(setup.TL.Pipe.Ctx.PackageManager.Exe).
 				Set(func(c *Command[Pipe]) error {
-					c.AppendArgs(setup.P.Pipe.Ctx.PackageManager.Commands.Run...).
+					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...).
 						AppendArgs(t.Pipe.NodeBuild.Script).
-						AppendArgs(setup.P.Pipe.Ctx.PackageManager.Commands.RunDelimitter...).
+						AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.RunDelimitter...).
 						AppendArgs(strings.Split(t.Pipe.NodeBuild.ScriptArgs, " ")...)
 
 					c.SetDir(t.Pipe.NodeBuild.Cwd)

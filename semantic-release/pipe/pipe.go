@@ -23,18 +23,18 @@ type (
 	}
 )
 
-var P = TaskList[Pipe]{
+var TL = TaskList[Pipe]{
 	Pipe: Pipe{},
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return P.New(p).SetTasks(
-		P.JobSequence(
-			P.JobParallel(
-				InstallApkPackages(&P).Job(),
-				InstallNodePackages(&P).Job(),
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			TL.JobParallel(
+				InstallApkPackages(&TL).Job(),
+				InstallNodePackages(&TL).Job(),
 			),
-			RunSemanticRelease(&P).Job(),
+			RunSemanticRelease(&TL).Job(),
 		),
 	)
 }

@@ -26,8 +26,8 @@ func main() {
 						Name:  "login",
 						Flags: a.AppendFlags(setup.Flags, login.Flags),
 						Action: func(c *cli.Context) error {
-							return login.P.RunJobs(
-								login.P.JobSequence(
+							return login.TL.RunJobs(
+								login.TL.JobSequence(
 									setup.New(a).Job(c),
 									login.New(a).Job(c),
 								),
@@ -39,8 +39,8 @@ func main() {
 						Name:  "install",
 						Flags: a.AppendFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(c *cli.Context) error {
-							return install.P.RunJobs(
-								install.P.JobSequence(
+							return install.TL.RunJobs(
+								install.TL.JobSequence(
 									setup.New(a).Job(c),
 									login.New(a).Job(c),
 									install.New(a).Job(c),
@@ -53,8 +53,8 @@ func main() {
 						Name:  "build",
 						Flags: a.AppendFlags(setup.Flags, build.Flags),
 						Action: func(c *cli.Context) error {
-							return build.P.RunJobs(
-								build.P.JobSequence(
+							return build.TL.RunJobs(
+								build.TL.JobSequence(
 									setup.New(a).Job(c),
 									build.New(a).Job(c),
 								),
@@ -66,8 +66,8 @@ func main() {
 						Name:  "run",
 						Flags: a.AppendFlags(setup.Flags, run.Flags),
 						Action: func(c *cli.Context) error {
-							return run.P.RunJobs(
-								run.P.JobSequence(
+							return run.TL.RunJobs(
+								run.TL.JobSequence(
 									setup.New(a).Job(c),
 									run.New(a).Job(c),
 								),

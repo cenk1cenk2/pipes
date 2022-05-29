@@ -11,6 +11,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_PACKAGE_MANAGER"},
 		Value:       "yarn",
-		Destination: &P.Pipe.Node.PackageManager,
+		Destination: &TL.Pipe.Node.PackageManager,
 	},
 }

@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"ADD_APKS"},
 		Value:       &cli.StringSlice{},
-		Destination: &P.Pipe.Packages.Apk,
+		Destination: &TL.Pipe.Packages.Apk,
 	},
 
 	&cli.StringSliceFlag{
@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"ADD_MODULES"},
 		Value:       &cli.StringSlice{},
-		Destination: &P.Pipe.Packages.Node,
+		Destination: &TL.Pipe.Packages.Node,
 	},
 
 	&cli.BoolFlag{
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"DRY_RUN"},
 		Value:       false,
-		Destination: &P.Pipe.SemanticRelease.IsDryRun,
+		Destination: &TL.Pipe.SemanticRelease.IsDryRun,
 	},
 
 	&cli.BoolFlag{
@@ -38,6 +38,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"RUN_MULTI"},
 		Value:       false,
-		Destination: &P.Pipe.SemanticRelease.UseMulti,
+		Destination: &TL.Pipe.SemanticRelease.UseMulti,
 	},
 }

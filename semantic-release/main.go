@@ -19,8 +19,8 @@ func main() {
 				Description: DESCRIPTION,
 				Flags:       p.AppendFlags(pipe.Flags),
 				Action: func(ctx *cli.Context) error {
-					return pipe.P.RunJobs(
-						pipe.P.JobSequence(
+					return pipe.TL.RunJobs(
+						pipe.TL.JobSequence(
 							pipe.New(p).Job(ctx),
 						),
 					)

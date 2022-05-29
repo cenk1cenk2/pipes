@@ -10,7 +10,7 @@ var Flags = []cli.Flag{
 		Usage:       "package.json script for given command operation.",
 		Required:    false,
 		EnvVars:     []string{"NODE_COMMAND_SCRIPT"},
-		Destination: &P.Pipe.NodeCommand.Script,
+		Destination: &TL.Pipe.NodeCommand.Script,
 	},
 
 	&cli.StringFlag{
@@ -18,7 +18,7 @@ var Flags = []cli.Flag{
 		Usage:       "package.json script arguments for given command operation.",
 		Required:    false,
 		EnvVars:     []string{"NODE_COMMAND_SCRIPT_ARGS"},
-		Destination: &P.Pipe.NodeCommand.ScriptArgs,
+		Destination: &TL.Pipe.NodeCommand.ScriptArgs,
 	},
 
 	&cli.StringFlag{
@@ -27,6 +27,6 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"NODE_COMMAND_CWD"},
 		Value:       ".",
-		Destination: &P.Pipe.NodeCommand.Cwd,
+		Destination: &TL.Pipe.NodeCommand.Cwd,
 	},
 }

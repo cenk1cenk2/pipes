@@ -11,18 +11,18 @@ type Ctx struct {
 func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("install").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(pipe.P.Pipe.Ctx.PackageManager.Exe).Set(func(c *Command[Pipe]) error {
-				if P.Pipe.NodeInstall.UseLockFile {
-					c.AppendArgs(pipe.P.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
+			t.CreateCommand(pipe.TL.Pipe.Ctx.PackageManager.Exe).Set(func(c *Command[Pipe]) error {
+				if TL.Pipe.NodeInstall.UseLockFile {
+					c.AppendArgs(pipe.TL.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
 
 					t.Log.Debugln("Using lockfile for installation.")
 				} else {
-					c.AppendArgs(pipe.P.Pipe.Ctx.PackageManager.Commands.Install...)
+					c.AppendArgs(pipe.TL.Pipe.Ctx.PackageManager.Commands.Install...)
 
 					t.Log.Debugln("Installing dependencies without a lockfile.")
 				}
 
-				c.SetDir(P.Pipe.NodeInstall.Cwd)
+				c.SetDir(TL.Pipe.NodeInstall.Cwd)
 
 				return nil
 			}).AddSelfToTheTask()
