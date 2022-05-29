@@ -13,7 +13,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/urfave/cli/v2 v2.8.1
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v2 v2.10.2
+	gitlab.kilic.dev/libraries/plumber/v2 v2.10.3
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 
