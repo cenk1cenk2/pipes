@@ -5,8 +5,13 @@ import (
 )
 
 type (
+	Default struct {
+		Flag string
+	}
+
 	Pipe struct {
 		Ctx
+		Default
 	}
 )
 
