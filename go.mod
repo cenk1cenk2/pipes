@@ -14,7 +14,7 @@ require (
 	github.com/urfave/cli/v2 v2.8.1
 	github.com/workanator/go-floc/v3 v3.0.1
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v2 v2.5.2
+	gitlab.kilic.dev/libraries/plumber/v2 v2.6.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 
