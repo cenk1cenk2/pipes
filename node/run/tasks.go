@@ -3,7 +3,6 @@ package run
 import (
 	"strings"
 
-	"github.com/workanator/go-floc/v3"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
@@ -13,7 +12,7 @@ type Ctx struct {
 
 func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("run").
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(setup.P.Pipe.Ctx.PackageManager.Exe).Set(func(c *Command[Pipe]) error {
 				c.AppendArgs(setup.P.Pipe.Ctx.PackageManager.Commands.Run...).
 					AppendArgs(t.Pipe.NodeCommand.Script).
@@ -27,7 +26,7 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

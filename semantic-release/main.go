@@ -8,20 +8,20 @@ import (
 )
 
 func main() {
-	a := App{}
+	p := Plumber{}
 
-	a.New(
-		func(a *App) *cli.App {
+	p.New(
+		func(p *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
 				Version:     VERSION,
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
-				Flags:       a.AppendFlags(pipe.Flags),
+				Flags:       p.AppendFlags(pipe.Flags),
 				Action: func(ctx *cli.Context) error {
 					return pipe.P.RunJobs(
 						pipe.P.JobSequence(
-							pipe.New(a).Job(ctx),
+							pipe.New(p).Job(ctx),
 						),
 					)
 				},

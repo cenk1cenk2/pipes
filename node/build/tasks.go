@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/nochso/gomd/eol"
-	"github.com/workanator/go-floc/v3"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	"gitlab.kilic.dev/libraries/go-utils/utils"
 	. "gitlab.kilic.dev/libraries/plumber/v2"
@@ -27,7 +26,7 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 				utils.DeleteEmptyStringsFromSlice(t.Pipe.NodeBuild.EnvironmentFiles.Value()),
 			) == 0
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.EnvironmentVariables = []string{}
 
 			if t.Pipe.Git.Tag != "" {
@@ -81,11 +80,11 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 				utils.DeleteEmptyStringsFromSlice(t.Pipe.NodeBuild.EnvironmentFiles.Value()),
 			) == 0
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			EOL := eol.OSDefault().String()
 
 			for _, file := range t.Pipe.NodeBuild.EnvironmentFiles.Value() {
-				t.CreateSubtask("inject").Set(func(st *Task[Pipe], c floc.Control) error {
+				t.CreateSubtask("inject").Set(func(st *Task[Pipe]) error {
 					st.Log.Infof("Injecting environment variables from: %s", file)
 
 					st.CreateCommand("ta-gitlab-env").Set(func(c *Command[Pipe]) error {
@@ -154,7 +153,7 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					return nil
 				}).ToParent(t, func(pt *Task[Pipe], st *Task[Pipe]) {
-					pt.ExtendSubtask(func(j floc.Job) floc.Job {
+					pt.ExtendSubtask(func(j Job) Job {
 						return tl.JobParallel(j, st.Job())
 					})
 				})
@@ -162,14 +161,14 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunSubtasks()
 		})
 }
 
 func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("build").
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(setup.P.Pipe.Ctx.PackageManager.Exe).
 				Set(func(c *Command[Pipe]) error {
 					c.AppendArgs(setup.P.Pipe.Ctx.PackageManager.Commands.Run...).
@@ -187,7 +186,7 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

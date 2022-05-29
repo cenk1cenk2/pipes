@@ -14,8 +14,8 @@ var P = TaskList[Pipe]{
 	Pipe: Pipe{},
 }
 
-func New(a *App) *TaskList[Pipe] {
-	return P.New(a).SetTasks(
+func New(p *Plumber) *TaskList[Pipe] {
+	return P.New(p).SetTasks(
 		P.JobSequence(
 			DefaultTask(&P).Job(),
 		),

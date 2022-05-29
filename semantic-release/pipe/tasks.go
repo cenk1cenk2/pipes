@@ -3,7 +3,6 @@ package pipe
 import (
 	"strings"
 
-	"github.com/workanator/go-floc/v3"
 	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
@@ -16,7 +15,7 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(t.Pipe.Apk.Value()) == 0
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			apks := t.Pipe.Apk.Value()
 
 			t.Log.Debugf(
@@ -32,7 +31,7 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }
@@ -42,7 +41,7 @@ func InstallNodePackages(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(t.Pipe.Node.Value()) == 0
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			packages := t.Pipe.Node.Value()
 
 			t.Log.Debugf(
@@ -57,14 +56,14 @@ func InstallNodePackages(tl *TaskList[Pipe]) *Task[Pipe] {
 			}).AddSelfToTheTask()
 
 			return nil
-		}).ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		}).ShouldRunAfter(func(t *Task[Pipe]) error {
 		return t.RunCommandJobAsJobParallel()
 	})
 }
 
 func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("release").
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			if t.Pipe.UseMulti {
 				t.Pipe.Ctx.Exe = MULTI_SEMANTIC_RELEASE_EXE
 			} else {
@@ -76,7 +75,7 @@ func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs("--dry-run")
 				}
 
-				if t.App.Environment.Debug {
+				if t.Plumber.Environment.Debug {
 					c.AppendArgs("--debug")
 				}
 
@@ -85,7 +84,7 @@ func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/nochso/gomd/eol"
 	"github.com/sirupsen/logrus"
-	"github.com/workanator/go-floc/v3"
 	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
@@ -21,7 +20,7 @@ func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Npm.Login == ""
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			// unmarshal npm logins and use the default registry for ones that are not defined
 			t.Log.Debugln("Npm login credentials are specified, initiating login context.")
 
@@ -30,10 +29,10 @@ func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			for i := range t.Pipe.Ctx.NpmLogin {
-				t.CreateSubtask("validate").Set(func(st *Task[Pipe], c floc.Control) error {
+				t.CreateSubtask("validate").Set(func(st *Task[Pipe]) error {
 					return tl.Validate(&st.Pipe.Ctx.NpmLogin[i])
 				}).ToParent(t, func(pt, st *Task[Pipe]) {
-					pt.ExtendSubtask(func(j floc.Job) floc.Job {
+					pt.ExtendSubtask(func(j Job) Job {
 						return tl.JobParallel(j, st.Job())
 					})
 				})
@@ -41,7 +40,7 @@ func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunSubtasks()
 		})
 }
@@ -51,7 +50,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Npm.Login == "" && t.Pipe.Npm.NpmRc == ""
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			t.Log.Debugf(
 				".npmrc file: %s", strings.Join(t.Pipe.Npm.NpmRcFile.Value(), ", "),
 			)
@@ -81,7 +80,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
-				t.CreateSubtask("generate").Set(func(st *Task[Pipe], c floc.Control) error {
+				t.CreateSubtask("generate").Set(func(st *Task[Pipe]) error {
 					st.Log.Debugf("Creating npmrc file: %s", file)
 
 					f, err := os.OpenFile(file,
@@ -99,7 +98,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					return nil
 				}).ToParent(t, func(pt, st *Task[Pipe]) {
-					pt.ExtendSubtask(func(j floc.Job) floc.Job {
+					pt.ExtendSubtask(func(j Job) Job {
 						return tl.JobParallel(j, st.Job())
 					})
 				})
@@ -107,7 +106,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunSubtasks()
 		})
 }
@@ -117,7 +116,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Npm.Login == ""
 		}).
-		Set(func(t *Task[Pipe], c floc.Control) error {
+		Set(func(t *Task[Pipe]) error {
 			for _, v := range t.Pipe.Ctx.NpmLogin {
 				t.CreateCommand("npm", "whoami").
 					SetLogLevel(logrus.DebugLevel, 0).
@@ -148,7 +147,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

@@ -12,10 +12,10 @@ import (
 )
 
 func main() {
-	a := App{}
+	p := Plumber{}
 
-	a.New(
-		func(a *App) *cli.App {
+	p.New(
+		func(a *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
 				Version:     VERSION,
