@@ -9,32 +9,28 @@ import (
 type Ctx struct {
 }
 
-func InstallNodeDependencies(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
-	t := Task[Pipe, Ctx]{}
+func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("install").
+		Set(func(t *Task[Pipe], c floc.Control) error {
+			t.CreateCommand(pipe.P.Pipe.Ctx.PackageManager.Exe).Set(func(c *Command[Pipe]) error {
+				if P.Pipe.NodeInstall.UseLockFile {
+					c.AppendArgs(pipe.P.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
 
-	return t.New(tl, "install").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
-		cmd := Command[Pipe, Ctx]{}
+					t.Log.Debugln("Using lockfile for installation.")
+				} else {
+					c.AppendArgs(pipe.P.Pipe.Ctx.PackageManager.Commands.Install...)
 
-		cmd.New(t, pipe.P.Context.PackageManager.Exe).Set(func(c *Command[Pipe, Ctx]) error {
-			if P.Pipe.NodeInstall.UseLockFile {
-				c.AppendArgs(pipe.P.Context.PackageManager.Commands.InstallWithLock...)
+					t.Log.Debugln("Installing dependencies without a lockfile.")
+				}
 
-				t.Log.Debugln("Using lockfile for installation.")
-			} else {
-				c.AppendArgs(pipe.P.Context.PackageManager.Commands.Install...)
+				c.SetDir(P.Pipe.NodeInstall.Cwd)
 
-				t.Log.Debugln("Installing dependencies without a lockfile.")
-			}
-
-			c.SetDir(P.Pipe.NodeInstall.Cwd)
+				return nil
+			}).AddSelfToTheTask()
 
 			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+			return t.RunCommandJobAsJobSequence()
 		})
-
-		t.AddCommands(cmd)
-
-		return nil
-	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
-		return t.RunCommandJobAsJobSequence()
-	})
 }

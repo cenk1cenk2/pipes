@@ -11,16 +11,16 @@ type (
 	}
 
 	Pipe struct {
-		NodeInstall NodeInstall
+		NodeInstall
+		Ctx
 	}
 )
 
-var P = TaskList[Pipe, Ctx]{
-	Pipe:    Pipe{},
-	Context: Ctx{},
+var P = TaskList[Pipe]{
+	Pipe: Pipe{},
 }
 
-func New(a *App) *TaskList[Pipe, Ctx] {
+func New(a *App) *TaskList[Pipe] {
 	return P.New(a).SetTasks(
 		P.JobSequence(
 			InstallNodeDependencies(&P).Job(),

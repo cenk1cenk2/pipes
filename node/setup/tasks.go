@@ -9,17 +9,16 @@ type Ctx struct {
 	PackageManager
 }
 
-func SetupPackageManager(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
-	t := Task[Pipe, Ctx]{}
+func SetupPackageManager(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("setup").
+		Set(func(t *Task[Pipe], c floc.Control) error {
+			t.Pipe.Ctx.PackageManager = PackageManager{
+				Exe:      t.Pipe.Node.PackageManager,
+				Commands: PackageManagers[t.Pipe.Node.PackageManager],
+			}
 
-	return t.New(tl, "setup").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
-		t.Context.PackageManager = PackageManager{
-			Exe:      t.Pipe.Node.PackageManager,
-			Commands: PackageManagers[t.Pipe.Node.PackageManager],
-		}
+			t.Log.Debugf("Using package manager: %s", t.Pipe.Node.PackageManager)
 
-		t.Log.Debugf("Using package manager: %s", t.Pipe.Node.PackageManager)
-
-		return nil
-	})
+			return nil
+		})
 }

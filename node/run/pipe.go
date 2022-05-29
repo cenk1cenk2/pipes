@@ -16,17 +16,17 @@ type (
 	}
 
 	Pipe struct {
-		NodeCommand NodeCommand
+		NodeCommand
+		Ctx
 	}
 )
 
-var P = TaskList[Pipe, Ctx]{
-	Pipe:    Pipe{},
-	Context: Ctx{},
+var P = TaskList[Pipe]{
+	Pipe: Pipe{},
 }
 
-func New(a *App) *TaskList[Pipe, Ctx] {
-	return P.New(a).ShouldRunBefore(func(tl *TaskList[Pipe, Ctx], ctx *cli.Context) error {
+func New(a *App) *TaskList[Pipe] {
+	return P.New(a).ShouldRunBefore(func(tl *TaskList[Pipe], ctx *cli.Context) error {
 		args := ctx.Args().Slice()
 		if len(args) < 1 {
 			return fmt.Errorf("Arguments are needed to run a specific script.")

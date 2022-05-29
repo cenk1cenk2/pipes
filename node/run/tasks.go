@@ -11,26 +11,23 @@ import (
 type Ctx struct {
 }
 
-func RunNodeScript(tl *TaskList[Pipe, Ctx]) *Task[Pipe, Ctx] {
-	t := Task[Pipe, Ctx]{}
+func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("run").
+		Set(func(t *Task[Pipe], c floc.Control) error {
+			t.CreateCommand(setup.P.Pipe.Ctx.PackageManager.Exe).Set(func(c *Command[Pipe]) error {
+				c.AppendArgs(setup.P.Pipe.Ctx.PackageManager.Commands.Run...).
+					AppendArgs(t.Pipe.NodeCommand.Script).
+					AppendArgs(setup.P.Pipe.Ctx.PackageManager.Commands.RunDelimitter...).
+					AppendArgs(strings.Split(t.Pipe.NodeCommand.ScriptArgs, " ")...)
 
-	return t.New(tl, "run").Set(func(t *Task[Pipe, Ctx], c floc.Control) error {
-		cmd := Command[Pipe, Ctx]{}
+				c.SetDir(t.Pipe.NodeCommand.Cwd)
 
-		cmd.New(t, setup.P.Context.PackageManager.Exe).Set(func(c *Command[Pipe, Ctx]) error {
-			c.AppendArgs(setup.P.Context.PackageManager.Commands.Run...).AppendArgs(t.Pipe.NodeCommand.Script).
-				AppendArgs(setup.P.Context.PackageManager.Commands.RunDelimitter...).
-				AppendArgs(strings.Split(t.Pipe.NodeCommand.ScriptArgs, " ")...)
-
-			c.SetDir(t.Pipe.NodeCommand.Cwd)
+				return nil
+			}).AddSelfToTheTask()
 
 			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe], c floc.Control) error {
+			return t.RunCommandJobAsJobSequence()
 		})
-
-		t.AddCommands(cmd)
-
-		return nil
-	}).ShouldRunAfter(func(t *Task[Pipe, Ctx], c floc.Control) error {
-		return t.RunCommandJobAsJobSequence()
-	})
 }

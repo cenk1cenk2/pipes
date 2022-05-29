@@ -23,15 +23,15 @@ type (
 	Pipe struct {
 		Git
 		NodeBuild
+		Ctx
 	}
 )
 
-var P = TaskList[Pipe, Ctx]{
-	Pipe:    Pipe{},
-	Context: Ctx{},
+var P = TaskList[Pipe]{
+	Pipe: Pipe{},
 }
 
-func New(a *App) *TaskList[Pipe, Ctx] {
+func New(a *App) *TaskList[Pipe] {
 	return P.New(a).SetTasks(
 		P.JobSequence(
 			SelectEnvironment(&P).Job(),
