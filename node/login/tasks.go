@@ -31,7 +31,7 @@ func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for i := range t.Pipe.Ctx.NpmLogin {
 				t.CreateSubtask("validate").Set(func(st *Task[Pipe], c floc.Control) error {
-					return st.TaskList.Validate(&st.Pipe.Ctx.NpmLogin[i])
+					return tl.Validate(&st.Pipe.Ctx.NpmLogin[i])
 				}).ToParent(t, func(pt, st *Task[Pipe]) {
 					pt.ExtendSubtask(func(j floc.Job) floc.Job {
 						return tl.JobParallel(j, st.Job())
@@ -100,7 +100,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 					return nil
 				}).ToParent(t, func(pt, st *Task[Pipe]) {
 					pt.ExtendSubtask(func(j floc.Job) floc.Job {
-						return pt.TaskList.JobParallel(j, st.Job())
+						return tl.JobParallel(j, st.Job())
 					})
 				})
 			}

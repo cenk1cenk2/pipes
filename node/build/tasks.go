@@ -155,7 +155,7 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 					return nil
 				}).ToParent(t, func(pt *Task[Pipe], st *Task[Pipe]) {
 					pt.ExtendSubtask(func(j floc.Job) floc.Job {
-						return pt.TaskList.JobParallel(j, st.Job())
+						return tl.JobParallel(j, st.Job())
 					})
 				})
 			}
