@@ -18,7 +18,7 @@ func main() {
 				Version:     VERSION,
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
-				Flags:       p.AppendFlags(pipe.Flags),
+				Flags:       p.AppendFlags(login.Flags, pipe.Flags),
 				Action: func(ctx *cli.Context) error {
 					return pipe.TL.RunJobs(
 						pipe.TL.JobSequence(
