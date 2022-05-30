@@ -237,6 +237,7 @@ publish-semantic-release:
   only:
     changes:
       - "semantic-release/**/*"
+      - "node/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml

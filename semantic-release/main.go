@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	pipe "gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
+	"gitlab.kilic.dev/devops/pipes/node/login"
+	"gitlab.kilic.dev/devops/pipes/node/setup"
+	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
 	. "gitlab.kilic.dev/libraries/plumber/v2"
 )
 
@@ -21,6 +23,8 @@ func main() {
 				Action: func(ctx *cli.Context) error {
 					return pipe.TL.RunJobs(
 						pipe.TL.JobSequence(
+							setup.New(p).Job(ctx),
+							login.New(p).Job(ctx),
 							pipe.New(p).Job(ctx),
 						),
 					)
