@@ -16,13 +16,13 @@ type Ctx struct {
 }
 
 func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("decode").
+	return tl.CreateTask("init").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Npm.Login == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
 			// unmarshal npm logins and use the default registry for ones that are not defined
-			t.Log.Debugln("Npm login credentials are specified, initiating login context.")
+			t.Log.Infoln("Npm login credentials are specified, initiating login process.")
 
 			if err := json.Unmarshal([]byte(t.Pipe.Npm.Login), &t.Pipe.Ctx.NpmLogin); err != nil {
 				t.Log.Fatalln("Can not decode Npm registry login credentials.")
