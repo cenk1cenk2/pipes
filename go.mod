@@ -13,7 +13,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/urfave/cli/v2 v2.8.1
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v2 v2.11.0
+	gitlab.kilic.dev/libraries/plumber/v2 v2.12.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 
@@ -50,4 +50,4 @@ require (
 	gotest.tools/v3 v3.2.0 // indirect
 )
 
-// replace gitlab.kilic.dev/libraries/plumber/v2 => /home/cenk/development/plumber
+//replace gitlab.kilic.dev/libraries/plumber/v2 => /home/cenk/development/plumber

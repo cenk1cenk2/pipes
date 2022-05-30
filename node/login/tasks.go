@@ -28,14 +28,8 @@ func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
 				t.Log.Fatalln("Can not decode Npm registry login credentials.")
 			}
 
-			for i := range t.Pipe.Ctx.NpmLogin {
-				t.CreateSubtask("validate").Set(func(st *Task[Pipe]) error {
-					return tl.Validate(&st.Pipe.Ctx.NpmLogin[i])
-				}).ToParent(t, func(pt, st *Task[Pipe]) {
-					pt.ExtendSubtask(func(j Job) Job {
-						return tl.JobParallel(j, st.Job())
-					})
-				})
+			if err := tl.Validate(&t.Pipe.Ctx); err != nil {
+				return err
 			}
 
 			return nil
@@ -80,28 +74,30 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
-				t.CreateSubtask("generate").Set(func(st *Task[Pipe]) error {
-					st.Log.Debugf("Creating npmrc file: %s", file)
+				t.CreateSubtask("generate").
+					Set(func(st *Task[Pipe]) error {
+						st.Log.Infof("Generating npmrc file: %s", file)
 
-					f, err := os.OpenFile(file,
-						os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+						f, err := os.OpenFile(file,
+							os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
-					if err != nil {
+						if err != nil {
+							return err
+						}
 
-						return err
-					}
+						defer f.Close()
 
-					defer f.Close()
-					if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
-						return err
-					}
+						if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
+							return err
+						}
 
-					return nil
-				}).ToParent(t, func(pt, st *Task[Pipe]) {
-					pt.ExtendSubtask(func(j Job) Job {
-						return tl.JobParallel(j, st.Job())
+						return nil
+					}).
+					AddSelfToParent(func(pt *Task[Pipe], st *Task[Pipe]) {
+						pt.ExtendSubtask(func(j Job) Job {
+							return tl.JobParallel(j, st.Job())
+						})
 					})
-				})
 			}
 
 			return nil
@@ -121,8 +117,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 				t.CreateCommand("npm", "whoami").
 					SetLogLevel(logrus.DebugLevel, 0).
 					Set(func(c *Command[Pipe]) error {
-
-						t.Log.Infof(
+						c.Log.Infof(
 							"Checking login credentials for Npm registry: %s", v.Registry,
 						)
 
@@ -142,7 +137,8 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 						)
 
 						return nil
-					}).AddSelfToTheTask()
+					}).
+					AddSelfToTheTask()
 			}
 
 			return nil
