@@ -23,11 +23,13 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 				strings.Join(apks, ", "),
 			)
 
-			t.CreateCommand("apk", "--no-cache").Set(func(c *Command[Pipe]) error {
-				c.AppendArgs(apks...)
+			t.CreateCommand("apk", "--no-cache").
+				Set(func(c *Command[Pipe]) error {
+					c.AppendArgs(apks...)
 
-				return nil
-			}).AddSelfToTheTask()
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
 		}).
@@ -49,11 +51,13 @@ func InstallNodePackages(tl *TaskList[Pipe]) *Task[Pipe] {
 				strings.Join(packages, ", "),
 			)
 
-			t.CreateCommand("yarn", "global", "add").Set(func(c *Command[Pipe]) error {
-				c.AppendArgs(packages...)
+			t.CreateCommand("yarn", "global", "add").
+				Set(func(c *Command[Pipe]) error {
+					c.AppendArgs(packages...)
 
-				return nil
-			}).AddSelfToTheTask()
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
 		}).ShouldRunAfter(func(t *Task[Pipe]) error {
@@ -70,17 +74,19 @@ func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 				t.Pipe.Ctx.Exe = SEMANTIC_RELEASE_EXE
 			}
 
-			t.CreateCommand(t.Pipe.Ctx.Exe).Set(func(c *Command[Pipe]) error {
-				if t.Pipe.SemanticRelease.IsDryRun {
-					c.AppendArgs("--dry-run")
-				}
+			t.CreateCommand(t.Pipe.Ctx.Exe).
+				Set(func(c *Command[Pipe]) error {
+					if t.Pipe.SemanticRelease.IsDryRun {
+						c.AppendArgs("--dry-run")
+					}
 
-				if t.Plumber.Environment.Debug {
-					c.AppendArgs("--debug")
-				}
+					if t.Plumber.Environment.Debug {
+						c.AppendArgs("--debug")
+					}
 
-				return nil
-			}).AddSelfToTheTask()
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
 		}).

@@ -75,24 +75,27 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
 				t.CreateSubtask("generate").
-					Set(func(st *Task[Pipe]) error {
-						st.Log.Infof("Generating npmrc file: %s", file)
+					Set(
+						func(file string) TaskFn[Pipe] {
+							return func(st *Task[Pipe]) error {
+								st.Log.Infof("Generating npmrc file: %s", file)
 
-						f, err := os.OpenFile(file,
-							os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+								f, err := os.OpenFile(file,
+									os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
-						if err != nil {
-							return err
-						}
+								if err != nil {
+									return err
+								}
 
-						defer f.Close()
+								defer f.Close()
 
-						if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
-							return err
-						}
+								if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
+									return err
+								}
 
-						return nil
-					}).
+								return nil
+							}
+						}(file)).
 					AddSelfToParent(func(pt *Task[Pipe], st *Task[Pipe]) {
 						pt.ExtendSubtask(func(j Job) Job {
 							return tl.JobParallel(j, st.Job())
@@ -116,29 +119,32 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 			for _, v := range t.Pipe.Ctx.NpmLogin {
 				t.CreateCommand("npm", "whoami").
 					SetLogLevel(logrus.DebugLevel, 0).
-					Set(func(c *Command[Pipe]) error {
-						c.Log.Infof(
-							"Checking login credentials for Npm registry: %s", v.Registry,
-						)
+					Set(func(v NpmLoginJson) CommandFn[Pipe] {
+						return func(c *Command[Pipe]) error {
+							c.Log.Infof(
+								"Checking login credentials for Npm registry: %s", v.Registry,
+							)
 
-						var url string
+							var url string
 
-						if v.UseHttps {
-							url = fmt.Sprintf("https://%s", v.Registry)
-						} else {
-							url = fmt.Sprintf("http://%s", v.Registry)
+							if v.UseHttps {
+								url = fmt.Sprintf("https://%s", v.Registry)
+							} else {
+								url = fmt.Sprintf("http://%s", v.Registry)
+							}
+
+							c.AppendArgs(
+								"--configfile",
+								t.Pipe.Npm.NpmRcFile.Value()[0],
+								"--registry",
+								url,
+							)
+
+							return nil
 						}
-
-						c.AppendArgs(
-							"--configfile",
-							t.Pipe.Npm.NpmRcFile.Value()[0],
-							"--registry",
-							url,
-						)
-
-						return nil
-					}).
+					}(v)).
 					AddSelfToTheTask()
+
 			}
 
 			return nil
