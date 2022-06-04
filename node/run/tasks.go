@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"gitlab.kilic.dev/devops/pipes/node/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type Ctx struct {

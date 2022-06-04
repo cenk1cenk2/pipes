@@ -10,7 +10,7 @@ import (
 	"github.com/nochso/gomd/eol"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	"gitlab.kilic.dev/libraries/go-utils/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type Ctx struct {

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type (
@@ -26,8 +25,8 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).ShouldRunBefore(func(tl *TaskList[Pipe], ctx *cli.Context) error {
-		args := ctx.Args().Slice()
+	return TL.New(p).ShouldRunBefore(func(tl *TaskList[Pipe]) error {
+		args := tl.CliContext.Args().Slice()
 		if len(args) < 1 {
 			return fmt.Errorf("Arguments are needed to run a specific script.")
 		} else {

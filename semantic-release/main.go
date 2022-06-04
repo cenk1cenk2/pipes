@@ -5,7 +5,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 func main() {
@@ -19,11 +19,11 @@ func main() {
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
 				Flags:       p.AppendFlags(login.Flags, pipe.Flags),
-				Action: func(ctx *cli.Context) error {
+				Action: func(c *cli.Context) error {
 					return pipe.TL.RunJobs(
 						pipe.TL.JobSequence(
-							login.New(p).Job(ctx),
-							pipe.New(p).Job(ctx),
+							login.New(p).SetCliContext(c).Job(),
+							pipe.New(p).SetCliContext(c).Job(),
 						),
 					)
 				},

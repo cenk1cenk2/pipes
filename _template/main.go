@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	pipe "gitlab.kilic.dev/devops/pipes/_template/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 func main() {
@@ -18,10 +18,10 @@ func main() {
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
 				Flags:       p.AppendFlags(pipe.Flags),
-				Action: func(ctx *cli.Context) error {
+				Action: func(c *cli.Context) error {
 					return pipe.TL.RunJobs(
 						pipe.TL.JobSequence(
-							pipe.New(p).Job(ctx),
+							pipe.New(p).SetCliContext(c).Job(),
 						),
 					)
 				},

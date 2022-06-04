@@ -8,7 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	"gitlab.kilic.dev/devops/pipes/node/run"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 func main() {
@@ -28,8 +28,8 @@ func main() {
 						Action: func(c *cli.Context) error {
 							return login.TL.RunJobs(
 								login.TL.JobSequence(
-									setup.New(a).Job(c),
-									login.New(a).Job(c),
+									setup.New(a).SetCliContext(c).Job(),
+									login.New(a).SetCliContext(c).Job(),
 								),
 							)
 						},
@@ -41,9 +41,9 @@ func main() {
 						Action: func(c *cli.Context) error {
 							return install.TL.RunJobs(
 								install.TL.JobSequence(
-									setup.New(a).Job(c),
-									login.New(a).Job(c),
-									install.New(a).Job(c),
+									setup.New(a).SetCliContext(c).Job(),
+									login.New(a).SetCliContext(c).Job(),
+									install.New(a).SetCliContext(c).Job(),
 								),
 							)
 						},
@@ -55,8 +55,8 @@ func main() {
 						Action: func(c *cli.Context) error {
 							return build.TL.RunJobs(
 								build.TL.JobSequence(
-									setup.New(a).Job(c),
-									build.New(a).Job(c),
+									setup.New(a).SetCliContext(c).Job(),
+									build.New(a).SetCliContext(c).Job(),
 								),
 							)
 						},
@@ -68,8 +68,8 @@ func main() {
 						Action: func(c *cli.Context) error {
 							return run.TL.RunJobs(
 								run.TL.JobSequence(
-									setup.New(a).Job(c),
-									run.New(a).Job(c),
+									setup.New(a).SetCliContext(c).Job(),
+									run.New(a).SetCliContext(c).Job(),
 								),
 							)
 						},

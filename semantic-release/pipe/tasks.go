@@ -3,7 +3,7 @@ package pipe
 import (
 	"strings"
 
-	. "gitlab.kilic.dev/libraries/plumber/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type Ctx struct {
