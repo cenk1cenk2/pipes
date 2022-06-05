@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/nochso/gomd/eol"
-	"github.com/sirupsen/logrus"
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
@@ -118,7 +117,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			for _, v := range t.Pipe.Ctx.NpmLogin {
 				t.CreateCommand("npm", "whoami").
-					SetLogLevel(logrus.DebugLevel, 0, logrus.DebugLevel).
+					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 					Set(func(v NpmLoginJson) CommandFn[Pipe] {
 						return func(c *Command[Pipe]) error {
 							c.Log.Infof(
