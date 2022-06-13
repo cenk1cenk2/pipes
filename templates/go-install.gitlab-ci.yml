@@ -1,11 +1,6 @@
 variables:
   GO_IMAGE: alpine
 
-cache:
-  paths:
-    - vendor/
-  key: ${CI_COMMIT_REF_SLUG}
-
 install:
   stage: install
   image: golang:$GO_IMAGE
@@ -13,6 +8,9 @@ install:
     - apk add --no-cache --no-progress make git
     - make install
   artifacts:
+    paths:
+      - vendor/
+  cache:
     paths:
       - vendor/
   tags:

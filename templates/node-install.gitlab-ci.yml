@@ -1,8 +1,3 @@
-cache:
-  paths:
-    - node_modules/
-    - .cache/
-
 install:
   stage: install
   image: $CI_REGISTRY/devops/pipes/gitlab-pipes-node:${NODE_VERSION}
@@ -12,5 +7,9 @@ install:
     paths:
       - node_modules/
       - "**/node_modules/"
+  cache:
+    paths:
+      - node_modules/
+      - .cache/
   tags:
     - docker
