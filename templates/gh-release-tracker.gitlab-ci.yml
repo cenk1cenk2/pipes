@@ -1,5 +1,5 @@
 stages:
-  - publish
+  - track
 
 gh-release-tracker:
   stage: publish
