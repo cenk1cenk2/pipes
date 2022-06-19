@@ -2,7 +2,7 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type (
@@ -38,7 +38,9 @@ type (
 		Password string
 	}
 
-	Plugin struct {
+	Pipe struct {
+		Ctx
+
 		Git
 		Docker
 		DockerImage
@@ -47,23 +49,21 @@ type (
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var TL = TaskList[Pipe]{
+	Pipe: Pipe{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			DockerVersion(),
-			DockerLogin(),
-			DockerSetupBuildx(),
-			DockerBuild(),
-			DockerBuildx(),
-			DockerPush(),
-			DockerInspect(),
-		},
+func New(p *Plumber) *TaskList[Pipe] {
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			Setup(&TL).Job(),
+			DockerVersion(&TL).Job(),
+			DockerLogin(&TL).Job(),
+			DockerSetupBuildX(&TL).Job(),
+			DockerBuildX(&TL).Job(),
+			DockerBuild(&TL).Job(),
+			DockerPush(&TL).Job(),
+			DockerInspect(&TL).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }

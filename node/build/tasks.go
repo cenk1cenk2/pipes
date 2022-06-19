@@ -84,90 +84,89 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 			EOL := eol.OSDefault().String()
 
 			for _, file := range t.Pipe.NodeBuild.EnvironmentFiles.Value() {
-				t.CreateSubtask("inject").Set(
-					func(file string) TaskFn[Pipe] {
-						return func(st *Task[Pipe]) error {
-							st.Log.Infof("Injecting environment variables from: %s", file)
+				func(file string) {
+					t.CreateSubtask("inject").Set(func(st *Task[Pipe]) error {
+						st.Log.Infof("Injecting environment variables from: %s", file)
 
-							err := st.CreateCommand("ta-gitlab-env").
-								Set(func(c *Command[Pipe]) error {
-									c.AppendArgs(
-										"--yml-file",
-										file,
-										"--prefix",
-										st.Pipe.Ctx.SelectedEnvironment,
-										"--fallback",
-										st.Pipe.Ctx.FallbackEnvironment,
-									)
+						err := st.CreateCommand("ta-gitlab-env").
+							Set(func(c *Command[Pipe]) error {
+								c.AppendArgs(
+									"--yml-file",
+									file,
+									"--prefix",
+									st.Pipe.Ctx.SelectedEnvironment,
+									"--fallback",
+									st.Pipe.Ctx.FallbackEnvironment,
+								)
 
-									output, err := c.Command.CombinedOutput()
+								output, err := c.Command.CombinedOutput()
 
-									if err != nil {
-										return err
+								if err != nil {
+									return err
+								}
+
+								variables := strings.Split(string(output), EOL)
+
+								for i, v := range variables {
+									v := strings.TrimSpace(v)
+
+									if v == "" {
+										continue
 									}
 
-									variables := strings.Split(string(output), EOL)
+									m := regexp.MustCompile(`^export ([^=]*)="([^"]*)"$`)
 
-									for i, v := range variables {
-										v := strings.TrimSpace(v)
+									matches := m.FindStringSubmatch(v)
 
-										if v == "" {
-											continue
-										}
-
-										m := regexp.MustCompile(`^export ([^=]*)="([^"]*)"$`)
-
-										matches := m.FindStringSubmatch(v)
-
-										if len(matches) != 3 {
-											st.Log.Fatalf(
-												"Can not fetch the environment variable from: %s",
-												v,
-											)
-										}
-
-										variables[i] = fmt.Sprintf("%s=%s", matches[1], matches[2])
-
-										st.Log.Debugf("Matched from environment variable: %s -> %s",
+									if len(matches) != 3 {
+										st.Log.Fatalf(
+											"Can not fetch the environment variable from: %s",
 											v,
-											variables[i])
-									}
-
-									variables = utils.DeleteEmptyStringsFromSlice(variables)
-
-									if len(variables) > 0 {
-										st.Log.Debugf(
-											"Injected Variables from environment file: %s%s%s",
-											file,
-											EOL,
-											strings.Join(variables, EOL),
 										)
-									} else {
-										st.Log.Warningf("No variables are injected from environment file: %s", file)
 									}
 
-									st.Lock.Lock()
-									st.Pipe.Ctx.EnvironmentVariables = append(
-										st.Pipe.Ctx.EnvironmentVariables,
-										variables...)
-									st.Lock.Unlock()
+									variables[i] = fmt.Sprintf("%s=%s", matches[1], matches[2])
 
-									return nil
-								}).
-								RunSet()
+									st.Log.Debugf("Matched from environment variable: %s -> %s",
+										v,
+										variables[i])
+								}
 
-							if err != nil {
-								return err
-							}
+								variables = utils.DeleteEmptyStringsFromSlice(variables)
 
-							return nil
+								if len(variables) > 0 {
+									st.Log.Debugf(
+										"Injected Variables from environment file: %s%s%s",
+										file,
+										EOL,
+										strings.Join(variables, EOL),
+									)
+								} else {
+									st.Log.Warningf("No variables are injected from environment file: %s", file)
+								}
+
+								st.Lock.Lock()
+								st.Pipe.Ctx.EnvironmentVariables = append(
+									st.Pipe.Ctx.EnvironmentVariables,
+									variables...)
+								st.Lock.Unlock()
+
+								return nil
+							}).
+							RunSet()
+
+						if err != nil {
+							return err
 						}
-					}(file)).
-					ToParent(t, func(pt *Task[Pipe], st *Task[Pipe]) {
-						pt.ExtendSubtask(func(j Job) Job {
-							return tl.JobParallel(j, st.Job())
+
+						return nil
+					}).
+						ToParent(t, func(pt *Task[Pipe], st *Task[Pipe]) {
+							pt.ExtendSubtask(func(j Job) Job {
+								return tl.JobParallel(j, st.Job())
+							})
 						})
-					})
+				}(file)
 			}
 
 			return nil

@@ -6,93 +6,84 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
-	u "gitlab.kilic.dev/libraries/go-utils/utils"
+	"gitlab.kilic.dev/libraries/go-utils/utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type Ctx struct {
 	Tags []string
 }
 
-var Context Ctx
+func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("init").
+		ShouldRunBefore(func(t *Task[Pipe]) error {
+			t.Pipe.Ctx.Tags = []string{}
 
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify"},
-		Task: func(t *utils.Task) error {
-			Context.Tags = []string{}
+			return nil
+		}).
+		Set(func(t *Task[Pipe]) error {
 			TagAsLatestForTagsRegex := []string{}
 			TagAsLatestForBranchesRegex := []string{}
 
-			for _, v := range u.RemoveDuplicateStr(u.DeleteEmptyStringsFromSlice(Pipe.DockerImage.Tags.Value())) {
-				tag, err := AddDockerTag(v)
-
-				if err != nil {
+			// add all the specified tags
+			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(t.Pipe.DockerImage.Tags.Value())) {
+				if err := AddDockerTag(v); err != nil {
 					return err
 				}
-
-				t.Log.Debugf("Docker image tag: %s",
-					tag,
-				)
 			}
 
-			if _, err := os.Stat(Pipe.DockerImage.TagsFile); err == nil {
+			// add tags through tags file
+			if _, err := os.Stat(t.Pipe.DockerImage.TagsFile); err == nil {
 				t.Log.Infof(
 					"Tags file does exists, will overwrite current tags: %s",
-					Pipe.DockerImage.TagsFile,
+					t.Pipe.DockerImage.TagsFile,
 				)
 
-				content, err := ioutil.ReadFile(Pipe.DockerImage.TagsFile)
+				content, err := ioutil.ReadFile(t.Pipe.DockerImage.TagsFile)
 				if err != nil {
 					return err
 				}
 
 				tags := strings.Split(string(content), ",")
 
-				Context.Tags = []string{}
+				t.Pipe.Ctx.Tags = []string{}
 
 				re := regexp.MustCompile(`\r?\n`)
 
-				errs := []error{}
-
 				for _, v := range tags {
-					tag, err := AddDockerTag(re.ReplaceAllString(v, ""))
-
-					if err != nil {
-						errs = append(errs, err)
-					}
-
-					Context.Tags = append(Context.Tags, tag)
+					func(v string) {
+						t.CreateSubtask("").
+							Set(func(t *Task[Pipe]) error {
+								return AddDockerTag(re.ReplaceAllString(v, ""))
+							}).
+							AddSelfToParent(func(pt, st *Task[Pipe]) {
+								pt.ExtendSubtask(func(j Job) Job {
+									return tl.JobParallel(j, st.Job())
+								})
+							})
+					}(v)
 				}
 
-				if len(errs) > 0 {
-					for _, v := range errs {
-						t.Log.Errorln(v)
-					}
-
-					return fmt.Errorf("Errors encountered while injecting environment variables.")
+				if err = t.RunSubtasks(); err != nil {
+					return err
 				}
 			} else if errors.Is(err, os.ErrNotExist) {
-				if Pipe.DockerImage.TagsFile != "" {
-					t.Log.Warnf("Tags file is set but it does not exists: %s", Pipe.DockerImage.TagsFile)
-
-					t.Log.Warnln("Nothing to do. Exitting...")
-					os.Exit(0)
+				if t.Pipe.DockerImage.TagsFile != "" {
+					return fmt.Errorf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
 				} else {
-					t.Log.Debugf("Tags file does not exists: %s", Pipe.DockerImage.TagsFile)
+					t.Log.Debugf("Tags file is not specified: %s", t.Pipe.DockerImage.TagsFile)
 				}
 			} else {
-				t.Log.Warnf("Can not read the tags file: %s", Pipe.DockerImage.TagsFile)
+				t.Log.Warnf("Can not read the tags file: %s", t.Pipe.DockerImage.TagsFile)
 			}
 
-			if Pipe.DockerImage.TagAsLatestForTagsRegex != "" {
+			// tag as latest for tags
+			if t.Pipe.DockerImage.TagAsLatestForTagsRegex != "" {
 				err := json.Unmarshal(
-					[]byte(Pipe.DockerImage.TagAsLatestForTagsRegex),
+					[]byte(t.Pipe.DockerImage.TagAsLatestForTagsRegex),
 					&TagAsLatestForTagsRegex,
 				)
 
@@ -100,24 +91,22 @@ func VerifyVariables() utils.Task {
 					return err
 				}
 
-				if Pipe.Git.Tag != "" {
+				if t.Pipe.Git.Tag != "" {
 					for _, re := range TagAsLatestForTagsRegex {
-						m, err := regexp.Match(re, []byte(Pipe.Git.Tag))
+						m, err := regexp.Match(re, []byte(t.Pipe.Git.Tag))
 
 						if err != nil {
 							return err
 						}
 
 						if m {
-							tag, err := AddDockerTag(DOCKER_LATEST_TAG)
-
-							if err != nil {
+							if err := AddDockerTag(DOCKER_LATEST_TAG); err != nil {
 								return err
 							}
 
 							t.Log.Infof(
 								"Will tag image as latest since tag regex matches: %s",
-								tag,
+								re,
 							)
 
 							break
@@ -126,9 +115,10 @@ func VerifyVariables() utils.Task {
 				}
 			}
 
-			if Pipe.DockerImage.TagAsLatestForBranchesRegex != "" {
+			// tag as latest for branches
+			if t.Pipe.DockerImage.TagAsLatestForBranchesRegex != "" {
 				err := json.Unmarshal(
-					[]byte(Pipe.DockerImage.TagAsLatestForBranchesRegex),
+					[]byte(t.Pipe.DockerImage.TagAsLatestForBranchesRegex),
 					&TagAsLatestForBranchesRegex,
 				)
 
@@ -136,24 +126,22 @@ func VerifyVariables() utils.Task {
 					return err
 				}
 
-				if Pipe.Git.Branch != "" {
+				if t.Pipe.Git.Branch != "" {
 					for _, re := range TagAsLatestForBranchesRegex {
-						m, err := regexp.Match(re, []byte(Pipe.Git.Branch))
+						m, err := regexp.Match(re, []byte(t.Pipe.Git.Branch))
 
 						if err != nil {
 							return err
 						}
 
 						if m {
-							tag, err := AddDockerTag(DOCKER_LATEST_TAG)
-
-							if err != nil {
+							if err := AddDockerTag(DOCKER_LATEST_TAG); err != nil {
 								return err
 							}
 
 							t.Log.Infof(
 								"Will tag image as latest since branch regex matches: %s",
-								tag,
+								re,
 							)
 
 							break
@@ -162,103 +150,155 @@ func VerifyVariables() utils.Task {
 				}
 			}
 
-			Context.Tags = u.RemoveDuplicateStr(
-				u.DeleteEmptyStringsFromSlice(Context.Tags),
+			t.Pipe.Ctx.Tags = utils.RemoveDuplicateStr(
+				utils.DeleteEmptyStringsFromSlice(t.Pipe.Ctx.Tags),
 			)
 
 			t.Log.Infof(
-				"Image tags: %s", strings.Join(Context.Tags, ", "),
+				"Image tags: %s", strings.Join(t.Pipe.Ctx.Tags, ", "),
 			)
 
 			return nil
-		},
-	}
+		})
 }
 
-func DockerVersion() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "version"},
-		Task: func(t *utils.Task) error {
-			cmd := exec.Command(DOCKER_EXE, "--version")
+func DockerVersion(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("version").
+		Set(func(t *Task[Pipe]) error {
+			t.CreateCommand(DOCKER_EXE, "--version").
+				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+				AddSelfToTheTask()
 
-			t.Commands = append(t.Commands, cmd)
-
-			if Pipe.Docker.UseBuildx {
+			if t.Pipe.Docker.UseBuildx {
 				t.Log.Infoln("Docker Buildx is enabled.")
 
-				cmd := exec.Command(DOCKER_EXE, "buildx", "version")
-
-				t.Commands = append(t.Commands, cmd)
+				t.CreateCommand(DOCKER_EXE, "buildx", "version").
+					SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+					AddSelfToTheTask()
 			}
 
 			return nil
-		},
-	}
-
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunCommandJobAsJobParallel()
+		})
 }
 
-func DockerLogin() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{
-			Context:        "login",
-			StdOutLogLevel: logrus.DebugLevel,
-		},
-		Task: func(t *utils.Task) error {
-			if Pipe.DockerRegistry.Username != "" && Pipe.DockerRegistry.Password != "" {
-				t.Log.Infof(
-					"Logging in to Docker registry: %s", Pipe.DockerRegistry.Registry,
-				)
+func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("login").
+		Set(func(t *Task[Pipe]) error {
+			// login task
+			t.CreateSubtask("login").
+				ShouldDisable(func(t *Task[Pipe]) bool {
+					return t.Pipe.DockerRegistry.Username == "" ||
+						t.Pipe.DockerRegistry.Password == ""
+				}).
+				Set(func(t *Task[Pipe]) error {
+					t.CreateCommand(
+						DOCKER_EXE,
+						"login",
+						t.Pipe.DockerRegistry.Registry,
+						"--username",
+						t.Pipe.DockerRegistry.Username,
+						"--password-stdin",
+					).
+						SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+						Set(func(c *Command[Pipe]) error {
+							c.Command.Stdin = strings.NewReader(t.Pipe.DockerRegistry.Password)
 
-				cmd := exec.Command(DOCKER_EXE, "login")
+							c.Log.Infof(
+								"Logging in to Docker registry: %s",
+								t.Pipe.DockerRegistry.Registry,
+							)
 
-				cmd.Args = append(cmd.Args, Pipe.DockerRegistry.Registry)
-				cmd.Args = append(
-					cmd.Args,
-					"--username",
-					Pipe.DockerRegistry.Username,
-					"--password-stdin",
-				)
+							return nil
+						}).
+						AddSelfToTheTask()
 
-				cmd.Stdin = strings.NewReader(Pipe.DockerRegistry.Password)
+					return nil
+				}).
+				ShouldRunAfter(func(t *Task[Pipe]) error {
+					return t.RunCommandJobAsJobSequence()
+				}).
+				AddSelfToParent(func(pt, st *Task[Pipe]) {
+					pt.ExtendSubtask(func(job Job) Job {
+						return tl.JobSequence(job, st.Job())
+					})
+				})
 
-				t.Commands = append(t.Commands, cmd)
-			}
+				// login verify task
+			t.CreateSubtask("login:verify").
+				Set(func(t *Task[Pipe]) error {
+					t.CreateCommand(
+						DOCKER_EXE,
+						"login",
+						t.Pipe.DockerRegistry.Registry,
+					).
+						SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+						Set(func(c *Command[Pipe]) error {
+							c.Log.Debugf(
+								"Will verify authentication in to Docker registry: %s",
+								t.Pipe.DockerRegistry.Registry,
+							)
 
-			t.Log.Debugf(
-				"Will verify authentication in to Docker registry: %s",
-				Pipe.DockerRegistry.Registry,
-			)
+							return nil
+						}).
+						AddSelfToTheTask()
 
-			cmd := exec.Command(DOCKER_EXE, "login")
-
-			cmd.Args = append(cmd.Args, Pipe.DockerRegistry.Registry)
-
-			t.Commands = append(t.Commands, cmd)
+					return nil
+				}).
+				ShouldRunAfter(func(t *Task[Pipe]) error {
+					return t.RunCommandJobAsJobSequence()
+				}).
+				AddSelfToParent(func(pt, st *Task[Pipe]) {
+					pt.ExtendSubtask(func(job Job) Job {
+						return tl.JobSequence(job, st.Job())
+					})
+				})
 
 			return nil
-		},
-	}
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunSubtasks()
+		})
 }
 
-func DockerSetupBuildx() utils.Task {
-	metadata := utils.TaskMetadata{Context: "setup-buildx", Skip: !Pipe.Docker.UseBuildx}
+func DockerSetupBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("setup:buildx").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return !t.Pipe.Docker.UseBuildx
+		}).
+		Set(func(t *Task[Pipe]) error {
+			err := t.CreateCommand(
+				DOCKER_EXE,
+				"buildx",
+				"create",
+				"--use",
+				"--name",
+				"gitlab",
+			).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				Set(func(c *Command[Pipe]) error {
+					c.Log.Infoln("Creating a new instance of docker buildx.")
 
-	return utils.Task{
-		Metadata: metadata,
-		Task: func(t *utils.Task) error {
-			t.Log.Infoln("Creating a new instance of docker buildx.")
-
-			cmd := exec.Command(DOCKER_EXE, "buildx", "create", "--use", "--name", "gitlab")
-
-			err := cmd.Run()
+					return nil
+				}).Run()
 
 			if err != nil {
-				t.Log.Warnln(
-					"Creating a new docker buildx instance failed, trying to use the existing one.",
-				)
-				cmd = exec.Command(DOCKER_EXE, "buildx", "use", "gitlab")
+				err := t.CreateCommand(
+					DOCKER_EXE,
+					"buildx",
+					"use",
+					"gitlab",
+				).
+					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+					Set(func(c *Command[Pipe]) error {
+						c.Log.Warnln(
+							"Creating a new docker buildx instance failed, trying to use the existing one.",
+						)
 
-				err := cmd.Run()
+						return nil
+					}).Run()
 
 				if err != nil {
 					return err
@@ -266,25 +306,25 @@ func DockerSetupBuildx() utils.Task {
 			}
 
 			return nil
-		},
-	}
+		})
 }
 
-func DockerBuildx() utils.Task {
-	metadata := utils.TaskMetadata{Context: "buildx", Skip: !Pipe.Docker.UseBuildx}
-
-	return utils.Task{
-		Metadata: metadata,
-		Task: func(t *utils.Task) error {
+func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("buildx").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return !t.Pipe.Docker.UseBuildx
+		}).
+		Set(func(t *Task[Pipe]) error {
 			t.Log.Infof(
 				"Building Docker image: %s in %s",
-				Pipe.DockerFile.Name,
-				Pipe.DockerFile.Context,
+				t.Pipe.DockerFile.Name,
+				t.Pipe.DockerFile.Context,
 			)
 
 			t.Log.Infoln("Using Docker Buildx for building the Docker image.")
 
-			cmd := exec.Command(
+			// spawn virtual machine
+			t.CreateCommand(
 				DOCKER_EXE,
 				"run",
 				"--rm",
@@ -293,137 +333,176 @@ func DockerBuildx() utils.Task {
 				"--reset",
 				"-p",
 				"yes",
-			)
+			).
+				AddSelfToTheTask()
 
-			t.Commands = append(t.Commands, cmd)
+				// check virtual machine
+			t.CreateCommand(
+				DOCKER_EXE,
+				"buildx",
+				"inspect",
+				"--bootstrap",
+			).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+				AddSelfToTheTask()
 
-			cmd = exec.Command(DOCKER_EXE, "buildx", "inspect", "--bootstrap")
+				// build image
+			t.CreateCommand(
+				DOCKER_EXE,
+				"buildx",
+				"build",
+			).
+				Set(func(c *Command[Pipe]) error {
+					for _, v := range t.Pipe.DockerImage.BuildArgs.Value() {
+						c.AppendArgs("--build-arg", v)
+					}
 
-			t.Commands = append(t.Commands, cmd)
+					if t.Pipe.DockerImage.Pull {
+						c.AppendArgs("--pull")
+					}
 
-			cmd = exec.Command(DOCKER_EXE, "buildx", "build")
+					c.AppendArgs("--push")
 
-			for _, v := range Pipe.DockerImage.BuildArgs.Value() {
-				cmd.Args = append(cmd.Args, "--build-arg", v)
-			}
+					if t.Pipe.Docker.BuildxPlatforms != "" {
+						c.AppendArgs("--platform", t.Pipe.Docker.BuildxPlatforms)
+					}
 
-			if Pipe.DockerImage.Pull {
-				cmd.Args = append(cmd.Args, "--pull")
-			}
+					for _, tag := range t.Pipe.Ctx.Tags {
+						c.AppendArgs("-t", tag)
+					}
 
-			cmd.Args = append(cmd.Args, "--push")
+					c.AppendArgs(
+						"--file",
+						t.Pipe.DockerFile.Name,
+						".",
+					)
 
-			if Pipe.Docker.BuildxPlatforms != "" {
-				cmd.Args = append(cmd.Args, "--platform", Pipe.Docker.BuildxPlatforms)
-			}
+					c.SetDir(t.Pipe.DockerFile.Context)
+					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
-			for _, tag := range Context.Tags {
-				cmd.Args = append(cmd.Args, "-t", tag)
-			}
-
-			cmd.Dir = Pipe.DockerFile.Context
-			t.Log.Debugf("CWD set as: %s", cmd.Dir)
-
-			cmd.Args = append(
-				cmd.Args,
-				"--file",
-				Pipe.DockerFile.Name,
-				".",
-			)
-
-			t.Commands = append(t.Commands, cmd)
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
-		},
-	}
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunCommandJobAsJobSequence()
+		})
 }
 
-func DockerBuild() utils.Task {
-	return utils.Task{Metadata: utils.TaskMetadata{Context: "build", Skip: Pipe.Docker.UseBuildx},
-		Task: func(t *utils.Task) error {
+func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("build").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.Docker.UseBuildx
+		}).
+		Set(func(t *Task[Pipe]) error {
 			t.Log.Infof(
 				"Building Docker image: %s in %s",
-				Pipe.DockerFile.Name,
-				Pipe.DockerFile.Context,
+				t.Pipe.DockerFile.Name,
+				t.Pipe.DockerFile.Context,
 			)
 
-			cmd := exec.Command(DOCKER_EXE, "build")
+			// build image
+			t.CreateCommand(
+				DOCKER_EXE,
+				"build",
+			).
+				Set(func(c *Command[Pipe]) error {
+					for _, v := range t.Pipe.DockerImage.BuildArgs.Value() {
+						c.AppendArgs("--build-arg", v)
+					}
 
-			for _, v := range Pipe.DockerImage.BuildArgs.Value() {
-				cmd.Args = append(cmd.Args, "--build-arg", v)
-			}
+					if t.Pipe.DockerImage.Pull {
+						c.AppendArgs("--pull")
+					}
 
-			if Pipe.DockerImage.Pull {
-				cmd.Args = append(cmd.Args, "--pull")
-			}
+					for _, tag := range t.Pipe.Ctx.Tags {
+						c.AppendArgs("-t", tag)
+					}
 
-			for _, tag := range Context.Tags {
-				cmd.Args = append(cmd.Args, "-t", tag)
-			}
+					c.AppendArgs(
+						"--file",
+						t.Pipe.DockerFile.Name,
+						".",
+					)
 
-			cmd.Dir = Pipe.DockerFile.Context
-			t.Log.Debugf("CWD set as: %s", cmd.Dir)
+					c.SetDir(t.Pipe.DockerFile.Context)
+					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
-			cmd.Args = append(
-				cmd.Args,
-				"--file",
-				Pipe.DockerFile.Name,
-				".",
-			)
-
-			t.Commands = append(t.Commands, cmd)
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
-		}}
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunCommandJobAsJobSequence()
+		})
 }
 
-func DockerPush() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "push", Skip: Pipe.Docker.UseBuildx},
-		Task: func(t *utils.Task) error {
-			t.Commands = []utils.Command{}
+func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("push").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.Docker.UseBuildx
+		}).
+		Set(func(t *Task[Pipe]) error {
+			for _, tag := range t.Pipe.Ctx.Tags {
+				func(tag string) {
+					t.CreateCommand(
+						DOCKER_EXE,
+						"push",
+						tag,
+					).
+						Set(func(c *Command[Pipe]) error {
+							c.Log.Infof(
+								"Pushing Docker image: %s",
+								tag,
+							)
 
-			for _, tag := range Context.Tags {
-				t.Log.Infof(
-					"Pushing Docker image: %s",
-					tag,
-				)
-
-				cmd := exec.Command(DOCKER_EXE, "push")
-
-				cmd.Args = append(cmd.Args, tag)
-
-				t.Commands = append(t.Commands, cmd)
+							return nil
+						}).
+						AddSelfToTheTask()
+				}(tag)
 			}
 
 			return nil
-		},
-	}
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunCommandJobAsJobParallel()
+		})
 }
 
-func DockerInspect() utils.Task {
-	return utils.Task{Metadata: utils.TaskMetadata{
-		Context:        "inspect",
-		Skip:           !Pipe.DockerImage.Inspect,
-		StdOutLogLevel: logrus.DebugLevel,
-	},
-		Task: func(t *utils.Task) error {
-			t.Commands = []utils.Command{}
+func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("push").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return !t.Pipe.DockerImage.Inspect
+		}).
+		Set(func(t *Task[Pipe]) error {
+			for _, tag := range t.Pipe.Ctx.Tags {
+				func(tag string) {
+					t.CreateCommand(
+						DOCKER_EXE,
+						"manifest",
+						"inspect",
+						tag,
+					).
+						SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+						Set(func(c *Command[Pipe]) error {
+							c.Log.Infof(
+								"Inspecting Docker image: %s",
+								tag,
+							)
 
-			for _, tag := range Context.Tags {
-				t.Log.Infof(
-					"Inspecting Docker image: %s",
-					tag,
-				)
-
-				cmd := exec.Command(DOCKER_EXE, "manifest", "inspect")
-
-				cmd.Args = append(cmd.Args, tag)
-
-				t.Commands = append(t.Commands, cmd)
+							return nil
+						}).
+						AddSelfToTheTask()
+				}(tag)
 			}
 
 			return nil
-		}}
-
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunCommandJobAsJobParallel()
+		})
 }

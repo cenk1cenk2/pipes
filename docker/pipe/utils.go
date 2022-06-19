@@ -5,20 +5,20 @@ import (
 	"fmt"
 )
 
-func AddDockerTag(tag string) (string, error) {
+func AddDockerTag(tag string) error {
 	if tag == "" {
-		return "", errors.New("Can not add empty tag to list.")
+		return errors.New("Can not add empty tag to list.")
 	}
 
 	var t string
 
-	if Pipe.DockerRegistry.Registry != "" {
-		t = fmt.Sprintf("%s/%s:%s", Pipe.DockerRegistry.Registry, Pipe.DockerImage.Name, tag)
+	if TL.Pipe.DockerRegistry.Registry != "" {
+		t = fmt.Sprintf("%s/%s:%s", TL.Pipe.DockerRegistry.Registry, TL.Pipe.DockerImage.Name, tag)
 	} else {
-		t = fmt.Sprintf("%s:%s", Pipe.DockerImage.Name, tag)
+		t = fmt.Sprintf("%s:%s", TL.Pipe.DockerImage.Name, tag)
 	}
 
-	Context.Tags = append(Context.Tags, t)
+	TL.Pipe.Ctx.Tags = append(TL.Pipe.Ctx.Tags, t)
 
-	return t, nil
+	return nil
 }

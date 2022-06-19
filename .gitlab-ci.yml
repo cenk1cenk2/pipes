@@ -47,35 +47,19 @@ build:
   script:
     - apk add --no-cache --no-progress make git
     - make -j4 build
-    - ./dist/${APP_BINARY} --help
   artifacts:
     paths:
       - ${APP_FOLDER}/dist/
   parallel:
     matrix:
       - APP_FOLDER: ./_template
-        APP_BINARY: pipe
-
       - APP_FOLDER: ./docker
-        APP_BINARY: gitlab-pipes-docker
-
       - APP_FOLDER: ./gh-release-tracker
-        APP_BINARY: gh-release-tracker
-
       - APP_FOLDER: ./node
-        APP_BINARY: pipe
-
       - APP_FOLDER: ./gl-artifacts
-        APP_BINARY: gitlab-pipes-gl-artifacts
-
       - APP_FOLDER: ./markdown-toc
-        APP_BINARY: pipe
-
       - APP_FOLDER: ./update-docker-hub-readme
-        APP_BINARY: update-docker-hub-readme
-
       - APP_FOLDER: ./semantic-release
-        APP_BINARY: pipe
   tags:
     - docker
 
@@ -85,7 +69,6 @@ publish-first-docker:
   extends: .publish-first
   variables:
     DOCKER_CONTEXT: ./docker
-    APP_BINARY: gitlab-pipes-docker
     CONTAINER_IMAGE: gitlab-pipes-docker:latest
   only:
     changes:
@@ -101,7 +84,6 @@ publish-first-gl-artifacts:
   extends: .publish-first
   variables:
     DOCKER_CONTEXT: ./gl-artifacts
-    APP_BINARY: gl-artifacts
     CONTAINER_IMAGE: gitlab-pipes-gl-artifacts:latest
   only:
     changes:
@@ -121,7 +103,7 @@ publish-docker:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: gitlab-pipes-docker
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./docker, gitlab-pipes-docker]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./docker]"
   only:
     changes:
       - "docker/**/*"
@@ -137,7 +119,7 @@ publish-node:
   variables:
     DOCKERFILE_CONTEXT: ./node
     DOCKER_IMAGE_NAME: gitlab-pipes-node
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node, pipe]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node]"
   parallel:
     matrix:
       - IMAGE_TAGS: ${NODE_VERSION}
@@ -163,7 +145,7 @@ publish-gl-artifacts:
     DOCKERFILE_CONTEXT: ./gl-artifacts
     DOCKER_IMAGE_NAME: gitlab-pipes-gl-artifacts
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts, gitlab-pipes-gl-artifacts]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts]"
   only:
     changes:
       - "gl-artifacts/**/*"
@@ -182,7 +164,7 @@ publish-gh-release-tracker:
     DOCKERFILE_CONTEXT: ./gh-release-tracker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gh-release-tracker, gh-release-tracker]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gh-release-tracker]"
   only:
     changes:
       - "gh-release-tracker/**/*"
@@ -199,7 +181,7 @@ publish-markdown-toc:
     DOCKERFILE_CONTEXT: ./markdown-toc
     IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc, pipe]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc]"
   only:
     changes:
       - "markdown-toc/**/*"
@@ -216,7 +198,7 @@ publish-update-docker-hub-readme:
     DOCKERFILE_CONTEXT: ./update-docker-hub-readme
     IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./update-docker-hub-readme, update-docker-hub-readme]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./update-docker-hub-readme]"
   only:
     changes:
       - "update-docker-hub-readme/**/*"
@@ -233,7 +215,7 @@ publish-semantic-release:
     DOCKERFILE_CONTEXT: ./semantic-release
     IMAGE_NAME: cenk1cenk2/pipe-semantic-release
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./semantic-release, pipe]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./semantic-release]"
   only:
     changes:
       - "semantic-release/**/*"

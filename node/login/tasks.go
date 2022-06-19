@@ -32,9 +32,6 @@ func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunSubtasks()
 		})
 }
 
@@ -116,10 +113,10 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			for _, v := range t.Pipe.Ctx.NpmLogin {
-				t.CreateCommand("npm", "whoami").
-					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-					Set(func(v NpmLoginJson) CommandFn[Pipe] {
-						return func(c *Command[Pipe]) error {
+				func(v NpmLoginJson) {
+					t.CreateCommand("npm", "whoami").
+						SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+						Set(func(c *Command[Pipe]) error {
 							c.Log.Infof(
 								"Checking login credentials for Npm registry: %s", v.Registry,
 							)
@@ -140,10 +137,9 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 							)
 
 							return nil
-						}
-					}(v)).
-					AddSelfToTheTask()
-
+						}).
+						AddSelfToTheTask()
+				}(v)
 			}
 
 			return nil

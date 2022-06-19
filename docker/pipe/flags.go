@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_COMMIT_REF_NAME"},
 		Value:       "",
-		Destination: &Pipe.Git.Branch,
+		Destination: &TL.Pipe.Git.Branch,
 	},
 
 	&cli.StringFlag{
@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_COMMIT_TAG"},
 		Value:       "",
-		Destination: &Pipe.Git.Tag,
+		Destination: &TL.Pipe.Git.Tag,
 	},
 
 	&cli.StringFlag{
@@ -28,7 +28,7 @@ var Flags = []cli.Flag{
 		Usage:       "Image name for the to be built Docker image.",
 		Required:    true,
 		EnvVars:     []string{"IMAGE_NAME"},
-		Destination: &Pipe.DockerImage.Name,
+		Destination: &TL.Pipe.DockerImage.Name,
 	},
 
 	&cli.StringSliceFlag{
@@ -36,7 +36,7 @@ var Flags = []cli.Flag{
 		Usage:       "Image tag for the to be built Docker image.",
 		Required:    true,
 		EnvVars:     []string{"IMAGE_TAGS"},
-		Destination: &Pipe.DockerImage.Tags,
+		Destination: &TL.Pipe.DockerImage.Tags,
 	},
 
 	&cli.StringFlag{
@@ -45,7 +45,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"DOCKERFILE_CONTEXT"},
 		Value:       ".",
-		Destination: &Pipe.DockerFile.Context,
+		Destination: &TL.Pipe.DockerFile.Context,
 	},
 
 	&cli.StringFlag{
@@ -54,7 +54,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"DOCKERFILE_NAME"},
 		Value:       "Dockerfile",
-		Destination: &Pipe.DockerFile.Name,
+		Destination: &TL.Pipe.DockerFile.Name,
 	},
 
 	&cli.StringFlag{
@@ -62,7 +62,7 @@ var Flags = []cli.Flag{
 		Usage:       "Docker registry to login to.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY"},
-		Destination: &Pipe.DockerRegistry.Registry,
+		Destination: &TL.Pipe.DockerRegistry.Registry,
 	},
 
 	&cli.StringFlag{
@@ -70,7 +70,7 @@ var Flags = []cli.Flag{
 		Usage:       "Docker registry username.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY_USERNAME"},
-		Destination: &Pipe.DockerRegistry.Username,
+		Destination: &TL.Pipe.DockerRegistry.Username,
 	},
 
 	&cli.StringFlag{
@@ -78,7 +78,7 @@ var Flags = []cli.Flag{
 		Usage:       "Docker registry password.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY_PASSWORD"},
-		Destination: &Pipe.DockerRegistry.Password,
+		Destination: &TL.Pipe.DockerRegistry.Password,
 	},
 
 	&cli.BoolFlag{
@@ -87,7 +87,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"DOCKER_USE_BUILDX"},
 		Value:       false,
-		Destination: &Pipe.Docker.UseBuildx,
+		Destination: &TL.Pipe.Docker.UseBuildx,
 	},
 
 	&cli.StringFlag{
@@ -96,7 +96,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"DOCKER_BUILDX_PLATFORMS"},
 		Value:       "linux/amd64",
-		Destination: &Pipe.Docker.BuildxPlatforms,
+		Destination: &TL.Pipe.Docker.BuildxPlatforms,
 	},
 
 	&cli.StringFlag{
@@ -105,7 +105,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"TAG_AS_LATEST_FOR_TAGS_REGEX"},
 		Value:       `["^v\\d*\\.\\d*\\.\\d*$"]`,
-		Destination: &Pipe.DockerImage.TagAsLatestForTagsRegex,
+		Destination: &TL.Pipe.DockerImage.TagAsLatestForTagsRegex,
 	},
 
 	&cli.StringFlag{
@@ -114,7 +114,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"TAG_AS_LATEST_FOR_BRANCHES_REGEX"},
 		Value:       `[]`,
-		Destination: &Pipe.DockerImage.TagAsLatestForBranchesRegex,
+		Destination: &TL.Pipe.DockerImage.TagAsLatestForBranchesRegex,
 	},
 
 	&cli.BoolFlag{
@@ -123,7 +123,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"IMAGE_PULL"},
 		Value:       true,
-		Destination: &Pipe.DockerImage.Pull,
+		Destination: &TL.Pipe.DockerImage.Pull,
 	},
 
 	&cli.StringFlag{
@@ -132,7 +132,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"TAGS_FILE"},
 		Value:       "",
-		Destination: &Pipe.DockerImage.TagsFile,
+		Destination: &TL.Pipe.DockerImage.TagsFile,
 	},
 
 	&cli.BoolFlag{
@@ -141,7 +141,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"IMAGE_INSPECT"},
 		Value:       true,
-		Destination: &Pipe.DockerImage.Inspect,
+		Destination: &TL.Pipe.DockerImage.Inspect,
 	},
 
 	&cli.StringSliceFlag{
@@ -149,6 +149,6 @@ var Flags = []cli.Flag{
 		Usage:       "Pass in extra build arguments for image.",
 		Required:    false,
 		EnvVars:     []string{"BUILD_ARGS"},
-		Destination: &Pipe.DockerImage.BuildArgs,
+		Destination: &TL.Pipe.DockerImage.BuildArgs,
 	},
 }
