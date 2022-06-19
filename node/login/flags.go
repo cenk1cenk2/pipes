@@ -7,7 +7,7 @@ import (
 var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:        "npm.login",
-		Usage:       "npm registries to login to. Format: json({username: string, password: string, registry?: string, useHttps?: boolean}[])",
+		Usage:       "npm registries to login to. (format: json({username: string, password: string, registry?: string, useHttps?: boolean}[]))",
 		Required:    false,
 		EnvVars:     []string{"NPM_LOGIN"},
 		Value:       "",
