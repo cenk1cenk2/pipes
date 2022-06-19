@@ -3,7 +3,6 @@ package pipe
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -72,7 +71,11 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 			} else if errors.Is(err, os.ErrNotExist) {
 				if t.Pipe.DockerImage.TagsFile != "" {
-					return fmt.Errorf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
+					t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
+
+					t.Plumber.SendExit(0)
+
+					return nil
 				} else {
 					t.Log.Debugf("Tags file is not specified: %s", t.Pipe.DockerImage.TagsFile)
 				}
@@ -228,6 +231,10 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 				// login verify task
 			t.CreateSubtask("login:verify").
+				ShouldDisable(func(t *Task[Pipe]) bool {
+					return t.Pipe.DockerRegistry.Username != "" &&
+						t.Pipe.DockerRegistry.Password != ""
+				}).
 				Set(func(t *Task[Pipe]) error {
 					t.CreateCommand(
 						DOCKER_EXE,
