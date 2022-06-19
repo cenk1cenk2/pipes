@@ -69,7 +69,7 @@ build:
         APP_BINARY: gitlab-pipes-gl-artifacts
 
       - APP_FOLDER: ./markdown-toc
-        APP_BINARY: markdown-toc
+        APP_BINARY: pipe
 
       - APP_FOLDER: ./update-docker-hub-readme
         APP_BINARY: update-docker-hub-readme
@@ -199,7 +199,7 @@ publish-markdown-toc:
     DOCKERFILE_CONTEXT: ./markdown-toc
     IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc, markdown-toc]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc, pipe]"
   only:
     changes:
       - "markdown-toc/**/*"
