@@ -9,7 +9,7 @@ type Ctx struct {
 }
 
 func SetupPackageManager(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("setup").
+	return tl.CreateTask("init").
 		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.PackageManager = PackageManager{
 				Exe:      t.Pipe.Node.PackageManager,
