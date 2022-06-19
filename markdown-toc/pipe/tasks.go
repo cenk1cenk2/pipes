@@ -2,82 +2,74 @@ package pipe
 
 import (
 	"os"
-	"os/exec"
 	"strings"
 
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
-	u "gitlab.kilic.dev/libraries/go-utils/utils"
+	"gitlab.kilic.dev/libraries/go-utils/utils"
 
 	glob "github.com/bmatcuk/doublestar/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type Ctx struct {
 	Matches []string
 }
 
-var Context Ctx
-
-func FindMarkdownFiles() utils.Task {
-	metadata := utils.TaskMetadata{Context: "discover"}
-
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
-		log := utils.Log.WithField("context", t.Metadata.Context)
-
-		cwd, err := os.Getwd()
-
-		if err != nil {
-			return err
-		}
-
-		fs := os.DirFS(cwd)
-
-		log.Debugf(
-			"Trying to match patterns: %s",
-			strings.Join(Pipe.Markdown.Patterns.Value(), ", "),
-		)
-
-		matches := []string{}
-
-		for _, v := range Pipe.Markdown.Patterns.Value() {
-			match, err := glob.Glob(fs, v)
+func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("discover").
+		Set(func(t *Task[Pipe]) error {
+			cwd, err := os.Getwd()
 
 			if err != nil {
 				return err
 			}
 
-			matches = append(matches, match...)
-		}
+			fs := os.DirFS(cwd)
 
-		if len(matches) == 0 {
-			log.Fatalf(
-				"Can not match any files with the given pattern: %s",
-				strings.Join(Pipe.Markdown.Patterns.Value(), ", "),
+			t.Log.Debugf(
+				"Trying to match patterns: %s",
+				strings.Join(t.Pipe.Markdown.Patterns.Value(), ", "),
 			)
-		}
 
-		matches = u.RemoveDuplicateStr(matches)
+			matches := []string{}
 
-		log.Debugf("Paths matched for given pattern: %s", strings.Join(matches, ", "))
+			for _, v := range t.Pipe.Markdown.Patterns.Value() {
+				match, err := glob.Glob(fs, v)
 
-		Context.Matches = matches
+				if err != nil {
+					return err
+				}
 
-		return nil
-	}}
+				matches = append(matches, match...)
+			}
+
+			if len(matches) == 0 {
+				t.Log.Fatalf(
+					"Can not match any files with the given pattern: %s",
+					strings.Join(t.Pipe.Markdown.Patterns.Value(), ", "),
+				)
+			}
+
+			matches = utils.RemoveDuplicateStr(matches)
+
+			t.Log.Debugf("Paths matched for given pattern: %s", strings.Join(matches, ", "))
+
+			t.Pipe.Ctx.Matches = matches
+
+			return nil
+		})
 }
 
-func RunMarkdownToc() utils.Task {
-	metadata := utils.TaskMetadata{Context: "generate"}
+func RunMarkdownToc(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("markdown-toc").
+		Set(func(t *Task[Pipe]) error {
 
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
+			for _, match := range t.Pipe.Ctx.Matches {
+				t.CreateCommand(MARKDOWN_TOC_COMMAND, t.Pipe.Markdown.Arguments, "-i", match).
+					AddSelfToTheTask()
+			}
 
-		for _, match := range Context.Matches {
-			cmd := exec.Command(MARKDOWN_TOC_COMMAND, Pipe.Markdown.Arguments, "-i")
-
-			cmd.Args = append(cmd.Args, match)
-
-			t.Commands = append(t.Commands, cmd)
-		}
-
-		return nil
-	}}
+			return nil
+		}).ShouldRunAfter(func(t *Task[Pipe]) error {
+		return t.RunCommandJobAsJobParallel()
+	})
 }

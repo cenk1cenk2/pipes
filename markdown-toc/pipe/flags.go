@@ -10,13 +10,13 @@ var Flags = []cli.Flag{
 		Usage:       "Pattern for markdown. Supports multiple patterns with comma-separated values.",
 		Value:       cli.NewStringSlice("README.md"),
 		EnvVars:     []string{"MARKDOWN_TOC_PATTERNS", "PLUGIN_MARKDOWN_TOC_PATTERNS"},
-		Destination: &Pipe.Markdown.Patterns,
+		Destination: &TL.Pipe.Markdown.Patterns,
 	},
 	&cli.StringFlag{
 		Name:        "markdown-toc.arguments",
 		Usage:       "Pass in the arguments for markdown-toc.",
 		Value:       "--bullets='-'",
 		EnvVars:     []string{"MARKDOWN_TOC_ARGUMENTS", "PLUGIN_MARKDOWN_TOC_ARGUMENTS"},
-		Destination: &Pipe.Markdown.Arguments,
+		Destination: &TL.Pipe.Markdown.Arguments,
 	},
 }

@@ -3,23 +3,26 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	pipe "gitlab.kilic.dev/devops/pipes/markdown-toc/pipe"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	"gitlab.kilic.dev/devops/pipes/markdown-toc/pipe"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 func main() {
-	utils.CliCreate(
-		&cli.App{
-			Name:    pipe.CLI_NAME,
-			Version: pipe.VERSION,
-			Action:  run,
-			Flags:   pipe.Flags,
-		},
-	)
-}
+	p := Plumber{}
 
-func run(c *cli.Context) error {
-	utils.CliGreet(c)
-
-	return pipe.Pipe.Exec()
+	p.New(
+		func(a *Plumber) *cli.App {
+			return &cli.App{
+				Name:        CLI_NAME,
+				Version:     VERSION,
+				Usage:       DESCRIPTION,
+				Description: DESCRIPTION,
+				Flags:       pipe.Flags,
+				Action: func(c *cli.Context) error {
+					return pipe.TL.RunJobs(
+						pipe.New(a).SetCliContext(c).Job(),
+					)
+				},
+			}
+		}).Run()
 }

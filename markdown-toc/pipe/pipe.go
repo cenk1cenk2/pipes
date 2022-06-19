@@ -2,7 +2,7 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type (
@@ -11,22 +11,22 @@ type (
 		Arguments string
 	}
 
-	Plugin struct {
-		Markdown Markdown
+	Pipe struct {
+		Ctx
+
+		Markdown
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var TL = TaskList[Pipe]{
+	Pipe: Pipe{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{
-			FindMarkdownFiles(),
-			RunMarkdownToc(),
-		},
+func New(p *Plumber) *TaskList[Pipe] {
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			FindMarkdownFiles(&TL).Job(),
+			RunMarkdownToc(&TL).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }
