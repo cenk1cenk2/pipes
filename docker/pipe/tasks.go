@@ -73,7 +73,7 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 				if t.Pipe.DockerImage.TagsFile != "" {
 					t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
 
-					t.Plumber.SendExit(0)
+					t.SendExit(0)
 
 					return nil
 				} else {
