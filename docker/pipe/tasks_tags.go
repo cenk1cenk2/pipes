@@ -12,15 +12,15 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-func DockerTags(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags:main").
+func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("tags:parent").
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
 				tl.JobParallel(
-					dockerTagsUser(tl).Job(),
-					dockerTagsFile(tl).Job(),
-					dockerTagsLatestFromTag(tl).Job(),
-					dockerTagsLatestFromBranch(tl).Job(),
+					DockerTagsUser(tl).Job(),
+					DockerTagsFile(tl).Job(),
+					DockerTagsLatestFromTag(tl).Job(),
+					DockerTagsLatestFromBranch(tl).Job(),
 				),
 			)
 
@@ -42,7 +42,7 @@ func DockerTags(tl *TaskList[Pipe]) *Task[Pipe] {
 	})
 }
 
-func dockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags:user").
 		Set(func(t *Task[Pipe]) error {
 			// add all the specified tags
@@ -56,7 +56,7 @@ func dockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags:file").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerImage.TagsFile == ""
@@ -113,7 +113,7 @@ func dockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags:latest:tag").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerImage.TagAsLatestForTagsRegex == "" || t.Pipe.Git.Tag == ""
@@ -150,7 +150,7 @@ func dockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerTagsLatestFromBranch(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsLatestFromBranch(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags:latest:branch").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerImage.TagAsLatestForBranchesRegex == "" || t.Pipe.Git.Branch == ""

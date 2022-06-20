@@ -4,16 +4,16 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("build:main").
+func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("build:parent").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Docker.UseBuildx
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
 				tl.JobSequence(
-					dockerBuild(tl).Job(),
-					dockerPush(tl).Job(),
+					DockerBuild(tl).Job(),
+					DockerPush(tl).Job(),
 				),
 			)
 
@@ -24,7 +24,7 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("build").
 		Set(func(t *Task[Pipe]) error {
 			t.Log.Infof(
@@ -71,7 +71,7 @@ func dockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("push").
 		Set(func(t *Task[Pipe]) error {
 			for _, tag := range t.Pipe.Ctx.Tags {

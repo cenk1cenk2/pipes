@@ -4,18 +4,18 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("buildx:main").
+func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("buildx:parent").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Docker.UseBuildx
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
 				tl.JobSequence(
-					dockerBuildXCreate(&TL).Job(),
-					dockerBuildXUse(&TL).Job(),
-					dockerBuildxSetupQemu(&TL).Job(),
-					dockerRunBuildX(&TL).Job(),
+					DockerBuildXCreate(&TL).Job(),
+					DockerBuildXUse(&TL).Job(),
+					DockerBuildxSetupQemu(&TL).Job(),
+					DockerBuildX(&TL).Job(),
 				),
 			)
 
@@ -24,7 +24,7 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 
 }
 
-func dockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx:create").
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
@@ -53,8 +53,11 @@ func dockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx:use").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return !t.Pipe.Ctx.TryToUseExistingBuildXInstance
+		}).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
 				DOCKER_EXE,
@@ -78,7 +81,7 @@ func dockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func dockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx:qemu").
 		Set(func(t *Task[Pipe]) error {
 			// spawn virtual machine
@@ -112,7 +115,7 @@ func dockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 
 }
 
-func dockerRunBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx").
 		Set(func(t *Task[Pipe]) error {
 			t.Log.Infof(

@@ -58,7 +58,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).SetTasks(
 		TL.JobSequence(
 			Setup(&TL).Job(),
-			DockerTags(&TL).Job(),
+			DockerTagsParent(&TL).Job(),
 			TL.JobParallel(
 				DockerVersion(&TL).Job(),
 				DockerBuildXVersion(&TL).Job(),
@@ -68,8 +68,8 @@ func New(p *Plumber) *TaskList[Pipe] {
 				DockerLoginVerify(&TL).Job(),
 			),
 			TL.JobParallel(
-				DockerBuild(&TL).Job(),
-				DockerBuildX(&TL).Job(),
+				DockerBuildParent(&TL).Job(),
+				DockerBuildXParent(&TL).Job(),
 			),
 			DockerInspect(&TL).Job(),
 		),
