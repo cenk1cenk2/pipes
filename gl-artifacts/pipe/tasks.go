@@ -197,7 +197,9 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 								artifact.path,
 								"-d",
 								"./",
-							).AddSelfToTheTask()
+							).
+								SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+								AddSelfToTheTask()
 
 							return nil
 						}).ShouldRunAfter(func(t *Task[Pipe]) error {
@@ -212,6 +214,6 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).ShouldRunAfter(func(t *Task[Pipe]) error {
-		return t.RunCommandJobAsJobParallel()
+		return t.RunSubtasks()
 	})
 }
