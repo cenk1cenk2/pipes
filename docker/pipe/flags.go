@@ -136,6 +136,15 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
+		Name:        "docker_image.tags_file_ignore_missing",
+		Usage:       "Dont finish the task if tags file is set and missing.",
+		Required:    false,
+		EnvVars:     []string{"TAGS_FILE_IGNORE_MISSING"},
+		Value:       false,
+		Destination: &TL.Pipe.DockerImage.TagsFileIgnoreMissing,
+	},
+
+	&cli.BoolFlag{
 		Name:        "docker_image.inspect",
 		Usage:       "Inspect after pushing the image.",
 		Required:    false,

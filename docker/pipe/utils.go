@@ -18,7 +18,9 @@ func AddDockerTag(tag string) error {
 		t = fmt.Sprintf("%s:%s", TL.Pipe.DockerImage.Name, tag)
 	}
 
+	TL.Lock.Lock()
 	TL.Pipe.Ctx.Tags = append(TL.Pipe.Ctx.Tags, t)
+	TL.Lock.Unlock()
 
 	return nil
 }

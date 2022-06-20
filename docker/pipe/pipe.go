@@ -22,6 +22,7 @@ type (
 		TagAsLatestForTagsRegex     string
 		TagAsLatestForBranchesRegex string
 		TagsFile                    string
+		TagsFileIgnoreMissing       bool
 		Pull                        bool
 		Inspect                     bool
 		BuildArgs                   cli.StringSlice
@@ -57,12 +58,19 @@ func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).SetTasks(
 		TL.JobSequence(
 			Setup(&TL).Job(),
-			DockerVersion(&TL).Job(),
-			DockerLogin(&TL).Job(),
-			DockerSetupBuildX(&TL).Job(),
-			DockerBuildX(&TL).Job(),
-			DockerBuild(&TL).Job(),
-			DockerPush(&TL).Job(),
+			DockerTags(&TL).Job(),
+			TL.JobParallel(
+				DockerVersion(&TL).Job(),
+				DockerBuildXVersion(&TL).Job(),
+			),
+			TL.JobParallel(
+				DockerLogin(&TL).Job(),
+				DockerLoginVerify(&TL).Job(),
+			),
+			TL.JobParallel(
+				DockerBuild(&TL).Job(),
+				DockerBuildX(&TL).Job(),
+			),
 			DockerInspect(&TL).Job(),
 		),
 	)
