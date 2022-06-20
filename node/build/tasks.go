@@ -127,7 +127,7 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 
 									variables[i] = fmt.Sprintf("%s=%s", matches[1], matches[2])
 
-									st.Log.Debugf("Matched from environment variable: %s -> %s",
+									st.Log.Debugf("Matched from environment variable: %s > %s",
 										v,
 										variables[i])
 								}

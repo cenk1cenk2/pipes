@@ -171,7 +171,7 @@ func UpdateDockerReadme() utils.Task {
 			}
 
 			log.Infof(
-				"Successfully pushed readme file to: %s -> %s/%s",
+				"Successfully pushed readme file to: %s > %s/%s",
 				Pipe.Readme.File,
 				Pipe.DockerHub.Address,
 				Pipe.Readme.Repository,

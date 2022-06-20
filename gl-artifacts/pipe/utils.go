@@ -39,7 +39,7 @@ func DownloadArtifact(t *Task[Pipe], url string) (string, error) {
 		res.Filename = fmt.Sprintf("%s.zip", uuid.New().String())
 	}
 
-	t.Log.Infof("Downloading file: %s -> %s", url, res.Filename)
+	t.Log.Infof("Downloading file: %s > %s", url, res.Filename)
 
 	code, err := strconv.Atoi(strings.Split(res.HTTPResponse.Status, " ")[0])
 
@@ -61,7 +61,7 @@ Loop:
 	for {
 		select {
 		case <-timer.C:
-			t.Log.Infof("%s -> %s: transferred %s / %s (%.2f%%) [%s]",
+			t.Log.Infof("%s > %s: transferred %s / %s (%.2f%%) [%s]",
 				url,
 				res.Filename,
 				humanize.Bytes(uint64(res.BytesComplete())),
@@ -72,10 +72,11 @@ Loop:
 
 		case <-res.Done:
 			t.Log.Infof(
-				"Download completed: %s to %s in %s with %s",
+				"Download completed: %s to %s in %s > %s with %s/s",
 				url,
 				res.Filename,
 				res.Duration(),
+				humanize.Bytes(uint64(res.Size())),
 				humanize.Bytes(uint64(res.BytesPerSecond())),
 			)
 

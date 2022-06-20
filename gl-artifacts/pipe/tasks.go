@@ -141,7 +141,7 @@ func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.CreateSubtask(fmt.Sprintf("download:%s", step.name)).
 						Set(func(t *Task[Pipe]) error {
 							t.Log.Debugf(
-								"Will download artifact with parent job: %s -> %d",
+								"Will download artifact with parent job: %s > %d",
 								step.name,
 								step.id,
 							)
@@ -150,7 +150,7 @@ func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							if err != nil {
 								return fmt.Errorf(
-									"Can not download artifacts from stage: %s -> %d with error: %s",
+									"Can not download artifacts from stage: %s > %d with error: %s",
 									step.name,
 									step.id,
 									err,
@@ -186,7 +186,7 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.CreateSubtask(fmt.Sprintf("unarchive:%s", artifact.name)).
 						Set(func(t *Task[Pipe]) error {
 							t.Log.Debugf(
-								"Decompressing artifact: %s -> %s",
+								"Decompressing artifact: %s > %s",
 								artifact.name,
 								artifact.path,
 							)

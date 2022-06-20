@@ -92,7 +92,7 @@ func FetchLatestTag() utils.Task {
 			Context.LatestTag = latest
 
 			t.Log.Infoln(
-				"Latest tag for repository: %s -> %s",
+				"Latest tag for repository: %s > %s",
 				Pipe.Github.Repository,
 				latest.GetName(),
 			)
