@@ -13,7 +13,7 @@ import (
 )
 
 func DockerTags(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags").
+	return tl.CreateTask("tags:main").
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
 				tl.JobParallel(

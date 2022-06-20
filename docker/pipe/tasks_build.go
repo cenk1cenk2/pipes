@@ -5,7 +5,7 @@ import (
 )
 
 func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("build:setup").
+	return tl.CreateTask("build:main").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Docker.UseBuildx
 		}).
