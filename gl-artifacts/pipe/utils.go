@@ -72,10 +72,11 @@ Loop:
 
 		case <-res.Done:
 			t.Log.Infof(
-				"Download completed: %s to %s in %s",
+				"Download completed: %s to %s in %.2f with %.2f",
 				url,
 				res.Filename,
 				res.Duration(),
+				res.BytesPerSecond(),
 			)
 
 			break Loop
