@@ -11,10 +11,10 @@ import (
 	"github.com/cavaliergopher/grab/v3"
 	"github.com/dustin/go-humanize"
 	"github.com/google/uuid"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-func DownloadArtifact(url string) (string, error) {
+func DownloadArtifact(t *Task[Pipe], url string) (string, error) {
 	path := fmt.Sprintf("/tmp/%s/", uuid.New().String())
 	err := os.MkdirAll(path, os.ModePerm)
 
@@ -26,10 +26,10 @@ func DownloadArtifact(url string) (string, error) {
 	client := grab.NewClient()
 	req, _ := grab.NewRequest(path, url)
 
-	if Pipe.Gitlab.Token != "" {
-		req.HTTPRequest.Header.Set("PRIVATE-TOKEN", Pipe.Gitlab.Token)
+	if t.Pipe.Gitlab.Token != "" {
+		req.HTTPRequest.Header.Set("PRIVATE-TOKEN", t.Pipe.Gitlab.Token)
 	} else {
-		req.HTTPRequest.Header.Set("JOB-TOKEN", Pipe.Gitlab.JobToken)
+		req.HTTPRequest.Header.Set("JOB-TOKEN", t.Pipe.Gitlab.JobToken)
 	}
 
 	// start download
@@ -39,7 +39,7 @@ func DownloadArtifact(url string) (string, error) {
 		res.Filename = fmt.Sprintf("%s.zip", uuid.New().String())
 	}
 
-	utils.Log.Infof("Downloading file: %s -> %s", url, res.Filename)
+	t.Log.Infof("Downloading file: %s -> %s", url, res.Filename)
 
 	code, err := strconv.Atoi(strings.Split(res.HTTPResponse.Status, " ")[0])
 
@@ -47,21 +47,21 @@ func DownloadArtifact(url string) (string, error) {
 		return "", err
 	}
 
-	err = ParseGLApiResponseCode(url, code)
+	err = ParseGLApiResponseCode(t, url, code)
 
 	if err != nil {
 		return "", err
 	}
 
 	// start UI loop
-	t := time.NewTicker(500 * time.Millisecond)
-	defer t.Stop()
+	timer := time.NewTicker(500 * time.Millisecond)
+	defer timer.Stop()
 
 Loop:
 	for {
 		select {
-		case <-t.C:
-			utils.Log.Infof("%s -> %s: transferred %s / %s (%.2f%%) [%s]",
+		case <-timer.C:
+			t.Log.Infof("%s -> %s: transferred %s / %s (%.2f%%) [%s]",
 				url,
 				res.Filename,
 				humanize.Bytes(uint64(res.BytesComplete())),
@@ -71,7 +71,7 @@ Loop:
 			)
 
 		case <-res.Done:
-			utils.Log.Infof(
+			t.Log.Infof(
 				"Download completed: %s to %s in %s",
 				url,
 				res.Filename,
@@ -85,7 +85,7 @@ Loop:
 	return res.Filename, nil
 }
 
-func ParseGLApiResponseCode(url string, code int) error {
+func ParseGLApiResponseCode(t *Task[Pipe], url string, code int) error {
 	switch code {
 	case http.StatusUnauthorized:
 		return fmt.Errorf(
@@ -94,7 +94,7 @@ func ParseGLApiResponseCode(url string, code int) error {
 	case http.StatusNotFound:
 		return fmt.Errorf("Given API path is not found.")
 	default:
-		utils.Log.Debugf("Status code: %d from %s", code, url)
+		t.Log.Debugf("Status code: %d from %s", code, url)
 	}
 
 	return nil

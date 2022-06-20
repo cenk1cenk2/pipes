@@ -90,7 +90,7 @@ type (
 		TagList           []string  `json:"tag_list"`
 	}
 
-	StepId struct {
+	Step struct {
 		id   int
 		name string
 	}

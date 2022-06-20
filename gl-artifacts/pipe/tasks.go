@@ -4,214 +4,214 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os/exec"
 	"strings"
-	"sync"
 
-	"github.com/sirupsen/logrus"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type Ctx struct {
 	StepsResponse       GLApiSuccessfulStepsResponse
-	StepIds             []StepId
+	Steps               []Step
 	Client              *http.Client
 	DownloadedArtifacts []DownloadedArtifact
 	JobNames            []string
 }
 
-var Context Ctx
+func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("init").
+		ShouldRunBefore(func(t *Task[Pipe]) error {
+			t.Pipe.Ctx.Steps = []Step{}
 
-func VerifyVariables() utils.Task {
-	metadata := utils.TaskMetadata{Context: "verify"}
+			return nil
+		}).
+		Set(func(t *Task[Pipe]) error {
 
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
-		reqUrl := fmt.Sprintf(
-			"%s/projects/%s/pipelines/%s/jobs/?scope=success",
-			Pipe.Gitlab.ApiUrl,
-			Pipe.Gitlab.ParentProjectId,
-			Pipe.Gitlab.ParentPipelineId,
-		)
+			reqUrl := fmt.Sprintf(
+				"%s/projects/%s/pipelines/%s/jobs/?scope=success",
+				t.Pipe.Gitlab.ApiUrl,
+				t.Pipe.Gitlab.ParentProjectId,
+				t.Pipe.Gitlab.ParentPipelineId,
+			)
 
-		utils.Log.Debugf("Pipeline steps API request URL: %s", reqUrl)
+			t.Log.Debugf("Pipeline steps API request URL: %s", reqUrl)
 
-		req, err := http.NewRequest(
-			http.MethodGet,
-			reqUrl,
-			nil,
-		)
+			req, err := http.NewRequest(
+				http.MethodGet,
+				reqUrl,
+				nil,
+			)
 
-		if err != nil {
-			utils.Log.Fatalln(err)
-		}
+			if err != nil {
+				return err
+			}
 
-		req.Header.Set("PRIVATE-TOKEN", Pipe.Gitlab.Token)
+			req.Header.Set("PRIVATE-TOKEN", t.Pipe.Gitlab.Token)
 
-		Context.Client = &http.Client{}
+			t.Pipe.Ctx.Client = &http.Client{}
 
-		res, err := Context.Client.Do(req)
+			res, err := t.Pipe.Ctx.Client.Do(req)
 
-		if err != nil {
-			return err
-		}
+			if err != nil {
+				return err
+			}
 
-		defer res.Body.Close()
+			defer res.Body.Close()
 
-		err = ParseGLApiResponseCode(reqUrl, res.StatusCode)
+			if err = ParseGLApiResponseCode(t, reqUrl, res.StatusCode); err != nil {
+				return err
+			}
 
-		if err != nil {
-			return err
-		}
+			decoder := json.NewDecoder(res.Body)
 
-		decoder := json.NewDecoder(res.Body)
+			if err = decoder.Decode(&t.Pipe.Ctx.StepsResponse); err != nil {
+				return err
+			}
 
-		err = decoder.Decode(&Context.StepsResponse)
-
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}}
+			return nil
+		})
 }
 
-func DiscoverArtifacts() utils.Task {
-	metadata := utils.TaskMetadata{Context: "discover"}
+func DiscoverArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("discover").
+		Set(func(t *Task[Pipe]) error {
+			t.Pipe.Ctx.JobNames = strings.Split(t.Pipe.Gitlab.DownloadArtifacts, "|")
 
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
-		Context.StepIds = []StepId{}
+			for _, step := range t.Pipe.Ctx.JobNames {
+				func(step string) {
+					t.CreateSubtask("").
+						Set(func(t *Task[Pipe]) error {
+							found := false
 
-		Context.JobNames = strings.Split(Pipe.Gitlab.DownloadArtifacts, "|")
+							for _, v := range t.Pipe.Ctx.StepsResponse {
+								if v.Name == step {
+									t.Log.Debugf(
+										"Adding step artifacts: %s with id %d", step, v.ID,
+									)
 
-		var wg sync.WaitGroup
-		wg.Add(len(Context.JobNames))
+									t.Pipe.Ctx.Steps = append(t.Pipe.Ctx.Steps, Step{id: v.ID, name: step})
 
-		for _, step := range Context.JobNames {
-			go func(step string) {
-				defer wg.Done()
+									found = true
+								}
+							}
 
-				found := false
+							if !found {
+								t.Log.Errorf(
+									"Job with name is not found so artifacts are not downloaded: %s ",
+									step,
+								)
 
-				for _, v := range Context.StepsResponse {
-					if v.Name == step {
-						utils.Log.Debugf(
-							"Adding step artifacts: %s with id %d", step, v.ID,
-						)
+								var available []string = []string{}
 
-						Context.StepIds = append(Context.StepIds, StepId{id: v.ID, name: step})
+								for _, v := range t.Pipe.Ctx.StepsResponse {
+									available = append(available, v.Name)
+								}
 
-						found = true
-					}
-				}
+								return fmt.Errorf("Available steps are: %s", strings.Join(available, ", "))
+							}
 
-				if !found {
-					utils.Log.Errorf(
-						"Job with name is not found so artifacts are not downloaded: %s ",
-						step,
-					)
+							return nil
+						}).
+						AddSelfToParent(func(pt, st *Task[Pipe]) {
+							pt.ExtendSubtask(func(j Job) Job {
+								return tl.JobParallel(j, st.Job())
+							})
+						})
+				}(step)
+			}
 
-					var available []string = []string{}
-
-					for _, v := range Context.StepsResponse {
-						available = append(available, v.Name)
-
-					}
-
-					utils.Log.Fatalf(
-						"Available steps are: %s",
-						strings.Join(available, ", "),
-					)
-				}
-
-			}(step)
-		}
-
-		wg.Wait()
-
-		return nil
-	}}
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunSubtasks()
+		})
 }
 
-func DownloadArtifacts() utils.Task {
-	metadata := utils.TaskMetadata{Context: "download"}
+func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("download").
+		Set(func(t *Task[Pipe]) error {
+			url := fmt.Sprintf(
+				"%s/projects/%s/jobs/%s/artifacts/",
+				t.Pipe.Gitlab.ApiUrl,
+				t.Pipe.Gitlab.ParentProjectId,
+				"%d",
+			)
 
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
-		url := fmt.Sprintf(
-			"%s/projects/%s/jobs/%s/artifacts/",
-			Pipe.Gitlab.ApiUrl,
-			Pipe.Gitlab.ParentProjectId,
-			"%d",
-		)
+			for _, step := range t.Pipe.Ctx.Steps {
+				func(step Step) {
+					t.CreateSubtask(fmt.Sprintf("download:%s", step.name)).
+						Set(func(t *Task[Pipe]) error {
+							t.Log.Debugf(
+								"Will download artifact with parent job: %s -> %d",
+								step.name,
+								step.id,
+							)
 
-		var wg sync.WaitGroup
-		wg.Add(len(Context.StepIds))
+							path, err := DownloadArtifact(t, fmt.Sprintf(url, step.id))
 
-		for _, stepId := range Context.StepIds {
-			go func(stepId StepId) {
-				defer wg.Done()
+							if err != nil {
+								return fmt.Errorf(
+									"Can not download artifacts from stage: %s -> %d with error: %s",
+									step.name,
+									step.id,
+									err,
+								)
+							}
 
-				utils.Log.Debugf(
-					"Will download artifact with parent job: %s -> %d",
-					stepId.name,
-					stepId.id,
-				)
+							t.Pipe.Ctx.DownloadedArtifacts = append(
+								t.Pipe.Ctx.DownloadedArtifacts,
+								DownloadedArtifact{name: step.name, path: path},
+							)
 
-				path, err := DownloadArtifact(fmt.Sprintf(url, stepId.id))
+							return nil
+						}).AddSelfToParent(func(pt, st *Task[Pipe]) {
+						pt.ExtendSubtask(func(j Job) Job {
+							return tl.JobParallel(j, st.Job())
+						})
+					})
+				}(step)
+			}
 
-				if err != nil {
-					utils.Log.Fatalf(
-						"Can not download artifacts from stage: %s -> %d with error: %s",
-						stepId.name,
-						stepId.id,
-						err,
-					)
-				}
-
-				Context.DownloadedArtifacts = append(
-					Context.DownloadedArtifacts,
-					DownloadedArtifact{name: stepId.name, path: path},
-				)
-			}(stepId)
-		}
-
-		wg.Wait()
-
-		return nil
-	}}
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunSubtasks()
+		})
 }
 
-func UnarchiveArtifacts() utils.Task {
-	metadata := utils.TaskMetadata{
-		Context:        "unarchive",
-		StdOutLogLevel: logrus.DebugLevel,
-	}
+func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("unarchive").
+		Set(func(t *Task[Pipe]) error {
+			for _, artifact := range t.Pipe.Ctx.DownloadedArtifacts {
+				func(artifact DownloadedArtifact) {
+					t.CreateSubtask(fmt.Sprintf("unarchive:%s", artifact.name)).
+						Set(func(t *Task[Pipe]) error {
+							t.Log.Debugf(
+								"Decompressing artifact: %s -> %s",
+								artifact.name,
+								artifact.path,
+							)
 
-	return utils.Task{Metadata: metadata, Task: func(t *utils.Task) error {
-		t.Commands = []utils.Command{}
+							t.CreateCommand(
+								"unzip",
+								"-o",
+								artifact.path,
+								"-d",
+								"./",
+							).AddSelfToTheTask()
 
-		var wg sync.WaitGroup
-		wg.Add(len(Context.DownloadedArtifacts))
+							return nil
+						}).ShouldRunAfter(func(t *Task[Pipe]) error {
+						return t.RunCommandJobAsJobParallel()
+					}).AddSelfToParent(func(pt, st *Task[Pipe]) {
+						pt.ExtendSubtask(func(j Job) Job {
+							return tl.JobParallel(j, st.Job())
+						})
+					})
+				}(artifact)
+			}
 
-		for _, artifact := range Context.DownloadedArtifacts {
-			go func(artifact DownloadedArtifact) {
-				defer wg.Done()
-
-				utils.Log.Debugf(
-					"Will Decompres artifact: %s -> %s",
-					artifact.name,
-					artifact.path,
-				)
-
-				cmd := exec.Command("unzip", "-o")
-
-				cmd.Args = append(cmd.Args, artifact.path, "-d", "./")
-
-				t.Commands = append(t.Commands, cmd)
-			}(artifact)
-		}
-
-		wg.Wait()
-
-		return nil
-	}}
+			return nil
+		}).ShouldRunAfter(func(t *Task[Pipe]) error {
+		return t.RunCommandJobAsJobParallel()
+	})
 }

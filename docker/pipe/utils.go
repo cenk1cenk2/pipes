@@ -3,23 +3,23 @@ package pipe
 import (
 	"errors"
 	"fmt"
+
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-func AddDockerTag(tag string) error {
+func AddDockerTag(t *Task[Pipe], tag string) error {
 	if tag == "" {
 		return errors.New("Can not add empty tag to list.")
 	}
 
-	var t string
-
 	if TL.Pipe.DockerRegistry.Registry != "" {
-		t = fmt.Sprintf("%s/%s:%s", TL.Pipe.DockerRegistry.Registry, TL.Pipe.DockerImage.Name, tag)
+		tag = fmt.Sprintf("%s/%s:%s", TL.Pipe.DockerRegistry.Registry, TL.Pipe.DockerImage.Name, tag)
 	} else {
-		t = fmt.Sprintf("%s:%s", TL.Pipe.DockerImage.Name, tag)
+		tag = fmt.Sprintf("%s:%s", TL.Pipe.DockerImage.Name, tag)
 	}
 
 	TL.Lock.Lock()
-	TL.Pipe.Ctx.Tags = append(TL.Pipe.Ctx.Tags, t)
+	TL.Pipe.Ctx.Tags = append(TL.Pipe.Ctx.Tags, tag)
 	TL.Lock.Unlock()
 
 	return nil

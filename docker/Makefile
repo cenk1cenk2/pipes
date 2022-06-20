@@ -39,4 +39,3 @@ docs:
 
 help:
 	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) $(ARGS) --help
-

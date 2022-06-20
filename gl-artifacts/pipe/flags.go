@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    true,
 		EnvVars:     []string{"CI_API_V4_URL"},
 		Value:       "",
-		Destination: &Pipe.Gitlab.ApiUrl,
+		Destination: &TL.Pipe.Gitlab.ApiUrl,
 	},
 
 	&cli.StringFlag{
@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Required:    true,
 		EnvVars:     []string{"GL_TOKEN"},
 		Value:       "",
-		Destination: &Pipe.Gitlab.Token,
+		Destination: &TL.Pipe.Gitlab.Token,
 	},
 
 	&cli.StringFlag{
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"CI_JOB_TOKEN"},
 		Value:       "",
-		Destination: &Pipe.Gitlab.JobToken,
+		Destination: &TL.Pipe.Gitlab.JobToken,
 	},
 
 	&cli.StringFlag{
@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 		Required:    true,
 		EnvVars:     []string{"CI_PROJECT_ID"},
 		Value:       "",
-		Destination: &Pipe.Gitlab.ParentProjectId,
+		Destination: &TL.Pipe.Gitlab.ParentProjectId,
 	},
 
 	&cli.StringFlag{
@@ -47,7 +47,7 @@ var Flags = []cli.Flag{
 		Required:    true,
 		EnvVars:     []string{"PARENT_PIPELINE_ID"},
 		Value:       "",
-		Destination: &Pipe.Gitlab.ParentPipelineId,
+		Destination: &TL.Pipe.Gitlab.ParentPipelineId,
 	},
 
 	&cli.StringFlag{
@@ -55,6 +55,6 @@ var Flags = []cli.Flag{
 		Usage:       "Names of the jobs that yield artifacts from the parent job.",
 		Required:    true,
 		EnvVars:     []string{"PARENT_DOWNLOAD_ARTIFACTS"},
-		Destination: &Pipe.Gitlab.DownloadArtifacts,
+		Destination: &TL.Pipe.Gitlab.DownloadArtifacts,
 	},
 }

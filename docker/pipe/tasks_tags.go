@@ -47,7 +47,7 @@ func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			// add all the specified tags
 			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(t.Pipe.DockerImage.Tags.Value())) {
-				if err := AddDockerTag(v); err != nil {
+				if err := AddDockerTag(t, v); err != nil {
 					return err
 				}
 			}
@@ -84,7 +84,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 					func(v string) {
 						t.CreateSubtask("").
 							Set(func(t *Task[Pipe]) error {
-								return AddDockerTag(re.ReplaceAllString(v, ""))
+								return AddDockerTag(t, re.ReplaceAllString(v, ""))
 							}).
 							AddSelfToParent(func(pt, st *Task[Pipe]) {
 								pt.ExtendSubtask(func(j Job) Job {
@@ -133,7 +133,7 @@ func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 
 				if m {
-					if err := AddDockerTag(DOCKER_LATEST_TAG); err != nil {
+					if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
 						return err
 					}
 
@@ -170,7 +170,7 @@ func DockerTagsLatestFromBranch(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 
 				if m {
-					if err := AddDockerTag(DOCKER_LATEST_TAG); err != nil {
+					if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
 						return err
 					}
 

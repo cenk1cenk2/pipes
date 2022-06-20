@@ -1,7 +1,7 @@
 package pipe
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type (
@@ -14,24 +14,24 @@ type (
 		DownloadArtifacts string
 	}
 
-	Plugin struct {
-		Gitlab Gitlab
+	Pipe struct {
+		Ctx
+
+		Gitlab
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var TL = TaskList[Pipe]{
+	Pipe: Pipe{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			DiscoverArtifacts(),
-			DownloadArtifacts(),
-			UnarchiveArtifacts(),
-		},
+func New(p *Plumber) *TaskList[Pipe] {
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			Setup(&TL).Job(),
+			DiscoverArtifacts(&TL).Job(),
+			DownloadArtifacts(&TL).Job(),
+			UnarchiveArtifacts(&TL).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }
