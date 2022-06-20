@@ -6,7 +6,7 @@ stages:
 
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  LOG_LEVEL: info
+  LOG_LEVEL: debug
 
 .publish-first:
   stage: publish-first

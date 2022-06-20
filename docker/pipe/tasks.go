@@ -13,10 +13,6 @@ type Ctx struct {
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
-		ShouldRunBefore(func(t *Task[Pipe]) error {
-
-			return nil
-		}).
 		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.Tags = []string{}
 
