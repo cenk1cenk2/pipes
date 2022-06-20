@@ -3,6 +3,7 @@ package pipe
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -82,7 +83,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 				for _, v := range tags {
 					func(v string) {
-						t.CreateSubtask("").
+						t.CreateSubtask(fmt.Sprintf("tags:file:%s", v)).
 							Set(func(t *Task[Pipe]) error {
 								return AddDockerTag(t, re.ReplaceAllString(v, ""))
 							}).
@@ -93,10 +94,6 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 							})
 					}(v)
 				}
-
-				if err = t.RunSubtasks(); err != nil {
-					return err
-				}
 			} else if errors.Is(err, os.ErrNotExist) && t.Pipe.DockerImage.TagsFile != "" {
 				t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
 
@@ -106,10 +103,13 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 				return nil
 			} else {
-				t.Log.Warnf("Can not read the tags file: %s", t.Pipe.DockerImage.TagsFile)
+				return fmt.Errorf("Can not read the tags file: %s", t.Pipe.DockerImage.TagsFile)
 			}
 
 			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunSubtasks()
 		})
 }
 

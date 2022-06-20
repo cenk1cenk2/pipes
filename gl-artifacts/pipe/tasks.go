@@ -78,7 +78,7 @@ func DiscoverArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, step := range t.Pipe.Ctx.JobNames {
 				func(step string) {
-					t.CreateSubtask("").
+					t.CreateSubtask(fmt.Sprintf("discover:%s", step)).
 						Set(func(t *Task[Pipe]) error {
 							found := false
 
