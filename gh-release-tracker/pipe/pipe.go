@@ -1,7 +1,7 @@
 package pipe
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type (
@@ -14,25 +14,25 @@ type (
 		Repository string
 	}
 
-	Plugin struct {
+	Pipe struct {
+		Ctx
+
 		Github
 		DockerImage
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var TL = TaskList[Pipe]{
+	Pipe: Pipe{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			GithubLogin(),
-			FetchLatestTag(),
-			WriteTagsFile(),
-		},
+func New(p *Plumber) *TaskList[Pipe] {
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			Setup(&TL).Job(),
+			GithubLogin(&TL).Job(),
+			FetchLatestTag(&TL).Job(),
+			WriteTagsFile(&TL).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }

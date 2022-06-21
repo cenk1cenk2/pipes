@@ -1,5 +1,0 @@
-package pipe
-
-var ()
-
-const ()

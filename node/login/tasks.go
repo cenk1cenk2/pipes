@@ -14,7 +14,7 @@ type Ctx struct {
 	NpmLogin []NpmLoginJson
 }
 
-func Decode(tl *TaskList[Pipe]) *Task[Pipe] {
+func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Npm.Login == ""

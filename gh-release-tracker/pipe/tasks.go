@@ -7,72 +7,68 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v44/github"
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 	"golang.org/x/oauth2"
 )
 
 type Ctx struct {
-	Client    *github.Client
-	LatestTag *github.RepositoryTag
+	Client     *github.Client
+	LatestTag  *github.RepositoryTag
+	Owner      string
+	Repository string
 }
 
-var Context Ctx
-
-func VerifyVariables() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "verify"},
-		Task: func(t *utils.Task) error {
-			err := utils.ValidateAndSetDefaults(t.Metadata, &Pipe)
-
-			if err != nil {
-				return err
-			}
-
+func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("init").
+		Set(func(t *Task[Pipe]) error {
 			// create client in any case
-			Context.Client = github.NewClient(nil)
+			t.Pipe.Ctx.Client = github.NewClient(nil)
 
 			return nil
-		},
-	}
+		})
 }
 
-func GithubLogin() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "login", Skip: Pipe.Github.Token == ""},
-		Task: func(t *utils.Task) error {
+func GithubLogin(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("login").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.Github.Token == ""
+		}).
+		Set(func(t *Task[Pipe]) error {
 			ctx := context.Background()
 			ts := oauth2.StaticTokenSource(
-				&oauth2.Token{AccessToken: Pipe.Github.Token},
+				&oauth2.Token{AccessToken: t.Pipe.Github.Token},
 			)
 			tc := oauth2.NewClient(ctx, ts)
 
-			Context.Client = github.NewClient(tc)
+			t.Pipe.Ctx.Client = github.NewClient(tc)
 
 			return nil
-		},
-	}
+		})
 }
 
-func FetchLatestTag() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "fetch"},
-		Task: func(t *utils.Task) error {
-			target := strings.Split(Pipe.Github.Repository, "/")
+func FetchLatestTag(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("fetch").
+		ShouldRunBefore(func(t *Task[Pipe]) error {
+			target := strings.Split(t.Pipe.Github.Repository, "/")
 
 			if len(target) != 2 {
 				return fmt.Errorf(
 					`Repository name should be valid where "%s" was provided.`,
-					Pipe.Github.Repository,
+					t.Pipe.Github.Repository,
 				)
 			}
 
-			owner := target[0]
-			repository := target[1]
+			t.Pipe.Ctx.Owner = target[0]
+			t.Pipe.Ctx.Repository = target[1]
 
-			tags, _, err := Context.Client.Repositories.ListTags(
+			return nil
+
+		}).
+		Set(func(t *Task[Pipe]) error {
+			tags, _, err := t.Pipe.Ctx.Client.Repositories.ListTags(
 				context.Background(),
-				owner,
-				repository,
+				t.Pipe.Ctx.Owner,
+				t.Pipe.Ctx.Repository,
 				&github.ListOptions{PerPage: 1},
 			)
 
@@ -83,30 +79,29 @@ func FetchLatestTag() utils.Task {
 			if len(tags) != 1 {
 				return fmt.Errorf(
 					"Repository does not contain any tags: %s",
-					Pipe.Github.Repository,
+					t.Pipe.Github.Repository,
 				)
 			}
 
 			latest := tags[0]
 
-			Context.LatestTag = latest
+			t.Pipe.Ctx.LatestTag = latest
 
 			t.Log.Infoln(
 				"Latest tag for repository: %s > %s",
-				Pipe.Github.Repository,
+				t.Pipe.Github.Repository,
 				latest.GetName(),
 			)
 
 			return nil
-		},
-	}
+
+		})
 }
 
-func WriteTagsFile() utils.Task {
-	return utils.Task{
-		Metadata: utils.TaskMetadata{Context: "write"},
-		Task: func(t *utils.Task) error {
-			f, err := os.Create(Pipe.DockerImage.TagsFile)
+func WriteTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("write").
+		Set(func(t *Task[Pipe]) error {
+			f, err := os.Create(t.Pipe.DockerImage.TagsFile)
 
 			if err != nil {
 				return err
@@ -114,15 +109,11 @@ func WriteTagsFile() utils.Task {
 
 			defer f.Close()
 
-			_, err = f.WriteString(
-				Context.LatestTag.GetName(),
-			)
-
-			if err != nil {
+			if _, err = f.WriteString(t.Pipe.Ctx.LatestTag.GetName()); err != nil {
 				return err
 			}
 
 			return nil
-		},
-	}
+
+		})
 }

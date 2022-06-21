@@ -11,7 +11,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 		EnvVars:     []string{"GH_TOKEN", "GITHUB_TOKEN"},
 		Value:       "",
-		Destination: &Pipe.Github.Token,
+		Destination: &TL.Pipe.Github.Token,
 	},
 	&cli.StringFlag{
 		Name:        "gh.repository",
@@ -19,7 +19,7 @@ var Flags = []cli.Flag{
 		Required:    true,
 		EnvVars:     []string{"GH_REPOSITORY", "GH_REPOSITORY"},
 		Value:       "",
-		Destination: &Pipe.Github.Repository,
+		Destination: &TL.Pipe.Github.Repository,
 	},
 	&cli.StringFlag{
 		Name:        "docker_image.tags_file",
@@ -27,6 +27,6 @@ var Flags = []cli.Flag{
 		Required:    true,
 		EnvVars:     []string{"TAGS_FILE"},
 		Value:       "",
-		Destination: &Pipe.DockerImage.TagsFile,
+		Destination: &TL.Pipe.DockerImage.TagsFile,
 	},
 }
