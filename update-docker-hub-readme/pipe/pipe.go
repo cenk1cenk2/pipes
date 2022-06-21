@@ -1,7 +1,7 @@
 package pipe
 
 import (
-	utils "gitlab.kilic.dev/libraries/go-utils/cli_utils"
+	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
 type (
@@ -17,24 +17,25 @@ type (
 		Description string
 	}
 
-	Plugin struct {
-		DockerHub DockerHub
-		Readme    Readme
+	Pipe struct {
+		Ctx
+
+		DockerHub
+		Readme
 	}
 )
 
-var Pipe Plugin = Plugin{}
+var TL = TaskList[Pipe]{
+	Pipe: Pipe{},
+}
 
-func (p Plugin) Exec() error {
-	utils.AddTasks(
-		[]utils.Task{
-			VerifyVariables(),
-			LoginToDockerHubRegistry(),
-			UpdateDockerReadme(),
-		},
+func New(p *Plumber) *TaskList[Pipe] {
+	return TL.New(p).SetTasks(
+		TL.JobSequence(
+			Setup(&TL).Job(),
+			LoginToDockerHubRegistry(&TL).Job(),
+			ReadReadmeFile(&TL).Job(),
+			UpdateDockerReadme(&TL).Job(),
+		),
 	)
-
-	utils.RunAllTasks(utils.DefaultRunAllTasksOptions)
-
-	return nil
 }
