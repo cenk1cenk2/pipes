@@ -87,11 +87,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 							Set(func(t *Task[Pipe]) error {
 								return AddDockerTag(t, re.ReplaceAllString(v, ""))
 							}).
-							AddSelfToParent(func(pt, st *Task[Pipe]) {
-								pt.ExtendSubtask(func(j Job) Job {
-									return tl.JobParallel(j, st.Job())
-								})
-							})
+							AddSelfToTheParentAsParallel()
 					}(v)
 				}
 			} else if errors.Is(err, os.ErrNotExist) && t.Pipe.DockerImage.TagsFile != "" {

@@ -111,11 +111,7 @@ func DiscoverArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							return nil
 						}).
-						AddSelfToParent(func(pt, st *Task[Pipe]) {
-							pt.ExtendSubtask(func(j Job) Job {
-								return tl.JobParallel(j, st.Job())
-							})
-						})
+						AddSelfToTheParentAsParallel()
 				}(step)
 			}
 
@@ -163,11 +159,8 @@ func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 							)
 
 							return nil
-						}).AddSelfToParent(func(pt, st *Task[Pipe]) {
-						pt.ExtendSubtask(func(j Job) Job {
-							return tl.JobParallel(j, st.Job())
-						})
-					})
+						}).
+						AddSelfToTheParentAsParallel()
 				}(step)
 			}
 
@@ -204,11 +197,8 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 							return nil
 						}).ShouldRunAfter(func(t *Task[Pipe]) error {
 						return t.RunCommandJobAsJobParallel()
-					}).AddSelfToParent(func(pt, st *Task[Pipe]) {
-						pt.ExtendSubtask(func(j Job) Job {
-							return tl.JobParallel(j, st.Job())
-						})
-					})
+					}).
+						AddSelfToTheParentAsParallel()
 				}(artifact)
 			}
 

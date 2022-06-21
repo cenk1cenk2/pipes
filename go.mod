@@ -12,7 +12,7 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.8.1
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v3 v3.13.1
+	gitlab.kilic.dev/libraries/plumber/v3 v3.14.0
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 

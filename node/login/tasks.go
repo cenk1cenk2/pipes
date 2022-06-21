@@ -92,11 +92,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 								return nil
 							}
 						}(file)).
-					AddSelfToParent(func(pt *Task[Pipe], st *Task[Pipe]) {
-						pt.ExtendSubtask(func(j Job) Job {
-							return tl.JobParallel(j, st.Job())
-						})
-					})
+					AddSelfToTheParentAsParallel()
 			}
 
 			return nil
