@@ -14,8 +14,9 @@ type (
 	}
 
 	Pipe struct {
-		Npm
 		Ctx
+
+		Npm
 	}
 )
 

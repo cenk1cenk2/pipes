@@ -11,13 +11,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type Ctx struct {
-	Client     *github.Client
-	LatestTag  *github.RepositoryTag
-	Owner      string
-	Repository string
-}
-
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		Set(func(t *Task[Pipe]) error {

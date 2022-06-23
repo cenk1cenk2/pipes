@@ -16,7 +16,6 @@ type (
 
 	Pipe struct {
 		NodeCommand
-		Ctx
 	}
 )
 

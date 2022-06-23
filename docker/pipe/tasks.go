@@ -6,11 +6,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	Tags                           []string
-	TryToUseExistingBuildXInstance bool
-}
-
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		Set(func(t *Task[Pipe]) error {

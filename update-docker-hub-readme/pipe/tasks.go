@@ -8,16 +8,8 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
-
-var DockerClient *client.Client
-
-type Ctx struct {
-	Token  string
-	Readme string
-}
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").

@@ -4,9 +4,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-}
-
 func DefaultTask(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("default").
 		Set(func(t *Task[Pipe]) error {

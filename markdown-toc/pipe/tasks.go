@@ -10,10 +10,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	Matches []string
-}
-
 func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("discover").
 		Set(func(t *Task[Pipe]) error {

@@ -7,9 +7,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-}
-
 func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("run").
 		Set(func(t *Task[Pipe]) error {

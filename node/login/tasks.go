@@ -10,10 +10,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	NpmLogin []NpmLoginJson
-}
-
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		ShouldDisable(func(t *Task[Pipe]) bool {

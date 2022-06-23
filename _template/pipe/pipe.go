@@ -11,6 +11,7 @@ type (
 
 	Pipe struct {
 		Ctx
+
 		Default
 	}
 )

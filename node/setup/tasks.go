@@ -4,10 +4,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	PackageManager
-}
-
 func SetupPackageManager(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		Set(func(t *Task[Pipe]) error {

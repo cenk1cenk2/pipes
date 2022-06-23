@@ -17,9 +17,10 @@ type (
 	}
 
 	Pipe struct {
+		Ctx
+
 		Packages
 		SemanticRelease
-		Ctx
 	}
 )
 

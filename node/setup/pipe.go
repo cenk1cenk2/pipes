@@ -10,8 +10,9 @@ type (
 	}
 
 	Pipe struct {
-		Node
 		Ctx
+
+		Node
 	}
 )
 

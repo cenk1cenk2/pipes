@@ -6,10 +6,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	Exe string
-}
-
 func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("apks").
 		ShouldDisable(func(t *Task[Pipe]) bool {

@@ -12,7 +12,6 @@ type (
 
 	Pipe struct {
 		NodeInstall
-		Ctx
 	}
 )
 

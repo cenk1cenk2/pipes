@@ -9,14 +9,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	StepsResponse       GLApiSuccessfulStepsResponse
-	Steps               []Step
-	Client              *http.Client
-	DownloadedArtifacts []DownloadedArtifact
-	JobNames            []string
-}
-
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		ShouldRunBefore(func(t *Task[Pipe]) error {

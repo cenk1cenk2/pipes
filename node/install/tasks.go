@@ -5,9 +5,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-}
-
 func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("install").
 		Set(func(t *Task[Pipe]) error {

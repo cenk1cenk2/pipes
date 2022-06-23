@@ -21,9 +21,10 @@ type (
 	}
 
 	Pipe struct {
+		Ctx
+
 		Git
 		NodeBuild
-		Ctx
 	}
 )
 

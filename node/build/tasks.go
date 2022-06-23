@@ -13,12 +13,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-type Ctx struct {
-	EnvironmentVariables []string
-	SelectedEnvironment  string
-	FallbackEnvironment  string
-}
-
 func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("environment").
 		ShouldDisable(func(t *Task[Pipe]) bool {
