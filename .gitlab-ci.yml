@@ -49,7 +49,7 @@ build:
     - make -j4 build
   artifacts:
     paths:
-      - ${APP_FOLDER}/dist/
+      - "./*/dist/"
   parallel:
     matrix:
       - APP_FOLDER: ./_template
