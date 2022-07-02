@@ -1,6 +1,8 @@
 package install
 
 import (
+	"strings"
+
 	pipe "gitlab.kilic.dev/devops/pipes/node/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
@@ -18,6 +20,8 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					t.Log.Debugln("Installing dependencies without a lockfile.")
 				}
+
+				c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
 
 				c.SetDir(TL.Pipe.NodeInstall.Cwd)
 

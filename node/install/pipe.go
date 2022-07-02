@@ -8,6 +8,7 @@ type (
 	NodeInstall struct {
 		Cwd         string `validate:"dir"`
 		UseLockFile bool
+		Args        string
 	}
 
 	Pipe struct {

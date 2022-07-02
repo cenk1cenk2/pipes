@@ -22,4 +22,13 @@ var Flags = []cli.Flag{
 		Value:       true,
 		Destination: &TL.Pipe.NodeInstall.UseLockFile,
 	},
+
+	&cli.StringFlag{
+		Name:        "node.install_args",
+		Usage:       "Arguments for appending to installation.",
+		Required:    false,
+		EnvVars:     []string{"NODE_INSTALL_ARGS"},
+		Value:       "",
+		Destination: &TL.Pipe.NodeInstall.Args,
+	},
 }
