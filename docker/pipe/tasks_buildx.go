@@ -39,8 +39,10 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 			)
 
 			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunSubtasks()
 		})
-
 }
 
 func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
