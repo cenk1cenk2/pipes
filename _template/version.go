@@ -1,6 +1,6 @@
 package main
 
-const CLI_NAME = "template"
+const CLI_NAME = "pipes-template"
 
 const DESCRIPTION = "template-cli"
 

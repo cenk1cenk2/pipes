@@ -1,6 +1,6 @@
 package main
 
-const CLI_NAME = "semantic-release"
+const CLI_NAME = "pipes-semantic-release"
 
 const VERSION = "latest"
 
