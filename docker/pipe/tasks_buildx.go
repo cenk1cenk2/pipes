@@ -118,9 +118,10 @@ func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 				"-p",
 				"yes",
 			).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				AddSelfToTheTask()
 
-				// check virtual machine
+			// check virtual machine
 			t.CreateCommand(
 				DOCKER_EXE,
 				"buildx",
