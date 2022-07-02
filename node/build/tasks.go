@@ -94,13 +94,11 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 										st.Pipe.Ctx.FallbackEnvironment,
 									)
 
-									output, err := c.Command.CombinedOutput()
-
-									if err != nil {
-										return err
-									}
-
-									variables := strings.Split(string(output), EOL)
+									return nil
+								}).
+								EnableStreamRecording().
+								ShouldRunAfter(func(c *Command[Pipe]) error {
+									variables := c.GetCombinedStream()
 
 									for i, v := range variables {
 										v := strings.TrimSpace(v)
@@ -143,7 +141,8 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 									st.Lock.Lock()
 									st.Pipe.Ctx.EnvironmentVariables = append(
 										st.Pipe.Ctx.EnvironmentVariables,
-										variables...)
+										variables...,
+									)
 									st.Lock.Unlock()
 
 									return nil
@@ -153,7 +152,7 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 							return nil
 						}).
 						ShouldRunAfter(func(t *Task[Pipe]) error {
-							return t.RunCommandJobAsJobParallel()
+							return t.RunCommandJobAsJobSequence()
 						}).
 						AddSelfToTheParentAsParallel()
 				}(file)

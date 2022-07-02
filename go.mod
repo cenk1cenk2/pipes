@@ -7,12 +7,12 @@ require (
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/docker/docker v20.10.16+incompatible
 	github.com/dustin/go-humanize v1.0.0
-	github.com/google/go-github/v44 v44.1.0
+	github.com/google/go-github/v45 v45.2.0
 	github.com/google/uuid v1.3.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.10.2
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v3 v3.18.3
+	gitlab.kilic.dev/libraries/plumber/v3 v3.19.1
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 
