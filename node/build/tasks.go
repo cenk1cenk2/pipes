@@ -84,6 +84,7 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 							st.Log.Infof("Injecting environment variables from: %s", file)
 
 							st.CreateCommand("ta-gitlab-env").
+								SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 								Set(func(c *Command[Pipe]) error {
 									c.AppendArgs(
 										"--yml-file",
