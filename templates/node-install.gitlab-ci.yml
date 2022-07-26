@@ -11,5 +11,7 @@ install:
     paths:
       - node_modules/
       - .cache/
+  rules:
+    - when: on_success
   tags:
     - docker

@@ -7,5 +7,7 @@ build:
     paths:
       - dist/
       - "**/dist/"
+  rules:
+    - when: on_success
   tags:
     - docker

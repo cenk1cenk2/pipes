@@ -12,3 +12,4 @@ test:
     - docker
   rules:
     - if: $GO_TEST_COMMAND
+    - when: on_success
