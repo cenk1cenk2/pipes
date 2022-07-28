@@ -7,4 +7,3 @@ lint:
     - docker
   rules:
     - if: $NODE_LINT_COMMAND
-    - when: on_success
