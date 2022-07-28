@@ -7,4 +7,3 @@ test:
     - docker
   rules:
     - if: $NODE_TEST_COMMAND
-    - when: on_success
