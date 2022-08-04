@@ -183,7 +183,7 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 								"-d",
 								"./",
 							).
-								SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+								SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 								AddSelfToTheTask()
 
 							return nil
