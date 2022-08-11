@@ -23,6 +23,10 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.EnvironmentVariables = []string{}
 
+			if t.Pipe.Git.Tag == "" && t.Pipe.Git.Branch == "" {
+				return fmt.Errorf("Can not set selected environment. Either tag name or branch name environment variable should be present.")
+			}
+
 			if t.Pipe.Git.Tag != "" {
 				var envConditions map[string]string
 				err := json.Unmarshal(
@@ -47,8 +51,6 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 			} else if t.Pipe.Git.Branch != "" {
 				t.Pipe.Ctx.SelectedEnvironment = t.Pipe.Git.Branch
-			} else {
-				return fmt.Errorf("Can not set selected environment. Either tag name or branch name environment variable should be present.")
 			}
 
 			t.Log.Debugf("Selected environment set: %s", t.Pipe.Ctx.SelectedEnvironment)

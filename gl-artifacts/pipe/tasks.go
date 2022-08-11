@@ -17,7 +17,6 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 			return nil
 		}).
 		Set(func(t *Task[Pipe]) error {
-
 			reqUrl := fmt.Sprintf(
 				"%s/projects/%s/pipelines/%s/jobs/?scope=success",
 				t.Pipe.Gitlab.ApiUrl,
@@ -55,11 +54,7 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			decoder := json.NewDecoder(res.Body)
 
-			if err = decoder.Decode(&t.Pipe.Ctx.StepsResponse); err != nil {
-				return err
-			}
-
-			return nil
+			return decoder.Decode(&t.Pipe.Ctx.StepsResponse)
 		})
 }
 

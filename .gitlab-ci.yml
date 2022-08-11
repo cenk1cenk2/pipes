@@ -7,6 +7,7 @@ stages:
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   LOG_LEVEL: debug
+  GO_LINT_COMMAND: make lint
 
 .publish-first:
   stage: publish-first
@@ -36,8 +37,10 @@ variables:
     strategy: depend
 
 include:
-  project: devops/pipes
-  file: /templates/go-install.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/go-install.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/go-lint.gitlab-ci.yml
 
 build:
   stage: build

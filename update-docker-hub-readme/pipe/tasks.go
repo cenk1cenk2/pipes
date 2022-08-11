@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/docker/docker/api/types"
 	. "gitlab.kilic.dev/libraries/plumber/v3"
@@ -51,7 +52,7 @@ func LoginToDockerHubRegistry(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			defer res.Body.Close()
 
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 
 			if err != nil {
 				return err
@@ -73,7 +74,7 @@ func ReadReadmeFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			t.Log.Debugf("Trying to read file: %s", t.Pipe.Readme.File)
 
-			content, err := ioutil.ReadFile(t.Pipe.Readme.File)
+			content, err := os.ReadFile(t.Pipe.Readme.File)
 
 			if err != nil {
 				return err
@@ -133,7 +134,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			defer res.Body.Close()
 
-			body, err = ioutil.ReadAll(res.Body)
+			body, err = io.ReadAll(res.Body)
 
 			if err != nil {
 				return err
@@ -186,6 +187,5 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			return nil
-
 		})
 }

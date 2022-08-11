@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -70,7 +69,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.Pipe.DockerImage.TagsFile,
 				)
 
-				content, err := ioutil.ReadFile(t.Pipe.DockerImage.TagsFile)
+				content, err := os.ReadFile(t.Pipe.DockerImage.TagsFile)
 				if err != nil {
 					return err
 				}

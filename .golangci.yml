@@ -1,0 +1,47 @@
+---
+linters:
+  enable:
+    - revive
+  presets:
+    - unused
+
+linters-settings:
+  revive:
+    ignore-generated-header: true
+    severity: warning
+    confidence: 0.8
+    rules:
+      - name: line-length-limit
+        severity: error
+        arguments: [180]
+      - name: time-equal
+      - name: time-naming
+      - name: var-declaration
+      - name: unexported-return
+        severity: error
+      - name: blank-imports
+      - name: errorf
+        severity: error
+      - name: error-return
+      - name: if-return
+        severity: error
+      - name: increment-decrement
+      - name: range
+      - name: indent-error-flow
+      - name: empty-block
+      - name: superfluous-else
+      - name: confusing-naming
+      - name: modifies-parameter
+      - name: confusing-results
+      - name: deep-exit
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: atomic
+      - name: empty-lines
+      - name: duplicated-imports
+      - name: import-shadowing
+      - name: unhandled-error
+      - name: early-return
+      - name: defer
+      - name: identical-branches
+      - name: useless-break

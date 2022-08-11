@@ -1,0 +1,16 @@
+variables:
+  GO_IMAGE: alpine
+  GO_LINT_COMMAND: ""
+
+test:
+  stage: build
+  image: golang:$GO_IMAGE
+  script:
+    - apk add --no-cache --no-progress make git
+    - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    - go install github.com/mgechev/revive@latest
+    - $GO_LINT_COMMAND
+  tags:
+    - docker
+  rules:
+    - if: $GO_LINT_COMMAND

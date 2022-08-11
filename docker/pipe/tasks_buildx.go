@@ -137,7 +137,6 @@ func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobSequence()
 		})
-
 }
 
 func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {

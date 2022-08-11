@@ -1,12 +1,13 @@
 variables:
   GO_IMAGE: alpine
+  GO_BUILD_COMMAND: make -j4 build
 
 build:
   stage: build
   image: golang:$GO_IMAGE
   script:
     - apk add --no-cache --no-progress make git
-    - make -j4 build
+    - $GO_BUILD_COMMAND
   rules:
     - when: on_success
   artifacts:

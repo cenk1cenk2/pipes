@@ -7,7 +7,7 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v3"
 )
 
-func AddDockerTag(t *Task[Pipe], tag string) error {
+func AddDockerTag(_ *Task[Pipe], tag string) error {
 	if tag == "" {
 		return errors.New("Can not add empty tag to list.")
 	}

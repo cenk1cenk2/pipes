@@ -23,11 +23,7 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 				t.Log.Fatalln("Can not decode Npm registry login credentials.")
 			}
 
-			if err := tl.Validate(&t.Pipe.Ctx); err != nil {
-				return err
-			}
-
-			return nil
+			return tl.Validate(&t.Pipe.Ctx)
 		})
 }
 

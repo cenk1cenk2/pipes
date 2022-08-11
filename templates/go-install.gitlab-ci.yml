@@ -1,12 +1,13 @@
 variables:
   GO_IMAGE: alpine
+  GO_INSTALL_COMMAND: make install
 
 install:
   stage: install
   image: golang:$GO_IMAGE
   script:
     - apk add --no-cache --no-progress make git
-    - make install
+    - $GO_INSTALL_COMMAND
   rules:
     - when: on_success
   artifacts:

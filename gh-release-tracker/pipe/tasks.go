@@ -55,7 +55,6 @@ func FetchLatestTag(tl *TaskList[Pipe]) *Task[Pipe] {
 			t.Pipe.Ctx.Repository = target[1]
 
 			return nil
-
 		}).
 		Set(func(t *Task[Pipe]) error {
 			tags, _, err := t.Pipe.Ctx.Client.Repositories.ListTags(
@@ -80,14 +79,13 @@ func FetchLatestTag(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			t.Pipe.Ctx.LatestTag = latest
 
-			t.Log.Infoln(
+			t.Log.Infof(
 				"Latest tag for repository: %s > %s",
 				t.Pipe.Github.Repository,
 				latest.GetName(),
 			)
 
 			return nil
-
 		})
 }
 
@@ -107,6 +105,5 @@ func WriteTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			return nil
-
 		})
 }

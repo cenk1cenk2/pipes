@@ -18,6 +18,9 @@ update:
 	$(GO_VENDOR)
 	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
 
+lint:
+	golangci-lint run ./...
+
 tidy:
 	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
 	$(GO_VENDOR)

@@ -28,9 +28,9 @@ func New(p *Plumber) *TaskList[Pipe] {
 		args := tl.CliContext.Args().Slice()
 		if len(args) < 1 {
 			return fmt.Errorf("Arguments are needed to run a specific script.")
-		} else {
-			TL.Pipe.NodeCommand.Script, TL.Pipe.NodeCommand.ScriptArgs = args[0], strings.Join(args[1:], " ")
 		}
+
+		TL.Pipe.NodeCommand.Script, TL.Pipe.NodeCommand.ScriptArgs = args[0], strings.Join(args[1:], " ")
 
 		return nil
 	}).SetTasks(
