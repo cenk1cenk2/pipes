@@ -146,7 +146,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 			err = json.Unmarshal(body, &b)
 
 			if err != nil {
-				return fmt.Errorf("Response unexpected: %s > %s", err.Error(), string(body))
+				return fmt.Errorf("Response unexpected: %w > %s", err, string(body))
 			}
 
 			switch res.StatusCode {

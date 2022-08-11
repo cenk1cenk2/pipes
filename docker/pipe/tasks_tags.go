@@ -108,6 +108,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
+//nolint:dupl // this is not to export to a function
 func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags:latest:tag").
 		ShouldDisable(func(t *Task[Pipe]) bool {
@@ -145,6 +146,7 @@ func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
+//nolint:dupl // this is not to export to a function
 func DockerTagsLatestFromBranch(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags:latest:branch").
 		ShouldDisable(func(t *Task[Pipe]) bool {

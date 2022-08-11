@@ -133,7 +133,7 @@ func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							if err != nil {
 								return fmt.Errorf(
-									"Can not download artifacts from stage: %s > %d with error: %s",
+									"Can not download artifacts from stage: %s > %d with error: %w",
 									step.name,
 									step.id,
 									err,

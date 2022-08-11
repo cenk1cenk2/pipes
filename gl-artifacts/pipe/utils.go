@@ -19,7 +19,7 @@ func DownloadArtifact(t *Task[Pipe], url string) (string, error) {
 	err := os.MkdirAll(path, os.ModePerm)
 
 	if err != nil {
-		return "", fmt.Errorf("Can not create temporary directory: %s with error %s", path, err)
+		return "", fmt.Errorf("Can not create temporary directory: %s with error %w", path, err)
 	}
 
 	// create client
