@@ -85,6 +85,8 @@ gitlab.kilic.dev/libraries/go-utils v1.1.2 h1:bxsYz6zw9gpz/ZkyZbLbL4c3QhS7EQ1071
 gitlab.kilic.dev/libraries/go-utils v1.1.2/go.mod h1:OZi5+ignKLdxrlWo1kykO7A5yw8Rj+Wv8iKHw7oawcQ=
 gitlab.kilic.dev/libraries/plumber/v3 v3.21.0 h1:1wvqw0oACsMU+KRvC94Pfa31/20Pb4dw83qi7wWGe0E=
 gitlab.kilic.dev/libraries/plumber/v3 v3.21.0/go.mod h1:cvNUqXz3C1LCXgyiJTgsp8ggSJskcwxtoDGugw80qbI=
+gitlab.kilic.dev/libraries/plumber/v3 v3.21.1 h1:SbDUY/pNktOZ8RZdnRT1Mt3DTENmKkAa6fTGUAqUQ5k=
+gitlab.kilic.dev/libraries/plumber/v3 v3.21.1/go.mod h1:vKi3fOxaxfn0xjU8+8d8Tbhs2jDEreAeplHcCNTwnPk=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
