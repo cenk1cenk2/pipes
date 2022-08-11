@@ -19,7 +19,7 @@ update:
 	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
 
 lint:
-	golangci-lint run ./...
+	CGO_ENABLED=$(GO_OPTION_C)	golangci-lint run ./...
 
 tidy:
 	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
