@@ -13,6 +13,7 @@ update-docker-hub-readme:
     refs:
       - master
       - main
+      - tags
   tags:
     - docker
   when: always
