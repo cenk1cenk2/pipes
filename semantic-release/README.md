@@ -1,58 +1,34 @@
 <!-- clidocs -->
 
-# NAME
-
-semantic-release - Releases applications through semantic-release library.
-
-# SYNOPSIS
-
-semantic-release
-
-```
-[--ci]
-[--debug]
-[--help|-h]
-[--log-level]=[value]
-[--packages.apk]=[value]
-[--packages.node]=[value]
-[--semantic_release.dry_run]
-[--semantic_release.run_multi]
-[--version|-v]
-```
-
-# DESCRIPTION
+# pipes-semantic-release
 
 Releases applications through semantic-release library.
 
-**Usage**:
+## Usage
 
-```
-semantic-release [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
-```
+`pipes-semantic-release [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
 
-# GLOBAL OPTIONS
+## Global Flags
 
-**--ci**: Sets whether this is running inside a CI/CD environment.
+| Flag / Environment                       | Description                                                                                                                                                     | Type        | Required | Default        |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- | -------- | -------------- |
+| --debug, $DEBUG                          | Enable debugging for the application.                                                                                                                           | Bool        | false    | false          |
+| --log-level, $LOG_LEVEL                  | Define the log level for the application. (format: enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;)) | String      | false    | &#34;info&#34; |
+| --npm.login, $NPM_LOGIN                  | npm registries to login to. (format: json({username: string, password: string, registry?: string, useHttps?: boolean}[]))                                       | String      | false    |                |
+| --npm.npmrc_file, $NPM_NPMRC_FILE        | .npmrc file to use.                                                                                                                                             | StringSlice | false    | [.npmrc]       |
+| --npm.npmrc, $NPM_NPMRC                  | Pass direct contents of the NPMRC file.                                                                                                                         | String      | false    |                |
+| --packages.apk, $ADD_APKS                | APK applications to install before running semantic-release.                                                                                                    | StringSlice | false    | []             |
+| --packages.node, $ADD_MODULES            | Node packages to install before running semantic-release.                                                                                                       | StringSlice | false    | []             |
+| --semantic_release.dry_run, $DRY_RUN     | Node packages to install before running semantic-release.                                                                                                       | Bool        | false    | false          |
+| --semantic_release.run_multi, $RUN_MULTI | Uses @qiwi/multi-semantic-release package to do a workspace release.                                                                                            | Bool        | false    | false          |
+| --help, -h                               | show help                                                                                                                                                       | Bool        | false    | false          |
+| --version, -v                            | print the version                                                                                                                                               | Bool        | false    | false          |
 
-**--debug**: Enable debugging for the application.
+# Commands
 
-**--help, -h**: show help
+## `help` , `h`
 
-**--log-level**="": Define the log level for the application. (default: info)
-
-**--packages.apk**="": APK applications to install before running semantic-release. (default: [])
-
-**--packages.node**="": Node packages to install before running semantic-release. (default: [])
-
-**--semantic_release.dry_run**: Node packages to install before running semantic-release.
-
-**--semantic_release.run_multi**: Uses @qiwi/multi-semantic-release package to do a workspace release.
-
-**--version, -v**: print the version
-
-# COMMANDS
-
-## help, h
+### Usage
 
 Shows a list of commands or help for one command
 

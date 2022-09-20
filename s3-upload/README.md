@@ -1,12 +1,12 @@
 <!-- clidocs -->
 
-# pipes-template
+# pipes-s3-upload
 
-template-cli
+Uploads the designated files as artifacts to S3.
 
 ## Usage
 
-`pipes-template [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
+`pipes-s3-upload [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
 
 ## Global Flags
 

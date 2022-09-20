@@ -1,0 +1,141 @@
+{
+  "tasks": [
+    {
+      "name": "install",
+      "cmd": "make install"
+    },
+    {
+      "name": "update",
+      "cmd": "make update"
+    },
+    {
+      "name": "tidy",
+      "cmd": "make tidy"
+    },
+    {
+      "name": "lint",
+      "cmd": "make lint"
+    },
+    {
+      "name": "_template",
+      "cwd": "./_template",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "docker",
+      "cwd": "./docker",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "gh-release-tracker",
+      "cwd": "./gh-release-tracker",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "gl-artifacts",
+      "cwd": "./gl-artifacts",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "markdown-toc",
+      "cwd": "./markdown-toc",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "node",
+      "cwd": "./node",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "s3-upload",
+      "cwd": "./s3-upload",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "select-env",
+      "cwd": "./select-env",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "semantic-release",
+      "cwd": "./semantic-release",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
+      "name": "update-docker-hub-readme",
+      "cwd": "./update-docker-hub-readme",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+
+    {
+      "name": "_template",
+      "cwd": "./_template",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "docker",
+      "cwd": "./docker",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "gh-release-tracker",
+      "cwd": "./gh-release-tracker",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "gl-artifacts",
+      "cwd": "./gl-artifacts",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "markdown-toc",
+      "cwd": "./markdown-toc",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "node",
+      "cwd": "./node",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "s3-upload",
+      "cwd": "./s3-upload",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "select-env",
+      "cwd": "./select-env",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "semantic-release",
+      "cwd": "./semantic-release",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    },
+    {
+      "name": "update-docker-hub-readme",
+      "cwd": "./update-docker-hub-readme",
+      "cmd": "make docs",
+      "tags": ["docs"]
+    }
+  ]
+}

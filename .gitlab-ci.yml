@@ -63,6 +63,8 @@ build:
       - APP_FOLDER: ./markdown-toc
       - APP_FOLDER: ./update-docker-hub-readme
       - APP_FOLDER: ./semantic-release
+      - APP_FOLDER: ./select-env
+      - APP_FOLDER: ./s3-upload
   tags:
     - docker
 
@@ -229,3 +231,37 @@ publish-semantic-release:
     refs:
       - main
       - tags
+#
+# publish-select-env:
+#   extends: .publish-docker-to-public
+#   variables:
+#     DOCKERFILE_CONTEXT: ./select-env
+#     IMAGE_NAME: cenk1cenk2/pipe-select-env
+#     IMAGE_TAGS: latest
+#     PARENT_DOWNLOAD_ARTIFACTS: "build: [./select-env]"
+#   only:
+#     changes:
+#       - "select-env/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#
+# publish-s3-upload:
+#   extends: .publish-docker-to-public
+#   variables:
+#     DOCKERFILE_CONTEXT: ./s3-upload
+#     IMAGE_NAME: cenk1cenk2/pipe-s3-upload
+#     IMAGE_TAGS: latest
+#     PARENT_DOWNLOAD_ARTIFACTS: "build: [./s3-upload]"
+#   only:
+#     changes:
+#       - "s3-upload/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
