@@ -10,17 +10,10 @@ require (
 	github.com/google/go-github/v45 v45.2.0
 	github.com/google/uuid v1.3.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-<<<<<<< HEAD
 	github.com/urfave/cli/v2 v2.16.3
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
 	gitlab.kilic.dev/libraries/plumber/v3 v3.21.1
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
-=======
-	github.com/urfave/cli/v2 v2.11.2
-	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v3 v3.21.1
-	golang.org/x/oauth2 v0.0.0-20220808172628-8227340efae7
->>>>>>> main
 )
 
 require (
