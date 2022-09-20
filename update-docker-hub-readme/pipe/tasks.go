@@ -150,7 +150,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			switch res.StatusCode {
-			case 200:
+			case http.StatusOK:
 				if b.FullDescription != t.Pipe.Ctx.Readme {
 					return fmt.Errorf("Uploaded README does not match with current repository README file.")
 				}
@@ -165,7 +165,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.Pipe.DockerHub.Address,
 					t.Pipe.Readme.Repository,
 				)
-			case 404:
+			case http.StatusNotFound:
 				return fmt.Errorf(
 					"Repository does not exists: %s/%s",
 					t.Pipe.DockerHub.Address,

@@ -53,6 +53,12 @@
       "tags": ["build"]
     },
     {
+      "name": "s3-upload",
+      "cwd": "./s3-upload",
+      "cmd": "make build",
+      "tags": ["build"]
+    },
+    {
       "name": "select-env",
       "cwd": "./select-env",
       "cmd": "make build",

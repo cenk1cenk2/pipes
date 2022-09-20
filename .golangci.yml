@@ -138,7 +138,7 @@ linters-settings:
         arguments: [180]
       - name: time-equal
       - name: time-naming
-      - name: var-declaration
+      # - name: var-declaration
       - name: unexported-return
         severity: error
       - name: blank-imports
