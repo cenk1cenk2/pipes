@@ -23,7 +23,7 @@ Login to the given NPM registries.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | --node.package_manager, $NODE_PACKAGE_MANAGER | Preferred Package manager for nodejs. |  String  | false | &#34;yarn&#34; |
-| --npm.login, $NPM_LOGIN | npm registries to login to. (format: json({username: string, password: string, registry?: string, useHttps?: boolean}[])) |  String  | false |  |
+| --npm.login, $NPM_LOGIN | npm registries to login to. format(json({ username: string, password: string, registry?: string, useHttps?: boolean }[])) |  String  | false |  |
 | --npm.npmrc_file, $NPM_NPMRC_FILE | .npmrc file to use. |  StringSlice  | false | [.npmrc] |
 | --npm.npmrc, $NPM_NPMRC | Pass direct contents of the NPMRC file. |  String  | false |  |
 
@@ -37,7 +37,7 @@ Install node.js dependencies with the given package manager.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | --node.package_manager, $NODE_PACKAGE_MANAGER | Preferred Package manager for nodejs. |  String  | false | &#34;yarn&#34; |
-| --npm.login, $NPM_LOGIN | npm registries to login to. (format: json({username: string, password: string, registry?: string, useHttps?: boolean}[])) |  String  | false |  |
+| --npm.login, $NPM_LOGIN | npm registries to login to. format(json({ username: string, password: string, registry?: string, useHttps?: boolean }[])) |  String  | false |  |
 | --npm.npmrc_file, $NPM_NPMRC_FILE | .npmrc file to use. |  StringSlice  | false | [.npmrc] |
 | --npm.npmrc, $NPM_NPMRC | Pass direct contents of the NPMRC file. |  String  | false |  |
 | --node.install_cwd, $NODE_INSTALL_CWD | Install CWD for nodejs. |  String  | false | &#34;.&#34; |
@@ -56,7 +56,7 @@ Install node.js dependencies with the given package manager.
 | --node.build_script_args, $NODE_BUILD_SCRIPT_ARGS | package.json script arguments for building operation. |  String  | false |  |
 | --node.build_cwd, $NODE_BUILD_CWD | Working directory for build operation. |  String  | false | &#34;.&#34; |
 | --node.build_environment_files, $NODE_BUILD_ENVIRONMENT_FILES | Yaml files to inject to build. |  StringSlice  | false | [] |
-| --node.build_environment_conditions, $NODE_BUILD_ENVIRONMENT_CONDITIONS | Tagging regex patterns to match. json({ [name: string]: RegExp }) |  String  | false | &#34;{ \&#34;production\&#34;: \&#34;^v\\\\d*\\\\.\\\\d*\\\\.\\\\d*$\&#34;, \&#34;stage\&#34;: \&#34;^v\\\\d*\\\\.\\\\d*\\\\.\\\\d*-.*$\&#34; }&#34; |
+| --node.build_environment_conditions, $NODE_BUILD_ENVIRONMENT_CONDITIONS | Tagging regex patterns to match. format(json({ [name: string]: RegExp })) |  String  | false | &#34;{ \&#34;production\&#34;: \&#34;^v\\\\d*\\\\.\\\\d*\\\\.\\\\d*$\&#34;, \&#34;stage\&#34;: \&#34;^v\\\\d*\\\\.\\\\d*\\\\.\\\\d*-.*$\&#34; }&#34; |
 | --node.build_environment_fallback, $NODE_BUILD_ENVIRONMENT_FALLBACK | Fallback, if it does not match any conditions. Defaults to current branch name. |  String  | false | &#34;develop&#34; |
 
 ## `run` 

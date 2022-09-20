@@ -21,8 +21,8 @@ Builds and publishes Docker images from CI/CD.
 | --docker_registry.password, $DOCKER_REGISTRY_PASSWORD | Docker registry password. |  String  | false |  |
 | --docker.use_buildx, $DOCKER_USE_BUILDX | Use docker buildx builder. |  Bool  | false | false |
 | --docker.buildx_platforms, $DOCKER_BUILDX_PLATFORMS | Platform arguments for docker buildx. |  String  | false | &#34;linux/amd64&#34; |
-| --docker_image.tag_as_latest_for_tags_regex, $TAG_AS_LATEST_FOR_TAGS_REGEX | Regex pattern to tag the image as latest. (format: json(string[])) |  String  | false | &#34;[\&#34;^v\\\\d*\\\\.\\\\d*\\\\.\\\\d*$\&#34;]&#34; |
-| --docker_image.tag_as_latest_for_branches_regex, $TAG_AS_LATEST_FOR_BRANCHES_REGEX | Regex pattern to tag the image as latest. (format: json(string[])) |  String  | false | &#34;[]&#34; |
+| --docker_image.tag_as_latest_for_tags_regex, $TAG_AS_LATEST_FOR_TAGS_REGEX | Regex pattern to tag the image as latest. format(json(string[])) |  String  | false | &#34;[\&#34;^v\\\\d*\\\\.\\\\d*\\\\.\\\\d*$\&#34;]&#34; |
+| --docker_image.tag_as_latest_for_branches_regex, $TAG_AS_LATEST_FOR_BRANCHES_REGEX | Regex pattern to tag the image as latest. format(json(string[])) |  String  | false | &#34;[]&#34; |
 | --docker_image.pull, $IMAGE_PULL | Pull while building the image. |  Bool  | false | true |
 | --docker_image.tags_file, $TAGS_FILE | Read tags from a file. |  String  | false |  |
 | --docker_image.tags_file_ignore_missing, $TAGS_FILE_IGNORE_MISSING | Dont finish the task if tags file is set and missing. |  Bool  | false | false |

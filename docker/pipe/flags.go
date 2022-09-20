@@ -101,7 +101,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Name:        "docker_image.tag_as_latest_for_tags_regex",
-		Usage:       "Regex pattern to tag the image as latest. (format: json(string[]))",
+		Usage:       "Regex pattern to tag the image as latest. format(json(string[]))",
 		Required:    false,
 		EnvVars:     []string{"TAG_AS_LATEST_FOR_TAGS_REGEX"},
 		Value:       `["^v\\d*\\.\\d*\\.\\d*$"]`,
@@ -110,7 +110,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Name:        "docker_image.tag_as_latest_for_branches_regex",
-		Usage:       "Regex pattern to tag the image as latest. (format: json(string[]))",
+		Usage:       "Regex pattern to tag the image as latest. format(json(string[]))",
 		Required:    false,
 		EnvVars:     []string{"TAG_AS_LATEST_FOR_BRANCHES_REGEX"},
 		Value:       `[]`,
