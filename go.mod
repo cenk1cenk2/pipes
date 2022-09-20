@@ -12,7 +12,7 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.16.3
 	gitlab.kilic.dev/libraries/go-utils v1.1.2
-	gitlab.kilic.dev/libraries/plumber/v3 v3.21.1
+	gitlab.kilic.dev/libraries/plumber/v3 v3.23.0
 	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 )
 
@@ -36,6 +36,7 @@ require (
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/crypto v0.0.0-20220919173607-35f4265a4bc0 // indirect
+	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b // indirect
 	golang.org/x/net v0.0.0-20220920152717-4a395b0a80a1 // indirect
 	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
 	golang.org/x/text v0.3.7 // indirect

@@ -1,47 +1,28 @@
 <!-- clidocs -->
 
-# NAME
-
-template - template-cli
-
-# SYNOPSIS
-
-template
-
-```
-[--ci]
-[--debug]
-[--help|-h]
-[--log-level]=[value]
-[--version|-v]
-```
-
-# DESCRIPTION
+# pipes-template
 
 template-cli
 
-**Usage**:
+## Usage
 
-```
-template [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
-```
+`pipes-template [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
 
-# GLOBAL OPTIONS
+## Global Flags
 
-**--ci**: Sets whether this is running inside a CI/CD environment.
+| Flag / Environment            | Description                                                                                                                                                     | Type   | Required | Default        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- | -------------- |
+| --debug, $DEBUG               | Enable debugging for the application.                                                                                                                           | Bool   | false    | false          |
+| --log-level, $LOG_LEVEL       | Define the log level for the application. (format: enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;)) | String | false    | &#34;info&#34; |
+| --default.flag, $DEFAULT_FLAG | Some default flag.                                                                                                                                              | String | false    |                |
+| --help, -h                    | show help                                                                                                                                                       | Bool   | false    | false          |
+| --version, -v                 | print the version                                                                                                                                               | Bool   | false    | false          |
 
-**--debug**: Enable debugging for the application.
+# Commands
 
-**--help, -h**: show help
+## `help` , `h`
 
-**--log-level**="": Define the log level for the application. (default: info)
-
-**--version, -v**: print the version
-
-
-# COMMANDS
-
-## help, h
+### Usage
 
 Shows a list of commands or help for one command
 

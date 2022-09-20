@@ -35,7 +35,7 @@ dev:
 	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) --log-level debug $(ARGS)
 
 docs:
-	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) --log-level debug docs
+	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) MARKDOWN_DOC
 
 help:
 	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) --help

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/urfave/cli/v2"
 
 	"gitlab.kilic.dev/devops/pipes/node/build"
@@ -23,8 +25,9 @@ func main() {
 				Description: DESCRIPTION,
 				Commands: cli.Commands{
 					{
-						Name:  "login",
-						Flags: a.AppendFlags(setup.Flags, login.Flags),
+						Name:        "login",
+						Description: "Login to the given NPM registries.",
+						Flags:       a.AppendFlags(setup.Flags, login.Flags),
 						Action: func(c *cli.Context) error {
 							return login.TL.RunJobs(
 								login.TL.JobSequence(
@@ -36,8 +39,10 @@ func main() {
 					},
 
 					{
-						Name:  "install",
-						Flags: a.AppendFlags(setup.Flags, login.Flags, install.Flags),
+						Name:        "install",
+						Description: "Install node.js dependencies with the given package manager.",
+						Usage:       fmt.Sprintf("%s install", CLI_NAME),
+						Flags:       a.AppendFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(c *cli.Context) error {
 							return install.TL.RunJobs(
 								install.TL.JobSequence(

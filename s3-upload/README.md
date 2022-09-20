@@ -1,47 +1,28 @@
 <!-- clidocs -->
 
-# NAME
+# pipes-s3-upload
 
-template - template-cli
+Uploads the designated files as artifacts to S3.
 
-# SYNOPSIS
+## Usage
 
-template
+`pipes-s3-upload [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
 
-```
-[--ci]
-[--debug]
-[--help|-h]
-[--log-level]=[value]
-[--version|-v]
-```
+## Global Flags
 
-# DESCRIPTION
+| Flag / Environment            | Description                                                                                                                                                     | Type   | Required | Default        |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- | -------------- |
+| --debug, $DEBUG               | Enable debugging for the application.                                                                                                                           | Bool   | false    | false          |
+| --log-level, $LOG_LEVEL       | Define the log level for the application. (format: enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;)) | String | false    | &#34;info&#34; |
+| --default.flag, $DEFAULT_FLAG | Some default flag.                                                                                                                                              | String | false    |                |
+| --help, -h                    | show help                                                                                                                                                       | Bool   | false    | false          |
+| --version, -v                 | print the version                                                                                                                                               | Bool   | false    | false          |
 
-template-cli
+# Commands
 
-**Usage**:
+## `help` , `h`
 
-```
-template [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
-```
-
-# GLOBAL OPTIONS
-
-**--ci**: Sets whether this is running inside a CI/CD environment.
-
-**--debug**: Enable debugging for the application.
-
-**--help, -h**: show help
-
-**--log-level**="": Define the log level for the application. (default: info)
-
-**--version, -v**: print the version
-
-
-# COMMANDS
-
-## help, h
+### Usage
 
 Shows a list of commands or help for one command
 

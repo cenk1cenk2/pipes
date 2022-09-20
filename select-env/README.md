@@ -1,47 +1,18 @@
 <!-- clidocs -->
 
-# NAME
+# select-env
 
-template - template-cli
+Selects an set of environment variable prefix depending on the condition.
 
-# SYNOPSIS
+## Usage
 
-template
+`select-env [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
 
-```
-[--ci]
-[--debug]
-[--help|-h]
-[--log-level]=[value]
-[--version|-v]
-```
+# Commands
 
-# DESCRIPTION
+## `help` , `h`
 
-template-cli
-
-**Usage**:
-
-```
-template [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
-```
-
-# GLOBAL OPTIONS
-
-**--ci**: Sets whether this is running inside a CI/CD environment.
-
-**--debug**: Enable debugging for the application.
-
-**--help, -h**: show help
-
-**--log-level**="": Define the log level for the application. (default: info)
-
-**--version, -v**: print the version
-
-
-# COMMANDS
-
-## help, h
+### Usage
 
 Shows a list of commands or help for one command
 
