@@ -9,7 +9,9 @@ import (
 )
 
 func main() {
-	p := Plumber{}
+	p := Plumber{
+		DocsExcludeFlags: true,
+	}
 
 	p.New(
 		func(p *Plumber) *cli.App {
