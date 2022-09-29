@@ -10,7 +10,7 @@ import (
 	"github.com/nochso/gomd/eol"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	"gitlab.kilic.dev/libraries/go-utils/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -81,7 +81,7 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, file := range t.Pipe.NodeBuild.EnvironmentFiles.Value() {
 				func(file string) {
-					t.CreateSubtask(fmt.Sprintf("variables:%s", file)).
+					t.CreateSubtask("variables", file).
 						Set(func(st *Task[Pipe]) error {
 							st.Log.Infof("Injecting environment variables from: %s", file)
 

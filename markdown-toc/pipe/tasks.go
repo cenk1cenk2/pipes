@@ -7,7 +7,7 @@ import (
 	"gitlab.kilic.dev/libraries/go-utils/utils"
 
 	glob "github.com/bmatcuk/doublestar/v4"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {

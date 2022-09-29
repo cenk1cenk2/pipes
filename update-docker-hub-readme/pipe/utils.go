@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func AddAuthenticationHeadersToRequest(t *Task[Pipe], req *http.Request) *http.Request {

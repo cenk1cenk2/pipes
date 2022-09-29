@@ -6,8 +6,16 @@ import (
 
 //revive:disable:line-length-limit
 
+const (
+	category_git             = "GIT"
+	category_docker          = "Docker"
+	category_docker_registry = "Registry"
+	category_docker_image    = "Image"
+)
+
 var Flags = []cli.Flag{
 	&cli.StringFlag{
+		Category:    category_git,
 		Name:        "git.branch",
 		Usage:       "Source control management branch.",
 		Required:    false,
@@ -17,6 +25,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_git,
 		Name:        "git.tag",
 		Usage:       "Source control management tag.",
 		Required:    false,
@@ -26,6 +35,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.name",
 		Usage:       "Image name for the to be built Docker image.",
 		Required:    true,
@@ -34,6 +44,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.tags",
 		Usage:       "Image tag for the to be built Docker image.",
 		Required:    true,
@@ -42,6 +53,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_image,
 		Name:        "docker_file.context",
 		Usage:       "Context for Dockerfile.",
 		Required:    false,
@@ -51,6 +63,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_image,
 		Name:        "docker_file.name",
 		Usage:       "Dockerfile name to build from.",
 		Required:    false,
@@ -60,6 +73,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_registry,
 		Name:        "docker_registry.registry",
 		Usage:       "Docker registry to login to.",
 		Required:    false,
@@ -68,6 +82,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_registry,
 		Name:        "docker_registry.username",
 		Usage:       "Docker registry username.",
 		Required:    false,
@@ -76,6 +91,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_registry,
 		Name:        "docker_registry.password",
 		Usage:       "Docker registry password.",
 		Required:    false,
@@ -84,6 +100,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
+		Category:    category_docker,
 		Name:        "docker.use_buildx",
 		Usage:       "Use docker buildx builder.",
 		Required:    false,
@@ -93,6 +110,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker,
 		Name:        "docker.buildx_platforms",
 		Usage:       "Platform arguments for docker buildx.",
 		Required:    false,
@@ -102,6 +120,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.tag_as_latest_for_tags_regex",
 		Usage:       "Regex pattern to tag the image as latest. format(json(string[]))",
 		Required:    false,
@@ -111,6 +130,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.tag_as_latest_for_branches_regex",
 		Usage:       "Regex pattern to tag the image as latest. format(json(string[]))",
 		Required:    false,
@@ -120,6 +140,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.pull",
 		Usage:       "Pull while building the image.",
 		Required:    false,
@@ -129,6 +150,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.tags_file",
 		Usage:       "Read tags from a file.",
 		Required:    false,
@@ -138,6 +160,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.tags_file_ignore_missing",
 		Usage:       "Dont finish the task if tags file is set and missing.",
 		Required:    false,
@@ -147,6 +170,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.inspect",
 		Usage:       "Inspect after pushing the image.",
 		Required:    false,
@@ -156,6 +180,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
+		Category:    category_docker_image,
 		Name:        "docker_image.build_args",
 		Usage:       "Pass in extra build arguments for image.",
 		Required:    false,

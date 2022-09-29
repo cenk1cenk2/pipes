@@ -6,31 +6,43 @@ import (
 
 //revive:disable:line-length-limit
 
+const (
+	category_docker_hub = "DockerHub"
+	category_readme     = "Readme"
+)
+
 var Flags = []cli.Flag{
 	&cli.StringFlag{
+		Category:    category_docker_hub,
 		Name:        "docker_hub.username",
 		Usage:       "Docker Hub username for updating the readme.",
 		EnvVars:     []string{"DOCKER_USERNAME", "PLUGIN_DOCKER_USERNAME"},
 		Required:    true,
 		Destination: &TL.Pipe.DockerHub.Username,
 	},
+
 	&cli.StringFlag{
+		Category:    category_docker_hub,
 		Name:        "docker_hub.password",
 		Usage:       "Docker Hub password for updating the readme.",
 		EnvVars:     []string{"DOCKER_PASSWORD", "PLUGIN_DOCKER_PASSWORD"},
 		Required:    true,
 		Destination: &TL.Pipe.DockerHub.Password,
 	},
+
 	&cli.StringFlag{
+		Category:    category_docker_hub,
 		Name:        "docker_hub.address",
 		Usage:       "HTTP address for the docker hub. There is only one!",
 		EnvVars:     []string{"DOCKER_HUB_ADDRESS", "PLUGIN_DOCKER_HUB_ADDRESS"},
 		Value:       "https://hub.docker.com/v2/repositories",
 		Destination: &TL.Pipe.DockerHub.Address,
 	},
+
 	&cli.StringFlag{
-		Name:  "readme.repository",
-		Usage: "Repository for applying the readme on.",
+		Category: category_readme,
+		Name:     "readme.repository",
+		Usage:    "Repository for applying the readme on.",
 		EnvVars: []string{
 			"DOCKER_IMAGE_NAME",
 			"IMAGE_NAME",
@@ -40,7 +52,9 @@ var Flags = []cli.Flag{
 		Required:    true,
 		Destination: &TL.Pipe.Readme.Repository,
 	},
+
 	&cli.StringFlag{
+		Category:    category_readme,
 		Name:        "readme.file",
 		Usage:       "Readme file for the given repossitory.",
 		EnvVars:     []string{"README_FILE", "PLUGIN_README_FILE"},
@@ -48,7 +62,9 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Readme.File,
 		Required:    false,
 	},
+
 	&cli.StringFlag{
+		Category:    category_readme,
 		Name:        "readme.short_description",
 		Usage:       "Pass in description to send it in the request.",
 		EnvVars:     []string{"README_DESCRIPTION", "PLUGIN_README_DESCRIPTION"},

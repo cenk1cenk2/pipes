@@ -2,18 +2,16 @@
 
 Selects an set of environment variable prefix depending on the condition.
 
-`select-env [GLOBAL FLAGS] command [COMMAND FLAGS] [ARGUMENTS...]`
+`select-env [FLAGS]`
 
-## Global Flags
+## Flags
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-|`$DEBUG` | Enable debugging for the application. | `Bool` | `false` | false |
-|`$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;) | `false` | &#34;info&#34; |
-|`$DEFAULT_FLAG` | Some default flag. | `String` | `false` |  |
+| `$DEFAULT_FLAG` | Some default flag. | `String` | `false` |  |
 
-## Commands
+### CLI
 
-### `help` , `h`
-
-`Shows a list of commands or help for one command`
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;) | `false` | &#34;info&#34; |

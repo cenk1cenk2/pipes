@@ -1,11 +1,11 @@
 package pipe
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("build:parent").
+	return tl.CreateTask("build", "parent").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Docker.UseBuildx
 		}).

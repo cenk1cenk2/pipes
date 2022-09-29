@@ -3,7 +3,7 @@ package pipe
 import (
 	"strings"
 
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {

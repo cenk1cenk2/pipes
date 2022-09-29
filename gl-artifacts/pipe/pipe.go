@@ -1,7 +1,7 @@
 package pipe
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 type (

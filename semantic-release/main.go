@@ -5,12 +5,13 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func main() {
 	p := Plumber{
-		DocsExcludeFlags: true,
+		DocsExcludeFlags:       true,
+		DocsExcludeHelpCommand: true,
 	}
 
 	p.New(

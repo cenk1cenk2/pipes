@@ -4,12 +4,13 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"gitlab.kilic.dev/devops/pipes/docker/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func main() {
 	p := Plumber{
-		DocsExcludeFlags: true,
+		DocsExcludeFlags:       true,
+		DocsExcludeHelpCommand: true,
 	}
 
 	p.New(

@@ -3,7 +3,7 @@ package pipe
 import (
 	"strings"
 
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -65,7 +65,7 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerLoginVerify(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("login:verify").
+	return tl.CreateTask("login", "verify").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerRegistry.Username != "" &&
 				t.Pipe.DockerRegistry.Password != ""

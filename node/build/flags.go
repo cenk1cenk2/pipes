@@ -6,8 +6,14 @@ import (
 
 //revive:disable:line-length-limit
 
+const (
+	category_git        = "GIT"
+	category_node_build = "Build"
+)
+
 var Flags = []cli.Flag{
 	&cli.StringFlag{
+		Category:    category_git,
 		Name:        "git.branch",
 		Usage:       "Source control management branch.",
 		Required:    false,
@@ -17,6 +23,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_git,
 		Name:        "git.tag",
 		Usage:       "Source control management tag.",
 		Required:    false,
@@ -26,6 +33,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_node_build,
 		Name:        "node.build_script",
 		Usage:       "package.json script for building operation.",
 		Required:    false,
@@ -35,6 +43,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_node_build,
 		Name:        "node.build_script_args",
 		Usage:       "package.json script arguments for building operation.",
 		Required:    false,
@@ -44,6 +53,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_node_build,
 		Name:        "node.build_cwd",
 		Usage:       "Working directory for build operation.",
 		Required:    false,
@@ -53,6 +63,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
+		Category:    category_node_build,
 		Name:        "node.build_environment_files",
 		Usage:       "Yaml files to inject to build.",
 		Required:    false,
@@ -62,6 +73,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_node_build,
 		Name:        "node.build_environment_conditions",
 		Usage:       "Tagging regex patterns to match. format(json({ [name: string]: RegExp }))",
 		Required:    false,
@@ -71,6 +83,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_node_build,
 		Name:        "node.build_environment_fallback",
 		Usage:       "Fallback, if it does not match any conditions. Defaults to current branch name.",
 		Required:    false,

@@ -9,7 +9,7 @@ import (
 	"os"
 
 	"github.com/docker/docker/api/types"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {

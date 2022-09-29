@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func AddDockerTag(_ *Task[Pipe], tag string) error {

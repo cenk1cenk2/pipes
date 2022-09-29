@@ -1,11 +1,11 @@
 package pipe
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func DockerBuildXVersion(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("version:buildx").
+	return tl.CreateTask("version", "buildx").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Docker.UseBuildx
 		}).
@@ -24,7 +24,7 @@ func DockerBuildXVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("buildx:parent").
+	return tl.CreateTask("buildx", "parent").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Docker.UseBuildx
 		}).
@@ -46,7 +46,7 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("buildx:create").
+	return tl.CreateTask("buildx", "create").
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
 				DOCKER_EXE,
@@ -77,7 +77,7 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("buildx:use").
+	return tl.CreateTask("buildx", "use").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Ctx.TryToUseExistingBuildXInstance
 		}).
@@ -105,7 +105,7 @@ func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("buildx:qemu").
+	return tl.CreateTask("buildx", "qemu").
 		Set(func(t *Task[Pipe]) error {
 			// spawn virtual machine
 			t.CreateCommand(

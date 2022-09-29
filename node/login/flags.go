@@ -6,8 +6,13 @@ import (
 
 //revive:disable:line-length-limit
 
+const (
+	category_node_login = "Login"
+)
+
 var Flags = []cli.Flag{
 	&cli.StringFlag{
+		Category:    category_node_login,
 		Name:        "npm.login",
 		Usage:       "npm registries to login to. format(json({ username: string, password: string, registry?: string, useHttps?: boolean }[]))",
 		Required:    false,
@@ -17,6 +22,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
+		Category:    category_node_login,
 		Name:        "npm.npmrc_file",
 		Usage:       ".npmrc file to use.",
 		Required:    false,
@@ -26,6 +32,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
+		Category:    category_node_login,
 		Name:        "npm.npmrc",
 		Usage:       "Pass direct contents of the NPMRC file.",
 		Required:    false,

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -65,7 +65,7 @@ func DiscoverArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, step := range t.Pipe.Ctx.JobNames {
 				func(step string) {
-					t.CreateSubtask(fmt.Sprintf("discover:%s", step)).
+					t.CreateSubtask("discover", step).
 						Set(func(t *Task[Pipe]) error {
 							found := false
 
@@ -121,7 +121,7 @@ func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, step := range t.Pipe.Ctx.Steps {
 				func(step Step) {
-					t.CreateSubtask(fmt.Sprintf("download:%s", step.name)).
+					t.CreateSubtask("download", step.name).
 						Set(func(t *Task[Pipe]) error {
 							t.Log.Debugf(
 								"Will download artifact with parent job: %s > %d",
@@ -163,7 +163,7 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			for _, artifact := range t.Pipe.Ctx.DownloadedArtifacts {
 				func(artifact DownloadedArtifact) {
-					t.CreateSubtask(fmt.Sprintf("unarchive:%s", artifact.name)).
+					t.CreateSubtask("unarchive", artifact.name).
 						Set(func(t *Task[Pipe]) error {
 							t.Log.Debugf(
 								"Decompressing artifact: %s > %s",

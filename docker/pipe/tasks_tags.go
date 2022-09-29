@@ -9,11 +9,11 @@ import (
 	"strings"
 
 	"gitlab.kilic.dev/libraries/go-utils/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags:parent").
+	return tl.CreateTask("tags", "parent").
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
 				tl.JobParallel(
@@ -43,7 +43,7 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags:user").
+	return tl.CreateTask("tags", "user").
 		Set(func(t *Task[Pipe]) error {
 			// add all the specified tags
 			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(t.Pipe.DockerImage.Tags.Value())) {
@@ -57,7 +57,7 @@ func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags:file").
+	return tl.CreateTask("tags", "file").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerImage.TagsFile == ""
 		}).
@@ -82,7 +82,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 				for _, v := range tags {
 					func(v string) {
-						t.CreateSubtask(fmt.Sprintf("tags:file:%s", v)).
+						t.CreateSubtask("file", v).
 							Set(func(t *Task[Pipe]) error {
 								return AddDockerTag(t, re.ReplaceAllString(v, ""))
 							}).
@@ -110,7 +110,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 //nolint:dupl // this is not to export to a function
 func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags:latest:tag").
+	return tl.CreateTask("tags", "latest", "tag").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerImage.TagAsLatestForTagsRegex == "" || t.Pipe.Git.Tag == ""
 		}).
@@ -148,7 +148,7 @@ func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
 
 //nolint:dupl // this is not to export to a function
 func DockerTagsLatestFromBranch(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags:latest:branch").
+	return tl.CreateTask("tags", "latest", "branch").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerImage.TagAsLatestForBranchesRegex == "" || t.Pipe.Git.Branch == ""
 		}).

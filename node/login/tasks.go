@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/nochso/gomd/eol"
-	. "gitlab.kilic.dev/libraries/plumber/v3"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -62,10 +62,10 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
-				t.CreateSubtask("generate").
-					Set(
-						func(file string) TaskFn[Pipe] {
-							return func(st *Task[Pipe]) error {
+				func(file string) {
+					t.CreateSubtask("generate", file).
+						Set(
+							func(st *Task[Pipe]) error {
 								st.Log.Infof("Generating npmrc file: %s", file)
 
 								f, err := os.OpenFile(file,
@@ -82,9 +82,9 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 								}
 
 								return nil
-							}
-						}(file)).
-					AddSelfToTheParentAsParallel()
+							}).
+						AddSelfToTheParentAsParallel()
+				}(file)
 			}
 
 			return nil
