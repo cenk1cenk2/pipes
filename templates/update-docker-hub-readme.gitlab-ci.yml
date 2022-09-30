@@ -16,4 +16,4 @@ update-docker-hub-readme:
       - tags
   tags:
     - docker
-  when: always
+  when: on_success
