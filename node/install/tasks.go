@@ -10,23 +10,27 @@ import (
 func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("install").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(setup.TL.Pipe.Ctx.PackageManager.Exe).Set(func(c *Command[Pipe]) error {
-				if TL.Pipe.NodeInstall.UseLockFile {
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
+			t.CreateCommand(
+				setup.TL.Pipe.Ctx.PackageManager.Exe,
+			).
+				Set(func(c *Command[Pipe]) error {
+					if TL.Pipe.NodeInstall.UseLockFile {
+						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
 
-					t.Log.Debugln("Using lockfile for installation.")
-				} else {
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Install...)
+						t.Log.Debugln("Using lockfile for installation.")
+					} else {
+						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Install...)
 
-					t.Log.Debugln("Installing dependencies without a lockfile.")
-				}
+						t.Log.Debugln("Installing dependencies without a lockfile.")
+					}
 
-				c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
+					c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
 
-				c.SetDir(TL.Pipe.NodeInstall.Cwd)
+					c.SetDir(TL.Pipe.NodeInstall.Cwd)
 
-				return nil
-			}).AddSelfToTheTask()
+					return nil
+				}).
+				AddSelfToTheTask()
 
 			return nil
 		}).

@@ -19,7 +19,10 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 				strings.Join(apks, ", "),
 			)
 
-			t.CreateCommand("apk", "--no-cache").
+			t.CreateCommand(
+				"apk",
+				"--no-cache",
+			).
 				Set(func(c *Command[Pipe]) error {
 					c.AppendArgs(apks...)
 
@@ -47,7 +50,11 @@ func InstallNodePackages(tl *TaskList[Pipe]) *Task[Pipe] {
 				strings.Join(packages, ", "),
 			)
 
-			t.CreateCommand("yarn", "global", "add").
+			t.CreateCommand(
+				"yarn",
+				"global",
+				"add",
+			).
 				Set(func(c *Command[Pipe]) error {
 					c.AppendArgs(packages...)
 
@@ -70,7 +77,9 @@ func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 				t.Pipe.Ctx.Exe = SEMANTIC_RELEASE_EXE
 			}
 
-			t.CreateCommand(t.Pipe.Ctx.Exe).
+			t.CreateCommand(
+				t.Pipe.Ctx.Exe,
+			).
 				Set(func(c *Command[Pipe]) error {
 					if t.Pipe.SemanticRelease.IsDryRun {
 						c.AppendArgs("--dry-run")

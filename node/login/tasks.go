@@ -63,7 +63,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
 				func(file string) {
-					t.CreateSubtask("generate", file).
+					t.CreateSubtask(file).
 						Set(
 							func(st *Task[Pipe]) error {
 								st.Log.Infof("Generating npmrc file: %s", file)
@@ -102,7 +102,10 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			for _, v := range t.Pipe.Ctx.NpmLogin {
 				func(v NpmLoginJson) {
-					t.CreateCommand("npm", "whoami").
+					t.CreateCommand(
+						"npm",
+						"whoami",
+					).
 						SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 						Set(func(c *Command[Pipe]) error {
 							c.Log.Infof(

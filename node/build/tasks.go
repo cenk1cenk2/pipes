@@ -81,11 +81,13 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, file := range t.Pipe.NodeBuild.EnvironmentFiles.Value() {
 				func(file string) {
-					t.CreateSubtask("variables", file).
+					t.CreateSubtask(file).
 						Set(func(st *Task[Pipe]) error {
 							st.Log.Infof("Injecting environment variables from: %s", file)
 
-							st.CreateCommand("ta-gitlab-env").
+							st.CreateCommand(
+								"ta-gitlab-env",
+							).
 								SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 								Set(func(c *Command[Pipe]) error {
 									c.AppendArgs(
@@ -171,7 +173,9 @@ func InjectEnvironmentVariables(tl *TaskList[Pipe]) *Task[Pipe] {
 func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("build").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(setup.TL.Pipe.Ctx.PackageManager.Exe).
+			t.CreateCommand(
+				setup.TL.Pipe.Ctx.PackageManager.Exe,
+			).
 				Set(func(c *Command[Pipe]) error {
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...).
 						AppendArgs(t.Pipe.NodeBuild.Script).
@@ -184,7 +188,8 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 						AppendDirectEnvironment(t.Pipe.Ctx.EnvironmentVariables...)
 
 					return nil
-				}).AddSelfToTheTask()
+				}).
+				AddSelfToTheTask()
 
 			return nil
 		}).

@@ -18,7 +18,10 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 func DockerVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("version").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(DOCKER_EXE, "--version").
+			t.CreateCommand(
+				DOCKER_EXE,
+				"--version",
+			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 				AddSelfToTheTask()
 

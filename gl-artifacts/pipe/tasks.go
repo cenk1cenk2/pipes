@@ -65,7 +65,7 @@ func DiscoverArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, step := range t.Pipe.Ctx.JobNames {
 				func(step string) {
-					t.CreateSubtask("discover", step).
+					t.CreateSubtask(step).
 						Set(func(t *Task[Pipe]) error {
 							found := false
 
@@ -121,7 +121,7 @@ func DownloadArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, step := range t.Pipe.Ctx.Steps {
 				func(step Step) {
-					t.CreateSubtask("download", step.name).
+					t.CreateSubtask(step.name).
 						Set(func(t *Task[Pipe]) error {
 							t.Log.Debugf(
 								"Will download artifact with parent job: %s > %d",
@@ -163,7 +163,7 @@ func UnarchiveArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			for _, artifact := range t.Pipe.Ctx.DownloadedArtifacts {
 				func(artifact DownloadedArtifact) {
-					t.CreateSubtask("unarchive", artifact.name).
+					t.CreateSubtask(artifact.name).
 						Set(func(t *Task[Pipe]) error {
 							t.Log.Debugf(
 								"Decompressing artifact: %s > %s",

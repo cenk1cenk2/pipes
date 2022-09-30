@@ -7,7 +7,9 @@ import (
 func DefaultTask(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("default").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand("echo").
+			t.CreateCommand(
+				"echo",
+			).
 				Set(func(c *Command[Pipe]) error {
 					c.AppendArgs("hello")
 

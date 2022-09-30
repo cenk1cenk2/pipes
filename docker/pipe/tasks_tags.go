@@ -82,7 +82,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 				for _, v := range tags {
 					func(v string) {
-						t.CreateSubtask("file", v).
+						t.CreateSubtask(v).
 							Set(func(t *Task[Pipe]) error {
 								return AddDockerTag(t, re.ReplaceAllString(v, ""))
 							}).

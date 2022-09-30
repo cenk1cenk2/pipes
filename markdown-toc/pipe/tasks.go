@@ -59,7 +59,12 @@ func RunMarkdownToc(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("markdown-toc").
 		Set(func(t *Task[Pipe]) error {
 			for _, match := range t.Pipe.Ctx.Matches {
-				t.CreateCommand(MARKDOWN_TOC_COMMAND, t.Pipe.Markdown.Arguments, "-i", match).
+				t.CreateCommand(
+					MARKDOWN_TOC_COMMAND,
+					t.Pipe.Markdown.Arguments,
+					"-i",
+					match,
+				).
 					AddSelfToTheTask()
 			}
 

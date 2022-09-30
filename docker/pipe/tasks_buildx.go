@@ -12,7 +12,11 @@ func DockerBuildXVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			t.Log.Infoln("Docker Buildx is enabled.")
 
-			t.CreateCommand(DOCKER_EXE, "buildx", "version").
+			t.CreateCommand(
+				DOCKER_EXE,
+				"buildx",
+				"version",
+			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 				AddSelfToTheTask()
 
