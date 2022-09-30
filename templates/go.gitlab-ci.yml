@@ -10,4 +10,7 @@ include:
     file: /templates/go-build.gitlab-ci.yml
 
   - project: devops/pipes
+    file: /templates/go-lint.gitlab-ci.yml
+
+  - project: devops/pipes
     file: /templates/go-test.gitlab-ci.yml
