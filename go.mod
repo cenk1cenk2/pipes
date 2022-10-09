@@ -10,7 +10,7 @@ require (
 	github.com/google/go-github/v47 v47.1.0
 	github.com/google/uuid v1.3.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-	github.com/urfave/cli/v2 v2.17.1
+	github.com/urfave/cli/v2 v2.19.1
 	gitlab.kilic.dev/libraries/go-utils v1.3.2
 	gitlab.kilic.dev/libraries/plumber/v4 v4.8.2
 	golang.org/x/oauth2 v0.0.0-20221006150949-b44042a4b9c1
