@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/bmatcuk/doublestar/v4 v4.2.0
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/docker/docker v20.10.19+incompatible
+	github.com/docker/docker v20.10.20+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/google/go-github/v47 v47.1.0
 	github.com/google/uuid v1.3.0
