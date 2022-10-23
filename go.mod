@@ -7,7 +7,7 @@ require (
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/docker/docker v20.10.20+incompatible
 	github.com/dustin/go-humanize v1.0.0
-	github.com/google/go-github/v47 v47.1.0
+	github.com/google/go-github/v48 v48.0.0
 	github.com/google/uuid v1.3.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.20.3
