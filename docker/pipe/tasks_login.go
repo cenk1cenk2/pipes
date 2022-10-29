@@ -10,7 +10,7 @@ func DockerLoginParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login", "parent").
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
-				tl.JobSequence(
+				tl.JobParallel(
 					DockerLogin(tl).Job(),
 					DockerLoginVerify(tl).Job(),
 				),
@@ -25,6 +25,10 @@ func DockerLoginParent(tl *TaskList[Pipe]) *Task[Pipe] {
 
 func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.DockerRegistry.Username == "" ||
+				t.Pipe.DockerRegistry.Password == ""
+		}).
 		Set(func(t *Task[Pipe]) error {
 			// login task
 			t.CreateCommand(
@@ -57,6 +61,10 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 func DockerLoginVerify(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login", "verify").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.DockerRegistry.Username != "" &&
+				t.Pipe.DockerRegistry.Password != ""
+		}).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
 				DOCKER_EXE,
