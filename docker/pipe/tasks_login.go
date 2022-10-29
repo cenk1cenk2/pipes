@@ -10,7 +10,7 @@ func DockerLoginParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login", "parent").
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
-				tl.JobParallel(
+				tl.JobSequence(
 					DockerLogin(tl).Job(),
 					DockerLoginVerify(tl).Job(),
 				),
@@ -51,7 +51,7 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 			return nil
 		}).
 		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunCommandJobAsJobParallel()
+			return t.RunCommandJobAsJobSequence()
 		})
 }
 
