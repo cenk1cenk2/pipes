@@ -75,7 +75,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    category_node_build,
 		Name:        "node.build_environment_conditions",
-		Usage:       "Tagging regex patterns to match. format(json({ [name: string]: RegExp }))",
+		Usage:       "Tagging regex patterns to match. format(json(map[string]RegExp))",
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_CONDITIONS"},
 		Value:       `{ "production": "^v\\d*\\.\\d*\\.\\d*$", "stage": "^v\\d*\\.\\d*\\.\\d*-.*$" }`,

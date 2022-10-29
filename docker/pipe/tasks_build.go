@@ -60,6 +60,16 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.SetDir(t.Pipe.DockerFile.Context)
 					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
+					if t.Pipe.Docker.UseBuildKit {
+						t.Log.Debugf("Using Docker BuildKit for the build operation.")
+
+						c.AppendEnvironment(
+							map[string]string{
+								"DOCKER_BUILDKIT": "1",
+							},
+						)
+					}
+
 					return nil
 				}).
 				AddSelfToTheTask()

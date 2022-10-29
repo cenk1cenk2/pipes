@@ -1,6 +1,7 @@
 package pipe
 
 type Ctx struct {
-	Tags                           []string
-	TryToUseExistingBuildXInstance bool
+	Tags                       []string
+	UseExistingBuildXInstance  bool
+	SanitizedRegularExpression map[string]string
 }

@@ -1,4 +1,4 @@
-GO_VERSION=1.18
+GO_VERSION=1.19
 
 GO_CMD=go
 GO_BUILD=$(GO_CMD) build
@@ -29,7 +29,7 @@ clean:
 build: build-linux-amd64
 
 build-linux-amd64:
-	CGO_ENABLED=$(GO_OPTION_C) GOOS=linux GOARCH=amd64 $(GO_BUILD) -mod=readonly -o $(BINARY_FOLDER)/$(BINARY_NAME)
+	CGO_ENABLED=$(GO_OPTION_C) GOOS=linux GOARCH=amd64 $(GO_BUILD) -mod=readonly -ldflags="-w -s" -o $(BINARY_FOLDER)/$(BINARY_NAME)
 
 dev:
 	CGO_ENABLED=$(GO_OPTION_C) $(GO_RUN) --log-level debug $(ARGS)

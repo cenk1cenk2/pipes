@@ -145,7 +145,7 @@ linters-settings:
       - name: errorf
         severity: error
       - name: error-return
-      - name: if-return
+        # - name: if-return
         severity: error
       - name: increment-decrement
       - name: range

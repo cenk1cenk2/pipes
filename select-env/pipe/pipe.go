@@ -5,14 +5,14 @@ import (
 )
 
 type (
-	Default struct {
-		Flag string
+	Environment struct {
+		Conditions string
 	}
 
 	Pipe struct {
 		Ctx
 
-		Default
+		Environment
 	}
 )
 

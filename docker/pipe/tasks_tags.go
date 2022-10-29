@@ -14,32 +14,40 @@ import (
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags", "parent").
+		ShouldRunBefore(func(t *Task[Pipe]) error {
+			// setup sanitizing the tags first
+			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagsSanitize), &t.Pipe.Ctx.SanitizedRegularExpression); err != nil {
+				return err
+			}
+
+			return nil
+		}).
 		Set(func(t *Task[Pipe]) error {
 			t.SetSubtask(
 				tl.JobParallel(
 					DockerTagsUser(tl).Job(),
 					DockerTagsFile(tl).Job(),
-					DockerTagsLatestFromTag(tl).Job(),
-					DockerTagsLatestFromBranch(tl).Job(),
+					DockerTagsLatest(tl).Job(),
 				),
 			)
 
 			return nil
-		}).ShouldRunAfter(func(t *Task[Pipe]) error {
-		if err := t.RunSubtasks(); err != nil {
-			return err
-		}
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			if err := t.RunSubtasks(); err != nil {
+				return err
+			}
 
-		t.Pipe.Ctx.Tags = utils.RemoveDuplicateStr(
-			utils.DeleteEmptyStringsFromSlice(t.Pipe.Ctx.Tags),
-		)
+			t.Pipe.Ctx.Tags = utils.RemoveDuplicateStr(
+				utils.DeleteEmptyStringsFromSlice(t.Pipe.Ctx.Tags),
+			)
 
-		t.Log.Infof(
-			"Image tags: %s", strings.Join(t.Pipe.Ctx.Tags, ", "),
-		)
+			t.Log.Infof(
+				"Image tags: %s", strings.Join(t.Pipe.Ctx.Tags, ", "),
+			)
 
-		return nil
-	})
+			return nil
+		})
 }
 
 func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -90,9 +98,9 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 					}(v)
 				}
 			} else if errors.Is(err, os.ErrNotExist) && t.Pipe.DockerImage.TagsFile != "" {
-				t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
-
 				if !t.Pipe.DockerImage.TagsFileIgnoreMissing {
+					t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
+
 					t.SendExit(0)
 				}
 
@@ -108,75 +116,55 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-//nolint:dupl // this is not to export to a function
-func DockerTagsLatestFromTag(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags", "latest", "tag").
+func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("tags", "latest").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerImage.TagAsLatestForTagsRegex == "" || t.Pipe.Git.Tag == ""
+			return t.Pipe.DockerImage.TagAsLatest == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
-			TagAsLatestForTagsRegex := []string{}
+			tagAsLatestRes := []string{}
 
-			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagAsLatestForTagsRegex), &TagAsLatestForTagsRegex); err != nil {
+			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagAsLatest), &tagAsLatestRes); err != nil {
 				return err
 			}
 
-			for _, re := range TagAsLatestForTagsRegex {
-				m, err := regexp.Match(re, []byte(t.Pipe.Git.Tag))
+			references := []string{}
 
-				if err != nil {
-					return err
-				}
+			if t.Pipe.Git.Tag != "" {
+				references = append(references, fmt.Sprintf("%s/%s", GIT_REFERENCE_TAGS, t.Pipe.Git.Tag))
+			}
 
-				if m {
-					if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
+			if t.Pipe.Git.Branch != "" {
+				references = append(references, fmt.Sprintf("%s/%s", GIT_REFERENCE_BRANCH, t.Pipe.Git.Branch))
+			}
+
+			if len(references) == 0 {
+				return nil
+			}
+
+			t.Log.Debugf("References for latest search: %v", references)
+
+		out:
+			for _, re := range tagAsLatestRes {
+				for _, reference := range references {
+					m, err := regexp.Match(re, []byte(reference))
+
+					if err != nil {
 						return err
 					}
 
-					t.Log.Infof(
-						"Will tag image as latest since tag regex matches: %s",
-						re,
-					)
+					if m {
+						if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
+							return err
+						}
 
-					break
-				}
-			}
+						t.Log.Infof(
+							"Will tag image as latest since tag regex matches: %s",
+							re,
+						)
 
-			return nil
-		})
-}
-
-//nolint:dupl // this is not to export to a function
-func DockerTagsLatestFromBranch(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags", "latest", "branch").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerImage.TagAsLatestForBranchesRegex == "" || t.Pipe.Git.Branch == ""
-		}).
-		Set(func(t *Task[Pipe]) error {
-			TagAsLatestForBranchesRegex := []string{}
-
-			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagAsLatestForBranchesRegex), &TagAsLatestForBranchesRegex); err != nil {
-				return err
-			}
-
-			for _, re := range TagAsLatestForBranchesRegex {
-				m, err := regexp.Match(re, []byte(t.Pipe.Git.Branch))
-
-				if err != nil {
-					return err
-				}
-
-				if m {
-					if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
-						return err
+						break out
 					}
-
-					t.Log.Infof(
-						"Will tag image as latest since branch regex matches: %s",
-						re,
-					)
-
-					break
 				}
 			}
 

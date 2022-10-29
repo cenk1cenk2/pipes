@@ -6,13 +6,18 @@ import (
 
 //revive:disable:line-length-limit
 
+const (
+	category_environment = "Environment"
+)
+
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name:        "default.flag",
-		Usage:       "Some default flag.",
+		Category:    category_environment,
+		Name:        "environment.conditions",
+		Usage:       "Regular expression patterns to match for selecting the environment. format(json({ tags: { [name: string]: RegExp }, branches: { [name: string]: RegExp } }))",
 		Required:    false,
-		EnvVars:     []string{"DEFAULT_FLAG"},
-		Value:       "",
-		Destination: &TL.Pipe.Default.Flag,
+		EnvVars:     []string{"ENVIRONMENT_CONDITIONS"},
+		Value:       `{ "production": "^v\\d*\\.\\d*\\.\\d*$", "stage": "^v\\d*\\.\\d*\\.\\d*-.*$" }`,
+		Destination: &TL.Pipe.Environment.Conditions,
 	},
 }

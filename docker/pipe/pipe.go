@@ -12,20 +12,21 @@ type (
 	}
 
 	Docker struct {
+		UseBuildKit     bool
 		UseBuildx       bool
 		BuildxPlatforms string
 	}
 
 	DockerImage struct {
-		Name                        string
-		Tags                        cli.StringSlice
-		TagAsLatestForTagsRegex     string
-		TagAsLatestForBranchesRegex string
-		TagsFile                    string
-		TagsFileIgnoreMissing       bool
-		Pull                        bool
-		Inspect                     bool
-		BuildArgs                   cli.StringSlice
+		Name                  string
+		Tags                  cli.StringSlice
+		TagAsLatest           string
+		TagsFile              string
+		TagsFileIgnoreMissing bool
+		TagsSanitize          string
+		Pull                  bool
+		Inspect               bool
+		BuildArgs             cli.StringSlice
 	}
 
 	DockerFile struct {
@@ -55,23 +56,25 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).SetTasks(
-		TL.JobSequence(
-			Setup(&TL).Job(),
-			DockerTagsParent(&TL).Job(),
-			TL.JobParallel(
-				DockerVersion(&TL).Job(),
-				DockerBuildXVersion(&TL).Job(),
+	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
+		return tl.JobSequence(
+			Setup(tl).Job(),
+
+			DockerTagsParent(tl).Job(),
+
+			tl.JobParallel(
+				DockerVersion(tl).Job(),
+				DockerBuildXVersion(tl).Job(),
 			),
-			TL.JobParallel(
-				DockerLogin(&TL).Job(),
-				DockerLoginVerify(&TL).Job(),
+
+			DockerLoginParent(tl).Job(),
+
+			tl.JobParallel(
+				DockerBuildParent(tl).Job(),
+				DockerBuildXParent(tl).Job(),
 			),
-			TL.JobParallel(
-				DockerBuildParent(&TL).Job(),
-				DockerBuildXParent(&TL).Job(),
-			),
-			DockerInspect(&TL).Job(),
-		),
-	)
+
+			DockerInspect(tl).Job(),
+		)
+	})
 }

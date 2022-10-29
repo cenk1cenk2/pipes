@@ -73,7 +73,7 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		ShouldRunAfter(func(t *Task[Pipe]) error {
 			if err := t.RunCommandJobAsJobSequence(); err != nil {
-				t.Pipe.Ctx.TryToUseExistingBuildXInstance = true
+				t.Pipe.Ctx.UseExistingBuildXInstance = true
 			}
 
 			return nil
@@ -83,7 +83,7 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx", "use").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !t.Pipe.Ctx.TryToUseExistingBuildXInstance
+			return !t.Pipe.Ctx.UseExistingBuildXInstance
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
