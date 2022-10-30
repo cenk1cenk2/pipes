@@ -153,7 +153,7 @@ var Flags = []cli.Flag{
 		Usage:       `Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json(RegExp[])`,
 		Required:    false,
 		EnvVars:     []string{"IMAGE_TAG_AS_LATEST"},
-		Value:       `[ "^tags/v?\\D.\\D.\\D$" ]`,
+		Value:       `[ "^tags/v?\\d.\\d.\\d$" ]`,
 		Destination: &TL.Pipe.DockerImage.TagAsLatest,
 	},
 
@@ -163,7 +163,7 @@ var Flags = []cli.Flag{
 		Usage:       `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json(map[RegExp]Template[[]string])`,
 		Required:    false,
 		EnvVars:     []string{"IMAGE_SANITIZE_TAGS"},
-		Value:       `{ "([^/]*/(.*))": "{{ .0 | to_upper_case }}_{{ .1 }}" }`,
+		Value:       `{ "([^/]*)/(.*)": "{{ $.0 | to_upper_case }}_{{ $.1 }}" }`,
 		Destination: &TL.Pipe.DockerImage.TagsSanitize,
 	},
 
