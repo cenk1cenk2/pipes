@@ -14,14 +14,6 @@ import (
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags", "parent").
-		ShouldRunBefore(func(t *Task[Pipe]) error {
-			// setup sanitizing the tags first
-			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagsSanitize), &t.Pipe.Ctx.SanitizedRegularExpression); err != nil {
-				return err
-			}
-
-			return nil
-		}).
 		SetJobWrapper(func(job Job) Job {
 			return tl.JobSequence(
 				tl.JobParallel(
@@ -117,9 +109,9 @@ func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
 			return t.Pipe.DockerImage.TagAsLatest == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
-			tagAsLatestRes := []string{}
+			tagAsLatestExpressions := []string{}
 
-			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagAsLatest), &tagAsLatestRes); err != nil {
+			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagAsLatest), &tagAsLatestExpressions); err != nil {
 				return err
 			}
 
@@ -140,22 +132,24 @@ func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
 			t.Log.Debugf("References for latest search: %v", references)
 
 		out:
-			for _, re := range tagAsLatestRes {
+			for _, expression := range tagAsLatestExpressions {
 				for _, reference := range references {
-					m, err := regexp.Match(re, []byte(reference))
+					re, err := regexp.Compile(expression)
 
 					if err != nil {
-						return err
+						return fmt.Errorf("Can not process regular expression for latest tag: %w", err)
 					}
 
-					if m {
+					t.Log.Debugf("Trying to match reference for latest: %s with %v", reference, re.String())
+
+					if re.MatchString(reference) {
 						if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
 							return err
 						}
 
 						t.Log.Infof(
 							"Will tag image as latest since tag regex matches: %s",
-							re,
+							expression,
 						)
 
 						break out

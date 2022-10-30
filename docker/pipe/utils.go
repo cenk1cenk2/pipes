@@ -41,13 +41,15 @@ func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
 			return "", fmt.Errorf("Can not compile sanitize regular expression: %w", err)
 		}
 
-		matches := re.FindAllString(tag, -1)
+		matches := re.FindStringSubmatch(tag)
+
+		t.Log.Debugf("Trying to sanitize tag: %s with %v", tag, re.String())
 
 		if matches == nil {
 			continue
 		}
 
-		t.Log.Debugf("Sanitizing since condition matched for given tag: %s -> %s", tag, re.String())
+		t.Log.Debugf("Sanitizing since condition matched for given tag: %s -> %s with %v", tag, re.String(), matches)
 
 		tmp, err := template.New("inline").Funcs(template.FuncMap{"join": strings.Join, "to_upper_case": strings.ToUpper, "to_lower_case": strings.ToLower}).Parse(tmpl)
 

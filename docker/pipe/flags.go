@@ -163,7 +163,7 @@ var Flags = []cli.Flag{
 		Usage:       `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json(map[RegExp]Template[[]string])`,
 		Required:    false,
 		EnvVars:     []string{"IMAGE_SANITIZE_TAGS"},
-		Value:       `{ "([^/]*)/(.*)": "{{ $.0 | to_upper_case }}_{{ $.1 }}" }`,
+		Value:       `{ "([^/]*)/(.*)": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" }`,
 		Destination: &TL.Pipe.DockerImage.TagsSanitize,
 	},
 
