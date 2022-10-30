@@ -17,7 +17,7 @@ type (
 		Cwd                   string `validate:"dir"`
 		EnvironmentFiles      cli.StringSlice
 		EnvironmentFallback   string
-		EnvironmentConditions string `validate:"json"`
+		EnvironmentConditions string
 	}
 
 	Pipe struct {
