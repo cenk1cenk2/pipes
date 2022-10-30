@@ -1,8 +1,10 @@
+---
 stages:
   - install
   - build
   - publish-first
   - publish
+  - post
 
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
