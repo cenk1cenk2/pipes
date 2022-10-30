@@ -8,7 +8,7 @@ update-docker-hub-readme:
     - pipe
   variables:
     DOCKER_USERNAME: $DOCKERHUB_USERNAME
-    DOCKER_PASSWORD: $DOCKER_HUB_API_PASSWORD
+    DOCKER_PASSWORD: $DOCKERHUB_API_PASSWORD
   only:
     refs:
       - master

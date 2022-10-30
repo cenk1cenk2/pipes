@@ -280,7 +280,7 @@ docker-hub-readme:
   extends: .docker-hub-readme
   variables:
     DOCKER_USERNAME: $DOCKERHUB_USERNAME
-    DOCKER_PASSWORD: $DOCKER_HUB_API_PASSWORD
+    DOCKER_PASSWORD: $DOCKERHUB_API_PASSWORD
   parallel:
     matrix:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
