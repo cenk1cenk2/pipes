@@ -8,7 +8,7 @@ Automation tools for various pipelines.
 
 <!-- toc -->
 
-- [Containers](#containers)
+- [Pipes](#pipes)
   - [cenk1cenk2/pipe-docker](#cenk1cenk2pipe-docker)
   - [cenk1cenk2/pipe-gh-release-tracker](#cenk1cenk2pipe-gh-release-tracker)
   - [cenk1cenk2/pipe-gl-artifacts](#cenk1cenk2pipe-gl-artifacts)
@@ -25,7 +25,7 @@ Automation tools for various pipelines.
 
 --
 
-## Containers
+## Pipes
 
 ### cenk1cenk2/pipe-docker
 
