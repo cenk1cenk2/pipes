@@ -68,6 +68,16 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Docker.BuildxPlatforms,
 	},
 
+	&cli.StringFlag{
+		Category:    category_docker,
+		Name:        "docker.buildx_instance",
+		Usage:       "Docker BuildX instance to be started or to use.",
+		Required:    false,
+		EnvVars:     []string{"DOCKER_BUILDX_INSTANCE"},
+		Value:       "CI",
+		Destination: &TL.Pipe.Docker.BuildxInstance,
+	},
+
 	// category_docker_registry
 
 	&cli.StringFlag{

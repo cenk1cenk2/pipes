@@ -8,18 +8,11 @@ import (
 
 func DockerLoginParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login", "parent").
-		Set(func(t *Task[Pipe]) error {
-			t.SetSubtask(
-				tl.JobParallel(
-					DockerLogin(tl).Job(),
-					DockerLoginVerify(tl).Job(),
-				),
+		SetJobWrapper(func(job Job) Job {
+			return tl.JobParallel(
+				DockerLogin(tl).Job(),
+				DockerLoginVerify(tl).Job(),
 			)
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunSubtasks()
 		})
 }
 

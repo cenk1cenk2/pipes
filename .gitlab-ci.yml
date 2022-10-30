@@ -14,9 +14,9 @@ variables:
   before_script:
     - cd $DOCKER_CONTEXT
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build --pull -t $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE .
-    - docker push $CI_REGISTRY_IMAGE/$CONTAINER_IMAGE
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+    - docker build --pull -t $DOCKER_IMAGE_NAME .
+    - docker push $DOCKER_IMAGE_NAME
   tags:
     - docker
 
@@ -34,6 +34,14 @@ variables:
     include:
       - project: devops/pipes
         file: /templates/docker-build-with-artifacts-dockerhub.gitlab-ci.yml
+    strategy: depend
+
+.docker-hub-readme:
+  stage: post
+  trigger:
+    include:
+      - project: devops/pipes
+        file: /templates/update-docker-hub-readme.gitlab-ci.yml
     strategy: depend
 
 include:
@@ -74,7 +82,7 @@ publish-first-docker:
   extends: .publish-first
   variables:
     DOCKER_CONTEXT: ./docker
-    CONTAINER_IMAGE: gitlab-pipes-docker:latest
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker:latest
   only:
     changes:
       - "docker/**/*"
@@ -89,7 +97,7 @@ publish-first-gl-artifacts:
   extends: .publish-first
   variables:
     DOCKER_CONTEXT: ./gl-artifacts
-    CONTAINER_IMAGE: gitlab-pipes-gl-artifacts:latest
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts:latest
   only:
     changes:
       - "gl-artifacts/**/*"
@@ -102,11 +110,13 @@ publish-first-gl-artifacts:
 
 # private images
 
+# public images
+
 publish-docker:
-  extends: .publish-docker-to-private
+  extends: .publish-docker-to-public
   variables:
     DOCKERFILE_CONTEXT: ./docker
-    DOCKER_IMAGE_NAME: gitlab-pipes-docker
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./docker]"
   only:
@@ -119,11 +129,28 @@ publish-docker:
       - main
       - tags
 
+publish-gl-artifacts:
+  extends: .publish-docker-to-public
+  variables:
+    DOCKERFILE_CONTEXT: ./gl-artifacts
+    DOCKER_IMAGE_NAME: pipe-gl-artifacts
+    IMAGE_TAGS: latest
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts]"
+  only:
+    changes:
+      - "gl-artifacts/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
 publish-node:
-  extends: .publish-docker-to-private
+  extends: .publish-docker-to-public
   variables:
     DOCKERFILE_CONTEXT: ./node
-    DOCKER_IMAGE_NAME: gitlab-pipes-node
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./node]"
   parallel:
     matrix:
@@ -143,25 +170,6 @@ publish-node:
     refs:
       - main
       - tags
-
-publish-gl-artifacts:
-  extends: .publish-docker-to-private
-  variables:
-    DOCKERFILE_CONTEXT: ./gl-artifacts
-    DOCKER_IMAGE_NAME: gitlab-pipes-gl-artifacts
-    IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts]"
-  only:
-    changes:
-      - "gl-artifacts/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-# public images
 
 publish-gh-release-tracker:
   extends: .publish-docker-to-public
@@ -265,3 +273,55 @@ publish-semantic-release:
 #     refs:
 #       - main
 #       - tags
+
+docker-hub-readme:
+  extends: .docker-hub-readme
+  variables:
+    DOCKER_USERNAME: $DOCKERHUB_USERNAME
+    DOCKER_PASSWORD: $DOCKER_HUB_API_PASSWORD
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+        README_FILE: ./docker/README.md
+        README_DESCRIPTION: |
+          Builds and publishes a Docker image with given conditions.
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
+        README_FILE: ./gl-artifacts/README.md
+        README_DESCRIPTION: |
+          Fetches artifacts from a stage in GitLab pipeline.
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
+        README_FILE: ./node/README.md
+        README_DESCRIPTION: |
+          Node.JS operations for pipeline.
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
+        README_FILE: ./gh-release-tracker/README.md
+        README_DESCRIPTION: |
+          Tracks a GitHub repository and fetches the latest tag.
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
+        README_FILE: ./markdown-toc/README.md
+        README_DESCRIPTION: |
+          Generates TOC for markdown files.
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
+        README_FILE: ./update-docker-hub-readme/README.md
+        README_DESCRIPTION: |
+          Updates the README on DockerHub for given repository.
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
+        README_FILE: ./semantic-release/README.md
+        README_DESCRIPTION: |
+          Semantic-Release embedded inside a container for CI jobs.
+      #
+      # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
+      #   README_FILE: ./select-env/README.md
+      #   README_DESCRIPTION: |
+      #     Selects an environment given on the conditions.
+      #
+      # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3-upload
+      #   README_FILE: ./s3-upload/README.md
+      #   README_DESCRIPTION: |
+      #     Uploads the given artificats to a S3 instance.

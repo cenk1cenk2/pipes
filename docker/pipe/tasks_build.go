@@ -9,18 +9,11 @@ func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Docker.UseBuildx
 		}).
-		Set(func(t *Task[Pipe]) error {
-			t.SetSubtask(
-				tl.JobSequence(
-					DockerBuild(tl).Job(),
-					DockerPush(tl).Job(),
-				),
+		SetJobWrapper(func(job Job) Job {
+			return tl.JobSequence(
+				DockerBuild(tl).Job(),
+				DockerPush(tl).Job(),
 			)
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunSubtasks()
 		})
 }
 

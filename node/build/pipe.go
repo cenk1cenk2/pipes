@@ -33,11 +33,11 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).SetTasks(
-		TL.JobSequence(
-			SelectEnvironment(&TL).Job(),
-			InjectEnvironmentVariables(&TL).Job(),
-			BuildNodeApplication(&TL).Job(),
-		),
-	)
+	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
+		return tl.JobSequence(
+			SelectEnvironment(tl).Job(),
+			InjectEnvironmentVariables(tl).Job(),
+			BuildNodeApplication(tl).Job(),
+		)
+	})
 }

@@ -12,7 +12,7 @@ stages:
 
 build-docker-image:
   stage: docker
-  image: $CI_REGISTRY/devops/pipes/gitlab-pipes-docker:${PIPES_VERSION}
+  image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
   script:
     - pipe
   tags:

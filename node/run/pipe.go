@@ -24,18 +24,20 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-		args := tl.CliContext.Args().Slice()
-		if len(args) < 1 {
-			return fmt.Errorf("Arguments are needed to run a specific script.")
-		}
+	return TL.New(p).
+		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
+			args := tl.CliContext.Args().Slice()
+			if len(args) < 1 {
+				return fmt.Errorf("Arguments are needed to run a specific script.")
+			}
 
-		TL.Pipe.NodeCommand.Script, TL.Pipe.NodeCommand.ScriptArgs = args[0], strings.Join(args[1:], " ")
+			TL.Pipe.NodeCommand.Script, TL.Pipe.NodeCommand.ScriptArgs = args[0], strings.Join(args[1:], " ")
 
-		return nil
-	}).SetTasks(
-		TL.JobSequence(
-			RunNodeScript(&TL).Job(),
-		),
-	)
+			return nil
+		}).
+		Set(func(tl *TaskList[Pipe]) Job {
+			return tl.JobSequence(
+				RunNodeScript(tl).Job(),
+			)
+		})
 }

@@ -14,13 +14,13 @@ func main() {
 		DeprecationNotices: []DeprecationNotice{
 			{
 				Level:       LOG_LEVEL_ERROR,
-				Environment: "TAG_AS_LATEST_FOR_TAGS_REGEX",
-				Flag:        "docker_image.tag_as_latest_for_tags_regex",
+				Environment: []string{"TAG_AS_LATEST_FOR_TAGS_REGEX"},
+				Flag:        []string{"--docker_image.tag_as_latest_for_tags_regex"},
 			},
 			{
 				Level:       LOG_LEVEL_ERROR,
-				Environment: "TAG_AS_LATEST_FOR_BRANCHES_REGEX",
-				Flag:        "docker_image.tag_as_latest_for_branches_regex",
+				Environment: []string{"TAG_AS_LATEST_FOR_BRANCHES_REGEX"},
+				Flag:        []string{"--docker_image.tag_as_latest_for_branches_regex"},
 			},
 		},
 	}

@@ -21,9 +21,9 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).SetTasks(
-		TL.JobSequence(
-			InstallNodeDependencies(&TL).Job(),
-		),
-	)
+	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
+		return tl.JobSequence(
+			InstallNodeDependencies(tl).Job(),
+		)
+	})
 }

@@ -48,5 +48,5 @@ Builds and publishes Docker images from CI/CD.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DOCKER_REGISTRY` | Docker registry url for logging in. | `String` | `false` |  |
-| `$DOCKER_REGISTRY_USERNAME` | Docker registry username for the given registry. | `String` | `true` |  |
-| `$DOCKER_REGISTRY_PASSWORD` | Docker registry password for the given registry. | `String` | `true` |  |
+| `$DOCKER_REGISTRY_USERNAME` | Docker registry username for the given registry. | `String` | `false` |  |
+| `$DOCKER_REGISTRY_PASSWORD` | Docker registry password for the given registry. | `String` | `false` |  |

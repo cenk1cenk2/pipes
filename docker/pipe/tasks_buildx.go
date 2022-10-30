@@ -32,20 +32,13 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Docker.UseBuildx
 		}).
-		Set(func(t *Task[Pipe]) error {
-			t.SetSubtask(
-				tl.JobSequence(
-					DockerBuildXCreate(&TL).Job(),
-					DockerBuildXUse(&TL).Job(),
-					DockerBuildxSetupQemu(&TL).Job(),
-					DockerBuildX(&TL).Job(),
-				),
+		SetJobWrapper(func(job Job) Job {
+			return tl.JobSequence(
+				DockerBuildXCreate(tl).Job(),
+				DockerBuildXUse(tl).Job(),
+				DockerBuildxSetupQemu(tl).Job(),
+				DockerBuildX(tl).Job(),
 			)
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunSubtasks()
 		})
 }
 
@@ -58,7 +51,7 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 				"create",
 				"--use",
 				"--name",
-				"gitlab",
+				t.Pipe.Docker.BuildxInstance,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				SetIgnoreError().
@@ -90,7 +83,7 @@ func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
 				DOCKER_EXE,
 				"buildx",
 				"use",
-				"gitlab",
+				t.Pipe.Docker.BuildxInstance,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				Set(func(c *Command[Pipe]) error {

@@ -29,13 +29,13 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).SetTasks(
-		TL.JobSequence(
-			TL.JobParallel(
-				InstallApkPackages(&TL).Job(),
-				InstallNodePackages(&TL).Job(),
+	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
+		return tl.JobSequence(
+			tl.JobParallel(
+				InstallApkPackages(tl).Job(),
+				InstallNodePackages(tl).Job(),
 			),
-			RunSemanticRelease(&TL).Job(),
-		),
-	)
+			RunSemanticRelease(tl).Job(),
+		)
+	})
 }

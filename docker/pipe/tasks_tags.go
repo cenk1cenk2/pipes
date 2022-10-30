@@ -22,22 +22,17 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		Set(func(t *Task[Pipe]) error {
-			t.SetSubtask(
+		SetJobWrapper(func(job Job) Job {
+			return tl.JobSequence(
 				tl.JobParallel(
 					DockerTagsUser(tl).Job(),
 					DockerTagsFile(tl).Job(),
 					DockerTagsLatest(tl).Job(),
 				),
+				job,
 			)
-
-			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			if err := t.RunSubtasks(); err != nil {
-				return err
-			}
-
+		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.Tags = utils.RemoveDuplicateStr(
 				utils.DeleteEmptyStringsFromSlice(t.Pipe.Ctx.Tags),
 			)

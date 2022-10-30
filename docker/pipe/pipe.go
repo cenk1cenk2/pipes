@@ -15,6 +15,7 @@ type (
 		UseBuildKit     bool
 		UseBuildx       bool
 		BuildxPlatforms string
+		BuildxInstance  string
 	}
 
 	DockerImage struct {
