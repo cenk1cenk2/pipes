@@ -12,6 +12,9 @@ const (
 )
 
 var Flags = []cli.Flag{
+
+	// category_packages
+
 	&cli.StringSliceFlag{
 		Category:    category_packages,
 		Name:        "packages.apk",
@@ -31,6 +34,8 @@ var Flags = []cli.Flag{
 		Value:       &cli.StringSlice{},
 		Destination: &TL.Pipe.Packages.Node,
 	},
+
+	// category_semantic_release
 
 	&cli.BoolFlag{
 		Category:    category_semantic_release,

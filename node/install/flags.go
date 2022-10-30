@@ -11,6 +11,9 @@ const (
 )
 
 var Flags = []cli.Flag{
+
+	// category_node_install
+
 	&cli.StringFlag{
 		Category:    category_node_install,
 		Name:        "node.install_cwd",

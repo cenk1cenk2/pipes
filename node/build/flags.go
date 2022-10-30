@@ -12,25 +12,30 @@ const (
 )
 
 var Flags = []cli.Flag{
-	&cli.StringFlag{
-		Category:    category_git,
-		Name:        "git.branch",
-		Usage:       "Source control management branch.",
-		Required:    false,
-		EnvVars:     []string{"CI_COMMIT_REF_NAME"},
-		Value:       "",
-		Destination: &TL.Pipe.Git.Branch,
-	},
+
+	// category_git
 
 	&cli.StringFlag{
 		Category:    category_git,
 		Name:        "git.tag",
 		Usage:       "Source control management tag.",
 		Required:    false,
-		EnvVars:     []string{"CI_COMMIT_TAG"},
+		EnvVars:     []string{"CI_COMMIT_TAG", "BITBUCKET_TAG"},
 		Value:       "",
 		Destination: &TL.Pipe.Git.Tag,
 	},
+
+	&cli.StringFlag{
+		Category:    category_git,
+		Name:        "git.branch",
+		Usage:       "Source control management branch.",
+		Required:    false,
+		EnvVars:     []string{"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
+		Value:       "",
+		Destination: &TL.Pipe.Git.Branch,
+	},
+
+	// category_build
 
 	&cli.StringFlag{
 		Category:    category_node_build,

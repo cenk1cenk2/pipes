@@ -21,10 +21,10 @@ type (
 	DockerImage struct {
 		Name                  string
 		Tags                  cli.StringSlice
-		TagAsLatest           string
+		TagAsLatest           string `validate:"json,omitempty"`
 		TagsFile              string
 		TagsFileIgnoreMissing bool
-		TagsSanitize          string
+		TagsSanitize          string `validate:"json,omitempty"`
 		Pull                  bool
 		Inspect               bool
 		BuildArgs             cli.StringSlice

@@ -87,8 +87,8 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CI_COMMIT_REF_NAME` | Source control management branch. | `String` | `false` |  |
-| `$CI_COMMIT_TAG` | Source control management tag. | `String` | `false` |  |
+| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control management tag. | `String` | `false` |  |
+| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control management branch. | `String` | `false` |  |
 
 ##### Package Manager
 

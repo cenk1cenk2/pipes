@@ -11,6 +11,9 @@ const (
 )
 
 var Flags = []cli.Flag{
+
+	// category_node_package_manager
+
 	&cli.StringFlag{
 		Category:    category_node_package_manager,
 		Name:        "node.package_manager",

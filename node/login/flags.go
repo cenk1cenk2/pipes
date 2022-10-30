@@ -11,6 +11,9 @@ const (
 )
 
 var Flags = []cli.Flag{
+
+	// category_node_login
+
 	&cli.StringFlag{
 		Category:    category_node_login,
 		Name:        "npm.login",
