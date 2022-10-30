@@ -5,3 +5,4 @@ LICENSE
 **/Makefile
 renovate.json
 .tasks.json
+.golangci.yml

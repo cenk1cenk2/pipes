@@ -19,6 +19,7 @@ Builds and publishes Docker images from CI/CD.
 | `$DOCKER_USE_BUILDKIT` | Use Docker build kit for building images. | `Bool` | `false` | false |
 | `$DOCKER_USE_BUILDX` | Use Docker BuildX builder. | `Bool` | `false` | false |
 | `$DOCKER_BUILDX_PLATFORMS` | Platform arguments for Docker BuildX. | `String` | `false` |  |
+| `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` |  |
 
 ### GIT
 
@@ -35,8 +36,8 @@ Builds and publishes Docker images from CI/CD.
 | `$IMAGE_TAGS` | Image tag for will be built Docker image. | `StringSlice` | `true` |  |
 | `$DOCKERFILE_CONTEXT` | Dockerfile context argument for build operation. | `String` | `false` |  |
 | `$DOCKERFILE_NAME` | Dockerfile path for the build operation | `String` | `false` |  |
-| `$IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>format(json(RegExp[])) | `false` |  |
-| `$IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression.  | `String`<br/>format(json(map[RegExp]Template[[]string])) | `false` |  |
+| `$IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json(RegExp[]) | `false` |  |
+| `$IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.  | `String`<br/>Template is interpolated with the given matches in the regular expression. json(map[RegExp]Template[[]string]) | `false` |  |
 | `$IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
 | `$TAGS_FILE` | Read tags from a file. | `String` | `false` |  |
 | `$TAGS_FILE_IGNORE_MISSING` | Ignore the missing tags file and contunie operation as expected in that case. | `Bool` | `false` | false |

@@ -14,7 +14,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    category_environment,
 		Name:        "environment.conditions",
-		Usage:       "Regular expression patterns to match for selecting the environment. format(json({ tags: { [name: string]: RegExp }, branches: { [name: string]: RegExp } }))",
+		Usage:       "Regular expression patterns to match for selecting the environment. json({ tags: map[string]RegExp, branches: map[string]RegExp })",
 		Required:    false,
 		EnvVars:     []string{"ENVIRONMENT_CONDITIONS"},
 		Value:       `{ "production": "^v\\d*\\.\\d*\\.\\d*$", "stage": "^v\\d*\\.\\d*\\.\\d*-.*$" }`,

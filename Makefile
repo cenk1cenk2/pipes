@@ -21,6 +21,9 @@ update:
 lint:
 	CGO_ENABLED=$(GO_OPTION_C)	golangci-lint run ./...
 
+lint-fix:
+	CGO_ENABLED=$(GO_OPTION_C)	golangci-lint run --fix ./...
+
 tidy:
 	$(GO_CMD) mod tidy -compat=$(GO_VERSION)
 	$(GO_VENDOR)

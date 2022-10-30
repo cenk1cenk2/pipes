@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    category_gitlab,
 		Name:        "gl.token",
-		Usage:       "Token for gitlab api authentication.",
+		Usage:       "Token for Gitlab API authentication.",
 		Required:    true,
 		EnvVars:     []string{"GL_TOKEN"},
 		Value:       "",

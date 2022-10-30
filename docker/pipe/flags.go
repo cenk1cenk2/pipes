@@ -150,17 +150,17 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    category_docker_image,
 		Name:        "docker_image.tag_as_latest",
-		Usage:       `Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. format(json(RegExp[]))`,
+		Usage:       `Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json(RegExp[])`,
 		Required:    false,
 		EnvVars:     []string{"IMAGE_TAG_AS_LATEST"},
-		Value:       `[]`,
+		Value:       `[ "^tags/v?\d.\d.\d$" ]`,
 		Destination: &TL.Pipe.DockerImage.TagAsLatest,
 	},
 
 	&cli.StringFlag{
 		Category:    category_docker_image,
 		Name:        "docker_image.sanitize_tags",
-		Usage:       `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. format(json(map[RegExp]Template[[]string]))`,
+		Usage:       `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json(map[RegExp]Template[[]string])`,
 		Required:    false,
 		EnvVars:     []string{"IMAGE_SANITIZE_TAGS"},
 		Value:       `{ "([^/]*/(.*))": "{{ .0 | to_upper_case }}_{{ .1 }}" }`,

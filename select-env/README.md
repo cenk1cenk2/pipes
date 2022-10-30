@@ -16,4 +16,4 @@ Selects an set of environment variable prefix depending on the condition.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$ENVIRONMENT_CONDITIONS` | Regular expression patterns to match for selecting the environment.  | `String`<br/>format(json({ tags: { [name: string]: RegExp }, branches: { [name: string]: RegExp } })) | `false` |  |
+| `$ENVIRONMENT_CONDITIONS` | Regular expression patterns to match for selecting the environment.  | `String`<br/>json({ tags: map[string]RegExp, branches: map[string]RegExp }) | `false` |  |

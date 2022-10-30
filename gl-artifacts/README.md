@@ -17,7 +17,7 @@ Downloads gitlab artifacts from the API for creating downstream pipelines.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_API_V4_URL` | Gitlab API URL of the instance. | `String` | `true` |  |
-| `$GL_TOKEN` | Token for gitlab api authentication. | `String` | `true` |  |
+| `$GL_TOKEN` | Token for Gitlab API authentication. | `String` | `true` |  |
 | `$CI_JOB_TOKEN` | Job token coming from the build job. | `String` | `false` |  |
 
 ### Pipeline
