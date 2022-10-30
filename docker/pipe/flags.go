@@ -153,7 +153,7 @@ var Flags = []cli.Flag{
 		Usage:       `Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json(RegExp[])`,
 		Required:    false,
 		EnvVars:     []string{"IMAGE_TAG_AS_LATEST"},
-		Value:       `[ "^tags/v?\d.\d.\d$" ]`,
+		Value:       `[ "^tags/v?\\D.\\D.\\D$" ]`,
 		Destination: &TL.Pipe.DockerImage.TagAsLatest,
 	},
 

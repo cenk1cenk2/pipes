@@ -38,7 +38,7 @@ func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
 		re, err := regexp.Compile(expression)
 
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("Can not compile sanitize regular expression: %w", err)
 		}
 
 		matches := re.FindAllString(tag, -1)
