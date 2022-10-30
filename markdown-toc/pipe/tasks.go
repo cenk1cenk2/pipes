@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -39,7 +40,7 @@ func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			if len(matches) == 0 {
-				t.Log.Fatalf(
+				return fmt.Errorf(
 					"Can not match any files with the given pattern: %s",
 					strings.Join(t.Pipe.Markdown.Patterns.Value(), ", "),
 				)

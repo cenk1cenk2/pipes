@@ -55,12 +55,13 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			t.Log.Debugf("Selected environment set: %s", t.Pipe.Ctx.SelectedEnvironment)
 
+			//revive:disable:early-return
 			if t.Pipe.NodeBuild.EnvironmentFallback != "" {
 				t.Pipe.Ctx.FallbackEnvironment = t.Pipe.NodeBuild.EnvironmentFallback
 			} else if t.Pipe.Git.Branch != "" {
 				t.Pipe.Ctx.FallbackEnvironment = t.Pipe.Git.Branch
 			} else {
-				t.Log.Fatalln("Can not set fallback environment. Either manual fallback parameter should be set or brannch name environment variable should be present.")
+				return fmt.Errorf("Can not set fallback environment. Either manual fallback parameter should be set or brannch name environment variable should be present.")
 			}
 
 			t.Log.Debugf("Fallback environment set: %s", t.Pipe.Ctx.FallbackEnvironment)

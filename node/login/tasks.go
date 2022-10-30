@@ -20,7 +20,7 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 			t.Log.Infoln("Npm login credentials are specified, initiating login process.")
 
 			if err := json.Unmarshal([]byte(t.Pipe.Npm.Login), &t.Pipe.Ctx.NpmLogin); err != nil {
-				t.Log.Fatalln("Can not decode Npm registry login credentials.")
+				return fmt.Errorf("Can not decode Npm registry login credentials.")
 			}
 
 			return tl.Validate(&t.Pipe.Ctx)
