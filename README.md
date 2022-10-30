@@ -9,11 +9,11 @@ Automation tools for various pipelines.
 <!-- toc -->
 
 - [Containers](#containers)
-  - [gitlab-pipes-docker](#gitlab-pipes-docker)
+  - [cenk1cenk2/pipe-docker](#cenk1cenk2pipe-docker)
   - [cenk1cenk2/pipe-gh-release-tracker](#cenk1cenk2pipe-gh-release-tracker)
-  - [gitlab-pipes-gl-artifacts](#gitlab-pipes-gl-artifacts)
+  - [cenk1cenk2/pipe-gl-artifacts](#cenk1cenk2pipe-gl-artifacts)
   - [cenk1cenk2/pipe-markdown-toc](#cenk1cenk2pipe-markdown-toc)
-  - [gitlab-pipes-node](#gitlab-pipes-node)
+  - [cenk1cenk2/pipe-node](#cenk1cenk2pipe-node)
   - [cenk1cenk2/pipe-s3-upload](#cenk1cenk2pipe-s3-upload)
   - [cenk1cenk2/select-env](#cenk1cenk2select-env)
   - [cenk1cenk2/pipe-semantic-release](#cenk1cenk2pipe-semantic-release)
@@ -27,7 +27,7 @@ Automation tools for various pipelines.
 
 ## Containers
 
-### gitlab-pipes-docker
+### cenk1cenk2/pipe-docker
 
 [Read more...](./docker/README.md)
 
@@ -35,7 +35,7 @@ Automation tools for various pipelines.
 
 [Read more...](./gh-release-tracker/README.md)
 
-### gitlab-pipes-gl-artifacts
+### cenk1cenk2/pipe-gl-artifacts
 
 [Read more...](./gl-artifacts/README.md)
 
@@ -43,7 +43,7 @@ Automation tools for various pipelines.
 
 [Read more...](./markdown-toc/README.md)
 
-### gitlab-pipes-node
+### cenk1cenk2/pipe-node
 
 [Read more...](./node/README.md)
 
