@@ -135,7 +135,7 @@ publish-gl-artifacts:
   extends: .publish-docker-to-public
   variables:
     DOCKERFILE_CONTEXT: ./gl-artifacts
-    DOCKER_IMAGE_NAME: pipe-gl-artifacts
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
     IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts]"
   only:
