@@ -87,6 +87,7 @@ publish-first-docker:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker:latest
   only:
     changes:
+      - "common/**/*"
       - "docker/**/*"
       - go.mod
       - go.sum
@@ -102,6 +103,7 @@ publish-first-gl-artifacts:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts:latest
   only:
     changes:
+      - "common/**/*"
       - "gl-artifacts/**/*"
       - go.mod
       - go.sum
@@ -123,6 +125,7 @@ publish-docker:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./docker]"
   only:
     changes:
+      - "common/**/*"
       - "docker/**/*"
       - go.mod
       - go.sum
@@ -140,6 +143,7 @@ publish-gl-artifacts:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts]"
   only:
     changes:
+      - "common/**/*"
       - "gl-artifacts/**/*"
       - go.mod
       - go.sum
@@ -165,6 +169,7 @@ publish-node:
           - 18-alpine
   only:
     changes:
+      - "common/**/*"
       - "node/**/*"
       - go.mod
       - go.sum
@@ -182,6 +187,7 @@ publish-gh-release-tracker:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./gh-release-tracker]"
   only:
     changes:
+      - "common/**/*"
       - "gh-release-tracker/**/*"
       - go.mod
       - go.sum
@@ -199,6 +205,7 @@ publish-markdown-toc:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc]"
   only:
     changes:
+      - "common/**/*"
       - "markdown-toc/**/*"
       - go.mod
       - go.sum
@@ -216,6 +223,7 @@ publish-update-docker-hub-readme:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./update-docker-hub-readme]"
   only:
     changes:
+      - "common/**/*"
       - "update-docker-hub-readme/**/*"
       - go.mod
       - go.sum
@@ -233,6 +241,7 @@ publish-semantic-release:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [./semantic-release]"
   only:
     changes:
+      - "common/**/*"
       - "semantic-release/**/*"
       - "node/**/*"
       - go.mod
@@ -251,6 +260,7 @@ publish-semantic-release:
 #     PARENT_DOWNLOAD_ARTIFACTS: "build: [./select-env]"
 #   only:
 #     changes:
+#       - "common/**/*"
 #       - "select-env/**/*"
 #       - go.mod
 #       - go.sum
@@ -268,6 +278,7 @@ publish-semantic-release:
 #     PARENT_DOWNLOAD_ARTIFACTS: "build: [./s3-upload]"
 #   only:
 #     changes:
+#       - "common/**/*"
 #       - "s3-upload/**/*"
 #       - go.mod
 #       - go.sum

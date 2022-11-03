@@ -2,39 +2,19 @@ package build
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 //revive:disable:line-length-limit
 
 const (
-	category_git        = "GIT"
 	category_node_build = "Build"
 )
 
-var Flags = []cli.Flag{
-
-	// category_git
-
-	&cli.StringFlag{
-		Category:    category_git,
-		Name:        "git.tag",
-		Usage:       "Source control management tag.",
-		Required:    false,
-		EnvVars:     []string{"CI_COMMIT_TAG", "BITBUCKET_TAG"},
-		Value:       "",
-		Destination: &TL.Pipe.Git.Tag,
-	},
-
-	&cli.StringFlag{
-		Category:    category_git,
-		Name:        "git.branch",
-		Usage:       "Source control management branch.",
-		Required:    false,
-		EnvVars:     []string{"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
-		Value:       "",
-		Destination: &TL.Pipe.Git.Branch,
-	},
-
+var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
+	GitBranch: &TL.Pipe.Git.Branch,
+	GitTag:    &TL.Pipe.Git.Tag,
+}), []cli.Flag{
 	// category_build
 
 	&cli.StringFlag{
@@ -96,4 +76,4 @@ var Flags = []cli.Flag{
 		Value:       "develop",
 		Destination: &TL.Pipe.NodeBuild.EnvironmentFallback,
 	},
-}
+})

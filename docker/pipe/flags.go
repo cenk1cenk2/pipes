@@ -2,39 +2,21 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 //revive:disable:line-length-limit
 
 const (
-	category_git             = "GIT"
 	category_docker          = "Docker"
 	category_docker_registry = "Registry"
 	category_docker_image    = "Image"
 )
 
-var Flags = []cli.Flag{
-	// category_docker
-
-	&cli.StringFlag{
-		Category:    category_git,
-		Name:        "git.branch",
-		Usage:       "Source control branch.",
-		Required:    false,
-		EnvVars:     []string{"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
-		Value:       "",
-		Destination: &TL.Pipe.Git.Branch,
-	},
-
-	&cli.StringFlag{
-		Category:    category_git,
-		Name:        "git.tag",
-		Usage:       "Source control tag.",
-		Required:    false,
-		EnvVars:     []string{"CI_COMMIT_TAG", "BITBUCKET_TAG"},
-		Value:       "",
-		Destination: &TL.Pipe.Git.Tag,
-	},
+var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
+	GitBranch: &TL.Pipe.Git.Branch,
+	GitTag:    &TL.Pipe.Git.Tag,
+}), []cli.Flag{
 
 	// category_docker
 
@@ -215,4 +197,4 @@ var Flags = []cli.Flag{
 		EnvVars:     []string{"BUILD_ARGS"},
 		Destination: &TL.Pipe.DockerImage.BuildArgs,
 	},
-}
+})
