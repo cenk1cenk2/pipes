@@ -1,5 +1,5 @@
-github.com/bmatcuk/doublestar/v4 v4.3.0 h1:Ct0GphHCZaXvUh2Gqtk37Mzj1qWvXcW9XnXQs1GL9S0=
-github.com/bmatcuk/doublestar/v4 v4.3.0/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
+github.com/bmatcuk/doublestar/v4 v4.3.1 h1:JmbSJX7X1c6ImkExYeRTcviuGnp3QFUK468GPrMlW9w=
+github.com/bmatcuk/doublestar/v4 v4.3.1/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
 github.com/cavaliergopher/grab/v3 v3.0.1 h1:4z7TkBfmPjmLAAmkkAZNX/6QJ1nNFdv3SdIHXju0Fr4=
 github.com/cavaliergopher/grab/v3 v3.0.1/go.mod h1:1U/KNnD+Ft6JJiYoYBAimKH2XrYptb8Kl3DFGmsjpq4=
 github.com/cpuguy83/go-md2man/v2 v2.0.2 h1:p1EgwI/C7NhT0JmVkwCD2ZBK8j4aeHQX2pMHHBfMQ6w=
