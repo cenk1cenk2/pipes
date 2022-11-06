@@ -1,8 +1,8 @@
 package setup
 
 type (
-	environmentCondition struct {
-		condition   string
-		environment string
+	EnvironmentConditionJson struct {
+		Condition   string `json:"condition"   validate:"required"`
+		Environment string `json:"environment" validate:"required"`
 	}
 )

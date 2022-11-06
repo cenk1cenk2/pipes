@@ -24,7 +24,7 @@ type (
 		TagAsLatest           []string
 		TagsFile              string
 		TagsFileIgnoreMissing bool
-		TagsSanitize          map[string]string
+		TagsSanitize          []TagsSanitizeJson
 		Pull                  bool
 		Inspect               bool
 		BuildArgs             cli.StringSlice

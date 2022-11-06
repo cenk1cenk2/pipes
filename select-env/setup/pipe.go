@@ -6,7 +6,7 @@ import (
 
 type (
 	Environment struct {
-		Conditions        []environmentCondition
+		Conditions        []EnvironmentConditionJson
 		FailOnNoReference bool
 	}
 

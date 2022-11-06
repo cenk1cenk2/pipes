@@ -99,7 +99,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		Name:        "docker_image.name",
 		Usage:       "Image name for will be built Docker image.",
 		Required:    true,
-		EnvVars:     []string{"IMAGE_NAME"},
+		EnvVars:     []string{"IMAGE_NAME", "DOCKER_IMAGE_NAME"},
 		Destination: &TL.Pipe.DockerImage.Name,
 	},
 
@@ -108,7 +108,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		Name:        "docker_image.tags",
 		Usage:       "Image tag for will be built Docker image.",
 		Required:    true,
-		EnvVars:     []string{"IMAGE_TAGS"},
+		EnvVars:     []string{"IMAGE_TAGS", "DOCKER_IMAGE_TAGS"},
 		Destination: &TL.Pipe.DockerImage.Tags,
 	},
 
@@ -137,8 +137,8 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		Name:     "docker_image.tag_as_latest",
 		Usage:    `Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json(RegExp[])`,
 		Required: false,
-		EnvVars:  []string{"IMAGE_TAG_AS_LATEST"},
-		Value:    `[ "^tags/v?\\d.\\d.\\d$" ]`,
+		EnvVars:  []string{"IMAGE_TAG_AS_LATEST", "DOCKER_IMAGE_TAG_AS_LATEST"},
+		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
 		Action: func(ctx *cli.Context, s string) error {
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.DockerImage.TagAsLatest); err != nil {
 				return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
@@ -151,10 +151,10 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.sanitize_tags",
-		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json(map[RegExp]Template[[]string])`,
+		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json([]struct{ condition: RegExp, template: Template })`,
 		Required: false,
-		EnvVars:  []string{"IMAGE_SANITIZE_TAGS"},
-		Value:    `{ "([^/]*)/(.*)": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" }`,
+		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
+		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
 		Action: func(ctx *cli.Context, s string) error {
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.DockerImage.TagsSanitize); err != nil {
 				return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
@@ -166,10 +166,29 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 
 	&cli.BoolFlag{
 		Category:    CATEGORY_DOCKER_IMAGE,
+		Name:        "docker_image.inspect",
+		Usage:       "Inspect after pushing the image.",
+		Required:    false,
+		EnvVars:     []string{"IMAGE_INSPECT", "DOCKER_IMAGE_INSPECT"},
+		Value:       true,
+		Destination: &TL.Pipe.DockerImage.Inspect,
+	},
+
+	&cli.StringSliceFlag{
+		Category:    CATEGORY_DOCKER_IMAGE,
+		Name:        "docker_image.build_args",
+		Usage:       "Pass in extra build arguments for image.",
+		Required:    false,
+		EnvVars:     []string{"BUILD_ARGS", "DOCKER_IMAGE_BUILD_ARGS"},
+		Destination: &TL.Pipe.DockerImage.BuildArgs,
+	},
+
+	&cli.BoolFlag{
+		Category:    CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_image.pull",
 		Usage:       "Pull before building the image.",
 		Required:    false,
-		EnvVars:     []string{"IMAGE_PULL"},
+		EnvVars:     []string{"IMAGE_PULL", "DOCKER_IMAGE_PULL"},
 		Value:       true,
 		Destination: &TL.Pipe.DockerImage.Pull,
 	},
@@ -192,24 +211,5 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		EnvVars:     []string{"TAGS_FILE_IGNORE_MISSING"},
 		Value:       false,
 		Destination: &TL.Pipe.DockerImage.TagsFileIgnoreMissing,
-	},
-
-	&cli.BoolFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.inspect",
-		Usage:       "Inspect after pushing the image.",
-		Required:    false,
-		EnvVars:     []string{"IMAGE_INSPECT"},
-		Value:       true,
-		Destination: &TL.Pipe.DockerImage.Inspect,
-	},
-
-	&cli.StringSliceFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.build_args",
-		Usage:       "Pass in extra build arguments for image.",
-		Required:    false,
-		EnvVars:     []string{"BUILD_ARGS"},
-		Destination: &TL.Pipe.DockerImage.BuildArgs,
 	},
 })

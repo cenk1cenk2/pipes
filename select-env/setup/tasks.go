@@ -41,18 +41,18 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 		out:
 			for _, c := range t.Pipe.Conditions {
 				for _, reference := range t.Pipe.Ctx.References {
-					re, err := regexp.Compile(c.condition)
+					re, err := regexp.Compile(c.Condition)
 
 					if err != nil {
-						return fmt.Errorf("Can not process regular expression for environment: %s -> %w", c.environment, err)
+						return fmt.Errorf("Can not process regular expression for environment: %s -> %w", c.Environment, err)
 					}
 
 					t.Log.Debugf("Trying to match condition for given reference: %s with %v", reference, re.String())
 
 					if re.MatchString(reference) {
-						t.Pipe.Ctx.Environment = c.environment
+						t.Pipe.Ctx.Environment = c.Environment
 
-						t.Log.Infof("Environment selected: %s", c.environment)
+						t.Log.Infof("Environment selected: %s", c.Environment)
 
 						break out
 					}

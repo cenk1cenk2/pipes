@@ -24,10 +24,10 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 	&cli.StringFlag{
 		Category: CATEGORY_ENVIRONMENT,
 		Name:     "environment.conditions",
-		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]{ condition: RegExp, environment: string })`,
+		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]struct{ condition: RegExp, environment: string })`,
 		Required: true,
 		EnvVars:  []string{"ENVIRONMENT_CONDITIONS"},
-		Value:    `[ { "condition": "^tags/v?\\d.\\d.\\d$", "environment": "production" }, { "condition": "^tags/v?\\d.\\d.\\d-.*\\.\\d$", "environment": "stage" }, { "condition" :"^heads/main$", "environment": "develop" }, { "condition": "^heads/master$", "environment": "develop" } ]`,
+		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
 		Action: func(ctx *cli.Context, s string) error {
 			// setup selection of environment conditions
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.Conditions); err != nil {

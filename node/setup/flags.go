@@ -2,6 +2,7 @@ package setup
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 //revive:disable:line-length-limit
@@ -17,10 +18,10 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_PACKAGE_MANAGER,
 		Name:        "node.package_manager",
-		Usage:       "Preferred Package manager for nodejs.",
+		Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn")`,
 		Required:    false,
 		EnvVars:     []string{"NODE_PACKAGE_MANAGER"},
-		Value:       "yarn",
+		Value:       flags.FLAG_DEFAULT_NODE_PACKAGE_MANAGER,
 		Destination: &TL.Pipe.Node.PackageManager,
 	},
 }
