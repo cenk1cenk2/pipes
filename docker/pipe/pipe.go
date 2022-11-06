@@ -17,15 +17,15 @@ type (
 	}
 
 	DockerImage struct {
-		Name                  string
-		Tags                  cli.StringSlice
-		TagAsLatest           []string
-		TagsFile              string
-		TagsFileIgnoreMissing bool
-		TagsSanitize          []TagsSanitizeJson
-		Pull                  bool
-		Inspect               bool
-		BuildArgs             cli.StringSlice
+		Name           string
+		Tags           cli.StringSlice
+		TagAsLatest    []string
+		TagsFile       string
+		TagsFileStrict bool
+		TagsSanitize   []TagsSanitizeJson
+		Pull           bool
+		Inspect        bool
+		BuildArgs      cli.StringSlice
 	}
 
 	DockerFile struct {
@@ -57,6 +57,8 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
 		return tl.JobSequence(
+			ProcessFlags(tl),
+
 			Setup(tl).Job(),
 
 			DockerTagsParent(tl).Job(),

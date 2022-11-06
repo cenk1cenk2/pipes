@@ -84,10 +84,12 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 					}(v)
 				}
 			} else if errors.Is(err, os.ErrNotExist) && t.Pipe.DockerImage.TagsFile != "" {
-				if !t.Pipe.DockerImage.TagsFileIgnoreMissing {
+				if t.Pipe.DockerImage.TagsFileStrict {
 					t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
 
 					t.SendExit(0)
+
+					return nil
 				}
 
 				return nil

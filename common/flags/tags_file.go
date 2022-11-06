@@ -15,7 +15,7 @@ func NewTagsFileFlags(setup TagsFileFlagsSetup) []cli.Flag {
 		// CATEGORY_TAGS_FILE
 		&cli.StringFlag{
 			Category:    CATEGORY_TAGS_FILE,
-			Name:        "tags.file",
+			Name:        "tags-file",
 			Usage:       "Read tags from a file.",
 			Required:    setup.TagsFileRequired,
 			EnvVars:     []string{"TAGS_FILE"},
@@ -25,23 +25,23 @@ func NewTagsFileFlags(setup TagsFileFlagsSetup) []cli.Flag {
 	}
 }
 
-type TagsFileIgnoreMissingSetup struct {
-	TagsFileIgnoreMissingDestination *bool
-	TagsFileIgnoreMissingRequired    bool
-	TagsFileIgnoreMissingValue       bool
+type TagsFileStrictFlagsSetup struct {
+	TagsFileStrictDestination *bool
+	TagsFileStrictRequired    bool
+	TagsFileStrictValue       bool
 }
 
-func NewTagsFileIgnoreMissingFlags(setup TagsFileIgnoreMissingSetup) []cli.Flag {
+func NewTagsFileStrictFlags(setup TagsFileStrictFlagsSetup) []cli.Flag {
 	return []cli.Flag{
 		// CATEGORY_TAGS_FILE
 		&cli.BoolFlag{
 			Category:    CATEGORY_TAGS_FILE,
-			Name:        "tags.ignore-missing",
-			Usage:       "Ignore the missing tags file and contunie operation as expected in that case.",
-			Required:    setup.TagsFileIgnoreMissingRequired,
-			EnvVars:     []string{"TAGS_FILE_IGNORE_MISSING"},
-			Value:       setup.TagsFileIgnoreMissingValue,
-			Destination: setup.TagsFileIgnoreMissingDestination,
+			Name:        "tags-file.strict",
+			Usage:       "Strict mode does not tolorate the missing tags file.",
+			Required:    setup.TagsFileStrictRequired,
+			EnvVars:     []string{"TAGS_FILE_STRICT"},
+			Value:       setup.TagsFileStrictValue,
+			Destination: setup.TagsFileStrictDestination,
 		},
 	}
 }

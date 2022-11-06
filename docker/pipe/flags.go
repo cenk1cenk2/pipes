@@ -6,6 +6,8 @@ import (
 
 	"github.com/urfave/cli/v2"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
+
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 //revive:disable:line-length-limit
@@ -26,10 +28,10 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		TagsFileDestination: &TL.Pipe.DockerImage.TagsFile,
 		TagsFileRequired:    false,
 	},
-), flags.NewTagsFileIgnoreMissingFlags(
-	flags.TagsFileIgnoreMissingSetup{
-		TagsFileIgnoreMissingDestination: &TL.Pipe.DockerImage.TagsFileIgnoreMissing,
-		TagsFileIgnoreMissingRequired:    false,
+), flags.NewTagsFileStrictFlags(
+	flags.TagsFileStrictFlagsSetup{
+		TagsFileStrictDestination: &TL.Pipe.DockerImage.TagsFileStrict,
+		TagsFileStrictRequired:    false,
 	},
 ), []cli.Flag{
 
@@ -151,17 +153,6 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Required: false,
 		EnvVars:  []string{"IMAGE_TAG_AS_LATEST", "DOCKER_IMAGE_TAG_AS_LATEST"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
-		Action: func(ctx *cli.Context, s string) error {
-			if s == "" {
-				return nil
-			}
-
-			if err := json.Unmarshal([]byte(s), &TL.Pipe.DockerImage.TagAsLatest); err != nil {
-				return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringFlag{
@@ -171,17 +162,6 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Required: false,
 		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
-		Action: func(ctx *cli.Context, s string) error {
-			if s == "" {
-				return nil
-			}
-
-			if err := json.Unmarshal([]byte(s), &TL.Pipe.DockerImage.TagsSanitize); err != nil {
-				return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.BoolFlag{
@@ -213,3 +193,17 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Destination: &TL.Pipe.DockerImage.Pull,
 	},
 })
+
+func ProcessFlags(tl *TaskList[Pipe]) Job {
+	return tl.CreateBasicJob(func() error {
+		if err := json.Unmarshal([]byte(tl.CliContext.String("docker_image.tag_as_latest")), &tl.Pipe.DockerImage.TagAsLatest); err != nil {
+			return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
+		}
+
+		if err := json.Unmarshal([]byte(tl.CliContext.String("docker_image.sanitize_tags")), &tl.Pipe.DockerImage.TagsSanitize); err != nil {
+			return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
+		}
+
+		return nil
+	})
+}

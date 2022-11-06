@@ -6,6 +6,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 //revive:disable:line-length-limit
@@ -30,18 +31,6 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Required: false,
 		EnvVars:  []string{"ENVIRONMENT_CONDITIONS"},
 		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
-		Action: func(ctx *cli.Context, s string) error {
-			if s == "" {
-				return nil
-			}
-
-			// setup selection of environment conditions
-			if err := json.Unmarshal([]byte(s), &TL.Pipe.Conditions); err != nil {
-				return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.BoolFlag{
@@ -53,4 +42,25 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Value:       true,
 		Destination: &TL.Pipe.Environment.FailOnNoReference,
 	},
+
+	&cli.BoolFlag{
+		Category:    CATEGORY_ENVIRONMENT,
+		Name:        "environment.strict",
+		Usage:       "Whether to fail on missing environment selection.",
+		Required:    false,
+		EnvVars:     []string{"ENVIRONMENT_STRICT"},
+		Value:       false,
+		Destination: &TL.Pipe.Environment.Strict,
+	},
 })
+
+func ProcessFlags(tl *TaskList[Pipe]) Job {
+	return tl.CreateBasicJob(func() error {
+		// setup selection of environment conditions
+		if err := json.Unmarshal([]byte(tl.CliContext.String("environment.conditions")), &TL.Pipe.Conditions); err != nil {
+			return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
+		}
+
+		return nil
+	})
+}

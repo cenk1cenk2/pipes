@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 //revive:disable:line-length-limit
@@ -24,17 +25,6 @@ var Flags = []cli.Flag{
 		Required: false,
 		EnvVars:  []string{"NPM_LOGIN"},
 		Value:    "",
-		Action: func(ctx *cli.Context, s string) error {
-			if s == "" {
-				return nil
-			}
-
-			if err := json.Unmarshal([]byte(s), &TL.Pipe.Npm.Login); err != nil {
-				return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringSliceFlag{
@@ -56,4 +46,14 @@ var Flags = []cli.Flag{
 		Value:       "",
 		Destination: &TL.Pipe.Npm.NpmRc,
 	},
+}
+
+func ProcessFlags(tl *TaskList[Pipe]) Job {
+	return tl.CreateBasicJob(func() error {
+		if err := json.Unmarshal([]byte(tl.CliContext.String("npm.login")), &tl.Pipe.Npm.Login); err != nil {
+			return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
+		}
+
+		return nil
+	})
 }

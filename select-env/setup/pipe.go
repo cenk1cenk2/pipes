@@ -9,6 +9,7 @@ type (
 	Environment struct {
 		Conditions        []EnvironmentConditionJson
 		FailOnNoReference bool
+		Strict            bool
 	}
 
 	Git flags.GitFlags
@@ -28,6 +29,7 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
 		return tl.JobSequence(
+			ProcessFlags(tl),
 			Setup(tl).Job(),
 
 			SelectEnvironment(tl).Job(),

@@ -25,7 +25,7 @@ func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.References = parser.ParseGitReferences(t.Pipe.Git.Tag, t.Pipe.Git.Branch)
 
-			if t.Pipe.Environment.FailOnNoReference && t.Pipe.Ctx.References == nil {
+			if t.Pipe.Environment.FailOnNoReference && len(t.Pipe.Ctx.References) == 0 {
 				return fmt.Errorf("References for the given environment has not been found.")
 			}
 
@@ -38,6 +38,7 @@ func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
 func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("environment", "select").
 		Set(func(t *Task[Pipe]) error {
+			t.Log.Warnf("%+v", t.Pipe.Conditions)
 		out:
 			for _, c := range t.Pipe.Conditions {
 				for _, reference := range t.Pipe.Ctx.References {
@@ -59,6 +60,12 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 			}
 
+			if t.Pipe.Environment.Strict && t.Pipe.Ctx.Environment == "" {
+				return fmt.Errorf("Environment is not selected. Can not process further on strict mode.")
+			} else if t.Pipe.Ctx.Environment == "" {
+				t.Log.Infof("No environment has been selected.")
+			}
+
 			return nil
 		})
 }
@@ -67,6 +74,11 @@ func FetchEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("environment", "fetch").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Ctx.Environment == ""
+		}).
+		ShouldRunBefore(func(t *Task[Pipe]) error {
+			t.Pipe.Ctx.EnvVars = map[string]string{}
+
+			return nil
 		}).
 		Set(func(t *Task[Pipe]) error {
 			vars := os.Environ()

@@ -17,9 +17,5 @@ func ParseGitReferences(tag string, branch string) []string {
 		references = append(references, fmt.Sprintf("%s/%s", constants.GIT_REFERENCE_BRANCH, branch))
 	}
 
-	if len(references) == 0 {
-		return nil
-	}
-
 	return references
 }

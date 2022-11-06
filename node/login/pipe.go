@@ -27,6 +27,8 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
 		return tl.JobSequence(
+			ProcessFlags(tl),
+
 			GenerateNpmRc(tl).Job(),
 			VerifyNpmLogin(tl).Job(),
 		)
