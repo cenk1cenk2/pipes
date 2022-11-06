@@ -7,15 +7,15 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	category_node_install = "Install"
+	CATEGORY_NODE_INSTALL = "Install"
 )
 
 var Flags = []cli.Flag{
 
-	// category_node_install
+	// CATEGORY_NODE_INSTALL
 
 	&cli.StringFlag{
-		Category:    category_node_install,
+		Category:    CATEGORY_NODE_INSTALL,
 		Name:        "node.install_cwd",
 		Usage:       "Install CWD for nodejs.",
 		Required:    false,
@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category:    category_node_install,
+		Category:    CATEGORY_NODE_INSTALL,
 		Name:        "node.use_lock_file",
 		Usage:       "Whether to use lock file or not.",
 		Required:    false,
@@ -35,7 +35,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_node_install,
+		Category:    CATEGORY_NODE_INSTALL,
 		Name:        "node.install_args",
 		Usage:       "Arguments for appending to installation.",
 		Required:    false,

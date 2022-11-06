@@ -7,15 +7,15 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	category_node_package_manager = "Package Manager"
+	CATEGORY_NODE_PACKAGE_MANAGER = "Package Manager"
 )
 
 var Flags = []cli.Flag{
 
-	// category_node_package_manager
+	// CATEGORY_NODE_PACKAGE_MANAGER
 
 	&cli.StringFlag{
-		Category:    category_node_package_manager,
+		Category:    CATEGORY_NODE_PACKAGE_MANAGER,
 		Name:        "node.package_manager",
 		Usage:       "Preferred Package manager for nodejs.",
 		Required:    false,

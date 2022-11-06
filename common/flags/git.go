@@ -9,9 +9,9 @@ type GitFlagsDestination struct {
 
 func NewGitFlags(destination GitFlagsDestination) []cli.Flag {
 	return []cli.Flag{
-		// category_git
+		// CATEGORY_GIT
 		&cli.StringFlag{
-			Category:    category_git,
+			Category:    CATEGORY_GIT,
 			Name:        "git.branch",
 			Usage:       "Source control branch.",
 			Required:    false,
@@ -21,7 +21,7 @@ func NewGitFlags(destination GitFlagsDestination) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    category_git,
+			Category:    CATEGORY_GIT,
 			Name:        "git.tag",
 			Usage:       "Source control tag.",
 			Required:    false,

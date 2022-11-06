@@ -1,5 +1,5 @@
 package flags
 
 const (
-	category_git = "GIT"
+	CATEGORY_GIT = "GIT"
 )

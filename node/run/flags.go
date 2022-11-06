@@ -7,15 +7,15 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	category_node_command = "Command"
+	CATEGORY_NODE_COMMAND = "Command"
 )
 
 var Flags = []cli.Flag{
 
-	// category_node_command
+	// CATEGORY_NODE_COMMAND
 
 	&cli.StringFlag{
-		Category:    category_node_command,
+		Category:    CATEGORY_NODE_COMMAND,
 		Name:        "node.command_script",
 		Usage:       "package.json script for given command operation.",
 		Required:    false,
@@ -24,7 +24,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_node_command,
+		Category:    CATEGORY_NODE_COMMAND,
 		Name:        "node.command_script_args",
 		Usage:       "package.json script arguments for given command operation.",
 		Required:    false,
@@ -33,7 +33,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_node_command,
+		Category:    CATEGORY_NODE_COMMAND,
 		Name:        "node.command_cwd",
 		Usage:       "Working directory for the given command operation.",
 		Required:    false,

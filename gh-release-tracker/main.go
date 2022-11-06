@@ -14,7 +14,7 @@ func main() {
 	}
 
 	p.New(
-		func(a *Plumber) *cli.App {
+		func(p *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
 				Version:     VERSION,
@@ -23,7 +23,7 @@ func main() {
 				Flags:       pipe.Flags,
 				Action: func(c *cli.Context) error {
 					return pipe.TL.RunJobs(
-						pipe.New(a).SetCliContext(c).Job(),
+						pipe.New(p).SetCliContext(c).Job(),
 					)
 				},
 			}

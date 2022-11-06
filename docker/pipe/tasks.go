@@ -1,20 +1,33 @@
 package pipe
 
 import (
-	"encoding/json"
-
+	"gitlab.kilic.dev/devops/pipes/common/parser"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
+		SetJobWrapper(func(job Job) Job {
+			return tl.JobSequence(
+				job,
+				ParseReferences(tl).Job(),
+			)
+		}).
 		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.Tags = []string{}
 
 			// setup sanitizing the tags first
-			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagsSanitize), &t.Pipe.Ctx.SanitizedRegularExpression); err != nil {
-				return err
-			}
+
+			return nil
+		})
+}
+
+func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("setup", "references").
+		Set(func(t *Task[Pipe]) error {
+			t.Pipe.Ctx.References = parser.ParseGitReferences(t.Pipe.Git.Tag, t.Pipe.Git.Branch)
+
+			t.Log.Debugf("References for environment selection: %v", t.Pipe.Ctx.References)
 
 			return nil
 		})

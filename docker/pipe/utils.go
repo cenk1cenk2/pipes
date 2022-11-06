@@ -34,7 +34,7 @@ func AddDockerTag(t *Task[Pipe], tag string) error {
 }
 
 func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
-	for expression, tmpl := range t.Pipe.Ctx.SanitizedRegularExpression {
+	for expression, tmpl := range t.Pipe.DockerImage.TagsSanitize {
 		re, err := regexp.Compile(expression)
 
 		if err != nil {

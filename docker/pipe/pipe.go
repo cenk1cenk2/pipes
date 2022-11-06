@@ -21,10 +21,10 @@ type (
 	DockerImage struct {
 		Name                  string
 		Tags                  cli.StringSlice
-		TagAsLatest           string
+		TagAsLatest           []string
 		TagsFile              string
 		TagsFileIgnoreMissing bool
-		TagsSanitize          string
+		TagsSanitize          map[string]string
 		Pull                  bool
 		Inspect               bool
 		BuildArgs             cli.StringSlice

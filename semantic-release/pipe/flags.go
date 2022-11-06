@@ -7,16 +7,16 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	category_packages         = "Packages"
-	category_semantic_release = "Semantic Release"
+	CATEGORY_PACKAGES         = "Packages"
+	CATEGORY_SEMANTIC_RELEASE = "Semantic Release"
 )
 
 var Flags = []cli.Flag{
 
-	// category_packages
+	// CATEGORY_PACKAGES
 
 	&cli.StringSliceFlag{
-		Category:    category_packages,
+		Category:    CATEGORY_PACKAGES,
 		Name:        "packages.apk",
 		Usage:       "APK applications to install before running semantic-release.",
 		Required:    false,
@@ -26,7 +26,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
-		Category:    category_packages,
+		Category:    CATEGORY_PACKAGES,
 		Name:        "packages.node",
 		Usage:       "Node packages to install before running semantic-release.",
 		Required:    false,
@@ -35,10 +35,10 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Packages.Node,
 	},
 
-	// category_semantic_release
+	// CATEGORY_SEMANTIC_RELEASE
 
 	&cli.BoolFlag{
-		Category:    category_semantic_release,
+		Category:    CATEGORY_SEMANTIC_RELEASE,
 		Name:        "semantic_release.dry_run",
 		Usage:       "Node packages to install before running semantic-release.",
 		Required:    false,
@@ -48,7 +48,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category:    category_semantic_release,
+		Category:    CATEGORY_SEMANTIC_RELEASE,
 		Name:        "semantic_release.run_multi",
 		Usage:       "Uses @qiwi/multi-semantic-release package to do a workspace release.",
 		Required:    false,

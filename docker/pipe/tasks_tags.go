@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -106,41 +105,19 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags", "latest").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerImage.TagAsLatest == ""
+			return t.Pipe.DockerImage.TagAsLatest == nil
 		}).
 		Set(func(t *Task[Pipe]) error {
-			tagAsLatestExpressions := []string{}
-
-			if err := json.Unmarshal([]byte(t.Pipe.DockerImage.TagAsLatest), &tagAsLatestExpressions); err != nil {
-				return err
-			}
-
-			references := []string{}
-
-			if t.Pipe.Git.Tag != "" {
-				references = append(references, fmt.Sprintf("%s/%s", GIT_REFERENCE_TAGS, t.Pipe.Git.Tag))
-			}
-
-			if t.Pipe.Git.Branch != "" {
-				references = append(references, fmt.Sprintf("%s/%s", GIT_REFERENCE_BRANCH, t.Pipe.Git.Branch))
-			}
-
-			if len(references) == 0 {
-				return nil
-			}
-
-			t.Log.Debugf("References for latest search: %v", references)
-
 		out:
-			for _, expression := range tagAsLatestExpressions {
-				for _, reference := range references {
+			for _, expression := range t.Pipe.DockerImage.TagAsLatest {
+				for _, reference := range t.Pipe.Ctx.References {
 					re, err := regexp.Compile(expression)
 
 					if err != nil {
 						return fmt.Errorf("Can not process regular expression for latest tag: %w", err)
 					}
 
-					t.Log.Debugf("Trying to match reference for latest: %s with %v", reference, re.String())
+					t.Log.Debugf("Trying to match condition for given reference: %s with %v", reference, re.String())
 
 					if re.MatchString(reference) {
 						if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {

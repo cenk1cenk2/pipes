@@ -1,18 +1,25 @@
-package pipe
+package setup
 
 import (
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 type (
-	Default struct {
-		Flag string
+	Environment struct {
+		Conditions        []environmentCondition
+		FailOnNoReference bool
+	}
+
+	Git struct {
+		Branch string
+		Tag    string
 	}
 
 	Pipe struct {
 		Ctx
 
-		Default
+		Environment
+		Git
 	}
 )
 
@@ -23,7 +30,10 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
 		return tl.JobSequence(
-			DefaultTask(tl).Job(),
+			Setup(tl).Job(),
+
+			SelectEnvironment(tl).Job(),
+			FetchEnvironment(tl).Job(),
 		)
 	})
 }

@@ -1,31 +1,40 @@
 package login
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/urfave/cli/v2"
 )
 
 //revive:disable:line-length-limit
 
 const (
-	category_node_login = "Login"
+	CATEGORY_NODE_LOGIN = "Login"
 )
 
 var Flags = []cli.Flag{
 
-	// category_node_login
+	// CATEGORY_NODE_LOGIN
 
 	&cli.StringFlag{
-		Category:    category_node_login,
-		Name:        "npm.login",
-		Usage:       "npm registries to login to. json(slice({ username: string, password: string, registry?: string, useHttps?: boolean }))",
-		Required:    false,
-		EnvVars:     []string{"NPM_LOGIN"},
-		Value:       "",
-		Destination: &TL.Pipe.Npm.Login,
+		Category: CATEGORY_NODE_LOGIN,
+		Name:     "npm.login",
+		Usage:    "npm registries to login to. json(slice({ username: string, password: string, registry?: string, useHttps?: boolean }))",
+		Required: false,
+		EnvVars:  []string{"NPM_LOGIN"},
+		Value:    "",
+		Action: func(ctx *cli.Context, s string) error {
+			if err := json.Unmarshal([]byte(s), &TL.Pipe.Npm.Login); err != nil {
+				return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.StringSliceFlag{
-		Category:    category_node_login,
+		Category:    CATEGORY_NODE_LOGIN,
 		Name:        "npm.npmrc_file",
 		Usage:       ".npmrc file to use.",
 		Required:    false,
@@ -35,7 +44,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_node_login,
+		Category:    CATEGORY_NODE_LOGIN,
 		Name:        "npm.npmrc",
 		Usage:       "Pass direct contents of the NPMRC file.",
 		Required:    false,

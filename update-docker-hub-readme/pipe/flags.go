@@ -7,13 +7,13 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	category_docker_hub = "DockerHub"
-	category_readme     = "Readme"
+	CATEGORY_DOCKER_HUB = "DockerHub"
+	CATEGORY_README     = "Readme"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    category_docker_hub,
+		Category:    CATEGORY_DOCKER_HUB,
 		Name:        "docker_hub.username",
 		Usage:       "Docker Hub username for updating the readme.",
 		EnvVars:     []string{"DOCKER_USERNAME", "PLUGIN_DOCKER_USERNAME"},
@@ -22,7 +22,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_docker_hub,
+		Category:    CATEGORY_DOCKER_HUB,
 		Name:        "docker_hub.password",
 		Usage:       "Docker Hub password for updating the readme.",
 		EnvVars:     []string{"DOCKER_PASSWORD", "PLUGIN_DOCKER_PASSWORD"},
@@ -31,7 +31,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_docker_hub,
+		Category:    CATEGORY_DOCKER_HUB,
 		Name:        "docker_hub.address",
 		Usage:       "HTTP address for the docker hub. There is only one!",
 		EnvVars:     []string{"DOCKER_HUB_ADDRESS", "PLUGIN_DOCKER_HUB_ADDRESS"},
@@ -40,7 +40,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: category_readme,
+		Category: CATEGORY_README,
 		Name:     "readme.repository",
 		Usage:    "Repository for applying the readme on.",
 		EnvVars: []string{
@@ -54,7 +54,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_readme,
+		Category:    CATEGORY_README,
 		Name:        "readme.file",
 		Usage:       "Readme file for the given repossitory.",
 		EnvVars:     []string{"README_FILE", "PLUGIN_README_FILE"},
@@ -64,7 +64,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_readme,
+		Category:    CATEGORY_README,
 		Name:        "readme.short_description",
 		Usage:       "Pass in description to send it in the request.",
 		EnvVars:     []string{"README_DESCRIPTION", "PLUGIN_README_DESCRIPTION"},

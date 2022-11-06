@@ -20,7 +20,7 @@ func main() {
 	}
 
 	p.New(
-		func(a *Plumber) *cli.App {
+		func(p *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
 				Version:     VERSION,
@@ -30,12 +30,12 @@ func main() {
 					{
 						Name:        "login",
 						Description: "Login to the given NPM registries.",
-						Flags:       a.AppendFlags(setup.Flags, login.Flags),
+						Flags:       p.AppendFlags(setup.Flags, login.Flags),
 						Action: func(c *cli.Context) error {
 							return login.TL.RunJobs(
 								login.TL.JobSequence(
-									setup.New(a).SetCliContext(c).Job(),
-									login.New(a).SetCliContext(c).Job(),
+									setup.New(p).SetCliContext(c).Job(),
+									login.New(p).SetCliContext(c).Job(),
 								),
 							)
 						},
@@ -45,13 +45,13 @@ func main() {
 						Name:        "install",
 						Description: "Install node.js dependencies with the given package manager.",
 						Usage:       fmt.Sprintf("%s install", CLI_NAME),
-						Flags:       a.AppendFlags(setup.Flags, login.Flags, install.Flags),
+						Flags:       p.AppendFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(c *cli.Context) error {
 							return install.TL.RunJobs(
 								install.TL.JobSequence(
-									setup.New(a).SetCliContext(c).Job(),
-									login.New(a).SetCliContext(c).Job(),
-									install.New(a).SetCliContext(c).Job(),
+									setup.New(p).SetCliContext(c).Job(),
+									login.New(p).SetCliContext(c).Job(),
+									install.New(p).SetCliContext(c).Job(),
 								),
 							)
 						},
@@ -59,12 +59,12 @@ func main() {
 
 					{
 						Name:  "build",
-						Flags: a.AppendFlags(setup.Flags, build.Flags),
+						Flags: p.AppendFlags(setup.Flags, build.Flags),
 						Action: func(c *cli.Context) error {
 							return build.TL.RunJobs(
 								build.TL.JobSequence(
-									setup.New(a).SetCliContext(c).Job(),
-									build.New(a).SetCliContext(c).Job(),
+									setup.New(p).SetCliContext(c).Job(),
+									build.New(p).SetCliContext(c).Job(),
 								),
 							)
 						},
@@ -72,12 +72,12 @@ func main() {
 
 					{
 						Name:  "run",
-						Flags: a.AppendFlags(setup.Flags, run.Flags),
+						Flags: p.AppendFlags(setup.Flags, run.Flags),
 						Action: func(c *cli.Context) error {
 							return run.TL.RunJobs(
 								run.TL.JobSequence(
-									setup.New(a).SetCliContext(c).Job(),
-									run.New(a).SetCliContext(c).Job(),
+									setup.New(p).SetCliContext(c).Job(),
+									run.New(p).SetCliContext(c).Job(),
 								),
 							)
 						},

@@ -8,7 +8,7 @@ import (
 
 type (
 	Npm struct {
-		Login     string
+		Login     []NpmLoginJson
 		NpmRcFile cli.StringSlice
 		NpmRc     string
 	}
@@ -27,7 +27,6 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
 		return tl.JobSequence(
-			Setup(tl).Job(),
 			GenerateNpmRc(tl).Job(),
 			VerifyNpmLogin(tl).Job(),
 		)

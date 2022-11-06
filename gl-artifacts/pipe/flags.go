@@ -7,13 +7,13 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	category_gitlab          = "Gitlab"
-	category_gitlab_pipeline = "Pipeline"
+	CATEGORY_GITLAB          = "Gitlab"
+	CATEGORY_GITLAB_PIPELINE = "Pipeline"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    category_gitlab,
+		Category:    CATEGORY_GITLAB,
 		Name:        "gl.api_url",
 		Usage:       "Gitlab API URL of the instance.",
 		Required:    true,
@@ -23,7 +23,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_gitlab,
+		Category:    CATEGORY_GITLAB,
 		Name:        "gl.token",
 		Usage:       "Token for Gitlab API authentication.",
 		Required:    true,
@@ -33,7 +33,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_gitlab,
+		Category:    CATEGORY_GITLAB,
 		Name:        "gl.job_token",
 		Usage:       "Job token coming from the build job.",
 		Required:    false,
@@ -43,7 +43,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_gitlab_pipeline,
+		Category:    CATEGORY_GITLAB_PIPELINE,
 		Name:        "gl_pipeline.project_id",
 		Usage:       "Parent project id.",
 		Required:    true,
@@ -53,7 +53,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_gitlab_pipeline,
+		Category:    CATEGORY_GITLAB_PIPELINE,
 		Name:        "gl_pipeline.parent_pipeline_id",
 		Usage:       "Pipeline id of the parent pipeline.",
 		Required:    true,
@@ -63,7 +63,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    category_gitlab_pipeline,
+		Category:    CATEGORY_GITLAB_PIPELINE,
 		Name:        "gl_pipeline.download_artifacts",
 		Usage:       "Names of the jobs that yield artifacts from the parent job.",
 		Required:    true,

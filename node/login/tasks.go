@@ -1,7 +1,6 @@
 package login
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -10,27 +9,10 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
-func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("init").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Npm.Login == ""
-		}).
-		Set(func(t *Task[Pipe]) error {
-			// unmarshal npm logins and use the default registry for ones that are not defined
-			t.Log.Infoln("Npm login credentials are specified, initiating login process.")
-
-			if err := json.Unmarshal([]byte(t.Pipe.Npm.Login), &t.Pipe.Ctx.NpmLogin); err != nil {
-				return fmt.Errorf("Can not decode Npm registry login credentials.")
-			}
-
-			return tl.Validate(&t.Pipe.Ctx)
-		})
-}
-
 func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("npmrc").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Npm.Login == "" && t.Pipe.Npm.NpmRc == ""
+			return t.Pipe.Npm.Login == nil && t.Pipe.Npm.NpmRc == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.Log.Debugf(
@@ -39,10 +21,10 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			npmrc := []string{}
 
-			if t.Pipe.Npm.Login != "" {
+			if t.Pipe.Npm.Login != nil {
 				t.Log.Infoln("Logging in to given registries with credentials.")
 
-				for _, v := range t.Pipe.Ctx.NpmLogin {
+				for _, v := range t.Pipe.Npm.Login {
 					t.Log.Infof(
 						"Generating login credentials for the registry: %s",
 						v.Registry,
@@ -97,10 +79,10 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Npm.Login == ""
+			return t.Pipe.Npm.Login == nil
 		}).
 		Set(func(t *Task[Pipe]) error {
-			for _, v := range t.Pipe.Ctx.NpmLogin {
+			for _, v := range t.Pipe.Npm.Login {
 				func(v NpmLoginJson) {
 					t.CreateCommand(
 						"npm",
