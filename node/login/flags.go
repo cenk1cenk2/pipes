@@ -54,6 +54,6 @@ func ProcessFlags(tl *TaskList[Pipe]) Job {
 			return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 		}
 
-		return tl.Validate(tl.Pipe)
+		return tl.Validate(&tl.Pipe)
 	})
 }

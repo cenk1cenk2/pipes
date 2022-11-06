@@ -61,6 +61,6 @@ func ProcessFlags(tl *TaskList[Pipe]) Job {
 			return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
 		}
 
-		return tl.Validate(tl.Pipe)
+		return tl.Validate(&tl.Pipe)
 	})
 }
