@@ -17,7 +17,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_COMMAND,
 		Name:        "node.command_script",
-		Usage:       "package.json script for given command operation.",
+		Usage:       "package.json script for given command operation. format(Template(struct{ Environment: string }))",
 		Required:    false,
 		EnvVars:     []string{"NODE_COMMAND_SCRIPT"},
 		Destination: &TL.Pipe.NodeCommand.Script,
@@ -26,7 +26,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_COMMAND,
 		Name:        "node.command_script_args",
-		Usage:       "package.json script arguments for given command operation.",
+		Usage:       "package.json script arguments for given command operation. format(Template(struct{ Environment: string }))",
 		Required:    false,
 		EnvVars:     []string{"NODE_COMMAND_SCRIPT_ARGS"},
 		Destination: &TL.Pipe.NodeCommand.ScriptArgs,

@@ -7,7 +7,6 @@ package flags
 //revive:disable:line-length-limit
 
 const (
-
 	// docker.
 
 	FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST = `[ "^tags/v?\\d.\\d.\\d$" ]`

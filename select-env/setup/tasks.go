@@ -65,14 +65,15 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 
 func FetchEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("environment", "fetch").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.Ctx.Environment == ""
+		}).
 		Set(func(t *Task[Pipe]) error {
 			vars := os.Environ()
 
 			prefix := strings.ToUpper(t.Pipe.Ctx.Environment)
 
-			if prefix != "" {
-				prefix = prefix + "_"
-			}
+			prefix = prefix + "_"
 
 			for _, v := range vars {
 				pair := strings.SplitN(v, "=", 2)
@@ -86,6 +87,8 @@ func FetchEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.Pipe.Ctx.EnvVars[trimmed] = value
 				}
 			}
+
+			t.Pipe.Ctx.EnvVars["ENVIRONMENT"] = t.Pipe.Ctx.Environment
 
 			t.Log.Debugf("Environment variables that matches the current environment: %s -> %+v", t.Pipe.Ctx.Environment, t.Pipe.Ctx.EnvVars)
 

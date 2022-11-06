@@ -20,7 +20,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_BUILD,
 		Name:        "node.build_script",
-		Usage:       "package.json script for building operation.",
+		Usage:       "package.json script for building operation. format(Template(struct{ Environment: string }))",
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_SCRIPT"},
 		Value:       "build",
@@ -30,7 +30,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_BUILD,
 		Name:        "node.build_script_args",
-		Usage:       "package.json script arguments for building operation.",
+		Usage:       "package.json script arguments for building operation. format(Template(struct{ Environment: string }))",
 		Required:    false,
 		EnvVars:     []string{"NODE_BUILD_SCRIPT_ARGS"},
 		Value:       "",
@@ -45,35 +45,5 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		EnvVars:     []string{"NODE_BUILD_CWD"},
 		Value:       ".",
 		Destination: &TL.Pipe.NodeBuild.Cwd,
-	},
-
-	&cli.StringSliceFlag{
-		Category:    CATEGORY_NODE_BUILD,
-		Name:        "node.build_environment_files",
-		Usage:       "Yaml files to inject to build.",
-		Required:    false,
-		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_FILES"},
-		Value:       &cli.StringSlice{},
-		Destination: &TL.Pipe.NodeBuild.EnvironmentFiles,
-	},
-
-	&cli.StringFlag{
-		Category:    CATEGORY_NODE_BUILD,
-		Name:        "node.build_environment_conditions",
-		Usage:       "Tagging regex patterns to match. json(map[string]RegExp)",
-		Required:    false,
-		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_CONDITIONS"},
-		Value:       `{ "production": "^v\\d*\\.\\d*\\.\\d*$", "stage": "^v\\d*\\.\\d*\\.\\d*-.*$" }`,
-		Destination: &TL.Pipe.NodeBuild.EnvironmentConditions,
-	},
-
-	&cli.StringFlag{
-		Category:    CATEGORY_NODE_BUILD,
-		Name:        "node.build_environment_fallback",
-		Usage:       "Fallback, if it does not match any conditions. Defaults to current branch name.",
-		Required:    false,
-		EnvVars:     []string{"NODE_BUILD_ENVIRONMENT_FALLBACK"},
-		Value:       "develop",
-		Destination: &TL.Pipe.NodeBuild.EnvironmentFallback,
 	},
 })

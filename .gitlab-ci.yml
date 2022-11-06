@@ -170,6 +170,7 @@ publish-node:
   only:
     changes:
       - "common/**/*"
+      - "select-env/**/*"
       - "node/**/*"
       - go.mod
       - go.sum
@@ -250,24 +251,24 @@ publish-semantic-release:
     refs:
       - main
       - tags
-#
-# publish-select-env:
-#   extends: .publish-docker-to-public
-#   variables:
-#     DOCKERFILE_CONTEXT: ./select-env
-#     IMAGE_NAME: cenk1cenk2/pipe-select-env
-#     IMAGE_TAGS: latest
-#     PARENT_DOWNLOAD_ARTIFACTS: "build: [./select-env]"
-#   only:
-#     changes:
-#       - "common/**/*"
-#       - "select-env/**/*"
-#       - go.mod
-#       - go.sum
-#       - .gitlab-ci.yml
-#     refs:
-#       - main
-#       - tags
+
+publish-select-env:
+  extends: .publish-docker-to-public
+  variables:
+    DOCKERFILE_CONTEXT: ./select-env
+    IMAGE_NAME: cenk1cenk2/pipe-select-env
+    IMAGE_TAGS: latest
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [./select-env]"
+  only:
+    changes:
+      - "common/**/*"
+      - "select-env/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
 #
 # publish-s3-upload:
 #   extends: .publish-docker-to-public
@@ -328,12 +329,12 @@ docker-hub-readme:
         README_FILE: ./semantic-release/README.md
         README_DESCRIPTION: |
           Semantic-Release embedded inside a container for CI jobs.
-      #
-      # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
-      #   README_FILE: ./select-env/README.md
-      #   README_DESCRIPTION: |
-      #     Selects an environment given on the conditions.
-      #
+
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
+        README_FILE: ./select-env/README.md
+        README_DESCRIPTION: |
+          Selects an environment given on the conditions.
+
       # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3-upload
       #   README_FILE: ./s3-upload/README.md
       #   README_DESCRIPTION: |

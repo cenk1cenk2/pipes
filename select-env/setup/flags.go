@@ -25,10 +25,14 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		Category: CATEGORY_ENVIRONMENT,
 		Name:     "environment.conditions",
 		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]struct{ condition: RegExp, environment: string })`,
-		Required: true,
+		Required: false,
 		EnvVars:  []string{"ENVIRONMENT_CONDITIONS"},
 		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
 		Action: func(ctx *cli.Context, s string) error {
+			if s == "" {
+				return nil
+			}
+
 			// setup selection of environment conditions
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.Conditions); err != nil {
 				return fmt.Errorf("Can not unmarshal environment conditions: %w", err)

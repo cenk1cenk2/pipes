@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v2"
 
 	"gitlab.kilic.dev/devops/pipes/node/build"
@@ -10,6 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	"gitlab.kilic.dev/devops/pipes/node/run"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
+	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -44,7 +43,6 @@ func main() {
 					{
 						Name:        "install",
 						Description: "Install node.js dependencies with the given package manager.",
-						Usage:       fmt.Sprintf("%s install", CLI_NAME),
 						Flags:       p.AppendFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(c *cli.Context) error {
 							return install.TL.RunJobs(
@@ -64,6 +62,7 @@ func main() {
 							return build.TL.RunJobs(
 								build.TL.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
+									environment.New(p).SetCliContext(c).Job(),
 									build.New(p).SetCliContext(c).Job(),
 								),
 							)
@@ -77,6 +76,7 @@ func main() {
 							return run.TL.RunJobs(
 								run.TL.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
+									environment.New(p).SetCliContext(c).Job(),
 									run.New(p).SetCliContext(c).Job(),
 								),
 							)

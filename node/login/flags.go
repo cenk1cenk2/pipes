@@ -25,6 +25,10 @@ var Flags = []cli.Flag{
 		EnvVars:  []string{"NPM_LOGIN"},
 		Value:    "",
 		Action: func(ctx *cli.Context, s string) error {
+			if s == "" {
+				return nil
+			}
+
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.Npm.Login); err != nil {
 				return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 			}

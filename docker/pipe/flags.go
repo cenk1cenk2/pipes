@@ -140,6 +140,10 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		EnvVars:  []string{"IMAGE_TAG_AS_LATEST", "DOCKER_IMAGE_TAG_AS_LATEST"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
 		Action: func(ctx *cli.Context, s string) error {
+			if s == "" {
+				return nil
+			}
+
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.DockerImage.TagAsLatest); err != nil {
 				return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
 			}
@@ -151,11 +155,15 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.sanitize_tags",
-		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json([]struct{ condition: RegExp, template: Template })`,
+		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json([]struct{ condition: RegExp, template: Template(map[string]string) })`,
 		Required: false,
 		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
 		Action: func(ctx *cli.Context, s string) error {
+			if s == "" {
+				return nil
+			}
+
 			if err := json.Unmarshal([]byte(s), &TL.Pipe.DockerImage.TagsSanitize); err != nil {
 				return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
 			}
