@@ -32,17 +32,15 @@ Builds and publishes Docker images from CI/CD.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$IMAGE_NAME` | Image name for will be built Docker image. | `String` | `true` |  |
-| `$IMAGE_TAGS` | Image tag for will be built Docker image. | `StringSlice` | `true` |  |
+| `$IMAGE_NAME`<br/>`$DOCKER_IMAGE_NAME` | Image name for will be built Docker image. | `String` | `true` |  |
+| `$IMAGE_TAGS`<br/>`$DOCKER_IMAGE_TAGS` | Image tag for will be built Docker image. | `StringSlice` | `true` |  |
 | `$DOCKERFILE_CONTEXT` | Dockerfile context argument for build operation. | `String` | `false` |  |
 | `$DOCKERFILE_NAME` | Dockerfile path for the build operation | `String` | `false` |  |
-| `$IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json(RegExp[]) | `false` |  |
-| `$IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.  | `String`<br/>Template is interpolated with the given matches in the regular expression. json(map[RegExp]Template[[]string]) | `false` |  |
-| `$IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
-| `$TAGS_FILE` | Read tags from a file. | `String` | `false` |  |
-| `$TAGS_FILE_IGNORE_MISSING` | Ignore the missing tags file and contunie operation as expected in that case. | `Bool` | `false` | false |
-| `$IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | false |
-| `$BUILD_ARGS` | Pass in extra build arguments for image. | `StringSlice` | `false` |  |
+| `$IMAGE_TAG_AS_LATEST`<br/>`$DOCKER_IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json(RegExp[]) | `false` |  |
+| `$IMAGE_SANITIZE_TAGS`<br/>`$DOCKER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression.  | `String`<br/>json([]struct{ match: RegExp, template: Template(map[string]string) }) | `false` |  |
+| `$IMAGE_INSPECT`<br/>`$DOCKER_IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | false |
+| `$BUILD_ARGS`<br/>`$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image. | `StringSlice` | `false` |  |
+| `$IMAGE_PULL`<br/>`$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
 
 ### Registry
 
@@ -51,3 +49,10 @@ Builds and publishes Docker images from CI/CD.
 | `$DOCKER_REGISTRY` | Docker registry url for logging in. | `String` | `false` |  |
 | `$DOCKER_REGISTRY_USERNAME` | Docker registry username for the given registry. | `String` | `false` |  |
 | `$DOCKER_REGISTRY_PASSWORD` | Docker registry password for the given registry. | `String` | `false` |  |
+
+### Tags File
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TAGS_FILE` | Read tags from a file. | `String` | `false` |  |
+| `$TAGS_FILE_IGNORE_MISSING` | Ignore the missing tags file and contunie operation as expected in that case. | `Bool` | `false` | false |

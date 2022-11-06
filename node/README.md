@@ -34,13 +34,13 @@ Login to the given NPM registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String` | `false` |  |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` |  |
 
 ### `install`
 
 Install node.js dependencies with the given package manager.
 
-`pipes-node install`
+`pipes-node install [GLOBAL FLAGS] [FLAGS]`
 
 #### Flags
 
@@ -64,7 +64,7 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String` | `false` |  |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` |  |
 
 ### `build`
 
@@ -76,25 +76,22 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_BUILD_SCRIPT` | package. | `String`<br/>json script for building operation. | `false` |  |
-| `$NODE_BUILD_SCRIPT_ARGS` | package. | `String`<br/>json script arguments for building operation. | `false` |  |
+| `$NODE_BUILD_SCRIPT` | package.json script for building operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
+| `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for building operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
 | `$NODE_BUILD_CWD` | Working directory for build operation. | `String` | `false` |  |
-| `$NODE_BUILD_ENVIRONMENT_FILES` | Yaml files to inject to build. | `StringSlice` | `false` |  |
-| `$NODE_BUILD_ENVIRONMENT_CONDITIONS` | Tagging regex patterns to match.  | `String`<br/>json(map[string]RegExp) | `false` |  |
-| `$NODE_BUILD_ENVIRONMENT_FALLBACK` | Fallback, if it does not match any conditions. Defaults to current branch name. | `String` | `false` |  |
 
 ##### GIT
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control management tag. | `String` | `false` |  |
-| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control management branch. | `String` | `false` |  |
+| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
+| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
 
 ##### Package Manager
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String` | `false` |  |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` |  |
 
 ### `run`
 
@@ -106,12 +103,12 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_COMMAND_SCRIPT` | package. | `String`<br/>json script for given command operation. | `false` |  |
-| `$NODE_COMMAND_SCRIPT_ARGS` | package. | `String`<br/>json script arguments for given command operation. | `false` |  |
+| `$NODE_COMMAND_SCRIPT` | package.json script for given command operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
+| `$NODE_COMMAND_SCRIPT_ARGS` | package.json script arguments for given command operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
 | `$NODE_COMMAND_CWD` | Working directory for the given command operation. | `String` | `false` |  |
 
 ##### Package Manager
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String` | `false` |  |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` |  |

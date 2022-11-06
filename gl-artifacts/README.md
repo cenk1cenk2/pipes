@@ -20,7 +20,7 @@ Downloads gitlab artifacts from the API for creating downstream pipelines.
 | `$GL_TOKEN` | Token for Gitlab API authentication. | `String` | `true` |  |
 | `$CI_JOB_TOKEN` | Job token coming from the build job. | `String` | `false` |  |
 
-### Pipeline
+### Gitlab Pipeline
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
