@@ -16,10 +16,22 @@ const (
 	CATEGORY_DOCKER_IMAGE    = "Image"
 )
 
-var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
-	GitBranch: &TL.Pipe.Git.Branch,
-	GitTag:    &TL.Pipe.Git.Tag,
-}), []cli.Flag{
+var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
+	flags.GitFlagsSetup{
+		GitBranchDestination: &TL.Pipe.Git.Branch,
+		GitTagDestination:    &TL.Pipe.Git.Tag,
+	},
+), flags.NewTagsFileFlags(
+	flags.TagsFileFlagsSetup{
+		TagsFileDestination: &TL.Pipe.DockerImage.TagsFile,
+		TagsFileRequired:    false,
+	},
+), flags.NewTagsFileIgnoreMissingFlags(
+	flags.TagsFileIgnoreMissingSetup{
+		TagsFileIgnoreMissingDestination: &TL.Pipe.DockerImage.TagsFileIgnoreMissing,
+		TagsFileIgnoreMissingRequired:    false,
+	},
+), []cli.Flag{
 
 	// CATEGORY_DOCKER
 
@@ -155,7 +167,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.sanitize_tags",
-		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json([]struct{ condition: RegExp, template: Template(map[string]string) })`,
+		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json([]struct{ match: RegExp, template: Template(map[string]string) })`,
 		Required: false,
 		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
@@ -199,25 +211,5 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
 		EnvVars:     []string{"IMAGE_PULL", "DOCKER_IMAGE_PULL"},
 		Value:       true,
 		Destination: &TL.Pipe.DockerImage.Pull,
-	},
-
-	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.tags_file",
-		Usage:       "Read tags from a file.",
-		Required:    false,
-		EnvVars:     []string{"TAGS_FILE"},
-		Value:       "",
-		Destination: &TL.Pipe.DockerImage.TagsFile,
-	},
-
-	&cli.BoolFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.tags_file_ignore_missing",
-		Usage:       "Ignore the missing tags file and contunie operation as expected in that case.",
-		Required:    false,
-		EnvVars:     []string{"TAGS_FILE_IGNORE_MISSING"},
-		Value:       false,
-		Destination: &TL.Pipe.DockerImage.TagsFileIgnoreMissing,
 	},
 })

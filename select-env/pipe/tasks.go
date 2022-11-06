@@ -1,25 +1,14 @@
 package pipe
 
 import (
+	"github.com/joho/godotenv"
+	"gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
-func DefaultTask(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("default").
+func WriteEnvironmentFile(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("environment", "file").
 		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(
-				"echo",
-			).
-				Set(func(c *Command[Pipe]) error {
-					c.AppendArgs("hello")
-
-					return nil
-				}).
-				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunCommandJobAsJobSequence()
+			return godotenv.Write(setup.TL.Pipe.Ctx.EnvVars, t.Pipe.Environment.File)
 		})
 }

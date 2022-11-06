@@ -5,8 +5,8 @@ import (
 )
 
 type (
-	DockerImage struct {
-		TagsFile string
+	Tags struct {
+		File string
 	}
 
 	Github struct {
@@ -18,7 +18,7 @@ type (
 		Ctx
 
 		Github
-		DockerImage
+		Tags
 	}
 )
 

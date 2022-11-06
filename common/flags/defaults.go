@@ -10,7 +10,7 @@ const (
 	// docker.
 
 	FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST = `[ "^tags/v?\\d.\\d.\\d$" ]`
-	FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS = `[ { "condition": "([^/]*)/(.*)", "template": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" } ]`
+	FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS = `[ { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" } ]`
 
 	// node.
 
@@ -18,5 +18,5 @@ const (
 
 	// select-env.
 
-	FLAG_DEFAULT_ENVIRONMENT_CONDITIONS = `[ { "condition": "^tags/v?\\d.\\d.\\d$", "environment": "production" }, { "condition": "^tags/v?\\d.\\d.\\d-.*\\.\\d$", "environment": "stage" }, { "condition" :"^heads/main$", "environment": "develop" }, { "condition": "^heads/master$", "environment": "develop" } ]`
+	FLAG_DEFAULT_ENVIRONMENT_CONDITIONS = `[ { "match": "^tags/v?\\d.\\d.\\d$", "environment": "production" }, { "match": "^tags/v?\\d.\\d.\\d-.*\\.\\d$", "environment": "stage" }, { "match" :"^heads/main$", "environment": "develop" }, { "match": "^heads/master$", "environment": "develop" } ]`
 )

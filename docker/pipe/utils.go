@@ -33,7 +33,7 @@ func AddDockerTag(t *Task[Pipe], tag string) error {
 
 func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
 	for _, s := range t.Pipe.DockerImage.TagsSanitize {
-		re, err := regexp.Compile(s.Condition)
+		re, err := regexp.Compile(s.Match)
 
 		if err != nil {
 			return "", fmt.Errorf("Can not compile sanitize regular expression: %w", err)

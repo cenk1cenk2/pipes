@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -10,10 +11,7 @@ type (
 		FailOnNoReference bool
 	}
 
-	Git struct {
-		Branch string
-		Tag    string
-	}
+	Git flags.GitFlags
 
 	Pipe struct {
 		Ctx

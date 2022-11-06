@@ -92,7 +92,7 @@ func FetchLatestTag(tl *TaskList[Pipe]) *Task[Pipe] {
 func WriteTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("write").
 		Set(func(t *Task[Pipe]) error {
-			f, err := os.Create(t.Pipe.DockerImage.TagsFile)
+			f, err := os.Create(t.Pipe.Tags.File)
 
 			if err != nil {
 				return err

@@ -2,14 +2,12 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 type (
-	Git struct {
-		Branch string
-		Tag    string
-	}
+	Git flags.GitFlags
 
 	Docker struct {
 		UseBuildKit     bool

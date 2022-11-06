@@ -14,8 +14,9 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 				setup.TL.Pipe.Ctx.PackageManager.Exe,
 			).
 				Set(func(c *Command[Pipe]) error {
-					ctx := NodeRunInlineTemplate{
+					ctx := environment.EnvironmentTemplate{
 						Environment: environment.TL.Pipe.Ctx.Environment,
+						EnvVars:     environment.TL.Pipe.Ctx.EnvVars,
 					}
 
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...)

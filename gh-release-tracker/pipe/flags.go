@@ -2,12 +2,20 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 //revive:disable:line-length-limit
 
-var Flags = []cli.Flag{
+var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
+	flags.TagsFileFlagsSetup{
+		TagsFileDestination: &TL.Pipe.Tags.File,
+		TagsFileRequired:    true,
+		TagsFileValue:       ".tags",
+	},
+), []cli.Flag{
 	&cli.StringFlag{
+		Category:    flags.CATEGORY_GITHUB,
 		Name:        "gh.token",
 		Usage:       "Github token for the API requests.",
 		Required:    false,
@@ -16,6 +24,7 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Github.Token,
 	},
 	&cli.StringFlag{
+		Category:    flags.CATEGORY_GITHUB,
 		Name:        "gh.repository",
 		Usage:       "Target repository to fetch the latest tag.",
 		Required:    true,
@@ -23,12 +32,4 @@ var Flags = []cli.Flag{
 		Value:       "",
 		Destination: &TL.Pipe.Github.Repository,
 	},
-	&cli.StringFlag{
-		Name:        "docker_image.tags_file",
-		Usage:       "Read tags from a file.",
-		Required:    true,
-		EnvVars:     []string{"TAGS_FILE"},
-		Value:       "",
-		Destination: &TL.Pipe.DockerImage.TagsFile,
-	},
-}
+})

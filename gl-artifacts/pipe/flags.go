@@ -2,18 +2,14 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 //revive:disable:line-length-limit
 
-const (
-	CATEGORY_GITLAB          = "Gitlab"
-	CATEGORY_GITLAB_PIPELINE = "Pipeline"
-)
-
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_GITLAB,
+		Category:    flags.CATEGORY_GITLAB,
 		Name:        "gl.api_url",
 		Usage:       "Gitlab API URL of the instance.",
 		Required:    true,
@@ -23,7 +19,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_GITLAB,
+		Category:    flags.CATEGORY_GITLAB,
 		Name:        "gl.token",
 		Usage:       "Token for Gitlab API authentication.",
 		Required:    true,
@@ -33,7 +29,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_GITLAB,
+		Category:    flags.CATEGORY_GITLAB,
 		Name:        "gl.job_token",
 		Usage:       "Job token coming from the build job.",
 		Required:    false,
@@ -43,7 +39,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_GITLAB_PIPELINE,
+		Category:    flags.CATEGORY_GITLAB_PIPELINE,
 		Name:        "gl_pipeline.project_id",
 		Usage:       "Parent project id.",
 		Required:    true,
@@ -53,7 +49,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_GITLAB_PIPELINE,
+		Category:    flags.CATEGORY_GITLAB_PIPELINE,
 		Name:        "gl_pipeline.parent_pipeline_id",
 		Usage:       "Pipeline id of the parent pipeline.",
 		Required:    true,
@@ -63,7 +59,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_GITLAB_PIPELINE,
+		Category:    flags.CATEGORY_GITLAB_PIPELINE,
 		Name:        "gl_pipeline.download_artifacts",
 		Usage:       "Names of the jobs that yield artifacts from the parent job.",
 		Required:    true,

@@ -5,14 +5,14 @@ import (
 )
 
 type (
-	Default struct {
-		Flag string
+	Environment struct {
+		File string
 	}
 
 	Pipe struct {
 		Ctx
 
-		Default
+		Environment
 	}
 )
 
@@ -23,7 +23,7 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
 		return tl.JobSequence(
-			DefaultTask(tl).Job(),
+			WriteEnvironmentFile(tl).Job(),
 		)
 	})
 }

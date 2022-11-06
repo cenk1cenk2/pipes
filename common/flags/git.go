@@ -1,13 +1,15 @@
 package flags
 
-import "github.com/urfave/cli/v2"
+import (
+	"github.com/urfave/cli/v2"
+)
 
-type GitFlagsDestination struct {
-	GitBranch *string
-	GitTag    *string
+type GitFlagsSetup struct {
+	GitBranchDestination *string
+	GitTagDestination    *string
 }
 
-func NewGitFlags(destination GitFlagsDestination) []cli.Flag {
+func NewGitFlags(setup GitFlagsSetup) []cli.Flag {
 	return []cli.Flag{
 		// CATEGORY_GIT
 		&cli.StringFlag{
@@ -17,7 +19,7 @@ func NewGitFlags(destination GitFlagsDestination) []cli.Flag {
 			Required:    false,
 			EnvVars:     []string{"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
 			Value:       "",
-			Destination: destination.GitBranch,
+			Destination: setup.GitBranchDestination,
 		},
 
 		&cli.StringFlag{
@@ -27,7 +29,7 @@ func NewGitFlags(destination GitFlagsDestination) []cli.Flag {
 			Required:    false,
 			EnvVars:     []string{"CI_COMMIT_TAG", "BITBUCKET_TAG"},
 			Value:       "",
-			Destination: destination.GitTag,
+			Destination: setup.GitTagDestination,
 		},
 	}
 }

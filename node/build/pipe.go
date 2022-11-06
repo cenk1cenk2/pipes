@@ -1,14 +1,12 @@
 package build
 
 import (
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 type (
-	Git struct {
-		Branch string
-		Tag    string
-	}
+	Git flags.GitFlags
 
 	NodeBuild struct {
 		Script     string

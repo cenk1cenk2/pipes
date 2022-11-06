@@ -14,17 +14,19 @@ const (
 	CATEGORY_ENVIRONMENT = "Environment"
 )
 
-var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(flags.GitFlagsDestination{
-	GitBranch: &TL.Pipe.Git.Branch,
-	GitTag:    &TL.Pipe.Git.Tag,
-}), []cli.Flag{
+var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
+	flags.GitFlagsSetup{
+		GitBranchDestination: &TL.Pipe.Git.Branch,
+		GitTagDestination:    &TL.Pipe.Git.Tag,
+	},
+), []cli.Flag{
 
 	// CATEGORY_ENVIRONMENT
 
 	&cli.StringFlag{
 		Category: CATEGORY_ENVIRONMENT,
 		Name:     "environment.conditions",
-		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]struct{ condition: RegExp, environment: string })`,
+		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]struct{ match: RegExp, environment: string })`,
 		Required: false,
 		EnvVars:  []string{"ENVIRONMENT_CONDITIONS"},
 		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
