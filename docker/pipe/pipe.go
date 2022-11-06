@@ -55,27 +55,29 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
-		return tl.JobSequence(
-			ProcessFlags(tl),
+	return TL.New(p).
+		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
+			return ProcessFlags(tl)
+		}).
+		Set(func(tl *TaskList[Pipe]) Job {
+			return tl.JobSequence(
+				Setup(tl).Job(),
 
-			Setup(tl).Job(),
+				DockerTagsParent(tl).Job(),
 
-			DockerTagsParent(tl).Job(),
+				tl.JobParallel(
+					DockerVersion(tl).Job(),
+					DockerBuildXVersion(tl).Job(),
+				),
 
-			tl.JobParallel(
-				DockerVersion(tl).Job(),
-				DockerBuildXVersion(tl).Job(),
-			),
+				DockerLoginParent(tl).Job(),
 
-			DockerLoginParent(tl).Job(),
+				tl.JobParallel(
+					DockerBuildParent(tl).Job(),
+					DockerBuildXParent(tl).Job(),
+				),
 
-			tl.JobParallel(
-				DockerBuildParent(tl).Job(),
-				DockerBuildXParent(tl).Job(),
-			),
-
-			DockerInspect(tl).Job(),
-		)
-	})
+				DockerInspect(tl).Job(),
+			)
+		})
 }

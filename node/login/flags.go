@@ -48,12 +48,12 @@ var Flags = []cli.Flag{
 	},
 }
 
-func ProcessFlags(tl *TaskList[Pipe]) Job {
-	return tl.CreateBasicJob(func() error {
-		if err := json.Unmarshal([]byte(tl.CliContext.String("npm.login")), &tl.Pipe.Npm.Login); err != nil {
+func ProcessFlags(tl *TaskList[Pipe]) error {
+	if v := tl.CliContext.String("npm.login"); v != "" {
+		if err := json.Unmarshal([]byte(v), &tl.Pipe.Npm.Login); err != nil {
 			return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 		}
+	}
 
-		return tl.Validate(&tl.Pipe)
-	})
+	return nil
 }

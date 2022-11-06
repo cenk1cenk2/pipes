@@ -194,16 +194,18 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 })
 
-func ProcessFlags(tl *TaskList[Pipe]) Job {
-	return tl.CreateBasicJob(func() error {
-		if err := json.Unmarshal([]byte(tl.CliContext.String("docker_image.tag_as_latest")), &tl.Pipe.DockerImage.TagAsLatest); err != nil {
+func ProcessFlags(tl *TaskList[Pipe]) error {
+	if v := tl.CliContext.String("docker_image.tag_as_latest"); v != "" {
+		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerImage.TagAsLatest); err != nil {
 			return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
 		}
+	}
 
-		if err := json.Unmarshal([]byte(tl.CliContext.String("docker_image.sanitize_tags")), &tl.Pipe.DockerImage.TagsSanitize); err != nil {
+	if v := tl.CliContext.String("docker_image.sanitize_tags"); v != "" {
+		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerImage.TagsSanitize); err != nil {
 			return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
 		}
+	}
 
-		return tl.Validate(&tl.Pipe)
-	})
+	return nil
 }

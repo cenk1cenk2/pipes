@@ -54,13 +54,13 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 })
 
-func ProcessFlags(tl *TaskList[Pipe]) Job {
-	return tl.CreateBasicJob(func() error {
-		// setup selection of environment conditions
-		if err := json.Unmarshal([]byte(tl.CliContext.String("environment.conditions")), &TL.Pipe.Conditions); err != nil {
+func ProcessFlags(tl *TaskList[Pipe]) error {
+	// setup selection of environment conditions
+	if v := tl.CliContext.String("environment.conditions"); v != "" {
+		if err := json.Unmarshal([]byte(v), &TL.Pipe.Conditions); err != nil {
 			return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
 		}
+	}
 
-		return tl.Validate(&tl.Pipe)
-	})
+	return nil
 }

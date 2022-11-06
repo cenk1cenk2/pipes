@@ -27,13 +27,16 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
-		return tl.JobSequence(
-			ProcessFlags(tl),
-			Setup(tl).Job(),
+	return TL.New(p).
+		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
+			return ProcessFlags(tl)
+		}).
+		Set(func(tl *TaskList[Pipe]) Job {
+			return tl.JobSequence(
+				Setup(tl).Job(),
 
-			SelectEnvironment(tl).Job(),
-			FetchEnvironment(tl).Job(),
-		)
-	})
+				SelectEnvironment(tl).Job(),
+				FetchEnvironment(tl).Job(),
+			)
+		})
 }
