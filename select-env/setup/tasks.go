@@ -38,10 +38,10 @@ func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
 func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("environment", "select").
 		Set(func(t *Task[Pipe]) error {
-			t.Log.Debugf("Conditions for environment variable selection: %+v", t.Pipe.Conditions)
+			t.Log.Debugf("Conditions for environment variable selection: %+v", t.Pipe.Environment.Conditions)
 
 		out:
-			for _, c := range t.Pipe.Conditions {
+			for _, c := range t.Pipe.Environment.Conditions {
 				for _, reference := range t.Pipe.Ctx.References {
 					re, err := regexp.Compile(c.Match)
 

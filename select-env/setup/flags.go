@@ -55,7 +55,6 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 })
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	// setup selection of environment conditions
 	if v := tl.CliContext.String("environment.conditions"); v != "" {
 		if err := json.Unmarshal([]byte(v), &tl.Pipe.Environment.Conditions); err != nil {
 			return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
