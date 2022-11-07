@@ -1,9 +1,11 @@
 package install
 
 import (
+	"os"
 	"strings"
 
 	"gitlab.kilic.dev/devops/pipes/node/setup"
+	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -27,6 +29,9 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
 
 					c.SetDir(TL.Pipe.NodeInstall.Cwd)
+
+					c.AppendDirectEnvironment(os.Environ()...).
+						AppendEnvironment(environment.TL.Pipe.Ctx.EnvVars)
 
 					return nil
 				}).
