@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v2"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
@@ -14,12 +13,7 @@ const (
 	CATEGORY_NODE_BUILD = "Build"
 )
 
-var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
-	flags.GitFlagsSetup{
-		GitBranchDestination: &TL.Pipe.Git.Branch,
-		GitTagDestination:    &TL.Pipe.Git.Tag,
-	},
-), []cli.Flag{
+var Flags = []cli.Flag{
 	// CATEGORY_BUILD
 
 	&cli.StringFlag{
@@ -51,4 +45,4 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Value:       ".",
 		Destination: &TL.Pipe.NodeBuild.Cwd,
 	},
-})
+}

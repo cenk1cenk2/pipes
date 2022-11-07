@@ -57,12 +57,12 @@ func main() {
 
 					{
 						Name:  "build",
-						Flags: p.AppendFlags(setup.Flags, build.Flags),
+						Flags: p.AppendFlags(environment.Flags, setup.Flags, build.Flags),
 						Action: func(c *cli.Context) error {
 							return build.TL.RunJobs(
 								build.TL.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
 									environment.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCliContext(c).Job(),
 									build.New(p).SetCliContext(c).Job(),
 								),
 							)
@@ -71,12 +71,12 @@ func main() {
 
 					{
 						Name:  "run",
-						Flags: p.AppendFlags(setup.Flags, run.Flags),
+						Flags: p.AppendFlags(environment.Flags, setup.Flags, run.Flags),
 						Action: func(c *cli.Context) error {
 							return run.TL.RunJobs(
 								run.TL.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
 									environment.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCliContext(c).Job(),
 									run.New(p).SetCliContext(c).Job(),
 								),
 							)

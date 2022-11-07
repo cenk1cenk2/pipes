@@ -21,7 +21,7 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("setup", "references").
+	return tl.CreateTask("init", "references").
 		Set(func(t *Task[Pipe]) error {
 			t.Pipe.Ctx.References = parser.ParseGitReferences(t.Pipe.Git.Tag, t.Pipe.Git.Branch)
 
