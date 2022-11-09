@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-	github.com/urfave/cli/v2 v2.23.4
+	github.com/urfave/cli/v2 v2.23.5
 	gitlab.kilic.dev/libraries/go-utils v1.3.9
 	gitlab.kilic.dev/libraries/plumber/v4 v4.16.0
 	golang.org/x/oauth2 v0.1.0
