@@ -8,7 +8,7 @@ import (
 )
 
 func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("run", tl.Pipe.NodeCommand.Script).
+	return tl.CreateTask("run", tl.Pipe.Ctx.Script).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
 				setup.TL.Pipe.Ctx.PackageManager.Exe,
@@ -21,8 +21,8 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...)
 
-					if t.Pipe.NodeCommand.Script != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.NodeCommand.Script, ctx)
+					if t.Pipe.Ctx.Script != "" {
+						tmpl, err := utils.InlineTemplate(t.Pipe.Ctx.Script, ctx)
 
 						if err != nil {
 							return err
@@ -33,8 +33,8 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.RunDelimitter...)
 
-					if t.Pipe.NodeCommand.ScriptArgs != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.NodeCommand.ScriptArgs, ctx)
+					if t.Pipe.Ctx.ScriptArgs != "" {
+						tmpl, err := utils.InlineTemplate(t.Pipe.Ctx.ScriptArgs, ctx)
 
 						if err != nil {
 							return err

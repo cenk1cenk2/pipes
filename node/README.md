@@ -1,8 +1,8 @@
-# pipes-node
+# pipe-node
 
 Pipe for installing node.js dependencies and building node.js applications on CI/CD.
 
-`pipes-node [GLOBAL FLAGS] [COMMAND] [FLAGS]`
+`pipe-node [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 
 ## Global Flags
 
@@ -11,6 +11,7 @@ Pipe for installing node.js dependencies and building node.js applications on CI
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ## Commands
 
@@ -18,7 +19,7 @@ Pipe for installing node.js dependencies and building node.js applications on CI
 
 Login to the given NPM registries.
 
-`pipes-node login [GLOBAL FLAGS] [FLAGS]`
+`pipe-node login [GLOBAL FLAGS] [FLAGS]`
 
 #### Flags
 
@@ -40,7 +41,7 @@ Login to the given NPM registries.
 
 Install node.js dependencies with the given package manager.
 
-`pipes-node install [GLOBAL FLAGS] [FLAGS]`
+`pipe-node install [GLOBAL FLAGS] [FLAGS]`
 
 #### Flags
 
@@ -68,7 +69,7 @@ Install node.js dependencies with the given package manager.
 
 ### `build`
 
-`pipes-node build [GLOBAL FLAGS] [FLAGS]`
+`pipe-node build [GLOBAL FLAGS] [FLAGS]`
 
 #### Flags
 
@@ -104,7 +105,7 @@ Install node.js dependencies with the given package manager.
 
 ### `run`
 
-`pipes-node run [GLOBAL FLAGS] [FLAGS]`
+`pipe-node run [GLOBAL FLAGS] [FLAGS]`
 
 #### Flags
 
@@ -113,7 +114,6 @@ Install node.js dependencies with the given package manager.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$NODE_COMMAND_SCRIPT` | package.json script for given command operation.  | `String`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `false` |  |
-| `$NODE_COMMAND_SCRIPT_ARGS` | package.json script arguments for given command operation.  | `String`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `false` |  |
 | `$NODE_COMMAND_CWD` | Working directory for the given command operation. | `String` | `false` | . |
 
 ##### Environment

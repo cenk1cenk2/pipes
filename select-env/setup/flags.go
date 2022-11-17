@@ -45,7 +45,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Usage:       "Whether to fail on missing environment selection.",
 		Required:    false,
 		EnvVars:     []string{"ENVIRONMENT_STRICT"},
-		Value:       false,
+		Value:       true,
 		Destination: &TL.Pipe.Environment.Strict,
 	},
 })

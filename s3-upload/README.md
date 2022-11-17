@@ -1,8 +1,8 @@
-# pipes-s3-upload
+# pipe-s3-upload
 
 Uploads the designated files as artifacts to S3.
 
-`pipes-s3-upload [FLAGS]`
+`pipe-s3-upload [FLAGS]`
 
 ## Flags
 
@@ -15,3 +15,4 @@ Uploads the designated files as artifacts to S3.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |

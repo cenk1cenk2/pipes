@@ -1,8 +1,8 @@
-# pipes-semantic-release
+# pipe-semantic-release
 
 Releases applications through semantic-release library.
 
-`pipes-semantic-release [FLAGS]`
+`pipe-semantic-release [FLAGS]`
 
 ## Flags
 
@@ -11,6 +11,7 @@ Releases applications through semantic-release library.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ### Login
 

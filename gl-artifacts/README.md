@@ -1,8 +1,8 @@
-# pipes-gitlab-artifacts
+# pipe-gitlab-artifacts
 
 Downloads gitlab artifacts from the API for creating downstream pipelines.
 
-`pipes-gitlab-artifacts [FLAGS]`
+`pipe-gitlab-artifacts [FLAGS]`
 
 ## Flags
 
@@ -11,13 +11,14 @@ Downloads gitlab artifacts from the API for creating downstream pipelines.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ### Gitlab
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_API_V4_URL` | Gitlab API URL of the instance. | `String` | `true` |  |
-| `$GL_TOKEN` | Token for Gitlab API authentication. | `String` | `true` |  |
+| `$GL_TOKEN`<br/>`$GITLAB_TOKEN` | Token for Gitlab API authentication. | `String` | `true` |  |
 | `$CI_JOB_TOKEN` | Job token coming from the build job. | `String` | `false` |  |
 
 ### Gitlab Pipeline

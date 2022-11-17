@@ -1,8 +1,8 @@
-# pipes-gh-release-tracker
+# pipe-gh-release-tracker
 
 Tracks the given Github repositories latest tags and generates tag file accordingly for further processing.
 
-`pipes-gh-release-tracker [FLAGS]`
+`pipe-gh-release-tracker [FLAGS]`
 
 ## Flags
 
@@ -11,6 +11,7 @@ Tracks the given Github repositories latest tags and generates tag file accordin
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ### Github
 

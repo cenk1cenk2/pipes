@@ -1,8 +1,8 @@
-# pipes-update-docker-hub-readme
+# pipe-update-docker-hub-readme
 
 Updates the readme file on DockerHub or any compatible API.
 
-`pipes-update-docker-hub-readme [FLAGS]`
+`pipe-update-docker-hub-readme [FLAGS]`
 
 ## Flags
 
@@ -11,6 +11,7 @@ Updates the readme file on DockerHub or any compatible API.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ### DockerHub
 

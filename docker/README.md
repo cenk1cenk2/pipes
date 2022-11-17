@@ -1,8 +1,8 @@
-# pipes-docker
+# pipe-docker
 
 Builds and publishes Docker images from CI/CD.
 
-`pipes-docker [FLAGS]`
+`pipe-docker [FLAGS]`
 
 ## Flags
 
@@ -11,6 +11,7 @@ Builds and publishes Docker images from CI/CD.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ### Docker
 
