@@ -8,7 +8,7 @@ stages:
 
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  LOG_LEVEL: debug
+  LOG_LEVEL: trace
   GO_LINT_COMMAND: make lint
 
 .publish-first:
