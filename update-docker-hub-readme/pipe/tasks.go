@@ -12,20 +12,6 @@ import (
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
-func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("init").
-		Set(func(t *Task[Pipe]) error {
-			if len(t.Pipe.Readme.Description) > 100 {
-				return fmt.Errorf(
-					"Readme short description can only be 100 characters long while you have: %d",
-					len(t.Pipe.Readme.Description),
-				)
-			}
-
-			return nil
-		})
-}
-
 func LoginToDockerHubRegistry(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login").
 		Set(func(t *Task[Pipe]) error {

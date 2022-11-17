@@ -27,7 +27,6 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
-		SetName("gitlab-artifacts").
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				Setup(tl).Job(),

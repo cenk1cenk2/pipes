@@ -17,7 +17,7 @@ Releases applications through semantic-release library.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NPM_LOGIN` | npm registries to login to.  | `String`<br/>`json(slice({ username: string, password: string, registry?: string, useHttps?: boolean }))` | `false` |  |
+| `$NPM_LOGIN` | npm registries to login to.  | `String`<br/>`json([]struct{ username: string, password: string, registry?: string, useHttps?: boolean })` | `false` |  |
 | `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | ".npmrc" |
 | `$NPM_NPMRC` | Pass direct contents of the NPMRC file. | `String` | `false` |  |
 

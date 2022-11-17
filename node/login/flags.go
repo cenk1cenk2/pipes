@@ -21,20 +21,19 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_NODE_LOGIN,
 		Name:     "npm.login",
-		Usage:    "npm registries to login to. json(slice({ username: string, password: string, registry?: string, useHttps?: boolean }))",
+		Usage:    "npm registries to login to. json([]struct{ username: string, password: string, registry?: string, useHttps?: boolean })",
 		Required: false,
 		EnvVars:  []string{"NPM_LOGIN"},
 		Value:    "",
 	},
 
 	&cli.StringSliceFlag{
-		Category:    CATEGORY_NODE_LOGIN,
-		Name:        "npm.npmrc_file",
-		Usage:       ".npmrc file to use.",
-		Required:    false,
-		EnvVars:     []string{"NPM_NPMRC_FILE"},
-		Value:       cli.NewStringSlice(".npmrc"),
-		Destination: &TL.Pipe.Npm.NpmRcFile,
+		Category: CATEGORY_NODE_LOGIN,
+		Name:     "npm.npmrc_file",
+		Usage:    ".npmrc file to use.",
+		Required: false,
+		EnvVars:  []string{"NPM_NPMRC_FILE"},
+		Value:    cli.NewStringSlice(".npmrc"),
 	},
 
 	&cli.StringFlag{
@@ -54,6 +53,8 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 			return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 		}
 	}
+
+	tl.Pipe.Npm.NpmRcFile = tl.CliContext.StringSlice("npm.npmrc_file")
 
 	return nil
 }

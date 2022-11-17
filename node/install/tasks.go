@@ -19,11 +19,11 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 					if TL.Pipe.NodeInstall.UseLockFile {
 						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
 
-						t.Log.Debugln("Using lockfile for installation.")
+						t.Log.Infoln("Using lockfile for installation.")
 					} else {
 						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Install...)
 
-						t.Log.Debugln("Installing dependencies without a lockfile.")
+						t.Log.Infoln("Installing dependencies without a lockfile.")
 					}
 
 					c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)

@@ -24,12 +24,12 @@ func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			t.Log.Debugf(
 				"Trying to match patterns: %s",
-				strings.Join(t.Pipe.Markdown.Patterns.Value(), ", "),
+				strings.Join(t.Pipe.Markdown.Patterns, ", "),
 			)
 
 			matches := []string{}
 
-			for _, v := range t.Pipe.Markdown.Patterns.Value() {
+			for _, v := range t.Pipe.Markdown.Patterns {
 				match, err := glob.Glob(fs, v)
 
 				if err != nil {
@@ -42,7 +42,7 @@ func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 			if len(matches) == 0 {
 				return fmt.Errorf(
 					"Can not match any files with the given pattern: %s",
-					strings.Join(t.Pipe.Markdown.Patterns.Value(), ", "),
+					strings.Join(t.Pipe.Markdown.Patterns, ", "),
 				)
 			}
 

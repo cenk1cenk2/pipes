@@ -1,13 +1,12 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 type (
 	Markdown struct {
-		Patterns  cli.StringSlice
+		Patterns  []string
 		Arguments string
 	}
 
@@ -24,7 +23,9 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
-		SetName("markdown-toc").
+		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
+			return ProcessFlags(tl)
+		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				FindMarkdownFiles(tl).Job(),

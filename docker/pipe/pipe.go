@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
@@ -18,14 +17,14 @@ type (
 
 	DockerImage struct {
 		Name           string
-		Tags           cli.StringSlice
+		Tags           []string
 		TagAsLatest    []string
 		TagsFile       string
 		TagsFileStrict bool
 		TagsSanitize   []TagsSanitizeJson
 		Pull           bool
 		Inspect        bool
-		BuildArgs      cli.StringSlice
+		BuildArgs      []string
 	}
 
 	DockerFile struct {
@@ -56,7 +55,6 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
-		SetName("docker").
 		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
 			return ProcessFlags(tl)
 		}).

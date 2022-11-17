@@ -9,10 +9,10 @@ import (
 func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("apks").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.Apk.Value()) == 0
+			return len(t.Pipe.Apk) == 0
 		}).
 		Set(func(t *Task[Pipe]) error {
-			apks := t.Pipe.Apk.Value()
+			apks := t.Pipe.Apk
 
 			t.Log.Debugf(
 				"Will install packages from APK repository: %s",
@@ -40,10 +40,10 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 func InstallNodePackages(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("install").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.Node.Value()) == 0
+			return len(t.Pipe.Node) == 0
 		}).
 		Set(func(t *Task[Pipe]) error {
-			packages := t.Pipe.Node.Value()
+			packages := t.Pipe.Node
 
 			t.Log.Debugf(
 				"Will install packages from NPM repository: %s",

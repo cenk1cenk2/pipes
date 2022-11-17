@@ -22,7 +22,9 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
-		SetName("template").
+		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
+			return ProcessFlags(tl)
+		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				DefaultTask(tl).Job(),

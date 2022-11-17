@@ -40,7 +40,7 @@ func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags", "user").
 		Set(func(t *Task[Pipe]) error {
 			// add all the specified tags
-			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(t.Pipe.DockerImage.Tags.Value())) {
+			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(t.Pipe.DockerImage.Tags)) {
 				if err := AddDockerTag(t, v); err != nil {
 					return err
 				}

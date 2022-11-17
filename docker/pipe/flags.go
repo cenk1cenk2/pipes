@@ -118,12 +118,11 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringSliceFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.tags",
-		Usage:       "Image tag for will be built Docker image.",
-		Required:    true,
-		EnvVars:     []string{"IMAGE_TAGS", "DOCKER_IMAGE_TAGS"},
-		Destination: &TL.Pipe.DockerImage.Tags,
+		Category: CATEGORY_DOCKER_IMAGE,
+		Name:     "docker_image.tags",
+		Usage:    "Image tag for will be built Docker image.",
+		Required: true,
+		EnvVars:  []string{"IMAGE_TAGS", "DOCKER_IMAGE_TAGS"},
 	},
 
 	&cli.StringFlag{
@@ -175,12 +174,11 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringSliceFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.build_args",
-		Usage:       "Pass in extra build arguments for image.",
-		Required:    false,
-		EnvVars:     []string{"BUILD_ARGS", "DOCKER_IMAGE_BUILD_ARGS"},
-		Destination: &TL.Pipe.DockerImage.BuildArgs,
+		Category: CATEGORY_DOCKER_IMAGE,
+		Name:     "docker_image.build_args",
+		Usage:    "Pass in extra build arguments for image.",
+		Required: false,
+		EnvVars:  []string{"BUILD_ARGS", "DOCKER_IMAGE_BUILD_ARGS"},
 	},
 
 	&cli.BoolFlag{
@@ -206,6 +204,9 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 			return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
 		}
 	}
+
+	tl.Pipe.DockerImage.Tags = tl.CliContext.StringSlice("docker_image.tags")
+	tl.Pipe.DockerImage.BuildArgs = tl.CliContext.StringSlice("docker_image.build_args")
 
 	return nil
 }

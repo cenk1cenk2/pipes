@@ -16,7 +16,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.Log.Debugf(
-				".npmrc file: %s", strings.Join(t.Pipe.Npm.NpmRcFile.Value(), ", "),
+				".npmrc file: %s", strings.Join(t.Pipe.Npm.NpmRcFile, ", "),
 			)
 
 			npmrc := []string{}
@@ -43,7 +43,7 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 				npmrc = append(npmrc, strings.Split(t.Pipe.Npm.NpmRc, eol.OSDefault().String())...)
 			}
 
-			for _, file := range t.Pipe.Npm.NpmRcFile.Value() {
+			for _, file := range t.Pipe.Npm.NpmRcFile {
 				func(file string) {
 					t.CreateSubtask(file).
 						Set(
@@ -104,7 +104,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							c.AppendArgs(
 								"--configfile",
-								t.Pipe.Npm.NpmRcFile.Value()[0],
+								t.Pipe.Npm.NpmRcFile[0],
 								"--registry",
 								url,
 							)

@@ -57,7 +57,8 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 			return fmt.Errorf("Arguments are needed to run a specific script.")
 		}
 
-		tl.Pipe.Ctx.Script, tl.Pipe.Ctx.ScriptArgs = args[0], strings.Join(args[1:], " ")
+		tl.Pipe.Ctx.Script = args[0]
+		tl.Pipe.Ctx.ScriptArgs = strings.Join(args[1:], " ")
 	} else {
 		tl.Pipe.Ctx.Script = strings.Split(tl.Pipe.NodeCommand.Script, " ")[0]
 		tl.Pipe.Ctx.ScriptArgs = strings.Join(strings.Split(tl.Pipe.NodeCommand.Script, " ")[1:], " ")

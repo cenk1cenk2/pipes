@@ -1,7 +1,10 @@
 package pipe
 
 import (
+	"fmt"
+
 	"github.com/urfave/cli/v2"
+	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 //revive:disable:line-length-limit
@@ -71,4 +74,15 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Readme.Description,
 		Required:    false,
 	},
+}
+
+func ProcessFlags(tl *TaskList[Pipe]) error {
+	if len(tl.Pipe.Readme.Description) > 100 {
+		return fmt.Errorf(
+			"Readme short description can only be 100 characters long while you have: %d",
+			len(tl.Pipe.Readme.Description),
+		)
+	}
+
+	return nil
 }

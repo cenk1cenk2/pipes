@@ -31,7 +31,6 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
-		SetName("node", "build").
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				BuildNodeApplication(tl).Job(),

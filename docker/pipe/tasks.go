@@ -12,13 +12,6 @@ func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 				job,
 				ParseReferences(tl).Job(),
 			)
-		}).
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.Tags = []string{}
-
-			// setup sanitizing the tags first
-
-			return nil
 		})
 }
 
