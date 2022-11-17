@@ -13,7 +13,6 @@ stages:
 cache:
   paths:
     - node_modules/
-    - .cache/
 
 include:
   - project: devops/pipes

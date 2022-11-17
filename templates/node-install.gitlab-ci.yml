@@ -10,7 +10,6 @@ install:
   cache:
     paths:
       - node_modules/
-      - .cache/
   rules:
     - when: on_success
   tags:
