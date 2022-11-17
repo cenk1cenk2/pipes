@@ -8,7 +8,7 @@ import (
 )
 
 func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("run").
+	return tl.CreateTask("run", tl.Pipe.NodeCommand.Script).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
 				setup.TL.Pipe.Ctx.PackageManager.Exe,
