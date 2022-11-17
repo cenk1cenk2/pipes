@@ -50,16 +50,13 @@ include:
   - project: devops/pipes
     file: /templates/go-install.gitlab-ci.yml
   - project: devops/pipes
+    file: /templates/go-build.gitlab-ci.yml
+  - project: devops/pipes
     file: /templates/go-lint.gitlab-ci.yml
 
 build:
-  stage: build
-  image: golang:alpine
   before_script:
     - cd ${APP_FOLDER}
-  script:
-    - apk add --no-cache --no-progress make git
-    - make -j4 build
   artifacts:
     paths:
       - "./*/dist/"
@@ -75,8 +72,6 @@ build:
       - APP_FOLDER: ./semantic-release
       - APP_FOLDER: ./select-env
       - APP_FOLDER: ./s3-upload
-  tags:
-    - docker
 
 # to stop depending on itself
 
