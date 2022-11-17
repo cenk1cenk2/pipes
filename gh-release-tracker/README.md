@@ -10,7 +10,7 @@ Tracks the given Github repositories latest tags and generates tag file accordin
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;) | `false` |  |
+| `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;) | `false` | info |
 
 ### Github
 
@@ -23,4 +23,4 @@ Tracks the given Github repositories latest tags and generates tag file accordin
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TAGS_FILE` | Read tags from a file. | `String` | `true` |  |
+| `$TAGS_FILE` | Read tags from a file. | `String` | `true` | .tags |

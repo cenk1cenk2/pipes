@@ -4,6 +4,7 @@ variables:
   NODE_VERSION: 16-alpine
   NODE_LINT_COMMAND: lint:check
   NODE_TEST_COMMAND: ""
+  ENVIRONMENT_ENABLE: "false"
 
 stages:
   - install
