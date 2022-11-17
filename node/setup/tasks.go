@@ -12,7 +12,7 @@ func SetupPackageManager(tl *TaskList[Pipe]) *Task[Pipe] {
 				Commands: PackageManagers[t.Pipe.Node.PackageManager],
 			}
 
-			t.Log.Debugf("Using package manager: %s", t.Pipe.Node.PackageManager)
+			t.Log.Infof("Using package manager: %s", t.Pipe.Node.PackageManager)
 
 			return nil
 		})

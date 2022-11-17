@@ -1,6 +1,6 @@
 package main
 
-const CLI_NAME = "pipes-s3-upload"
+const CLI_NAME = "pipe-s3-upload"
 
 const DESCRIPTION = "Uploads the designated files as artifacts to S3."
 
