@@ -23,7 +23,7 @@ var Flags = []cli.Flag{
 		Name:        "gl.token",
 		Usage:       "Token for Gitlab API authentication.",
 		Required:    true,
-		EnvVars:     []string{"GL_TOKEN"},
+		EnvVars:     []string{"GL_TOKEN", "GITLAB_TOKEN"},
 		Value:       "",
 		Destination: &TL.Pipe.Gitlab.Token,
 	},
