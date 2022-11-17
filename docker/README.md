@@ -37,7 +37,7 @@ Builds and publishes Docker images from CI/CD.
 | `$DOCKERFILE_CONTEXT` | Dockerfile context argument for build operation. | `String` | `false` | . |
 | `$DOCKERFILE_NAME` | Dockerfile path for the build operation | `String` | `false` | Dockerfile |
 | `$IMAGE_TAG_AS_LATEST`<br/>`$DOCKER_IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.  | `String`<br/>`json(RegExp[])` | `false` | [ "^tags/v?\\d+.\\d+.\\d+$" ] |
-| `$IMAGE_SANITIZE_TAGS`<br/>`$DOCKER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression.  | `String`<br/>`json([]struct{ match: RegExp, template: Template(map[string]string) })` | `false` | [<br />    { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" }<br />] |
+| `$IMAGE_SANITIZE_TAGS`<br/>`$DOCKER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression.  | `String`<br/>`json([]struct{ match: RegExp, template: Template(map[string]string) })` | `false` | [<br />{ "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" }<br />] |
 | `$IMAGE_INSPECT`<br/>`$DOCKER_IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | false |
 | `$BUILD_ARGS`<br/>`$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image. | `StringSlice` | `false` |  |
 | `$IMAGE_PULL`<br/>`$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |

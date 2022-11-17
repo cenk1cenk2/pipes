@@ -23,10 +23,12 @@ var TL = TaskList[Pipe]{
 }
 
 func New(p *Plumber) *TaskList[Pipe] {
-	return TL.New(p).Set(func(tl *TaskList[Pipe]) Job {
-		return tl.JobSequence(
-			FindMarkdownFiles(tl).Job(),
-			RunMarkdownToc(tl).Job(),
-		)
-	})
+	return TL.New(p).
+		SetName("markdown-toc").
+		Set(func(tl *TaskList[Pipe]) Job {
+			return tl.JobSequence(
+				FindMarkdownFiles(tl).Job(),
+				RunMarkdownToc(tl).Job(),
+			)
+		})
 }

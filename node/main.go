@@ -65,17 +65,14 @@ func main() {
 
 					{
 						Name:  "build",
-						Flags: p.AppendFlags(environment.Flags, setup.Flags, build.Flags),
+						Flags: p.AppendFlags(setup.Flags, environment.Flags, build.Flags),
 						Action: func(c *cli.Context) error {
 							return build.TL.RunJobs(
 								build.TL.JobSequence(
-									build.TL.JobIf(
-										build.TL.Predicate(func(tl *TaskList[build.Pipe]) bool {
-											return tl.Pipe.Environment.Enable
-										}),
-										environment.New(p).SetCliContext(c).Job(),
-									),
 									setup.New(p).SetCliContext(c).Job(),
+									environment.New(p).SetCliContext(c).ShouldDisable(func(tl *TaskList[environment.Pipe]) bool {
+										return !build.TL.Pipe.Environment.Enable
+									}).Job(),
 									build.New(p).SetCliContext(c).Job(),
 								),
 							)
@@ -84,17 +81,14 @@ func main() {
 
 					{
 						Name:  "run",
-						Flags: p.AppendFlags(environment.Flags, setup.Flags, run.Flags),
+						Flags: p.AppendFlags(setup.Flags, environment.Flags, run.Flags),
 						Action: func(c *cli.Context) error {
 							return run.TL.RunJobs(
 								run.TL.JobSequence(
-									run.TL.JobIf(
-										run.TL.Predicate(func(tl *TaskList[run.Pipe]) bool {
-											return tl.Pipe.Environment.Enable
-										}),
-										environment.New(p).SetCliContext(c).Job(),
-									),
 									setup.New(p).SetCliContext(c).Job(),
+									environment.New(p).SetCliContext(c).ShouldDisable(func(tl *TaskList[environment.Pipe]) bool {
+										return !build.TL.Pipe.Environment.Enable
+									}).Job(),
 									run.New(p).SetCliContext(c).Job(),
 								),
 							)

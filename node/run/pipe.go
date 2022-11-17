@@ -30,6 +30,7 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
+		SetName("node", "run").
 		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
 			args := tl.CliContext.Args().Slice()
 			if len(args) < 1 {
