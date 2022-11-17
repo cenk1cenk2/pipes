@@ -11,10 +11,6 @@ import (
 
 //revive:disable:line-length-limit
 
-const (
-	CATEGORY_ENVIRONMENT = "Environment"
-)
-
 var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	flags.GitFlagsSetup{
 		GitBranchDestination: &TL.Pipe.Git.Branch,
@@ -25,7 +21,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	// CATEGORY_ENVIRONMENT
 
 	&cli.StringFlag{
-		Category: CATEGORY_ENVIRONMENT,
+		Category: flags.CATEGORY_ENVIRONMENT,
 		Name:     "environment.conditions",
 		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]struct{ match: RegExp, environment: string })`,
 		Required: false,
@@ -34,7 +30,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_ENVIRONMENT,
+		Category:    flags.CATEGORY_ENVIRONMENT,
 		Name:        "environment.fail-on-no-reference",
 		Usage:       "Whether to fail on missing environment references.",
 		Required:    false,
@@ -44,7 +40,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_ENVIRONMENT,
+		Category:    flags.CATEGORY_ENVIRONMENT,
 		Name:        "environment.strict",
 		Usage:       "Whether to fail on missing environment selection.",
 		Required:    false,

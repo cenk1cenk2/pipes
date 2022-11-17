@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
@@ -13,7 +14,13 @@ const (
 	CATEGORY_NODE_BUILD = "Build"
 )
 
-var Flags = []cli.Flag{
+var Flags = TL.Plumber.AppendFlags(flags.NewSelectEnvEnableFlag(
+	flags.SelectEnvEnableFlagSetup{
+		SelectEnvEnableDestination: &TL.Pipe.Environment.Enable,
+		SelectEnvEnableRequired:    false,
+		SelectEnvEnableValue:       false,
+	},
+), []cli.Flag{
 	// CATEGORY_BUILD
 
 	&cli.StringFlag{
@@ -45,4 +52,4 @@ var Flags = []cli.Flag{
 		Value:       ".",
 		Destination: &TL.Pipe.NodeBuild.Cwd,
 	},
-}
+})

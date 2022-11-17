@@ -80,6 +80,15 @@ Install node.js dependencies with the given package manager.
 | `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for building operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
 | `$NODE_BUILD_CWD` | Working directory for build operation. | `String` | `false` |  |
 
+##### Environment
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json([]struct{ match: RegExp, environment: string }) | `false` |  |
+| `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Whether to fail on missing environment references. | `Bool` | `false` | false |
+| `$ENVIRONMENT_STRICT` | Whether to fail on missing environment selection. | `Bool` | `false` | false |
+| `$ENVIRONMENT_ENABLE` | Whether to enable environment injection or not. | `Bool` | `false` | false |
+
 ##### GIT
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -106,6 +115,22 @@ Install node.js dependencies with the given package manager.
 | `$NODE_COMMAND_SCRIPT` | package.json script for given command operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
 | `$NODE_COMMAND_SCRIPT_ARGS` | package.json script arguments for given command operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
 | `$NODE_COMMAND_CWD` | Working directory for the given command operation. | `String` | `false` |  |
+
+##### Environment
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json([]struct{ match: RegExp, environment: string }) | `false` |  |
+| `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Whether to fail on missing environment references. | `Bool` | `false` | false |
+| `$ENVIRONMENT_STRICT` | Whether to fail on missing environment selection. | `Bool` | `false` | false |
+| `$ENVIRONMENT_ENABLE` | Whether to enable environment injection or not. | `Bool` | `false` | false |
+
+##### GIT
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
+| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
 
 ##### Package Manager
 

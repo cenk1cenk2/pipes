@@ -8,6 +8,10 @@ import (
 )
 
 type (
+	Environment struct {
+		Enable bool
+	}
+
 	NodeCommand struct {
 		Script     string
 		ScriptArgs string
@@ -15,6 +19,7 @@ type (
 	}
 
 	Pipe struct {
+		Environment
 		NodeCommand
 	}
 )

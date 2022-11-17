@@ -55,4 +55,4 @@ Builds and publishes Docker images from CI/CD.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TAGS_FILE` | Read tags from a file. | `String` | `false` |  |
-| `$TAGS_FILE_IGNORE_MISSING` | Ignore the missing tags file and contunie operation as expected in that case. | `Bool` | `false` | false |
+| `$TAGS_FILE_STRICT` | Strict mode does not tolorate the missing tags file. | `Bool` | `false` | false |

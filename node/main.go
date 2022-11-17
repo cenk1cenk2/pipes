@@ -61,7 +61,12 @@ func main() {
 						Action: func(c *cli.Context) error {
 							return build.TL.RunJobs(
 								build.TL.JobSequence(
-									environment.New(p).SetCliContext(c).Job(),
+									build.TL.JobIf(
+										build.TL.Predicate(func(tl *TaskList[build.Pipe]) bool {
+											return tl.Pipe.Environment.Enable
+										}),
+										environment.New(p).SetCliContext(c).Job(),
+									),
 									setup.New(p).SetCliContext(c).Job(),
 									build.New(p).SetCliContext(c).Job(),
 								),
@@ -75,7 +80,12 @@ func main() {
 						Action: func(c *cli.Context) error {
 							return run.TL.RunJobs(
 								run.TL.JobSequence(
-									environment.New(p).SetCliContext(c).Job(),
+									run.TL.JobIf(
+										run.TL.Predicate(func(tl *TaskList[run.Pipe]) bool {
+											return tl.Pipe.Environment.Enable
+										}),
+										environment.New(p).SetCliContext(c).Job(),
+									),
 									setup.New(p).SetCliContext(c).Job(),
 									run.New(p).SetCliContext(c).Job(),
 								),
