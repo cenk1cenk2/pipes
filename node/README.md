@@ -10,7 +10,7 @@ Pipe for installing node.js dependencies and building node.js applications on CI
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>enum(&#34;PANIC&#34;, &#34;FATAL&#34;, &#34;WARNING&#34;, &#34;INFO&#34;, &#34;DEBUG&#34;, &#34;TRACE&#34;) | `false` | info |
+| `$LOG_LEVEL` | Define the log level for the application.  | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
 
 ## Commands
 
@@ -26,15 +26,15 @@ Login to the given NPM registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NPM_LOGIN` | npm registries to login to.  | `String`<br/>json(slice({ username: string, password: string, registry?: string, useHttps?: boolean })) | `false` |  |
-| `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | &#34;.npmrc&#34; |
+| `$NPM_LOGIN` | npm registries to login to.  | `String`<br/>`json(slice({ username: string, password: string, registry?: string, useHttps?: boolean }))` | `false` |  |
+| `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | ".npmrc" |
 | `$NPM_NPMRC` | Pass direct contents of the NPMRC file. | `String` | `false` |  |
 
 ##### Package Manager
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
 
 ### `install`
 
@@ -56,15 +56,15 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NPM_LOGIN` | npm registries to login to.  | `String`<br/>json(slice({ username: string, password: string, registry?: string, useHttps?: boolean })) | `false` |  |
-| `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | &#34;.npmrc&#34; |
+| `$NPM_LOGIN` | npm registries to login to.  | `String`<br/>`json(slice({ username: string, password: string, registry?: string, useHttps?: boolean }))` | `false` |  |
+| `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | ".npmrc" |
 | `$NPM_NPMRC` | Pass direct contents of the NPMRC file. | `String` | `false` |  |
 
 ##### Package Manager
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
 
 ### `build`
 
@@ -76,20 +76,15 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_BUILD_SCRIPT` | package.json script for building operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` | build |
-| `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for building operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
+| `$NODE_BUILD_SCRIPT` | package.json script for building operation.  | `String`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `false` | build |
+| `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for building operation.  | `String`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `false` |  |
 | `$NODE_BUILD_CWD` | Working directory for build operation. | `String` | `false` | . |
 
 ##### Environment
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json([]struct{ match: RegExp, environment: string }) | `false` | [
-    { &#34;match&#34;: &#34;^tags/v?\\d&#43;.\\d&#43;.\\d&#43;$&#34;, &#34;environment&#34;: &#34;production&#34; },
-    { &#34;match&#34;: &#34;^tags/v?\\d&#43;.\\d&#43;.\\d&#43;-.*\\.\\d&#43;$&#34;, &#34;environment&#34;: &#34;stage&#34; },
-    { &#34;match&#34; :&#34;^heads/main$&#34;, &#34;environment&#34;: &#34;develop&#34; },
-    { &#34;match&#34;: &#34;^heads/master$&#34;, &#34;environment&#34;: &#34;develop&#34; }
-] |
+| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.  | `String`<br/>`json([]struct{ match: RegExp, environment: string })` | `false` | [<br />    { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },<br />    { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },<br />    { "match" :"^heads/main$", "environment": "develop" },<br />    { "match": "^heads/master$", "environment": "develop" }<br />] |
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Whether to fail on missing environment references. | `Bool` | `false` | false |
 | `$ENVIRONMENT_STRICT` | Whether to fail on missing environment selection. | `Bool` | `false` | false |
 | `$ENVIRONMENT_ENABLE` | Whether to enable environment injection or not. | `Bool` | `false` | false |
@@ -105,7 +100,7 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
 
 ### `run`
 
@@ -117,20 +112,15 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_COMMAND_SCRIPT` | package.json script for given command operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
-| `$NODE_COMMAND_SCRIPT_ARGS` | package.json script arguments for given command operation.  | `String`<br/>format(Template(struct{ Environment: string, EnvVars: map[string]string })) | `false` |  |
+| `$NODE_COMMAND_SCRIPT` | package.json script for given command operation.  | `String`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `false` |  |
+| `$NODE_COMMAND_SCRIPT_ARGS` | package.json script arguments for given command operation.  | `String`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `false` |  |
 | `$NODE_COMMAND_CWD` | Working directory for the given command operation. | `String` | `false` | . |
 
 ##### Environment
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment. Use either &#34;heads/&#34; for narrowing the search to branches or &#34;tags/&#34; for narrowing the search to tags.  | `String`<br/>json([]struct{ match: RegExp, environment: string }) | `false` | [
-    { &#34;match&#34;: &#34;^tags/v?\\d&#43;.\\d&#43;.\\d&#43;$&#34;, &#34;environment&#34;: &#34;production&#34; },
-    { &#34;match&#34;: &#34;^tags/v?\\d&#43;.\\d&#43;.\\d&#43;-.*\\.\\d&#43;$&#34;, &#34;environment&#34;: &#34;stage&#34; },
-    { &#34;match&#34; :&#34;^heads/main$&#34;, &#34;environment&#34;: &#34;develop&#34; },
-    { &#34;match&#34;: &#34;^heads/master$&#34;, &#34;environment&#34;: &#34;develop&#34; }
-] |
+| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.  | `String`<br/>`json([]struct{ match: RegExp, environment: string })` | `false` | [<br />    { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },<br />    { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },<br />    { "match" :"^heads/main$", "environment": "develop" },<br />    { "match": "^heads/master$", "environment": "develop" }<br />] |
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Whether to fail on missing environment references. | `Bool` | `false` | false |
 | `$ENVIRONMENT_STRICT` | Whether to fail on missing environment selection. | `Bool` | `false` | false |
 | `$ENVIRONMENT_ENABLE` | Whether to enable environment injection or not. | `Bool` | `false` | false |
@@ -146,4 +136,4 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>enum(&#34;npm&#34;, &#34;yarn&#34;) | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs.  | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
