@@ -148,7 +148,9 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.tag_as_latest",
-		Usage:    `Regex pattern to tag the image as latest. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json(RegExp[])`,
+		Usage: `Regex pattern to tag the image as latest.
+Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
+json(RegExp[])`,
 		Required: false,
 		EnvVars:  []string{"IMAGE_TAG_AS_LATEST", "DOCKER_IMAGE_TAG_AS_LATEST"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
@@ -157,7 +159,9 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.sanitize_tags",
-		Usage:    `Sanitizes the given regex pattern out of tag name. Template is interpolated with the given matches in the regular expression. json([]struct{ match: RegExp, template: Template(map[string]string) })`,
+		Usage: `Sanitizes the given regex pattern out of tag name.
+Template is interpolated with the given matches in the regular expression.
+json([]struct{ match: RegExp, template: Template(map[string]string) })`,
 		Required: false,
 		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,

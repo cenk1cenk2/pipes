@@ -11,7 +11,7 @@ const (
 
 	FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST = `[ "^tags/v?\\d+.\\d+.\\d+$" ]`
 	FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS = `[
-    { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | to_upper_case }}_{{ index $ 2 }}" }
+    { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }
 ]`
 
 	// node.

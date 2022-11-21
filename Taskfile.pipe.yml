@@ -1,0 +1,61 @@
+---
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GO_VERSION: 1.19
+  GO_LD_FLAGS: -w -s
+  BINARY_DIR: dist
+  BINARY_NAME: pipe
+  BINARY_APPEND_OS: false
+  BINARY_APPEND_ARCH: false
+
+env:
+  CGO_ENABLED: 0
+
+tasks:
+  clean:
+    desc: Cleans the output binary folder and build cache.
+    cmds:
+      - go clean
+      - rm -f {{ .BINARY_DIR }}
+
+  test:
+    desc: Tests the given application.
+    cmds:
+      - go test -v -p 1 ./...
+
+  build:
+    desc: Builds the application.
+    deps:
+      - task: build.platform
+        vars:
+          os: linux
+          arch: amd64
+
+  build.platform:
+    internal: true
+    cmds:
+      - GOOS={{ .os }} GOARCH={{ .arch }} go build -mod=readonly {{- if .GO_LD_FLAGS }} -ldflags="{{ .GO_LD_FLAGS }}"{{- end }} -o {{ .BINARY_DIR }}/{{ .BINARY_NAME }}{{ if eq .BINARY_APPEND_OS "true" }}-{{ .os }}{{ end }}{{ if eq .BINARY_APPEND_ARCH "true" }}-{{ .arch }}{{ end }}
+
+  start:
+    desc: Starts the given application.
+    interactive: true
+    env:
+      LOG_LEVEL: debug
+    cmds:
+      - go run . {{ .CLI_ARGS }}
+
+  docs:
+    desc: Generates the documentation for the application.
+    interactive: true
+    env:
+      LOG_LEVEL: trace
+    cmds:
+      - go run . MARKDOWN_DOC
+
+  help:
+    desc: Generates help for the application.
+    cmds:
+      - go run . --help

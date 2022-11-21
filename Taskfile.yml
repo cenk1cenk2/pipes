@@ -1,0 +1,107 @@
+---
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GO_VERSION: 1.19
+
+env:
+  CGO_ENABLED: 0
+
+includes:
+  template:
+    dir: ./_template
+    taskfile: ./Taskfile.pipe.yml
+  docker:
+    dir: ./docker
+    taskfile: ./Taskfile.pipe.yml
+  gh-release-tracker:
+    dir: ./gh-release-tracker
+    taskfile: ./Taskfile.pipe.yml
+  gl-artifacts:
+    dir: ./gl-artifacts
+    taskfile: ./Taskfile.pipe.yml
+  markdown-toc:
+    dir: ./markdown-toc
+    taskfile: ./Taskfile.pipe.yml
+  node:
+    dir: ./node
+    taskfile: ./Taskfile.pipe.yml
+  s3-upload:
+    dir: ./s3-upload
+    taskfile: ./Taskfile.pipe.yml
+  select-env:
+    dir: ./select-env
+    taskfile: ./Taskfile.pipe.yml
+  semantic-release:
+    dir: ./semantic-release
+    taskfile: ./Taskfile.pipe.yml
+  update-docker-hub-readme:
+    dir: ./update-docker-hub-readme
+    taskfile: ./Taskfile.pipe.yml
+
+tasks:
+  install:
+    desc: Installs the required dependencies on pull.
+    cmds:
+      - go mod vendor
+    sources:
+      - go.sum
+    generates:
+      - "vendor/**"
+
+  format:
+    desc: Formats the current code base.
+    cmds:
+      - goimports -w .
+      - golangci-lint run --fix
+
+  lint:
+    desc: Lints the codebase with predefined rules.
+    cmds:
+      - golangci-lint run
+    sources:
+      - "**/*.go"
+
+  update:
+    desc: Updates all the dependencies to their latest minor version.
+    cmds:
+      - go get -u all
+      - task: tidy
+
+  tidy:
+    desc: Tidies the go.mod file.
+    cmds:
+      - go mod tidy -compat={{ .GO_VERSION }}
+      - task: install
+    sources:
+      - "go.{mod,sum}"
+
+  packages:
+    internal: true
+    deps:
+      - task: "template:{{ .command }}"
+      - task: "docker:{{ .command }}"
+      - task: "gh-release-tracker:{{ .command }}"
+      - task: "gl-artifacts:{{ .command }}"
+      - task: "markdown-toc:{{ .command }}"
+      - task: "node:{{ .command }}"
+      - task: "s3-upload:{{ .command }}"
+      - task: "select-env:{{ .command }}"
+      - task: "semantic-release:{{ .command }}"
+      - task: "update-docker-hub-readme:{{ .command }}"
+
+  build:
+    desc: Builds all the applications.
+    cmds:
+      - task: packages
+        vars:
+          command: build
+
+  docs:
+    desc: Generates documentation for all applications.
+    cmds:
+      - task: packages
+        vars:
+          command: docs

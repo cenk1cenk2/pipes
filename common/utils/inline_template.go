@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"strings"
+
+	"gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func InlineTemplate[Ctx any](tmpl string, ctx Ctx) (string, error) {
@@ -12,7 +13,8 @@ func InlineTemplate[Ctx any](tmpl string, ctx Ctx) (string, error) {
 		return "", nil
 	}
 
-	tmp, err := template.New("inline").Funcs(template.FuncMap{"join": strings.Join, "to_upper_case": strings.ToUpper, "to_lower_case": strings.ToLower}).Parse(tmpl)
+	// functions can be found here: https://go-task.github.io/slim-sprig/
+	tmp, err := template.New("inline").Funcs(plumber.TemplateFuncMap()).Parse(tmpl)
 
 	if err != nil {
 		return "", fmt.Errorf("Can not create inline template: %w", err)
