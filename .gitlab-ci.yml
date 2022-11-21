@@ -9,7 +9,6 @@ stages:
 variables:
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   LOG_LEVEL: trace
-  GO_LINT_COMMAND: make lint
 
 .publish-first:
   stage: publish-first
@@ -57,21 +56,23 @@ include:
 build:
   before_script:
     - cd ${APP_FOLDER}
+  variables:
+    GO_BUILD_COMMAND: task $PIPE:build
   artifacts:
     paths:
       - "./*/dist/"
   parallel:
     matrix:
-      - APP_FOLDER: ./_template
-      - APP_FOLDER: ./docker
-      - APP_FOLDER: ./gh-release-tracker
-      - APP_FOLDER: ./node
-      - APP_FOLDER: ./gl-artifacts
-      - APP_FOLDER: ./markdown-toc
-      - APP_FOLDER: ./update-docker-hub-readme
-      - APP_FOLDER: ./semantic-release
-      - APP_FOLDER: ./select-env
-      - APP_FOLDER: ./s3-upload
+      - PIPE: template
+      - PIPE: docker
+      - PIPE: gh-release-tracker
+      - PIPE: node
+      - PIPE: gl-artifacts
+      - PIPE: markdown-toc
+      - PIPE: update-docker-hub-readme
+      - PIPE: semantic-release
+      - PIPE: select-env
+      - PIPE: s3-upload
 
 # to stop depending on itself
 
@@ -117,7 +118,7 @@ publish-docker:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./docker]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [docker]"
   only:
     changes:
       - "common/**/*"
@@ -135,7 +136,7 @@ publish-gl-artifacts:
     DOCKERFILE_CONTEXT: ./gl-artifacts
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gl-artifacts]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [gl-artifacts]"
   only:
     changes:
       - "common/**/*"
@@ -152,7 +153,7 @@ publish-node:
   variables:
     DOCKERFILE_CONTEXT: ./node
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./node]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [node]"
   parallel:
     matrix:
       - IMAGE_TAGS: ${NODE_VERSION}
@@ -180,7 +181,7 @@ publish-gh-release-tracker:
     DOCKERFILE_CONTEXT: ./gh-release-tracker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./gh-release-tracker]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [gh-release-tracker]"
   only:
     changes:
       - "common/**/*"
@@ -198,7 +199,7 @@ publish-markdown-toc:
     DOCKERFILE_CONTEXT: ./markdown-toc
     IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./markdown-toc]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [markdown-toc]"
   only:
     changes:
       - "common/**/*"
@@ -216,7 +217,7 @@ publish-update-docker-hub-readme:
     DOCKERFILE_CONTEXT: ./update-docker-hub-readme
     IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./update-docker-hub-readme]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [update-docker-hub-readme]"
   only:
     changes:
       - "common/**/*"
@@ -234,7 +235,7 @@ publish-semantic-release:
     DOCKERFILE_CONTEXT: ./semantic-release
     IMAGE_NAME: cenk1cenk2/pipe-semantic-release
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./semantic-release]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [semantic-release]"
   only:
     changes:
       - "common/**/*"
@@ -253,7 +254,7 @@ publish-select-env:
     DOCKERFILE_CONTEXT: ./select-env
     IMAGE_NAME: cenk1cenk2/pipe-select-env
     IMAGE_TAGS: latest
-    PARENT_DOWNLOAD_ARTIFACTS: "build: [./select-env]"
+    PARENT_DOWNLOAD_ARTIFACTS: "build: [select-env]"
   only:
     changes:
       - "common/**/*"
@@ -271,7 +272,7 @@ publish-select-env:
 #     DOCKERFILE_CONTEXT: ./s3-upload
 #     IMAGE_NAME: cenk1cenk2/pipe-s3-upload
 #     IMAGE_TAGS: latest
-#     PARENT_DOWNLOAD_ARTIFACTS: "build: [./s3-upload]"
+#     PARENT_DOWNLOAD_ARTIFACTS: "build: [s3-upload]"
 #   only:
 #     changes:
 #       - "common/**/*"
