@@ -54,8 +54,6 @@ include:
     file: /templates/go-lint.gitlab-ci.yml
 
 build:
-  before_script:
-    - cd ${APP_FOLDER}
   variables:
     GO_BUILD_COMMAND: task $PIPE:build
   artifacts:
