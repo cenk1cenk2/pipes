@@ -7,7 +7,7 @@ build:
   image: golang:$GO_IMAGE
   script:
     - apk add --no-cache --no-progress git
-    - wget https://taskfile.dev/install.sh -O - | bash /dev/stdin -d -b /usr/bin
+    - wget https://taskfile.dev/install.sh -O - | sh /dev/stdin -d -b /usr/bin
     - $GO_BUILD_COMMAND
   rules:
     - when: on_success
