@@ -7,7 +7,7 @@ test:
   image: golang:$GO_IMAGE
   script:
     - apk add --no-cache --no-progress git
-    - wget https://taskfile.dev/install.sh -O - | sh /dev/stdin -d -b /usr/bin
+    - wget -O- -nv https://taskfile.dev/install.sh | sh /dev/stdin -d -b /usr/bin
     - $GO_TEST_COMMAND
   tags:
     - docker
