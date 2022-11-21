@@ -1,6 +1,6 @@
 variables:
   GO_IMAGE: alpine
-  GO_LINT_COMMAND: ""
+  GO_LINT_COMMAND: task lint
 
 lint:
   stage: build
