@@ -49,7 +49,7 @@ var Flags = []cli.Flag{
 	&cli.BoolFlag{
 		Category:    CATEGORY_SEMANTIC_RELEASE,
 		Name:        "semantic_release.run_multi",
-		Usage:       "Uses @qiwi/multi-semantic-release package to do a workspace release.",
+		Usage:       "Use @qiwi/multi-semantic-release package to do a workspace release.",
 		Required:    false,
 		EnvVars:     []string{"RUN_MULTI"},
 		Value:       false,

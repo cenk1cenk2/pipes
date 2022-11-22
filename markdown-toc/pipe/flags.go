@@ -10,7 +10,7 @@ import (
 var Flags = []cli.Flag{
 	&cli.StringSliceFlag{
 		Name:    "markdown-toc.pattern",
-		Usage:   "Pattern for markdown. Supports multiple patterns with comma-separated values.",
+		Usage:   "Pattern for markdown.",
 		Value:   cli.NewStringSlice("README.md"),
 		EnvVars: []string{"MARKDOWN_TOC_PATTERNS", "PLUGIN_MARKDOWN_TOC_PATTERNS"},
 	},

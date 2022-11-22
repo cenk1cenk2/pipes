@@ -23,7 +23,9 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category: flags.CATEGORY_ENVIRONMENT,
 		Name:     "environment.conditions",
-		Usage:    `Regex pattern to select an environment. Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. json([]struct{ match: RegExp, environment: string })`,
+		Usage: `Regex pattern to select an environment.
+      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
+      json([]struct{ match: RegExp, environment: string })`,
 		Required: false,
 		EnvVars:  []string{"ENVIRONMENT_CONDITIONS"},
 		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
@@ -32,7 +34,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.BoolFlag{
 		Category:    flags.CATEGORY_ENVIRONMENT,
 		Name:        "environment.fail-on-no-reference",
-		Usage:       "Whether to fail on missing environment references.",
+		Usage:       "Fail on missing environment references.",
 		Required:    false,
 		EnvVars:     []string{"ENVIRONMENT_FAIL_ON_NO_REFERENCE"},
 		Value:       true,
@@ -42,7 +44,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.BoolFlag{
 		Category:    flags.CATEGORY_ENVIRONMENT,
 		Name:        "environment.strict",
-		Usage:       "Whether to fail on missing environment selection.",
+		Usage:       "Fail on no environment selected.",
 		Required:    false,
 		EnvVars:     []string{"ENVIRONMENT_STRICT"},
 		Value:       true,

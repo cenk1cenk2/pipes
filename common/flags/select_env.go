@@ -18,7 +18,7 @@ func NewSelectEnvEnableFlag(setup SelectEnvEnableFlagSetup) []cli.Flag {
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.enable",
-			Usage:       "Whether to enable environment injection or not.",
+			Usage:       "Enable environment injection.",
 			Required:    setup.SelectEnvEnableRequired,
 			EnvVars:     []string{"ENVIRONMENT_ENABLE"},
 			Value:       setup.SelectEnvEnableValue,

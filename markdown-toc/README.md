@@ -8,7 +8,7 @@ Finds the markdown files and adds TOC to them.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$MARKDOWN_TOC_PATTERNS`<br/>`$PLUGIN_MARKDOWN_TOC_PATTERNS` | Pattern for markdown. Supports multiple patterns with comma-separated values. | `StringSlice` | `false` | "README.md" |
+| `$MARKDOWN_TOC_PATTERNS`<br/>`$PLUGIN_MARKDOWN_TOC_PATTERNS` | Pattern for markdown. | `StringSlice` | `false` | "README.md" |
 | `$MARKDOWN_TOC_ARGUMENTS`<br/>`$PLUGIN_MARKDOWN_TOC_ARGUMENTS` | Pass in the arguments for markdown-toc. | `String` | `false` | --bullets='-' |
 
 ### CLI

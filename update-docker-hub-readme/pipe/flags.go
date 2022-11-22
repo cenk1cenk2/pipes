@@ -18,7 +18,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_DOCKER_HUB,
 		Name:        "docker_hub.username",
-		Usage:       "Docker Hub username for updating the readme.",
+		Usage:       "DockerHub username for updating the readme.",
 		EnvVars:     []string{"DOCKER_USERNAME", "PLUGIN_DOCKER_USERNAME"},
 		Required:    true,
 		Destination: &TL.Pipe.DockerHub.Username,
@@ -27,7 +27,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_DOCKER_HUB,
 		Name:        "docker_hub.password",
-		Usage:       "Docker Hub password for updating the readme.",
+		Usage:       "DockerHub password for updating the readme.",
 		EnvVars:     []string{"DOCKER_PASSWORD", "PLUGIN_DOCKER_PASSWORD"},
 		Required:    true,
 		Destination: &TL.Pipe.DockerHub.Password,
@@ -36,7 +36,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_DOCKER_HUB,
 		Name:        "docker_hub.address",
-		Usage:       "HTTP address for the docker hub. There is only one!",
+		Usage:       "HTTP address for the DockerHub compatible service.",
 		EnvVars:     []string{"DOCKER_HUB_ADDRESS", "PLUGIN_DOCKER_HUB_ADDRESS"},
 		Value:       "https://hub.docker.com/v2/repositories",
 		Destination: &TL.Pipe.DockerHub.Address,
@@ -59,7 +59,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_README,
 		Name:        "readme.file",
-		Usage:       "Readme file for the given repossitory.",
+		Usage:       "Readme file for the given repository.",
 		EnvVars:     []string{"README_FILE", "PLUGIN_README_FILE"},
 		Value:       "README.md",
 		Destination: &TL.Pipe.Readme.File,
@@ -69,7 +69,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_README,
 		Name:        "readme.short_description",
-		Usage:       "Pass in description to send it in the request.",
+		Usage:       "Short description to display on DockerHub.",
 		EnvVars:     []string{"README_DESCRIPTION", "PLUGIN_README_DESCRIPTION"},
 		Destination: &TL.Pipe.Readme.Description,
 		Required:    false,

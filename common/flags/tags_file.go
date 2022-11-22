@@ -37,7 +37,7 @@ func NewTagsFileStrictFlags(setup TagsFileStrictFlagsSetup) []cli.Flag {
 		&cli.BoolFlag{
 			Category:    CATEGORY_TAGS_FILE,
 			Name:        "tags-file.strict",
-			Usage:       "Strict mode does not tolorate the missing tags file.",
+			Usage:       "Fail on missing tags file.",
 			Required:    setup.TagsFileStrictRequired,
 			EnvVars:     []string{"TAGS_FILE_STRICT"},
 			Value:       setup.TagsFileStrictValue,

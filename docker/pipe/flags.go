@@ -40,7 +40,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.BoolFlag{
 		Category:    CATEGORY_DOCKER,
 		Name:        "docker.use_buildkit",
-		Usage:       "Use Docker build kit for building images.",
+		Usage:       "Use Docker BuildKit for building images.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_USE_BUILDKIT"},
 		Value:       true,
@@ -50,7 +50,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.BoolFlag{
 		Category:    CATEGORY_DOCKER,
 		Name:        "docker.use_buildx",
-		Usage:       "Use Docker BuildX builder.",
+		Usage:       "Use Docker BuildX builder for multi-platform builds.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_USE_BUILDX"},
 		Value:       false,
@@ -82,7 +82,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category:    CATEGORY_DOCKER_REGISTRY,
 		Name:        "docker_registry.registry",
-		Usage:       "Docker registry url for logging in.",
+		Usage:       "Docker registry url to login to.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_REGISTRY"},
 		Destination: &TL.Pipe.DockerRegistry.Registry,
@@ -111,7 +111,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category:    CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_image.name",
-		Usage:       "Image name for will be built Docker image.",
+		Usage:       "Image name for the will be built Docker image.",
 		Required:    true,
 		EnvVars:     []string{"IMAGE_NAME", "DOCKER_IMAGE_NAME"},
 		Destination: &TL.Pipe.DockerImage.Name,
@@ -120,7 +120,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringSliceFlag{
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.tags",
-		Usage:    "Image tag for will be built Docker image.",
+		Usage:    "Image tag for the will be built Docker image.",
 		Required: true,
 		EnvVars:  []string{"IMAGE_TAGS", "DOCKER_IMAGE_TAGS"},
 	},
@@ -149,8 +149,8 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.tag_as_latest",
 		Usage: `Regex pattern to tag the image as latest.
-Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
-json(RegExp[])`,
+      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
+      json(RegExp[])`,
 		Required: false,
 		EnvVars:  []string{"IMAGE_TAG_AS_LATEST", "DOCKER_IMAGE_TAG_AS_LATEST"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
@@ -160,8 +160,8 @@ json(RegExp[])`,
 		Category: CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.sanitize_tags",
 		Usage: `Sanitizes the given regex pattern out of tag name.
-Template is interpolated with the given matches in the regular expression.
-json([]struct{ match: RegExp, template: Template(map[string]string) })`,
+      Template is interpolated with the given matches in the regular expression.
+      json([]struct{ match: RegExp, template: Template(map[string]string) })`,
 		Required: false,
 		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,

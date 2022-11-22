@@ -17,7 +17,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_INSTALL,
 		Name:        "node.install_cwd",
-		Usage:       "Install CWD for nodejs.",
+		Usage:       "Install CWD for the package manager.",
 		Required:    false,
 		EnvVars:     []string{"NODE_INSTALL_CWD"},
 		Value:       ".",
@@ -27,7 +27,7 @@ var Flags = []cli.Flag{
 	&cli.BoolFlag{
 		Category:    CATEGORY_NODE_INSTALL,
 		Name:        "node.use_lock_file",
-		Usage:       "Whether to use lock file or not.",
+		Usage:       "Use the lockfile while installing the packages.",
 		Required:    false,
 		EnvVars:     []string{"NODE_INSTALL_USE_LOCK_FILE"},
 		Value:       true,
@@ -37,7 +37,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_INSTALL,
 		Name:        "node.install_args",
-		Usage:       "Arguments for appending to installation.",
+		Usage:       "Arguments to append to install command.",
 		Required:    false,
 		EnvVars:     []string{"NODE_INSTALL_ARGS"},
 		Value:       "",

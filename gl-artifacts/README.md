@@ -27,4 +27,4 @@ Downloads gitlab artifacts from the API for creating downstream pipelines.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_PROJECT_ID` | Parent project id. | `String` | `true` |  |
 | `$PARENT_PIPELINE_ID` | Pipeline id of the parent pipeline. | `String` | `true` |  |
-| `$PARENT_DOWNLOAD_ARTIFACTS` | Names of the jobs that yield artifacts from the parent job. | `String` | `true` |  |
+| `$PARENT_DOWNLOAD_ARTIFACTS` | Names of the jobs that yield artifacts from the parent job. | `String`<br/>`format(multiple("|"))` | `true` |  |
