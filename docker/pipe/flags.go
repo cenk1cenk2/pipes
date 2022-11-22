@@ -175,7 +175,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
       json([]struct{ match: RegExp, template: Template(map[string]string) })`,
 		Required: false,
 		EnvVars:  []string{"DOCKER_IMAGE_TAGS_TEMPLATE"},
-		Value:    "",
+		Value:    "[]",
 	},
 
 	&cli.BoolFlag{
