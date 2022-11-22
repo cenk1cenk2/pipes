@@ -157,7 +157,7 @@ publish-node:
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: ${NODE_VERSION}
-        DOCKER_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
+        DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
         NODE_VERSION:
           - 16
           - 16-alpine
@@ -239,8 +239,9 @@ publish-semantic-release:
   only:
     changes:
       - "common/**/*"
-      - "semantic-release/**/*"
+      - "select-env/**/*"
       - "node/**/*"
+      - "semantic-release/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml
