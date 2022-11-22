@@ -1,8 +1,6 @@
+# syntax=docker/dockerfile-upstream:master-labs
 FROM alpine:latest
 
-COPY ./dist/pipe /usr/bin/pipe
+COPY --chmod=777 ./dist/pipe /usr/bin/pipe
 
-RUN chmod +x /usr/bin/pipe && \
-  apk add --no-cache --no-progress unzip && \
-  # smoke test
-  pipe --help
+RUN pipe --help
