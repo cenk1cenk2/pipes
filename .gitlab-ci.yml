@@ -14,8 +14,8 @@ variables:
   stage: publish-first
   before_script:
     - cd $DOCKER_CONTEXT
-  vars:
-    DOCKER_BUILDKIT: 1
+  variables:
+    DOCKER_BUILDKIT: "1"
   script:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
     - docker build --pull -t $DOCKER_IMAGE_NAME .
