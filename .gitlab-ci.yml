@@ -117,7 +117,7 @@ publish-docker:
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [docker]"
   only:
     changes:
@@ -135,7 +135,7 @@ publish-gl-artifacts:
   variables:
     DOCKERFILE_CONTEXT: ./gl-artifacts
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [gl-artifacts]"
   only:
     changes:
@@ -156,7 +156,7 @@ publish-node:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [node]"
   parallel:
     matrix:
-      - IMAGE_TAGS: ${NODE_VERSION}
+      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}
         BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
         NODE_VERSION:
           - 16
@@ -180,7 +180,7 @@ publish-gh-release-tracker:
   variables:
     DOCKERFILE_CONTEXT: ./gh-release-tracker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [gh-release-tracker]"
   only:
     changes:
@@ -198,7 +198,7 @@ publish-markdown-toc:
   variables:
     DOCKERFILE_CONTEXT: ./markdown-toc
     IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [markdown-toc]"
   only:
     changes:
@@ -216,7 +216,7 @@ publish-update-docker-hub-readme:
   variables:
     DOCKERFILE_CONTEXT: ./update-docker-hub-readme
     IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [update-docker-hub-readme]"
   only:
     changes:
@@ -234,7 +234,7 @@ publish-semantic-release:
   variables:
     DOCKERFILE_CONTEXT: ./semantic-release
     IMAGE_NAME: cenk1cenk2/pipe-semantic-release
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [semantic-release]"
   only:
     changes:
@@ -253,7 +253,7 @@ publish-select-env:
   variables:
     DOCKERFILE_CONTEXT: ./select-env
     IMAGE_NAME: cenk1cenk2/pipe-select-env
-    IMAGE_TAGS: latest
+    DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [select-env]"
   only:
     changes:
@@ -271,7 +271,7 @@ publish-select-env:
 #   variables:
 #     DOCKERFILE_CONTEXT: ./s3-upload
 #     IMAGE_NAME: cenk1cenk2/pipe-s3-upload
-#     IMAGE_TAGS: latest
+#     DOCKER_IMAGE_TAGS: latest
 #     PARENT_DOWNLOAD_ARTIFACTS: "build: [s3-upload]"
 #   only:
 #     changes:
