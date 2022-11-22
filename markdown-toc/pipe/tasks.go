@@ -1,13 +1,16 @@
 package pipe
 
 import (
+	"bytes"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"gitlab.kilic.dev/libraries/go-utils/utils"
 
 	glob "github.com/bmatcuk/doublestar/v4"
+	toc "github.com/ekalinin/github-markdown-toc.go"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -59,18 +62,60 @@ func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 func RunMarkdownToc(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("markdown-toc").
 		Set(func(t *Task[Pipe]) error {
+			const start = "<!-- toc -->"
+			const end = "<!-- tocstop -->"
+			expr := fmt.Sprintf(`(?s)%s(.*)%s`, start, end)
+
+			t.Log.Debugf("Using expression: %s", expr)
+
 			for _, match := range t.Pipe.Ctx.Matches {
-				t.CreateCommand(
-					MARKDOWN_TOC_COMMAND,
-					t.Pipe.Markdown.Arguments,
-					"-i",
-					match,
-				).
-					AddSelfToTheTask()
+				func(match string) {
+					t.CreateSubtask(match).
+						Set(func(t *Task[Pipe]) error {
+							parser := toc.NewGHDoc(match, false, t.Pipe.Markdown.StartDepth, t.Pipe.Markdown.EndDepth, false, "", t.Pipe.Markdown.Indentation, false)
+
+							p := parser.GetToc()
+
+							var b bytes.Buffer
+
+							p.Print(&b)
+
+							s := b.String()
+
+							marker := regexp.MustCompile(`(?m)^(\s+)?\*`)
+
+							s = marker.ReplaceAllString(s, fmt.Sprintf(`$1%s`, t.Pipe.Markdown.ListIdentifier))
+
+							t.Log.Debugf("Trying to read file: %s", match)
+
+							content, err := os.ReadFile(match)
+
+							if err != nil {
+								return err
+							}
+
+							readme := string(content)
+
+							r := regexp.MustCompile(expr)
+
+							replace := strings.Join([]string{start, "", strings.TrimSpace(s), "", end}, "\n")
+
+							result := r.ReplaceAllString(readme, replace)
+
+							if err := os.WriteFile(match, []byte(result), 0600); err != nil {
+								return err
+							}
+
+							t.Log.Infof("Processed file: %s", match)
+
+							return nil
+						}).
+						AddSelfToTheParentAsParallel()
+				}(match)
 			}
 
 			return nil
 		}).ShouldRunAfter(func(t *Task[Pipe]) error {
-		return t.RunCommandJobAsJobParallel()
+		return t.RunSubtasks()
 	})
 }

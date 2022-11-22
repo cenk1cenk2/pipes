@@ -8,10 +8,6 @@ import (
 type (
 	Git flags.GitFlags
 
-	Environment struct {
-		Enable bool
-	}
-
 	NodeBuild struct {
 		Script     string
 		ScriptArgs string
@@ -19,7 +15,6 @@ type (
 	}
 
 	Pipe struct {
-		Environment
 		Git
 		NodeBuild
 	}

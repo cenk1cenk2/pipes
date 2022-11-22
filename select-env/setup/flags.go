@@ -17,6 +17,16 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		GitTagDestination:    &TL.Pipe.Git.Tag,
 	},
 ), []cli.Flag{
+	&cli.BoolFlag{
+		Category:    flags.CATEGORY_ENVIRONMENT,
+		Name:        "environment.enable",
+		Usage:       "Enable environment injection.",
+		Required:    false,
+		Hidden:      true,
+		EnvVars:     []string{"ENVIRONMENT_ENABLE"},
+		Value:       true,
+		Destination: &TL.Pipe.Environment.Enable,
+	},
 
 	// CATEGORY_ENVIRONMENT
 

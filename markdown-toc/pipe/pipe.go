@@ -6,8 +6,11 @@ import (
 
 type (
 	Markdown struct {
-		Patterns  []string
-		Arguments string
+		Patterns       []string
+		StartDepth     int
+		EndDepth       int
+		Indentation    int
+		ListIdentifier string
 	}
 
 	Pipe struct {

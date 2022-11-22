@@ -28,7 +28,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
 		Name:        "gh.repository",
 		Usage:       "Target repository to fetch the latest tag.",
 		Required:    true,
-		EnvVars:     []string{"GH_REPOSITORY", "GH_REPOSITORY"},
+		EnvVars:     []string{"GH_REPOSITORY", "GITHUB_REPOSITORY"},
 		Value:       "",
 		Destination: &TL.Pipe.Github.Repository,
 	},

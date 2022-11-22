@@ -8,24 +8,7 @@ import (
 )
 
 func main() {
-	p := Plumber{
-		DocsExcludeFlags:       true,
-		DocsExcludeHelpCommand: true,
-		DeprecationNotices: []DeprecationNotice{
-			{
-				Level:       LOG_LEVEL_ERROR,
-				Environment: []string{"TAG_AS_LATEST_FOR_TAGS_REGEX"},
-				Flag:        []string{"--docker_image.tag_as_latest_for_tags_regex"},
-			},
-			{
-				Level:       LOG_LEVEL_ERROR,
-				Environment: []string{"TAG_AS_LATEST_FOR_BRANCHES_REGEX"},
-				Flag:        []string{"--docker_image.tag_as_latest_for_branches_regex"},
-			},
-		},
-	}
-
-	p.New(
+	NewPlumber(
 		func(p *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
@@ -33,11 +16,23 @@ func main() {
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
 				Flags:       pipe.Flags,
+				Before: func(ctx *cli.Context) error {
+					p.SetDeprecationNotices(pipe.DeprecationNotices)
+
+					return nil
+				},
 				Action: func(c *cli.Context) error {
-					return pipe.TL.RunJobs(
+					tl := &pipe.TL
+
+					return tl.RunJobs(
 						pipe.New(p).SetCliContext(c).Job(),
 					)
 				},
 			}
-		}).Run()
+		}).
+		SetDocumentationOptions(DocumentationOptions{
+			ExcludeFlags:       true,
+			ExcludeHelpCommand: true,
+		}).
+		Run()
 }

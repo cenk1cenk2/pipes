@@ -1,9 +1,6 @@
-FROM node:16-alpine
+# syntax=docker/dockerfile-upstream:master-labs
+FROM alpine:latest
 
-RUN yarn global add markdown-toc
+COPY --chmod=777 ./dist/pipe /usr/bin/pipe
 
-COPY ./dist/pipe /usr/bin/pipe
-
-RUN chmod +x /usr/bin/pipe && \
-  # smoke test
-  pipe --help
+RUN pipe --help

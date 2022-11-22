@@ -10,7 +10,7 @@ Pipe for installing node.js dependencies and building node.js applications on CI
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warning", "info", "debug", "trace")` | `false` | info |
 | `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ## Commands
@@ -85,10 +85,10 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$ENVIRONMENT_ENABLE` | Enable environment injection. | `Bool` | `false` | false |
 | `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `String`<br/>`json([]struct{ match: RegExp, environment: string })` | `false` | [<br />  { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },<br />  { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },<br />  { "match" :"^heads/main$", "environment": "develop" },<br />  { "match": "^heads/master$", "environment": "develop" }<br />] |
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | false |
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | false |
-| `$ENVIRONMENT_ENABLE` | Enable environment injection. | `Bool` | `false` | false |
 
 ##### GIT
 
@@ -120,10 +120,10 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$ENVIRONMENT_ENABLE` | Enable environment injection. | `Bool` | `false` | false |
 | `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `String`<br/>`json([]struct{ match: RegExp, environment: string })` | `false` | [<br />  { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },<br />  { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },<br />  { "match" :"^heads/main$", "environment": "develop" },<br />  { "match": "^heads/master$", "environment": "develop" }<br />] |
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | false |
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | false |
-| `$ENVIRONMENT_ENABLE` | Enable environment injection. | `Bool` | `false` | false |
 
 ##### GIT
 

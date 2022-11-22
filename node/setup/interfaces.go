@@ -6,6 +6,8 @@ type (
 		InstallWithLock []string
 		Run             []string
 		RunDelimitter   []string
+		Add             []string
+		Global          []string
 	}
 
 	AvailablePackageManagerCommands map[string]PackageManagerCommands

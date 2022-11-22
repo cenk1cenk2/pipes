@@ -1,4 +1,5 @@
-FROM node:16-alpine
+# syntax=docker/dockerfile-upstream:master-labs
+FROM node:18-alpine
 
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
@@ -7,9 +8,9 @@ RUN \
   npm i -g npm@8.4
 
 
-COPY ./dist/pipe /usr/bin/pipe
+COPY --chmod=777 ./dist/pipe /usr/bin/pipe
 
-RUN chmod +x /usr/bin/pipe && \
+RUN \
   # smoke test
   node --version && \
   npm --version && \

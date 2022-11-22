@@ -22,6 +22,7 @@ type (
 		TagsFile       string
 		TagsFileStrict bool
 		TagsSanitize   []TagsSanitizeJson
+		TagsTemplate   []TagsTemplateJson
 		Pull           bool
 		Inspect        bool
 		BuildArgs      []string

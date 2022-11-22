@@ -8,4 +8,5 @@ const (
 	CATEGORY_GITLAB_PIPELINE = "Gitlab Pipeline"
 	CATEGORY_TAGS_FILE       = "Tags File"
 	CATEGORY_ENVIRONMENT     = "Environment"
+	CATEGORY_PACKAGES        = "Packages"
 )

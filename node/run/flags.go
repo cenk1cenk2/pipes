@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v2"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
@@ -16,13 +15,7 @@ const (
 	CATEGORY_NODE_COMMAND = "Command"
 )
 
-var Flags = TL.Plumber.AppendFlags(flags.NewSelectEnvEnableFlag(
-	flags.SelectEnvEnableFlagSetup{
-		SelectEnvEnableDestination: &TL.Pipe.Environment.Enable,
-		SelectEnvEnableRequired:    false,
-		SelectEnvEnableValue:       false,
-	},
-), []cli.Flag{
+var Flags = []cli.Flag{
 
 	// CATEGORY_NODE_COMMAND
 
@@ -47,7 +40,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewSelectEnvEnableFlag(
 		Value:       ".",
 		Destination: &TL.Pipe.NodeCommand.Cwd,
 	},
-})
+}
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
 	if tl.Pipe.NodeCommand.Script == "" {

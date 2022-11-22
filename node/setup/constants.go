@@ -7,6 +7,8 @@ var (
 			InstallWithLock: []string{"install", "--frozen-lock-file"},
 			Run:             []string{"run"},
 			RunDelimitter:   []string{},
+			Add:             []string{"add"},
+			Global:          []string{"global"},
 		},
 
 		"npm": {
@@ -14,6 +16,8 @@ var (
 			InstallWithLock: []string{"ci", "--unsafe-perm"},
 			Run:             []string{"run"},
 			RunDelimitter:   []string{"--"},
+			Add:             []string{"install", "--unsafe-perm"},
+			Global:          []string{"-g"},
 		},
 	}
 )

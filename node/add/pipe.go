@@ -5,20 +5,15 @@ import (
 )
 
 type (
-	Packages struct {
-		Apk []string
-	}
-
-	SemanticRelease struct {
-		IsDryRun bool
-		UseMulti bool
+	NodeAdd struct {
+		Packages   []string
+		Global     bool
+		ScriptArgs string
+		Cwd        string
 	}
 
 	Pipe struct {
-		Ctx
-
-		Packages
-		SemanticRelease
+		NodeAdd
 	}
 )
 
@@ -28,13 +23,15 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
+		ShouldDisable(func(tl *TaskList[Pipe]) bool {
+			return len(tl.Pipe.NodeAdd.Packages) == 0
+		}).
 		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
 			return ProcessFlags(tl)
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
-				InstallApkPackages(tl).Job(),
-				RunSemanticRelease(tl).Job(),
+				AddNodeModules(tl).Job(),
 			)
 		})
 }

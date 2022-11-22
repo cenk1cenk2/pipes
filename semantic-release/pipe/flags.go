@@ -2,13 +2,13 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_PACKAGES         = "Packages"
 	CATEGORY_SEMANTIC_RELEASE = "Semantic Release"
 )
 
@@ -17,20 +17,11 @@ var Flags = []cli.Flag{
 	// CATEGORY_PACKAGES
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_PACKAGES,
+		Category: flags.CATEGORY_PACKAGES,
 		Name:     "packages.apk",
 		Usage:    "APK applications to install before running semantic-release.",
 		Required: false,
 		EnvVars:  []string{"ADD_APKS"},
-		Value:    &cli.StringSlice{},
-	},
-
-	&cli.StringSliceFlag{
-		Category: CATEGORY_PACKAGES,
-		Name:     "packages.node",
-		Usage:    "Node packages to install before running semantic-release.",
-		Required: false,
-		EnvVars:  []string{"ADD_MODULES"},
 		Value:    &cli.StringSlice{},
 	},
 
@@ -41,7 +32,7 @@ var Flags = []cli.Flag{
 		Name:        "semantic_release.dry_run",
 		Usage:       "Node packages to install before running semantic-release.",
 		Required:    false,
-		EnvVars:     []string{"DRY_RUN"},
+		EnvVars:     []string{"SEMANTIC_RELEASE_DRY_RUN"},
 		Value:       false,
 		Destination: &TL.Pipe.SemanticRelease.IsDryRun,
 	},
@@ -51,7 +42,7 @@ var Flags = []cli.Flag{
 		Name:        "semantic_release.run_multi",
 		Usage:       "Use @qiwi/multi-semantic-release package to do a workspace release.",
 		Required:    false,
-		EnvVars:     []string{"RUN_MULTI"},
+		EnvVars:     []string{"SEMANTIC_RELEASE_RUN_MULTI"},
 		Value:       false,
 		Destination: &TL.Pipe.SemanticRelease.UseMulti,
 	},
@@ -59,7 +50,19 @@ var Flags = []cli.Flag{
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
 	tl.Pipe.Apk = tl.CliContext.StringSlice("packages.apk")
-	tl.Pipe.Node = tl.CliContext.StringSlice("packages.node")
 
 	return nil
+}
+
+var DeprecationNotices = []DeprecationNotice{
+	{
+		Environment: []string{"DRY_RUN", "RUN_MULTI"},
+		Level:       LOG_LEVEL_ERROR,
+		Message:     `"%s" is deprecated, please use the environment variable with the "SEMANTIC_RELEASE_" prefix instead.`,
+	},
+	{
+		Environment: []string{"ADD_MODULES"},
+		Level:       LOG_LEVEL_ERROR,
+		Message:     `"%s" is deprecated, please use the environment variable "ADD_NODE_MODULES" through node pipe instead.`,
+	},
 }

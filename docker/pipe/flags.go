@@ -113,7 +113,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:        "docker_image.name",
 		Usage:       "Image name for the will be built Docker image.",
 		Required:    true,
-		EnvVars:     []string{"IMAGE_NAME", "DOCKER_IMAGE_NAME"},
+		EnvVars:     []string{"DOCKER_IMAGE_NAME"},
 		Destination: &TL.Pipe.DockerImage.Name,
 	},
 
@@ -122,7 +122,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:     "docker_image.tags",
 		Usage:    "Image tag for the will be built Docker image.",
 		Required: true,
-		EnvVars:  []string{"IMAGE_TAGS", "DOCKER_IMAGE_TAGS"},
+		EnvVars:  []string{"DOCKER_IMAGE_TAGS"},
 	},
 
 	&cli.StringFlag{
@@ -152,7 +152,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json(RegExp[])`,
 		Required: false,
-		EnvVars:  []string{"IMAGE_TAG_AS_LATEST", "DOCKER_IMAGE_TAG_AS_LATEST"},
+		EnvVars:  []string{"DOCKER_IMAGE_TAG_AS_LATEST"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
 	},
 
@@ -163,8 +163,19 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
       Template is interpolated with the given matches in the regular expression.
       json([]struct{ match: RegExp, template: Template(map[string]string) })`,
 		Required: false,
-		EnvVars:  []string{"IMAGE_SANITIZE_TAGS", "DOCKER_IMAGE_SANITIZE_TAGS"},
+		EnvVars:  []string{"DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
+	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_DOCKER_IMAGE,
+		Name:     "docker_image.tags_template",
+		Usage: `Modifies every tag that matches a certain condition.
+      Template is interpolated with the given matches in the regular expression.
+      json([]struct{ match: RegExp, template: Template(map[string]string) })`,
+		Required: false,
+		EnvVars:  []string{"DOCKER_IMAGE_TAGS_TEMPLATE"},
+		Value:    "",
 	},
 
 	&cli.BoolFlag{
@@ -172,7 +183,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:        "docker_image.inspect",
 		Usage:       "Inspect after pushing the image.",
 		Required:    false,
-		EnvVars:     []string{"IMAGE_INSPECT", "DOCKER_IMAGE_INSPECT"},
+		EnvVars:     []string{"DOCKER_IMAGE_INSPECT"},
 		Value:       true,
 		Destination: &TL.Pipe.DockerImage.Inspect,
 	},
@@ -182,7 +193,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:     "docker_image.build_args",
 		Usage:    "Pass in extra build arguments for image.",
 		Required: false,
-		EnvVars:  []string{"BUILD_ARGS", "DOCKER_IMAGE_BUILD_ARGS"},
+		EnvVars:  []string{"DOCKER_IMAGE_BUILD_ARGS"},
 	},
 
 	&cli.BoolFlag{
@@ -190,7 +201,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:        "docker_image.pull",
 		Usage:       "Pull before building the image.",
 		Required:    false,
-		EnvVars:     []string{"IMAGE_PULL", "DOCKER_IMAGE_PULL"},
+		EnvVars:     []string{"DOCKER_IMAGE_PULL"},
 		Value:       true,
 		Destination: &TL.Pipe.DockerImage.Pull,
 	},
@@ -209,8 +220,28 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 		}
 	}
 
+	if v := tl.CliContext.String("docker_image.tags_template"); v != "" {
+		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerImage.TagsTemplate); err != nil {
+			return fmt.Errorf("Can not unmarshal Docker image templating tag conditions: %w", err)
+		}
+	}
+
 	tl.Pipe.DockerImage.Tags = tl.CliContext.StringSlice("docker_image.tags")
 	tl.Pipe.DockerImage.BuildArgs = tl.CliContext.StringSlice("docker_image.build_args")
 
 	return nil
+}
+
+var DeprecationNotices = []DeprecationNotice{
+	{
+		Level:       LOG_LEVEL_ERROR,
+		Environment: []string{"TAG_AS_LATEST_FOR_BRANCHES_REGEX", "TAG_AS_LATEST_FOR_TAGS_REGEX"},
+		Flag:        []string{"--docker_image.tag_as_latest_for_branches_regex", "--docker_image.tag_as_latest_for_tags_regex"},
+		Message:     `"%s" is deprecated, please use the "TAG_AS_LATEST" format.`,
+	},
+	{
+		Level:       LOG_LEVEL_ERROR,
+		Environment: []string{"IMAGE_NAME", "IMAGE_TAGS", "IMAGE_TAG_AS_LATEST", "IMAGE_SANITIZE_TAGS", "IMAGE_SANITIZE_TAGS", "IMAGE_INSPECT", "BUILD_ARGS", "IMAGE_PULL"},
+		Message:     `"%s" is deprecated, please use the environment variable with the "DOCKER_" prefix instead.`,
+	},
 }

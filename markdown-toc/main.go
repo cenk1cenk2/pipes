@@ -8,12 +8,7 @@ import (
 )
 
 func main() {
-	p := Plumber{
-		DocsExcludeFlags:       true,
-		DocsExcludeHelpCommand: true,
-	}
-
-	p.New(
+	NewPlumber(
 		func(p *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
@@ -21,11 +16,23 @@ func main() {
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
 				Flags:       pipe.Flags,
+				Before: func(ctx *cli.Context) error {
+					p.SetDeprecationNotices(pipe.DeprecationNotices)
+
+					return nil
+				},
 				Action: func(c *cli.Context) error {
-					return pipe.TL.RunJobs(
+					tl := &pipe.TL
+
+					return tl.RunJobs(
 						pipe.New(p).SetCliContext(c).Job(),
 					)
 				},
 			}
-		}).Run()
+		}).
+		SetDocumentationOptions(DocumentationOptions{
+			ExcludeFlags:       true,
+			ExcludeHelpCommand: true,
+		}).
+		Run()
 }

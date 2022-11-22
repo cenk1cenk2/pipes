@@ -5,10 +5,6 @@ import (
 )
 
 type (
-	Environment struct {
-		Enable bool
-	}
-
 	NodeCommand struct {
 		Script string
 		Cwd    string `validate:"dir"`
@@ -17,7 +13,6 @@ type (
 	Pipe struct {
 		Ctx
 
-		Environment
 		NodeCommand
 	}
 )

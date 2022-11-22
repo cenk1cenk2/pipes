@@ -37,37 +37,6 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func InstallNodePackages(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("install").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.Node) == 0
-		}).
-		Set(func(t *Task[Pipe]) error {
-			packages := t.Pipe.Node
-
-			t.Log.Debugf(
-				"Will install packages from NPM repository: %s",
-				strings.Join(packages, ", "),
-			)
-
-			t.CreateCommand(
-				"yarn",
-				"global",
-				"add",
-			).
-				Set(func(c *Command[Pipe]) error {
-					c.AppendArgs(packages...)
-
-					return nil
-				}).
-				AddSelfToTheTask()
-
-			return nil
-		}).ShouldRunAfter(func(t *Task[Pipe]) error {
-		return t.RunCommandJobAsJobParallel()
-	})
-}
-
 func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("release").
 		Set(func(t *Task[Pipe]) error {

@@ -10,7 +10,7 @@ Downloads gitlab artifacts from the API for creating downstream pipelines.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("PANIC", "FATAL", "WARNING", "INFO", "DEBUG", "TRACE")` | `false` | info |
+| `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warning", "info", "debug", "trace")` | `false` | info |
 | `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
 ### Gitlab
@@ -27,4 +27,4 @@ Downloads gitlab artifacts from the API for creating downstream pipelines.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_PROJECT_ID` | Parent project id. | `String` | `true` |  |
 | `$PARENT_PIPELINE_ID` | Pipeline id of the parent pipeline. | `String` | `true` |  |
-| `$PARENT_DOWNLOAD_ARTIFACTS` | Names of the jobs that yield artifacts from the parent job. | `String`<br/>`format(multiple("|"))` | `true` |  |
+| `$PARENT_DOWNLOAD_ARTIFACTS` | Names of the jobs that yield artifacts from the parent job. | `String`<br/>`multiple("|")` | `true` |  |

@@ -13,20 +13,16 @@ import (
 )
 
 func main() {
-	p := Plumber{
-		DocsExcludeFlags:       true,
-		DocsExcludeHelpCommand: true,
-		DeprecationNotices: []DeprecationNotice{
-			{
-				Flag:        []string{"--node.build_environment_files", "--node.build_environment_fallback", "--node.build_environment_conditions"},
-				Environment: []string{"NODE_BUILD_ENVIRONMENT_FILES", "NODE_BUILD_ENVIRONMENT_CONDITIONS", "NODE_BUILD_ENVIRONMENT_FALLBACK"},
-				Level:       LOG_LEVEL_ERROR,
-				Message:     `"%s" is deprecated, please utilize the new select-env flags instead.`,
-			},
-		},
-	}
+	OverwriteCliFlag(environment.Flags, func(f *cli.BoolFlag) bool {
+		return f.Name == "environment.enable"
+	}, func(f *cli.BoolFlag) *cli.BoolFlag {
+		f.Hidden = false
+		f.Value = false
 
-	p.New(
+		return f
+	})
+
+	NewPlumber(
 		func(p *Plumber) *cli.App {
 			return &cli.App{
 				Name:        CLI_NAME,
@@ -39,8 +35,10 @@ func main() {
 						Description: "Login to the given NPM registries.",
 						Flags:       p.AppendFlags(setup.Flags, login.Flags),
 						Action: func(c *cli.Context) error {
-							return login.TL.RunJobs(
-								login.TL.JobSequence(
+							tl := &login.TL
+
+							return tl.RunJobs(
+								tl.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
 									login.New(p).SetCliContext(c).Job(),
 								),
@@ -53,8 +51,10 @@ func main() {
 						Description: "Install node.js dependencies with the given package manager.",
 						Flags:       p.AppendFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(c *cli.Context) error {
-							return install.TL.RunJobs(
-								install.TL.JobSequence(
+							tl := &install.TL
+
+							return tl.RunJobs(
+								tl.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
 									login.New(p).SetCliContext(c).Job(),
 									install.New(p).SetCliContext(c).Job(),
@@ -66,13 +66,18 @@ func main() {
 					{
 						Name:  "build",
 						Flags: p.AppendFlags(setup.Flags, environment.Flags, build.Flags),
+						Before: func(ctx *cli.Context) error {
+							p.SetDeprecationNotices(build.DeprecationNotices)
+
+							return nil
+						},
 						Action: func(c *cli.Context) error {
-							return build.TL.RunJobs(
-								build.TL.JobSequence(
+							tl := &build.TL
+
+							return tl.RunJobs(
+								tl.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
-									environment.New(p).SetCliContext(c).ShouldDisable(func(tl *TaskList[environment.Pipe]) bool {
-										return !build.TL.Pipe.Environment.Enable
-									}).Job(),
+									environment.New(p).SetCliContext(c).Job(),
 									build.New(p).SetCliContext(c).Job(),
 								),
 							)
@@ -83,12 +88,12 @@ func main() {
 						Name:  "run",
 						Flags: p.AppendFlags(setup.Flags, environment.Flags, run.Flags),
 						Action: func(c *cli.Context) error {
-							return run.TL.RunJobs(
-								run.TL.JobSequence(
+							tl := &run.TL
+
+							return tl.RunJobs(
+								tl.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
-									environment.New(p).SetCliContext(c).ShouldDisable(func(tl *TaskList[environment.Pipe]) bool {
-										return !build.TL.Pipe.Environment.Enable
-									}).Job(),
+									environment.New(p).SetCliContext(c).Job(),
 									run.New(p).SetCliContext(c).Job(),
 								),
 							)
@@ -97,5 +102,10 @@ func main() {
 				},
 			}
 		},
-	).Run()
+	).
+		SetDocumentationOptions(DocumentationOptions{
+			ExcludeFlags:       true,
+			ExcludeHelpCommand: true,
+		}).
+		Run()
 }

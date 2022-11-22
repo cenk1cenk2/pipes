@@ -18,6 +18,10 @@ func AddDockerTag(t *Task[Pipe], tag string) error {
 		return err
 	}
 
+	if tag, err = ApplyTagTemplate(t, tag); err != nil {
+		return err
+	}
+
 	if t.Pipe.DockerRegistry.Registry != "" {
 		tag = fmt.Sprintf("%s/%s:%s", t.Pipe.DockerRegistry.Registry, t.Pipe.DockerImage.Name, tag)
 	} else {
@@ -48,6 +52,30 @@ func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
 		}
 
 		t.Log.Debugf("Sanitizing since condition matched for given tag: %s -> %s with %v", tag, re.String(), matches)
+
+		return utils.InlineTemplate(s.Template, matches)
+	}
+
+	return tag, nil
+}
+
+func ApplyTagTemplate(t *Task[Pipe], tag string) (string, error) {
+	for _, s := range t.Pipe.DockerImage.TagsTemplate {
+		re, err := regexp.Compile(s.Match)
+
+		if err != nil {
+			return "", fmt.Errorf("Can not compile tag template regular expression: %w", err)
+		}
+
+		matches := re.FindStringSubmatch(tag)
+
+		t.Log.Debugf("Trying to apply template to tag: %s with %v", tag, re.String())
+
+		if matches == nil {
+			continue
+		}
+
+		t.Log.Debugf("Applying template since condition matched for given tag: %s -> %s with %v", tag, re.String(), matches)
 
 		return utils.InlineTemplate(s.Template, matches)
 	}

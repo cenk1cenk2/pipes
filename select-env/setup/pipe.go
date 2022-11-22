@@ -7,6 +7,7 @@ import (
 
 type (
 	Environment struct {
+		Enable            bool
 		Conditions        []EnvironmentConditionJson
 		FailOnNoReference bool
 		Strict            bool
@@ -28,6 +29,9 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
+		ShouldDisable(func(tl *TaskList[Pipe]) bool {
+			return !tl.Pipe.Environment.Enable
+		}).
 		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
 			return ProcessFlags(tl)
 		}).
