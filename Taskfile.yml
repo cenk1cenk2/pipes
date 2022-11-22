@@ -47,7 +47,7 @@ tasks:
     cmds:
       - go mod vendor
     sources:
-      - go.sum
+      - go.{sum,mod}
     generates:
       - "vendor/**"
 
