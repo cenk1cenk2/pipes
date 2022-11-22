@@ -10,8 +10,8 @@ type (
 	}
 
 	SemanticRelease struct {
-		IsDryRun bool
-		UseMulti bool
+		IsDryRun  bool
+		Workspace bool
 	}
 
 	Pipe struct {

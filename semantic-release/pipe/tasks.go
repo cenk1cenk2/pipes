@@ -40,7 +40,7 @@ func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
 func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("release").
 		Set(func(t *Task[Pipe]) error {
-			if t.Pipe.UseMulti {
+			if t.Pipe.Workspace {
 				t.Pipe.Ctx.Exe = MULTI_SEMANTIC_RELEASE_EXE
 			} else {
 				t.Pipe.Ctx.Exe = SEMANTIC_RELEASE_EXE

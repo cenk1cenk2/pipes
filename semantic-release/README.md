@@ -58,4 +58,4 @@ Releases applications through semantic-release library.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$SEMANTIC_RELEASE_DRY_RUN` | Node packages to install before running semantic-release. | `Bool` | `false` | false |
-| `$SEMANTIC_RELEASE_RUN_MULTI` | Use @qiwi/multi-semantic-release package to do a workspace release. | `Bool` | `false` | false |
+| `$SEMANTIC_RELEASE_WORKSPACE` | Use @qiwi/multi-semantic-release package to do a workspace release. | `Bool` | `false` | false |

@@ -54,7 +54,7 @@ var DeprecationNotices = []DeprecationNotice{
 	{
 		Level:       LOG_LEVEL_WARN,
 		Flag:        []string{"markdown-toc.arguments"},
-		Environment: []string{"MARKDOWN_TOC_ARGUMENTS", "PLUGIN_MARKDOWN_TOC_ARGUMENTS"},
+		Environment: []string{"MARKDOWN_TOC_ARGUMENTS"},
 		Message:     `The underlying application changed from node.js based one to golang based library therefore "%s" is not valid anymore.`,
 	},
 }
