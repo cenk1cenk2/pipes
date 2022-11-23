@@ -443,6 +443,7 @@ publish-select-env:
 #       - tags
 
 docker-manifest:
+  stage: post
   extends: .manifest-docker-to-public
   parallel:
     matrix:
