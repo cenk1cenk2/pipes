@@ -18,7 +18,7 @@ build-docker-image:
     - pipe build
   artifacts:
     paths:
-      - .published-tags*
-      - "**/.published-tags*/"
+      - .published-docker-images*
+      - "**/.published-docker-images*"
   tags:
     - ${GITLAB_CI_ARCH}
