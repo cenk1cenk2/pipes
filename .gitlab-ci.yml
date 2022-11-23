@@ -1,6 +1,7 @@
 ---
 stages:
-  - containers
+  - pre-build
+  - pre-manifest
   - install
   - build
   - publish-first
@@ -72,7 +73,7 @@ include:
 
 publish-go:
   extends: .publish-first
-  stage: containers
+  stage: pre-build
   variables:
     DOCKERFILE_CONTEXT: ./go
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
@@ -97,6 +98,20 @@ publish-go:
     refs:
       - main
       - tags
+
+update-go-manifest:
+  stage: pre-manifest
+  parallel:
+    matrix:
+      - DOCKER_BUILDKIT: "1"
+        DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
+        DOCKER_IMAGE_TAGS: 1.19-alpine
+        DOCKER_IMAGE_AMEND_TAG: 1.19-alpine-arm64
+  script:
+    - docker manifest create $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $(for AMEND_TAG in "$DOCKER_IMAGE_AMEND_TAG"; do echo "--amend=$DOCKER_IMAGE_NAME:$AMEND_TAG"; done)
+    - docker manifest push --purge $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
+  tags:
+    - external
 
 build:
   variables:
