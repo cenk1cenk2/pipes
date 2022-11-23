@@ -168,7 +168,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 							return nil
 						}).
 						ShouldRunAfter(func(t *Task[Pipe]) error {
-							return t.RunCommandJobAsJobParallel()
+							return t.RunCommandJobAsJobSequence()
 						}).
 						AddSelfToTheParentAsParallel()
 				}(target)
