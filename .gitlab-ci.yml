@@ -63,6 +63,8 @@ include:
     file: /templates/go-build.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/go-lint.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/parent-pipeline-id.gitlab-ci.yml
 
 build:
   variables:
