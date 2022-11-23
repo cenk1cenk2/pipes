@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gitlab.kilic.dev/libraries/go-utils/utils"
+	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 

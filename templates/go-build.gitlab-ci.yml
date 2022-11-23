@@ -1,13 +1,10 @@
 variables:
-  GO_IMAGE: alpine
   GO_BUILD_COMMAND: task build
 
 build:
   stage: build
-  image: golang:$GO_IMAGE
+  image: cenkcenk1/pipe-go:${GO_VERSION}
   script:
-    - apk add --no-cache --no-progress git
-    - wget -O- -nv https://taskfile.dev/install.sh | sh /dev/stdin -d -b /usr/bin
     - $GO_BUILD_COMMAND
   rules:
     - when: on_success

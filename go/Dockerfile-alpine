@@ -1,0 +1,9 @@
+# syntax=docker/dockerfile-upstream:master-labs
+ARG GO_VERSION
+
+FROM golang:${GO_VERSION}
+
+RUN \
+  apk add --no-cache --no-progress git && \
+  wget -O- -nv https://taskfile.dev/install.sh | sh /dev/stdin -d -b /usr/bin && \
+  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | BINDIR=/usr/bin sh -s

@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gitlab.kilic.dev/libraries/go-utils/utils"
+	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 
 	glob "github.com/bmatcuk/doublestar/v4"
 	toc "github.com/ekalinin/github-markdown-toc.go"

@@ -2,6 +2,10 @@ stages:
   - install
   - build
 
+variables:
+  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  GO_VERSION: 1.19-alpine
+
 include:
   - project: devops/pipes
     file: /templates/go-install.gitlab-ci.yml
