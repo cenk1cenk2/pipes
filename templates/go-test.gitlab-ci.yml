@@ -1,6 +1,6 @@
 variables:
   GO_TEST_COMMAND: ""
-  GITLAB_CI_ARCH: amd64
+  GITLAB_CI_ARCH: docker
 
 test:
   stage: build

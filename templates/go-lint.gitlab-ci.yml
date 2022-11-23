@@ -1,6 +1,6 @@
 variables:
   GO_LINT_COMMAND: task lint
-  GITLAB_CI_ARCH: amd64
+  GITLAB_CI_ARCH: docker
 
 lint:
   stage: build
