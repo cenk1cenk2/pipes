@@ -25,7 +25,7 @@ variables:
     DOCKER_IMAGE_BUILD_ARGS: ""
   script:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-    - docker build --pull -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $(for BUILD_ARG in "$DOCKER_IMAGE_BUILD_ARGS"; do echo "--build-arg=$BUILD_ARG" | tr -d "\n"; done) -f ${DOCKERFILE_NAME} .
+    - docker build --pull -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $DOCKER_IMAGE_BUILD_ARGS -f ${DOCKERFILE_NAME} .
     - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
   tags:
     - $GITLAB_CI_ARCH
@@ -90,13 +90,13 @@ publish-go:
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: ${GO_VERSION}-amd64
-        DOCKER_IMAGE_BUILD_ARGS: GO_VERSION=${GO_VERSION}
+        DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
         DOCKERFILE_NAME: Dockerfile-alpine
         GO_VERSION:
           - 1.19-alpine
         GITLAB_CI_ARCH: amd64
       - DOCKER_IMAGE_TAGS: ${GO_VERSION}-arm64
-        DOCKER_IMAGE_BUILD_ARGS: GO_VERSION=${GO_VERSION}
+        DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
         DOCKERFILE_NAME: Dockerfile-alpine
         GO_VERSION:
           - 1.19-alpine
