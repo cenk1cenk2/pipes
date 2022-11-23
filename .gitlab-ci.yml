@@ -109,7 +109,7 @@ publish-go:
       - main
       - tags
 
-update-go-manifest:
+manifest-go:
   extends: .docker-manifest
   stage: pre-manifest
   parallel:
@@ -184,7 +184,7 @@ publish-first-gl-artifacts:
       - tags
 
 manifest-first-docker:
-  extends: .manifest
+  extends: .docker-manifest
   stage: manifest
   parallel:
     matrix:
@@ -193,7 +193,7 @@ manifest-first-docker:
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
 
 manifest-first-gl-artifacts:
-  extends: .manifest
+  extends: .docker-manifest
   stage: manifest
   parallel:
     matrix:
