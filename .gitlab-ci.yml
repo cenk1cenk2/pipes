@@ -12,6 +12,8 @@ stages:
 variables:
   LOG_LEVEL: trace
   GO_VERSION: 1.19-alpine
+  DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-docker:latest,cenk1cenk2/pipe-gl-artifacts:latest,cenk1cenk2/pipe-node
+  DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-docker:latest-amd64,cenk1cenk2/pipe-docker:latest-arm64,cenk1cenk2/pipe-gl-artifacts:latest-amd64,cenk1cenk2/pipe-gl-artifacts:latest-arm64
 
 .publish-first:
   stage: publish-first
@@ -30,7 +32,7 @@ variables:
   tags:
     - $GITLAB_CI_ARCH
 
-.docker-manifest:
+.docker-manifest-first:
   variables:
     DOCKER_BUILDKIT: "1"
   script:
@@ -56,11 +58,18 @@ variables:
     strategy: depend
 
 .publish-docker-to-public-without-artifacts:
-  stage: containers
+  stage: pre-build
   trigger:
     include:
       - project: devops/pipes
         file: /templates/docker-build-dockerhub.gitlab-ci.yml
+    strategy: depend
+
+.manifest-docker-to-public:
+  trigger:
+    include:
+      - project: devops/pipes
+        file: /templates/docker-manifest-dockerhub.gitlab-ci.yml
     strategy: depend
 
 .docker-hub-readme:
@@ -110,7 +119,7 @@ publish-go:
       - tags
 
 manifest-go:
-  extends: .docker-manifest
+  extends: .docker-manifest-first
   stage: pre-manifest
   parallel:
     matrix:
@@ -184,7 +193,7 @@ publish-first-gl-artifacts:
       - tags
 
 manifest-first-docker:
-  extends: .docker-manifest
+  extends: .docker-manifest-first
   stage: manifest
   parallel:
     matrix:
@@ -193,7 +202,7 @@ manifest-first-docker:
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
 
 manifest-first-gl-artifacts:
-  extends: .docker-manifest
+  extends: .docker-manifest-first
   stage: manifest
   parallel:
     matrix:
@@ -212,6 +221,12 @@ publish-docker:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [docker]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -230,6 +245,12 @@ publish-gl-artifacts:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [gl-artifacts]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -249,13 +270,22 @@ publish-node:
     PARENT_DOWNLOAD_ARTIFACTS: "build: [node]"
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}
+      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
         DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
         NODE_VERSION:
           - 16
           - 16-alpine
           - 18
           - 18-alpine
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
+        DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
+        NODE_VERSION:
+          - 16
+          - 16-alpine
+          - 18
+          - 18-alpine
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -275,6 +305,12 @@ publish-gh-release-tracker:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [gh-release-tracker]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -293,6 +329,12 @@ publish-markdown-toc:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [markdown-toc]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -311,6 +353,12 @@ publish-update-docker-hub-readme:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [update-docker-hub-readme]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -329,6 +377,12 @@ publish-semantic-release:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [semantic-release]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -349,6 +403,12 @@ publish-select-env:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
     DOCKER_IMAGE_TAGS: latest
     PARENT_DOWNLOAD_ARTIFACTS: "build: [select-env]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -363,20 +423,61 @@ publish-select-env:
 # publish-s3-upload:
 #   extends: .publish-docker-to-public
 #   variables:
-#     DOCKERFILE_CONTEXT: ./s3-upload
-#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3-upload
+#     DOCKERFILE_CONTEXT: ./s3
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3
 #     DOCKER_IMAGE_TAGS: latest
-#     PARENT_DOWNLOAD_ARTIFACTS: "build: [s3-upload]"
+#     PARENT_DOWNLOAD_ARTIFACTS: "build: [s3]"
+#     parallel:
+#       matrix:
+#         - DOCKER_IMAGE_TAGS: latest-amd64
+#           GITLAB_CI_ARCH: amd64
+#         - DOCKER_IMAGE_TAGS: latest-arm64
+#           GITLAB_CI_ARCH: arm64
 #   only:
 #     changes:
 #       - "common/**/*"
-#       - "s3-upload/**/*"
+#       - "s3/**/*"
 #       - go.mod
 #       - go.sum
 #       - .gitlab-ci.yml
 #     refs:
 #       - main
 #       - tags
+
+docker-manifest:
+  extends: .manifest-docker-to-public
+  parallel:
+    matrix:
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:latest-amd64,cenk1cenk2/pipe-go:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-docker:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-docker:latest-amd64,cenk1cenk2/pipe-docker:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-gl-artifacts:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-gl-artifacts:latest-amd64,cenk1cenk2/pipe-gl-artifacts:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-node:16
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-node:16-amd64,cenk1cenk2/pipe-node:16-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-node:16-alpine
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-node:16-alpine-amd64,cenk1cenk2/pipe-node:16-alpine-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-node:18
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-node:18-amd64,cenk1cenk2/pipe-node:18-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-node:18-alpine
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-node:18-alpine-amd64,cenk1cenk2/pipe-node:18-alpine-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-gh-release-tracker:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-gh-release-tracker:latest-amd64,cenk1cenk2/pipe-gh-release-tracker:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-markdown-toc:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-markdown-toc:latest-amd64,cenk1cenk2/pipe-markdown-toc:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-update-docker-hub-readme:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-update-docker-hub-readme:latest-amd64,cenk1cenk2/pipe-update-docker-hub-readme:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-semantic-release:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-semantic-release:latest-amd64,cenk1cenk2/pipe-semantic-release:latest-arm64
+      - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-select-env:latest
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-select-env:latest-amd64,cenk1cenk2/pipe-select-env:latest-arm64
+      # - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-s3:latest
+      #   DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-s3:latest-amd64,cenk1cenk2/pipe-s3:latest-arm64
+  only:
+    refs:
+      - main
+      - tags
 
 docker-hub-readme:
   extends: .docker-hub-readme

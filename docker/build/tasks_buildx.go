@@ -1,36 +1,14 @@
-package pipe
+package build
 
 import (
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
-
-func DockerBuildXVersion(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("version", "buildx").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !t.Pipe.Docker.UseBuildx
-		}).
-		Set(func(t *Task[Pipe]) error {
-			t.Log.Infoln("Docker Buildx is enabled.")
-
-			t.CreateCommand(
-				DOCKER_EXE,
-				"buildx",
-				"version",
-			).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunCommandJobAsJobParallel()
-		})
-}
 
 func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx", "parent").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !t.Pipe.Docker.UseBuildx
+			return !setup.TL.Pipe.Docker.UseBuildx
 		}).
 		SetJobWrapper(func(job Job) Job {
 			return tl.JobSequence(
@@ -46,12 +24,12 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx", "create").
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"buildx",
 				"create",
 				"--use",
 				"--name",
-				t.Pipe.Docker.BuildxInstance,
+				setup.TL.Pipe.Docker.BuildxInstance,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				SetIgnoreError().
@@ -80,10 +58,10 @@ func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"buildx",
 				"use",
-				t.Pipe.Docker.BuildxInstance,
+				setup.TL.Pipe.Docker.BuildxInstance,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				Set(func(c *Command[Pipe]) error {
@@ -106,7 +84,7 @@ func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			// spawn virtual machine
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"run",
 				"--rm",
 				"--privileged",
@@ -121,7 +99,7 @@ func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			// check virtual machine
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"buildx",
 				"inspect",
 				"--bootstrap",
@@ -149,7 +127,7 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			// build image
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"buildx",
 				"build",
 			).

@@ -4,6 +4,6 @@ lint:
   script:
     - pipe run ${NODE_LINT_COMMAND}
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH}
   rules:
     - if: $NODE_LINT_COMMAND

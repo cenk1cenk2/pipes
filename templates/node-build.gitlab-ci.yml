@@ -10,4 +10,4 @@ build:
   rules:
     - when: on_success
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH}

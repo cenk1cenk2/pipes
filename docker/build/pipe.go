@@ -1,4 +1,4 @@
-package pipe
+package build
 
 import (
 	"gitlab.kilic.dev/devops/pipes/common/flags"
@@ -9,10 +9,7 @@ type (
 	Git flags.GitFlags
 
 	Docker struct {
-		UseBuildKit     bool
-		UseBuildx       bool
 		BuildxPlatforms string
-		BuildxInstance  string
 	}
 
 	DockerImage struct {
@@ -26,17 +23,12 @@ type (
 		Pull           bool
 		Inspect        bool
 		BuildArgs      []string
+		TagsOutputFile string
 	}
 
 	DockerFile struct {
 		Context string
 		Name    string
-	}
-
-	DockerRegistry struct {
-		Registry string
-		Username string
-		Password string
 	}
 
 	Pipe struct {
@@ -46,7 +38,6 @@ type (
 		Docker
 		DockerImage
 		DockerFile
-		DockerRegistry
 	}
 )
 
@@ -62,15 +53,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				Setup(tl).Job(),
-
 				DockerTagsParent(tl).Job(),
-
-				tl.JobParallel(
-					DockerVersion(tl).Job(),
-					DockerBuildXVersion(tl).Job(),
-				),
-
-				DockerLoginParent(tl).Job(),
 
 				tl.JobParallel(
 					DockerBuildParent(tl).Job(),

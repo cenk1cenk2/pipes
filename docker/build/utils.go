@@ -1,10 +1,11 @@
-package pipe
+package build
 
 import (
 	"fmt"
 	"regexp"
 
 	"gitlab.kilic.dev/devops/pipes/common/utils"
+	"gitlab.kilic.dev/devops/pipes/docker/login"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -22,8 +23,8 @@ func AddDockerTag(t *Task[Pipe], tag string) error {
 		return err
 	}
 
-	if t.Pipe.DockerRegistry.Registry != "" {
-		tag = fmt.Sprintf("%s/%s:%s", t.Pipe.DockerRegistry.Registry, t.Pipe.DockerImage.Name, tag)
+	if login.TL.Pipe.DockerRegistry.Registry != "" {
+		tag = fmt.Sprintf("%s/%s:%s", login.TL.Pipe.DockerRegistry.Registry, t.Pipe.DockerImage.Name, tag)
 	} else {
 		tag = fmt.Sprintf("%s:%s", t.Pipe.DockerImage.Name, tag)
 	}

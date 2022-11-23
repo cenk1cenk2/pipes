@@ -1,4 +1,4 @@
-package pipe
+package build
 
 import (
 	"errors"
@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"strings"
 
+	u "gitlab.kilic.dev/devops/pipes/common/utils"
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
@@ -21,6 +23,7 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 					DockerTagsLatest(tl).Job(),
 				),
 				job,
+				DockerTagsWriteFile(tl).Job(),
 			)
 		}).
 		Set(func(t *Task[Pipe]) error {
@@ -31,6 +34,32 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 			t.Log.Infof(
 				"Image tags: %s", strings.Join(t.Pipe.Ctx.Tags, ", "),
 			)
+
+			return nil
+		})
+}
+
+func DockerTagsWriteFile(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("tags", "file").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return t.Pipe.DockerImage.TagsOutputFile == ""
+		}).
+		Set(func(t *Task[Pipe]) error {
+			tags := strings.Join(t.Pipe.DockerImage.Tags, ",")
+
+			filename, err := u.InlineTemplate(t.Pipe.DockerImage.TagsOutputFile, tags)
+
+			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
+
+			if err != nil {
+				return err
+			}
+
+			if err := os.WriteFile(filename, []byte(tags), 0600); err != nil {
+				return err
+			}
+
+			t.Log.Infof("Wrote image tags to file for later use: %s", filename)
 
 			return nil
 		})
@@ -122,7 +151,7 @@ func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.Log.Debugf("Trying to match condition for given reference: %s with %v", reference, re.String())
 
 					if re.MatchString(reference) {
-						if err := AddDockerTag(t, DOCKER_LATEST_TAG); err != nil {
+						if err := AddDockerTag(t, setup.DOCKER_LATEST_TAG); err != nil {
 							return err
 						}
 

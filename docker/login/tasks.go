@@ -1,8 +1,9 @@
-package pipe
+package login
 
 import (
 	"strings"
 
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -25,7 +26,7 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			// login task
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"login",
 				t.Pipe.DockerRegistry.Registry,
 				"--username",
@@ -60,7 +61,7 @@ func DockerLoginVerify(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"login",
 				t.Pipe.DockerRegistry.Registry,
 			).

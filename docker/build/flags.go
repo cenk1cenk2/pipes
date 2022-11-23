@@ -1,4 +1,4 @@
-package pipe
+package build
 
 import (
 	"encoding/json"
@@ -6,17 +6,12 @@ import (
 
 	"github.com/urfave/cli/v2"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 //revive:disable:line-length-limit
-
-const (
-	CATEGORY_DOCKER          = "Docker"
-	CATEGORY_DOCKER_REGISTRY = "Registry"
-	CATEGORY_DOCKER_IMAGE    = "Image"
-)
 
 var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	flags.GitFlagsSetup{
@@ -37,28 +32,8 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 
 	// CATEGORY_DOCKER
 
-	&cli.BoolFlag{
-		Category:    CATEGORY_DOCKER,
-		Name:        "docker.use_buildkit",
-		Usage:       "Use Docker BuildKit for building images.",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_USE_BUILDKIT"},
-		Value:       true,
-		Destination: &TL.Pipe.Docker.UseBuildKit,
-	},
-
-	&cli.BoolFlag{
-		Category:    CATEGORY_DOCKER,
-		Name:        "docker.use_buildx",
-		Usage:       "Use Docker BuildX builder for multi-platform builds.",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_USE_BUILDX"},
-		Value:       false,
-		Destination: &TL.Pipe.Docker.UseBuildx,
-	},
-
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER,
+		Category:    setup.CATEGORY_DOCKER,
 		Name:        "docker.buildx_platforms",
 		Usage:       "Platform arguments for Docker BuildX.",
 		Required:    false,
@@ -67,49 +42,10 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Destination: &TL.Pipe.Docker.BuildxPlatforms,
 	},
 
-	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER,
-		Name:        "docker.buildx_instance",
-		Usage:       "Docker BuildX instance to be started or to use.",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_BUILDX_INSTANCE"},
-		Value:       "CI",
-		Destination: &TL.Pipe.Docker.BuildxInstance,
-	},
-
-	// CATEGORY_DOCKER_REGISTRY
+	// setup.CATEGORY_DOCKER_IMAGE
 
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_REGISTRY,
-		Name:        "docker_registry.registry",
-		Usage:       "Docker registry url to login to.",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_REGISTRY"},
-		Destination: &TL.Pipe.DockerRegistry.Registry,
-	},
-
-	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_REGISTRY,
-		Name:        "docker_registry.username",
-		Usage:       "Docker registry username for the given registry.",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_REGISTRY_USERNAME"},
-		Destination: &TL.Pipe.DockerRegistry.Username,
-	},
-
-	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_REGISTRY,
-		Name:        "docker_registry.password",
-		Usage:       "Docker registry password for the given registry.",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_REGISTRY_PASSWORD"},
-		Destination: &TL.Pipe.DockerRegistry.Password,
-	},
-
-	// CATEGORY_DOCKER_IMAGE
-
-	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_image.name",
 		Usage:       "Image name for the will be built Docker image.",
 		Required:    true,
@@ -118,7 +54,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_DOCKER_IMAGE,
+		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.tags",
 		Usage:    "Image tag for the will be built Docker image.",
 		Required: true,
@@ -126,7 +62,17 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
+		Name:        "docker_image.tags-output-file",
+		Usage:       "Write all the images that are published in to a file for later use. Template(string)",
+		Required:    false,
+		EnvVars:     []string{"DOCKER_IMAGE_TAGS_OUTPUT_FILE"},
+		Value:       `.published-docker-images_{{ sha256sum $ }}`,
+		Destination: &TL.Pipe.DockerImage.TagsOutputFile,
+	},
+
+	&cli.StringFlag{
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_file.context",
 		Usage:       "Dockerfile context argument for build operation.",
 		Required:    false,
@@ -136,7 +82,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_file.name",
 		Usage:       "Dockerfile path for the build operation",
 		Required:    false,
@@ -146,7 +92,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_DOCKER_IMAGE,
+		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.tag_as_latest",
 		Usage: `Regex pattern to tag the image as latest.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
@@ -157,7 +103,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_DOCKER_IMAGE,
+		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.sanitize_tags",
 		Usage: `Sanitizes the given regex pattern out of tag name.
       Template is interpolated with the given matches in the regular expression.
@@ -168,7 +114,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_DOCKER_IMAGE,
+		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.tags_template",
 		Usage: `Modifies every tag that matches a certain condition.
       Template is interpolated with the given matches in the regular expression.
@@ -179,7 +125,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_image.inspect",
 		Usage:       "Inspect after pushing the image.",
 		Required:    false,
@@ -189,7 +135,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_DOCKER_IMAGE,
+		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.build_args",
 		Usage:    "Pass in extra build arguments for image.",
 		Required: false,
@@ -197,7 +143,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_DOCKER_IMAGE,
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_image.pull",
 		Usage:       "Pull before building the image.",
 		Required:    false,

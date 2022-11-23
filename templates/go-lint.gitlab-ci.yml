@@ -7,6 +7,6 @@ lint:
   script:
     - $GO_LINT_COMMAND
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH}
   rules:
     - if: $GO_LINT_COMMAND

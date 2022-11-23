@@ -6,6 +6,7 @@ variables:
   DOCKER_IMAGE_NAME: $DOCKER_IMAGE_NAME
   DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME
   DOCKERFILE_CONTEXT: "."
+  GITLAB_CI_ARCH: amd64
 
 stages:
   - docker
@@ -14,6 +15,10 @@ build-docker-image:
   stage: docker
   image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
   script:
-    - pipe
+    - pipe build
+  artifacts:
+    paths:
+      - .published-tags*
+      - "**/.published-tags*/"
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH}

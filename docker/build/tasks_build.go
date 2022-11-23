@@ -1,15 +1,16 @@
-package pipe
+package build
 
 import (
 	"time"
 
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("build", "parent").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Docker.UseBuildx
+			return setup.TL.Pipe.Docker.UseBuildx
 		}).
 		SetJobWrapper(func(job Job) Job {
 			return tl.JobSequence(
@@ -30,7 +31,7 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			// build image
 			t.CreateCommand(
-				DOCKER_EXE,
+				setup.DOCKER_EXE,
 				"build",
 			).
 				Set(func(c *Command[Pipe]) error {
@@ -55,7 +56,7 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.SetDir(t.Pipe.DockerFile.Context)
 					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
-					if t.Pipe.Docker.UseBuildKit {
+					if setup.TL.Pipe.Docker.UseBuildKit {
 						t.Log.Debugf("Using Docker BuildKit for the build operation.")
 
 						c.AppendEnvironment(
@@ -82,7 +83,7 @@ func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 			for _, tag := range t.Pipe.Ctx.Tags {
 				func(tag string) {
 					t.CreateCommand(
-						DOCKER_EXE,
+						setup.DOCKER_EXE,
 						"push",
 						tag,
 					).

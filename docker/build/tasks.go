@@ -1,7 +1,8 @@
-package pipe
+package build
 
 import (
 	"gitlab.kilic.dev/devops/pipes/common/parser"
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -26,23 +27,6 @@ func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func DockerVersion(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("version").
-		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(
-				DOCKER_EXE,
-				"--version",
-			).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunCommandJobAsJobParallel()
-		})
-}
-
 func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("inspect").
 		ShouldDisable(func(t *Task[Pipe]) bool {
@@ -52,7 +36,7 @@ func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
 			for _, tag := range t.Pipe.Ctx.Tags {
 				func(tag string) {
 					t.CreateCommand(
-						DOCKER_EXE,
+						setup.DOCKER_EXE,
 						"manifest",
 						"inspect",
 						tag,

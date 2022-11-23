@@ -4,6 +4,6 @@ test:
   script:
     - pipe run ${NODE_TEST_COMMAND}
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH}
   rules:
     - if: $NODE_TEST_COMMAND

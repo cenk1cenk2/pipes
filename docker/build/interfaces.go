@@ -1,4 +1,4 @@
-package pipe
+package build
 
 type (
 	TagsSanitizeJson struct {

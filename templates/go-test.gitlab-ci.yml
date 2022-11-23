@@ -7,6 +7,6 @@ test:
   script:
     - $GO_TEST_COMMAND
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH}
   rules:
     - if: $GO_TEST_COMMAND
