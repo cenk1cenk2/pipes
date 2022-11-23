@@ -31,7 +31,7 @@ variables:
 
 .docker-manifest:
   stage: pre-manifest
-  environment:
+  variables:
     DOCKER_BUILDKIT: "1"
   script:
     - docker manifest create $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $DOCKER_IMAGE_AMEND_TAG
