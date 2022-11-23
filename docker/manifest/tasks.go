@@ -38,10 +38,12 @@ func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 
 			if len(matches) == 0 {
-				return fmt.Errorf(
+				t.Log.Warnf(
 					"Can not match any files with the given pattern: %s",
 					strings.Join(t.Pipe.DockerManifest.Files, ", "),
 				)
+
+				return nil
 			}
 
 			matches = utils.RemoveDuplicateStr(matches)
