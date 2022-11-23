@@ -14,15 +14,15 @@ variables:
 .publish-first:
   stage: publish-first
   before_script:
-    - cd $DOCKER_CONTEXT
+    - cd $DOCKERFILE_CONTEXT
   variables:
     DOCKER_BUILDKIT: "1"
   script:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-    - docker build --pull -t $DOCKER_IMAGE_NAME .
-    - docker push $DOCKER_IMAGE_NAME
+    - docker build --pull -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $(for BUILD_ARG in "$DOCKER_IMAGE_BUILD_ARGS"; do echo "--build-arg=$BUILD_ARG"; done) ${DOCKERFILE_NAME:-"Dockerfile"} .
+    - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
   tags:
-    - docker
+    - ${GITLAB_CI_ARCH:-"amd64"}
 
 .publish-docker-to-private:
   stage: publish
@@ -66,6 +66,34 @@ include:
   - project: devops/pipes
     file: /templates/parent-pipeline-id.gitlab-ci.yml
 
+publish-go:
+  extends: .publish-first
+  stage: containers
+  variables:
+    DOCKERFILE_CONTEXT: ./go
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: ${GO_VERSION}
+        DOCKER_IMAGE_BUILD_ARGS: GO_VERSION=${GO_VERSION}
+        DOCKERFILE_NAME: Dockerfile-alpine
+        GO_VERSION:
+          - 1.19-alpine
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-arm64
+        DOCKER_IMAGE_BUILD_ARGS: GO_VERSION=${GO_VERSION}
+        DOCKERFILE_NAME: Dockerfile-alpine
+        GO_VERSION:
+          - 1.19-alpine
+        GITLAB_CI_ARCH: arm64
+  only:
+    #   changes:
+    #     - "go/**/*"
+    #     - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
 build:
   variables:
     GO_BUILD_COMMAND: task $PIPE:build
@@ -90,8 +118,9 @@ build:
 publish-first-docker:
   extends: .publish-first
   variables:
-    DOCKER_CONTEXT: ./docker
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker:latest
+    DOCKERFILE_CONTEXT: ./docker
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+    DOCKER_IMAGE_TAGS: latest
   only:
     changes:
       - "common/**/*"
@@ -106,8 +135,9 @@ publish-first-docker:
 publish-first-gl-artifacts:
   extends: .publish-first
   variables:
-    DOCKER_CONTEXT: ./gl-artifacts
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts:latest
+    DOCKERFILE_CONTEXT: ./gl-artifacts
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
+    DOCKER_IMAGE_TAGS: latest
   only:
     changes:
       - "common/**/*"
@@ -200,26 +230,6 @@ publish-gh-release-tracker:
       - go.mod
       - go.sum
       - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-publish-go:
-  extends: .publish-docker-to-public-without-artifacts
-  variables:
-    DOCKERFILE_CONTEXT: ./go
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: ${GO_VERSION}
-        DOCKER_IMAGE_BUILD_ARGS: GO_VERSION=${GO_VERSION}
-        DOCKERFILE_NAME: Dockerfile-alpine
-        GO_VERSION:
-          - 1.19-alpine
-  only:
-    #   changes:
-    #     - "go/**/*"
-    #     - .gitlab-ci.yml
     refs:
       - main
       - tags
