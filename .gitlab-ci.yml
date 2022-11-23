@@ -34,6 +34,7 @@ variables:
   variables:
     DOCKER_BUILDKIT: "1"
   script:
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
     - docker manifest create ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAGS} ${DOCKER_IMAGE_AMEND_TAGS}
     - docker manifest push --purge $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
   tags:
