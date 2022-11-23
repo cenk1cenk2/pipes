@@ -4,7 +4,7 @@ variables:
   NODE_VERSION: 16-alpine
   NODE_LINT_COMMAND: lint:check
   NODE_TEST_COMMAND: ""
-  GITLAB_CI_ARCH: docker
+  GITLAB_CI_ARCH: amd64
 
 stages:
   - install

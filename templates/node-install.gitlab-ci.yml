@@ -1,5 +1,5 @@
 variables:
-  GITLAB_CI_ARCH: docker
+  GITLAB_CI_ARCH: amd64
 
 install:
   stage: install

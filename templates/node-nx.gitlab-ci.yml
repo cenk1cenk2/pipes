@@ -5,7 +5,7 @@ variables:
   NODE_LINT_COMMAND: lint:check
   NODE_TEST_COMMAND: ""
   ENVIRONMENT_ENABLE: "false"
-  GITLAB_CI_ARCH: docker
+  GITLAB_CI_ARCH: amd64
 
 stages:
   - install
