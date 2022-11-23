@@ -2,39 +2,67 @@
 
 Builds and publishes Docker images from CI/CD.
 
-`pipe-docker [FLAGS]`
+`pipe-docker [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 
-## Flags
+## Global Flags
 
 ### CLI
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warning", "info", "debug", "trace")` | `false` | info |
+| `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warn", "info", "debug", "trace")` | `false` | info |
 | `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
-### Docker
+## Commands
+
+### `login`
+
+Login to the given Docker registries.
+
+`pipe-docker login [GLOBAL FLAGS] [FLAGS]`
+
+#### Flags
+
+##### Docker
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DOCKER_USE_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | false |
 | `$DOCKER_USE_BUILDX` | Use Docker BuildX builder for multi-platform builds. | `Bool` | `false` | false |
-| `$DOCKER_BUILDX_PLATFORMS` | Platform arguments for Docker BuildX. | `String` | `false` | linux/amd64 |
 | `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` | CI |
 
-### GIT
+##### Docker Registry
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
-| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
+| `$DOCKER_REGISTRY` | Docker registry url to login to. | `String` | `false` |  |
+| `$DOCKER_REGISTRY_USERNAME` | Docker registry username for the given registry. | `String` | `false` |  |
+| `$DOCKER_REGISTRY_PASSWORD` | Docker registry password for the given registry. | `String` | `false` |  |
 
-### Image
+### `build`
+
+Build Docker images.
+
+`pipe-docker build [GLOBAL FLAGS] [FLAGS]`
+
+#### Flags
+
+##### Docker
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$DOCKER_USE_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | false |
+| `$DOCKER_USE_BUILDX` | Use Docker BuildX builder for multi-platform builds. | `Bool` | `false` | false |
+| `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` | CI |
+| `$DOCKER_BUILDX_PLATFORMS` | Platform arguments for Docker BuildX. | `String` | `false` | linux/amd64 |
+
+##### Docker Image
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DOCKER_IMAGE_NAME` | Image name for the will be built Docker image. | `String` | `true` |  |
 | `$DOCKER_IMAGE_TAGS` | Image tag for the will be built Docker image. | `StringSlice` | `true` |  |
+| `$DOCKER_IMAGE_TAGS_OUTPUT_FILE` | Write all the images that are published in to a file for later use. | `String`<br/>`Template(string)` | `false` | .published-docker-images_{{ sha256sum $ }} |
 | `$DOCKERFILE_CONTEXT` | Dockerfile context argument for build operation. | `String` | `false` | . |
 | `$DOCKERFILE_NAME` | Dockerfile path for the build operation | `String` | `false` | Dockerfile |
 | `$DOCKER_IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `String`<br/>`json(RegExp[])` | `false` | [ "^tags/v?\\d+.\\d+.\\d+$" ] |
@@ -44,7 +72,7 @@ Builds and publishes Docker images from CI/CD.
 | `$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image. | `StringSlice` | `false` |  |
 | `$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
 
-### Registry
+##### Docker Registry
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -52,9 +80,48 @@ Builds and publishes Docker images from CI/CD.
 | `$DOCKER_REGISTRY_USERNAME` | Docker registry username for the given registry. | `String` | `false` |  |
 | `$DOCKER_REGISTRY_PASSWORD` | Docker registry password for the given registry. | `String` | `false` |  |
 
-### Tags File
+##### GIT
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
+| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
+
+##### Tags File
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TAGS_FILE` | Read tags from a file. | `String` | `false` |  |
 | `$TAGS_FILE_STRICT` | Fail on missing tags file. | `Bool` | `false` | false |
+
+### `manifest`
+
+Update manifests of the Docker images.
+
+`pipe-docker manifest [GLOBAL FLAGS] [FLAGS]`
+
+#### Flags
+
+##### Docker
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$DOCKER_USE_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | false |
+| `$DOCKER_USE_BUILDX` | Use Docker BuildX builder for multi-platform builds. | `Bool` | `false` | false |
+| `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` | CI |
+
+##### Docker Manifest
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$DOCKER_MANIFEST_FILES` | Read published tags from a file. | `StringSlice`<br/>`format(glob)` | `false` | "**/.published-docker-images*" |
+| `$DOCKER_MANIFEST_TARGETS` | Target image names for patching the manifest. | `StringSlice` | `true` |  |
+| `$DOCKER_MANIFEST_IMAGES` | Image names for patching the manifest with the given target. | `StringSlice` | `false` |  |
+
+##### Docker Registry
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$DOCKER_REGISTRY` | Docker registry url to login to. | `String` | `false` |  |
+| `$DOCKER_REGISTRY_USERNAME` | Docker registry username for the given registry. | `String` | `false` |  |
+| `$DOCKER_REGISTRY_PASSWORD` | Docker registry password for the given registry. | `String` | `false` |  |
