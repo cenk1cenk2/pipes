@@ -1,5 +1,6 @@
 variables:
   GO_TEST_COMMAND: ""
+  GITLAB_CI_ARCH: amd64
 
 test:
   stage: build

@@ -1,5 +1,6 @@
 variables:
   GO_INSTALL_COMMAND: task install
+  GITLAB_CI_ARCH: amd64
 
 install:
   stage: install

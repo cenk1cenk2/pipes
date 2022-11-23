@@ -1,5 +1,6 @@
 variables:
   GO_BUILD_COMMAND: task build
+  GITLAB_CI_ARCH: amd64
 
 build:
   stage: build
