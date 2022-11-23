@@ -134,7 +134,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 							}
 
 							if len(matches) == 0 {
-								t.Log.Warn("No matches for given target tag, doing nothing: %s", target)
+								t.Log.Warnf("No matches for given target tag, doing nothing: %s", target)
 							}
 
 							t.
