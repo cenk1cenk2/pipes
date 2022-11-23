@@ -5,6 +5,7 @@ variables:
 stages:
   - prepare
   - docker
+  - post
 
 include:
   - project: devops/pipes

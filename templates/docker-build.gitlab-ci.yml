@@ -8,8 +8,13 @@ variables:
   DOCKERFILE_CONTEXT: "."
   GITLAB_CI_ARCH: amd64
 
+include:
+  - project: devops/pipes
+    file: /templates/docker-manifest.gitlab-ci.yml
+
 stages:
   - docker
+  - post
 
 build-docker-image:
   stage: docker

@@ -5,10 +5,13 @@ variables:
 stages:
   - prepare
   - docker
+  - post
 
 include:
   - project: devops/pipes
     file: /templates/docker-build.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/docker-manifest.gitlab-ci.yml
 
 prepare:
   stage: prepare

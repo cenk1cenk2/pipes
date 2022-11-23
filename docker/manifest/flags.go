@@ -36,7 +36,7 @@ var Flags = []cli.Flag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
 		Name:     "docker_manifest.images",
 		Usage:    "Image names for patching the manifest with the given target.",
-		Required: true,
+		Required: false,
 		EnvVars:  []string{"DOCKER_MANIFEST_IMAGES"},
 	},
 }

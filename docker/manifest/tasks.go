@@ -59,10 +59,10 @@ func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 func FetchPublishedImagesFromFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("fetch", "file").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.DockerManifest.Files) == 0
+			return len(t.Pipe.Ctx.Matches) == 0
 		}).
 		Set(func(t *Task[Pipe]) error {
-			for _, f := range t.Pipe.DockerManifest.Files {
+			for _, f := range t.Pipe.Ctx.Matches {
 				func(f string) {
 					t.CreateSubtask(f).
 						Set(func(t *Task[Pipe]) error {
