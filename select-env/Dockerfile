@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile-upstream:master-labs
 FROM alpine:latest
 
-COPY --chmod=777 ./dist/pipe /usr/bin/pipe
+ARG BUILDOS
+ARG BUILDARCH
+
+COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
 RUN pipe --help

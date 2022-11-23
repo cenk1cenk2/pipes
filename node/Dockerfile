@@ -3,10 +3,13 @@ ARG NODE_VERSION
 
 FROM node:${NODE_VERSION}
 
+ARG BUILDOS
+ARG BUILDARCH
+
 RUN \
   unset NPM_CONFIG_USER && \
   npm config set unsafe-perm true
 
-COPY --chmod=777 ./dist/pipe /usr/bin/pipe
+COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
 RUN pipe --help

@@ -8,8 +8,8 @@ vars:
   GO_LD_FLAGS: -w -s
   BINARY_DIR: dist
   BINARY_NAME: pipe
-  BINARY_APPEND_OS: false
-  BINARY_APPEND_ARCH: false
+  BINARY_APPEND_OS: true
+  BINARY_APPEND_ARCH: true
 
 env:
   CGO_ENABLED: 0
@@ -33,6 +33,10 @@ tasks:
         vars:
           os: linux
           arch: amd64
+      - task: build.platform
+        vars:
+          os: linux
+          arch: arm64
 
   build.platform:
     internal: true

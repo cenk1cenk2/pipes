@@ -5,6 +5,7 @@ stages:
   - install
   - build
   - publish-first
+  - manifest
   - publish
   - post
 
@@ -143,7 +144,12 @@ publish-first-docker:
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-    DOCKER_IMAGE_TAGS: latest
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -160,7 +166,12 @@ publish-first-gl-artifacts:
   variables:
     DOCKERFILE_CONTEXT: ./gl-artifacts
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
-    DOCKER_IMAGE_TAGS: latest
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-amd64
+        GITLAB_CI_ARCH: amd64
+      - DOCKER_IMAGE_TAGS: latest-arm64
+        GITLAB_CI_ARCH: arm64
   only:
     changes:
       - "common/**/*"
@@ -171,6 +182,24 @@ publish-first-gl-artifacts:
     refs:
       - main
       - tags
+
+manifest-first-docker:
+  extends: .manifest
+  stage: manifest
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+        DOCKER_IMAGE_TAGS: latest
+        DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
+
+manifest-first-gl-artifacts:
+  extends: .manifest
+  stage: manifest
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
+        DOCKER_IMAGE_TAGS: latest
+        DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-gl-artifacts:latest-amd64 -a cenk1cenk2/pipe-gl-artifacts:latest-arm64"
 
 # private images
 
