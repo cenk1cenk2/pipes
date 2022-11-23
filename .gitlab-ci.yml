@@ -448,7 +448,7 @@ docker-manifest:
   parallel:
     matrix:
       - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
-        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:latest-amd64,cenk1cenk2/pipe-go:latest-arm64
+        DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:1.19-alpine-amd64,cenk1cenk2/pipe-go:1.19-alpine-arm64
       - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-docker:latest
         DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-docker:latest-amd64,cenk1cenk2/pipe-docker:latest-arm64
       - DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-gl-artifacts:latest
