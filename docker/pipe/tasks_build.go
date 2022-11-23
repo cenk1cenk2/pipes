@@ -1,6 +1,8 @@
 package pipe
 
 import (
+	"time"
+
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -92,6 +94,7 @@ func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							return nil
 						}).
+						SetRetries(3, false, time.Second*10).
 						AddSelfToTheTask()
 				}(tag)
 			}
