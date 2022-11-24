@@ -1,7 +1,4 @@
 ---
-stages:
-  - track
-
 .gh-release-tracker:
   image: cenk1cenk2/pipe-gh-release-tracker:${PIPES_VERSION}
   variables:

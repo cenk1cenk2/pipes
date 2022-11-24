@@ -1,6 +1,5 @@
 ---
 .docker-manifest:
-  stage: post
   image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
   variables:
     PIPES_VERSION: latest
