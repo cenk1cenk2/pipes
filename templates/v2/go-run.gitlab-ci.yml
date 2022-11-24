@@ -5,6 +5,5 @@
     GITLAB_CI_ARCH: docker
   script:
     - task $GO_COMMAND_SCRIPT
-  when: on_success
   tags:
     - ${GITLAB_CI_ARCH}
