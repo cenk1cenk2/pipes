@@ -6,8 +6,8 @@ include:
 .go-install:
   extends: .go-run
   variables:
-    GO_COMMAND_SCRIPT: $GO_INSTALL_COMMAND
     GO_INSTALL_COMMAND: install
+    GO_COMMAND_SCRIPT: $GO_INSTALL_COMMAND
   artifacts:
     paths:
       - vendor/
