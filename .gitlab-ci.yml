@@ -41,8 +41,8 @@ stages:
     - external
 
 include:
-  - project: devops/pipes
-    file: /templates/v2/workflow.gitlab-ci.yml
+  # - project: devops/pipes
+  #   file: /templates/v2/workflow.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/v2/go.gitlab-ci.yml
   - project: devops/pipes
