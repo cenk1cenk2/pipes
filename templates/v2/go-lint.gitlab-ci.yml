@@ -3,8 +3,10 @@ include:
   - project: devops/pipes
     file: /templates/v2/go-run.gitlab-ci.yml
 
+variables:
+  GO_LINT_COMMAND: lint
+
 .go-lint:
   extends: .go-run
   variables:
     GO_COMMAND_SCRIPT: $GO_LINT_COMMAND
-    GO_LINT_COMMAND: lint

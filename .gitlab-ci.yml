@@ -5,6 +5,7 @@ variables:
 
 stages:
   - pre
+  - install
   - test
   - build
   - publish
@@ -89,11 +90,18 @@ docker-manifest-first_go:
   needs:
     - job: docker-build-first_go
 
+install:
+  extends: .go-install
+  stage: install
+  needs:
+    - job: docker-manifest-first_go
+
 lint:
   extends: .go-lint
   stage: test
   needs:
     - job: docker-manifest-first_go
+    - job: install
 
 build:
   extends: .go-build
@@ -116,8 +124,9 @@ build:
       - PIPE: select-env
       - PIPE: s3-upload
   needs:
-    - job: lint
     - job: docker-manifest-first_go
+    - job: install
+    - job: job
 #
 # # to stop depending on itself
 #
