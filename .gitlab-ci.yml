@@ -4,14 +4,11 @@ variables:
   GO_VERSION: 1.19-alpine
 
 stages:
-  - first-build
-  - first-manifest
+  - pre
   - test
   - build
   - pre-publish
-  - pre-manifest
   - publish
-  - manifest
   - post
 
 .docker-build-vanilla:
@@ -27,6 +24,10 @@ stages:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
     - docker build --pull -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $DOCKER_IMAGE_BUILD_ARGS -f ${DOCKERFILE_NAME} .
     - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
+  only:
+    refs:
+      - main
+      - tags
   tags:
     - $GITLAB_CI_ARCH
 
@@ -37,12 +38,16 @@ stages:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
     - docker manifest create ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAGS} ${DOCKER_IMAGE_AMEND_TAGS}
     - docker manifest push --purge $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
+  only:
+    refs:
+      - main
+      - tags
   tags:
-    - external
+    - docker
 
 include:
-  # - project: devops/pipes
-  #   file: /templates/v2/workflow.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/workflow.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/v2/go.gitlab-ci.yml
   - project: devops/pipes
@@ -54,7 +59,7 @@ include:
 
 docker-build-first_go:
   extends: .docker-build-vanilla
-  stage: first-build
+  stage: pre
   variables:
     DOCKERFILE_CONTEXT: ./go
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
@@ -73,17 +78,10 @@ docker-build-first_go:
           - 1.19-alpine
         GITLAB_CI_ARCH: arm64
   needs: []
-  only:
-    #   changes:
-    #     - "go/**/*"
-    #     - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
 
 docker-manifest-first_go:
   extends: .docker-manifest-vanilla
-  stage: first-manifest
+  stage: pre
   parallel:
     matrix:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
@@ -147,11 +145,11 @@ docker-build-first_docker:
       - main
       - tags
   needs:
-    - job: "build: [docker]"
+    - job: build
 
 docker-manifest-first_docker:
   extends: .docker-manifest-vanilla
-  stage: pre-manifest
+  stage: pre-publish
   variables:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
@@ -188,7 +186,7 @@ docker-build_docker:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [docker]"
+    - job: build
 
 docker-build_gl-artifacts:
   extends: .docker-build-dockerhub
@@ -215,8 +213,7 @@ docker-build_gl-artifacts:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [gl-artifacts]"
-      artifacts: true
+    - job: build
 
 docker-build_node:
   extends: .docker-build-dockerhub
@@ -256,8 +253,7 @@ docker-build_node:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [node]"
-      artifacts: true
+    - job: build
 
 docker-build_gh-release-tracker:
   extends: .docker-build-dockerhub
@@ -284,8 +280,7 @@ docker-build_gh-release-tracker:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [gh-release-tracker]"
-      artifacts: true
+    - job: build
 
 docker-build_markdown-toc:
   extends: .docker-build-dockerhub
@@ -312,8 +307,7 @@ docker-build_markdown-toc:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [markdown-toc]"
-      artifacts: true
+    - job: build
 
 docker-build_update-docker-hub-readme:
   extends: .docker-build-dockerhub
@@ -340,8 +334,7 @@ docker-build_update-docker-hub-readme:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [update-docker-hub-readme]"
-      artifacts: true
+    - job: build
 
 docker-build_semantic-release:
   extends: .docker-build-dockerhub
@@ -370,8 +363,7 @@ docker-build_semantic-release:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [semantic-release]"
-      artifacts: true
+    - job: build
 
 docker-build_select-env:
   extends: .docker-build-dockerhub
@@ -398,8 +390,7 @@ docker-build_select-env:
       - tags
   needs:
     - job: docker-manifest-first_docker
-    - job: "build: [select-env]"
-      artifacts: true
+    - job: build
 #
 # publish-s3-upload:
 #   extends: .publish-docker-to-public
@@ -427,32 +418,24 @@ docker-build_select-env:
 
 docker-manifest:
   extends: .docker-manifest-dockerhub
-  stage: manifest
+  stage: post
   only:
     refs:
       - main
       - tags
   needs:
     - job: "docker-build_docker"
-      artifacts: true
     - job: "docker-build_gh-release-tracker"
-      artifacts: true
     - job: "docker-build_gl-artifacts"
-      artifacts: true
     - job: "docker-build_markdown-toc"
-      artifacts: true
     - job: "docker-build_node"
-      artifacts: true
     - job: "docker-build_select-env"
-      artifacts: true
     - job: "docker-build_semantic-release"
-      artifacts: true
     - job: "docker-build_update-docker-hub-readme"
-      artifacts: true
 
 docker-manifest_go:
   extends: .docker-manifest-dockerhub
-  stage: manifest
+  stage: post
   variables:
     DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
     DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:1.19-alpine-amd64,cenk1cenk2/pipe-go:1.19-alpine-arm64
@@ -461,6 +444,7 @@ docker-manifest_go:
       - main
       - tags
   needs:
+    - job: "docker-build_docker"
     - job: "docker-build-first_go"
 
 update-docker-hub-readme:
