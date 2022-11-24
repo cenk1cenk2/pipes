@@ -126,7 +126,7 @@ build:
   needs:
     - job: docker-manifest-first_go
     - job: install
-    - job: job
+    - job: lint
 #
 # # to stop depending on itself
 #
