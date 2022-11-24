@@ -3,6 +3,17 @@ variables:
   LOG_LEVEL: trace
   GO_VERSION: 1.19-alpine
 
+stages:
+  - first-build
+  - first-manifest
+  - test
+  - build
+  - pre-publish
+  - pre-manifest
+  - publish
+  - manifest
+  - post
+
 .docker-build-vanilla:
   before_script:
     - cd $DOCKERFILE_CONTEXT
@@ -43,6 +54,7 @@ include:
 
 docker-build-first_go:
   extends: .docker-build-vanilla
+  stage: first-build
   variables:
     DOCKERFILE_CONTEXT: ./go
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
@@ -71,6 +83,7 @@ docker-build-first_go:
 
 docker-manifest-first_go:
   extends: .docker-manifest-vanilla
+  stage: first-manifest
   parallel:
     matrix:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
@@ -81,11 +94,13 @@ docker-manifest-first_go:
 
 lint:
   extends: .go-lint
+  stage: test
   needs:
     - job: docker-manifest-first_go
 
 build:
   extends: .go-build
+  stage: build
   variables:
     GO_BUILD_COMMAND: $PIPE:build
   artifacts:
@@ -111,6 +126,7 @@ build:
 
 docker-build-first_docker:
   extends: .docker-build-vanilla
+  stage: pre-publish
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
@@ -135,6 +151,7 @@ docker-build-first_docker:
 
 docker-manifest-first_docker:
   extends: .docker-manifest-vanilla
+  stage: pre-manifest
   variables:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
@@ -148,6 +165,7 @@ docker-manifest-first_docker:
 
 docker-build_docker:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
@@ -174,6 +192,7 @@ docker-build_docker:
 
 docker-build_gl-artifacts:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./gl-artifacts
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
@@ -201,6 +220,7 @@ docker-build_gl-artifacts:
 
 docker-build_node:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./node
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
@@ -241,6 +261,7 @@ docker-build_node:
 
 docker-build_gh-release-tracker:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./gh-release-tracker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
@@ -268,6 +289,7 @@ docker-build_gh-release-tracker:
 
 docker-build_markdown-toc:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./markdown-toc
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
@@ -295,6 +317,7 @@ docker-build_markdown-toc:
 
 docker-build_update-docker-hub-readme:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./update-docker-hub-readme
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
@@ -322,6 +345,7 @@ docker-build_update-docker-hub-readme:
 
 docker-build_semantic-release:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./semantic-release
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
@@ -351,6 +375,7 @@ docker-build_semantic-release:
 
 docker-build_select-env:
   extends: .docker-build-dockerhub
+  stage: publish
   variables:
     DOCKERFILE_CONTEXT: ./select-env
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
@@ -402,6 +427,7 @@ docker-build_select-env:
 
 docker-manifest:
   extends: .docker-manifest-dockerhub
+  stage: manifest
   only:
     refs:
       - main
@@ -426,6 +452,7 @@ docker-manifest:
 
 docker-manifest_go:
   extends: .docker-manifest-dockerhub
+  stage: manifest
   variables:
     DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
     DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:1.19-alpine-amd64,cenk1cenk2/pipe-go:1.19-alpine-arm64
@@ -438,6 +465,7 @@ docker-manifest_go:
 
 update-docker-hub-readme:
   extends: .update-docker-hub-readme
+  stage: post
   parallel:
     matrix:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
