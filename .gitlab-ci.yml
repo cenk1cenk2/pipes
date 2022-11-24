@@ -95,38 +95,37 @@ install:
   stage: install
   needs:
     - job: docker-manifest-first_go
-
-lint:
-  extends: .go-lint
-  stage: test
-  needs:
-    - job: docker-manifest-first_go
-    - job: install
-
-build:
-  extends: .go-build
-  stage: build
-  variables:
-    GO_BUILD_COMMAND: $PIPE:build
-  artifacts:
-    paths:
-      - "./*/dist/"
-  parallel:
-    matrix:
-      - PIPE: template
-      - PIPE: docker
-      - PIPE: gh-release-tracker
-      - PIPE: node
-      - PIPE: gl-artifacts
-      - PIPE: markdown-toc
-      - PIPE: update-docker-hub-readme
-      - PIPE: semantic-release
-      - PIPE: select-env
-      - PIPE: s3-upload
-  needs:
-    - job: docker-manifest-first_go
-    - job: install
-    - job: lint
+# lint:
+#   extends: .go-lint
+#   stage: test
+#   needs:
+#     - job: docker-manifest-first_go
+#     - job: install
+#
+# build:
+#   extends: .go-build
+#   stage: build
+#   variables:
+#     GO_BUILD_COMMAND: $PIPE:build
+#   artifacts:
+#     paths:
+#       - "./*/dist/"
+#   parallel:
+#     matrix:
+#       - PIPE: template
+#       - PIPE: docker
+#       - PIPE: gh-release-tracker
+#       - PIPE: node
+#       - PIPE: gl-artifacts
+#       - PIPE: markdown-toc
+#       - PIPE: update-docker-hub-readme
+#       - PIPE: semantic-release
+#       - PIPE: select-env
+#       - PIPE: s3-upload
+#   needs:
+#     - job: docker-manifest-first_go
+#     - job: install
+#     - job: lint
 #
 # # to stop depending on itself
 #
