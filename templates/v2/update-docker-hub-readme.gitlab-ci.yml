@@ -1,5 +1,5 @@
 ---
-update-docker-hub-readme:
+.update-docker-hub-readme:
   image: cenk1cenk2/pipe-update-docker-hub-readme:${PIPES_VERSION}
   script:
     - pipe

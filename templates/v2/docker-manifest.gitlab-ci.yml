@@ -8,5 +8,3 @@
     - pipe manifest
   tags:
     - docker
-  rules:
-    - if: $DOCKER_MANIFEST_TARGETS

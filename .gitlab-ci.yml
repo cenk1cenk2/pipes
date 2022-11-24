@@ -1,14 +1,4 @@
 ---
-stages:
-  - pre-build
-  - pre-manifest
-  - install
-  - build
-  - publish-first
-  - manifest
-  - publish
-  - post
-
 variables:
   LOG_LEVEL: trace
   GO_VERSION: 1.19-alpine
