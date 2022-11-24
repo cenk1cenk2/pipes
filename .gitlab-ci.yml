@@ -87,8 +87,9 @@ docker-manifest-first_go:
     - job: docker-build-first_go
 
 install:
-  extends: .go-install
   stage: install
+  script:
+    - echo imdat
   needs:
     - docker-build-first_go
     - docker-manifest-first_go
