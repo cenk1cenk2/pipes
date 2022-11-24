@@ -68,14 +68,10 @@ docker-build-first_go:
       - DOCKER_IMAGE_TAGS: ${GO_VERSION}-amd64
         DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
         DOCKERFILE_NAME: Dockerfile-alpine
-        GO_VERSION:
-          - 1.19-alpine
         GITLAB_CI_ARCH: amd64
       - DOCKER_IMAGE_TAGS: ${GO_VERSION}-arm64
         DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
         DOCKERFILE_NAME: Dockerfile-alpine
-        GO_VERSION:
-          - 1.19-alpine
         GITLAB_CI_ARCH: arm64
   needs: []
 
@@ -94,7 +90,8 @@ install:
   extends: .go-install
   stage: install
   needs:
-    - job: docker-manifest-first_go
+    - docker-build-first_go
+    - docker-manifest-first_go
 # lint:
 #   extends: .go-lint
 #   stage: test
