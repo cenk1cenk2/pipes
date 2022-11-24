@@ -1,15 +1,16 @@
 ---
+include:
+  - project: devops/pipes
+    file: /templates/v2/go-run.gitlab-ci.yml
+
 .go-install:
+  extends: .go-run
   variables:
+    GO_COMMAND_SCRIPT: $GO_INSTALL_COMMAND
     GO_INSTALL_COMMAND: install
-    GITLAB_CI_ARCH: docker
-  script:
-    - task $GO_INSTALL_COMMAND
   artifacts:
     paths:
       - vendor/
   cache:
     paths:
       - vendor/
-  tags:
-    - ${GITLAB_CI_ARCH}
