@@ -41,13 +41,15 @@ variables:
 
 include:
   - project: devops/pipes
-    file: /templates/go-install.gitlab-ci.yml
+    file: /templates/v2/workflow.gitlab-ci.yml
   - project: devops/pipes
-    file: /templates/go-build.gitlab-ci.yml
+    file: /templates/v2/go.gitlab-ci.yml
   - project: devops/pipes
-    file: /templates/go-lint.gitlab-ci.yml
+    file: /templates/v2/docker-build-dockerhub.gitlab-ci.yml
   - project: devops/pipes
-    file: /templates/parent-pipeline-id.gitlab-ci.yml
+    file: /templates/v2/update-docker-hub-readme.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
 
 docker-build-first_go:
   extends: .docker-build-vanilla
