@@ -109,6 +109,12 @@ func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
 			t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target] = append(t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target], t.Pipe.DockerManifest.Images...)
 			t.Lock.Unlock()
 
+			for _, manifest := range t.Pipe.DockerManifest.Matrix {
+				t.Lock.Lock()
+				t.Pipe.Ctx.ManifestedImages[manifest.Target] = append(t.Pipe.Ctx.ManifestedImages[manifest.Target], manifest.Images...)
+				t.Lock.Unlock()
+			}
+
 			return nil
 		})
 }

@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/urfave/cli/v2"
@@ -43,14 +44,11 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_README,
-		Name:     "readme.repository",
-		Usage:    "Repository for applying the readme on.",
-		EnvVars: []string{
-			"DOCKER_IMAGE_NAME",
-			"README_REPOSITORY",
-		},
-		Required:    true,
+		Category:    CATEGORY_README,
+		Name:        "readme.repository",
+		Usage:       "Repository for applying the readme on.",
+		EnvVars:     []string{"DOCKER_IMAGE_NAME", "README_REPOSITORY"},
+		Required:    false,
 		Destination: &TL.Pipe.Readme.Repository,
 	},
 
@@ -72,6 +70,14 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Readme.Description,
 		Required:    false,
 	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_README,
+		Name:     "readme.matrix",
+		Usage:    "Matrix of multiple README files to update. json([]struct{ repository: string, file: string, description?: string })",
+		EnvVars:  []string{"README_MATRIX"},
+		Required: false,
+	},
 }
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
@@ -80,6 +86,16 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 			"Readme short description can only be 100 characters long while you have: %d",
 			len(tl.Pipe.Readme.Description),
 		)
+	}
+
+	if v := tl.CliContext.String("readme.matrix"); v != "" {
+		if err := json.Unmarshal([]byte(v), &tl.Pipe.Readme.Matrix); err != nil {
+			return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
+		}
+	}
+
+	if tl.Pipe.Readme.Repository == "" && len(tl.Pipe.Readme.Matrix) == 0 {
+		return fmt.Errorf("You have to either provide a target via Repository or multiple targets through the Matrix.")
 	}
 
 	return nil

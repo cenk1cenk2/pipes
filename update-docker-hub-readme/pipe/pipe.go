@@ -15,6 +15,7 @@ type (
 		Repository  string
 		File        string
 		Description string
+		Matrix      []ReadmeMatrixJson
 	}
 
 	Pipe struct {

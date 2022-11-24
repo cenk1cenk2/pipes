@@ -9,7 +9,7 @@ type (
 		Target string
 		Images []string
 		Files  []string
-		Matrix DockerManifestMatrixJson
+		Matrix []DockerManifestMatrixJson
 	}
 
 	Pipe struct {

@@ -48,8 +48,8 @@ stages:
     - docker
 
 include:
-  # - project: devops/pipes
-  #   file: /templates/v2/workflow.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/workflow.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/v2/go.gitlab-ci.yml
   - project: devops/pipes
@@ -403,54 +403,52 @@ docker-manifest_go:
 update-docker-hub-readme:
   extends: .update-docker-hub-readme
   stage: post
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-        README_FILE: ./docker/README.md
-        README_DESCRIPTION: |
-          Builds and publishes a Docker image with given conditions.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
-        README_FILE: ./gl-artifacts/README.md
-        README_DESCRIPTION: |
-          Fetches artifacts from a stage in GitLab pipeline.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
-        README_FILE: ./node/README.md
-        README_DESCRIPTION: |
-          Node.JS operations for pipeline.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
-        README_FILE: ./gh-release-tracker/README.md
-        README_DESCRIPTION: |
-          Tracks a GitHub repository and fetches the latest tag.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-        README_FILE: ./go/README.md
-        README_DESCRIPTION: |
-          Generates TOC for markdown files.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
-        README_FILE: ./markdown-toc/README.md
-        README_DESCRIPTION: |
-          Generates TOC for markdown files.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
-        README_FILE: ./update-docker-hub-readme/README.md
-        README_DESCRIPTION: |
-          Updates the README on DockerHub for given repository.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
-        README_FILE: ./semantic-release/README.md
-        README_DESCRIPTION: |
-          Semantic-Release embedded inside a container for CI jobs.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
-        README_FILE: ./select-env/README.md
-        README_DESCRIPTION: |
-          Selects an environment given on the conditions.
-
-      # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3-upload
-      #   README_FILE: ./s3-upload/README.md
-      #   README_DESCRIPTION: |
-      #     Uploads the given artificats to a S3 instance.
+  variables:
+    README_MATRIX: |
+      [
+        {
+          "repository": "cenk1cenk2/pipe-docker",
+          "file": "./docker/README.md",
+          "description": "Builds and publishes a Docker image with given conditions."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-gl-artifacts",
+          "file": "./gl-artifacts/README.md",
+          "description": "Fetches artifacts from a stage in GitLab pipeline."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-node",
+          "file": "./node/README.md",
+          "description": "Node.JS operations for pipelines."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-gh-release-tracker",
+          "file": "./gh-release-tracker/README.md",
+          "description": "Tracks a GitHub repository and fetches the latest tag."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-go",
+          "file": "./go/README.md",
+          "description": "GoLang operations for pipelines."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-markdown-toc",
+          "file": "./markdown-toc/README.md",
+          "description": "Generates TOC for markdown files."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-update-docker-hub-readme",
+          "file": "./update-docker-hub-readme/README.md",
+          "description": "Updates the README on DockerHub for given repository."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-semantic-release",
+          "file": "./semantic-release/README.md",
+          "description": "Semantic-Release embedded inside a container for CI jobs."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-select-env",
+          "file": "./select-env/README.md",
+          "description": "Selects an environment given on the conditions."
+        }
+      ]

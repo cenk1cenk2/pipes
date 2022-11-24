@@ -2,5 +2,5 @@ package pipe
 
 type Ctx struct {
 	Token  string
-	Readme string
+	Readme map[string]ParsedReadme
 }
