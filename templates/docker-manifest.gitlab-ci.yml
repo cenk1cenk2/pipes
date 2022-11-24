@@ -7,5 +7,5 @@ include:
     file: /templates/v2/docker-manifest-internal.gitlab-ci.yml
 
 docker-manifest:
-  stage: .post
+  stage: post
   extends: .docker-manifest-internal
