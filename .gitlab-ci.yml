@@ -57,7 +57,7 @@ include:
   - project: devops/pipes
     file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
 
-docker-build-first_go:
+docker-build-first-go:
   extends: .docker-build-vanilla
   stage: pre
   variables:
@@ -75,7 +75,7 @@ docker-build-first_go:
         GITLAB_CI_ARCH: arm64
   needs: []
 
-docker-manifest-first_go:
+docker-manifest-first-go:
   extends: .docker-manifest-vanilla
   stage: pre
   parallel:
@@ -91,8 +91,7 @@ install:
   script:
     - echo imdat
   needs:
-    - docker-build-first_go
-    - docker-manifest-first_go
+    - docker-manifest-first-go
 # lint:
 #   extends: .go-lint
 #   stage: test
