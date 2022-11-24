@@ -1,9 +1,11 @@
 ---
+variables:
+  GITLAB_CI_ARCH: docker
+
 .go-run:
   image: cenk1cenk2/pipe-go:${GO_VERSION}
-  variables:
-    GITLAB_CI_ARCH: docker
   script:
     - task $GO_COMMAND_SCRIPT
+  when: on_success
   tags:
     - ${GITLAB_CI_ARCH}
