@@ -49,7 +49,6 @@ type (
 
 type (
 	ParsedReadme struct {
-		Buffer      []byte
 		File        string
 		Description string
 	}

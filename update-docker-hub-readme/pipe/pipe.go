@@ -39,7 +39,6 @@ func New(p *Plumber) *TaskList[Pipe] {
 			return tl.JobSequence(
 				LoginToDockerHubRegistry(tl).Job(),
 				DiscoverJobs(tl).Job(),
-				ReadReadmeFile(tl).Job(),
 				UpdateDockerReadme(tl).Job(),
 			)
 		})

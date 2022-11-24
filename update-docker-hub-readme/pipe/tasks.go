@@ -78,41 +78,6 @@ func DiscoverJobs(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func ReadReadmeFile(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("read").
-		Set(func(t *Task[Pipe]) error {
-			for repository, readme := range t.Pipe.Ctx.Readme {
-				func(repository string, readme ParsedReadme) {
-					t.CreateSubtask(repository).
-						Set(func(t *Task[Pipe]) error {
-							t.Log.Debugf("Trying to read file: %s", readme.File)
-
-							content, err := os.ReadFile(readme.File)
-
-							if err != nil {
-								return err
-							}
-
-							if entry, ok := t.Pipe.Ctx.Readme[repository]; ok {
-								//nolint:govet
-								entry.Buffer = content
-
-								t.Log.Debugf("File read: %s", readme.File)
-							}
-
-							return fmt.Errorf("Can not read the file: %s", readme.File)
-						}).
-						AddSelfToTheParentAsParallel()
-				}(repository, readme)
-			}
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunSubtasks()
-		})
-}
-
 //ignore:funlen
 func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("update").
@@ -127,8 +92,16 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 								repository,
 							)
 
+							t.Log.Debugf("Trying to read file: %s", readme.File)
+
+							content, err := os.ReadFile(readme.File)
+
+							if err != nil {
+								return err
+							}
+
 							update := DockerHubUpdateReadmeRequest{
-								Readme: string(readme.Buffer),
+								Readme: string(content),
 							}
 
 							if readme.Description != "" {
@@ -181,7 +154,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							switch res.StatusCode {
 							case http.StatusOK:
-								if b.FullDescription != string(readme.Buffer) {
+								if b.FullDescription != string(content) {
 									return fmt.Errorf("Uploaded README does not match with current repository README file.")
 								}
 
