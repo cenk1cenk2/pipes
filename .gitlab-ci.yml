@@ -88,35 +88,36 @@ docker-manifest-first_go:
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:1.19-alpine-amd64 -a cenk1cenk2/pipe-go:1.19-alpine-arm64"
   needs:
     - job: docker-build-first_go
-# lint:
-#   extends: .go-lint
-#   stage: test
-#   needs:
-#     - job: docker-manifest-first_go
-#
-# build:
-#   extends: .go-build
-#   stage: build
-#   variables:
-#     GO_BUILD_COMMAND: $PIPE:build
-#   artifacts:
-#     paths:
-#       - "./*/dist/"
-#   parallel:
-#     matrix:
-#       - PIPE: template
-#       - PIPE: docker
-#       - PIPE: gh-release-tracker
-#       - PIPE: node
-#       - PIPE: gl-artifacts
-#       - PIPE: markdown-toc
-#       - PIPE: update-docker-hub-readme
-#       - PIPE: semantic-release
-#       - PIPE: select-env
-#       - PIPE: s3-upload
-#   needs:
-#     - job: lint
-#     - job: docker-manifest-first_go
+
+lint:
+  extends: .go-lint
+  stage: test
+  needs:
+    - job: docker-manifest-first_go
+
+build:
+  extends: .go-build
+  stage: build
+  variables:
+    GO_BUILD_COMMAND: $PIPE:build
+  artifacts:
+    paths:
+      - "./*/dist/"
+  parallel:
+    matrix:
+      - PIPE: template
+      - PIPE: docker
+      - PIPE: gh-release-tracker
+      - PIPE: node
+      - PIPE: gl-artifacts
+      - PIPE: markdown-toc
+      - PIPE: update-docker-hub-readme
+      - PIPE: semantic-release
+      - PIPE: select-env
+      - PIPE: s3-upload
+  needs:
+    - job: lint
+    - job: docker-manifest-first_go
 #
 # # to stop depending on itself
 #
