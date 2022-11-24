@@ -105,14 +105,20 @@ func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
 			return len(t.Pipe.DockerManifest.Images) == 0
 		}).
 		Set(func(t *Task[Pipe]) error {
-			t.Lock.Lock()
-			t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target] = append(t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target], t.Pipe.DockerManifest.Images...)
-			t.Lock.Unlock()
+			if t.Pipe.DockerManifest.Target != "" && len(t.Pipe.DockerManifest.Images) > 0 {
+				t.Lock.Lock()
+				t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target] = append(t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target], t.Pipe.DockerManifest.Images...)
+				t.Lock.Unlock()
+
+				t.Log.Debugf("Fetched direct image: %s -> %v", t.Pipe.DockerManifest.Target, t.Pipe.DockerManifest.Images)
+			}
 
 			for _, manifest := range t.Pipe.DockerManifest.Matrix {
 				t.Lock.Lock()
 				t.Pipe.Ctx.ManifestedImages[manifest.Target] = append(t.Pipe.Ctx.ManifestedImages[manifest.Target], manifest.Images...)
 				t.Lock.Unlock()
+
+				t.Log.Debugf("Fetched manifest from matrix: %s -> %v", manifest.Target, manifest.Images)
 			}
 
 			return nil

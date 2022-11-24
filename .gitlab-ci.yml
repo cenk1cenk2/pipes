@@ -11,6 +11,7 @@ stages:
   - pre-publish
   - pre-manifest
   - publish
+  - manifest
   - post
 
 .docker-build-vanilla:
@@ -283,12 +284,12 @@ docker-build_markdown-toc:
       - main
       - tags
 
-docker-build_update-docker-hub-readme:
+docker-build_select-env:
   extends: .docker-build-dockerhub
   stage: publish
   variables:
-    DOCKERFILE_CONTEXT: ./update-docker-hub-readme
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
+    DOCKERFILE_CONTEXT: ./select-env
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
@@ -299,7 +300,7 @@ docker-build_update-docker-hub-readme:
   only:
     changes:
       - "common/**/*"
-      - "update-docker-hub-readme/**/*"
+      - "select-env/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml
@@ -333,12 +334,12 @@ docker-build_semantic-release:
       - main
       - tags
 
-docker-build_select-env:
+docker-build_update-docker-hub-readme:
   extends: .docker-build-dockerhub
   stage: publish
   variables:
-    DOCKERFILE_CONTEXT: ./select-env
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
+    DOCKERFILE_CONTEXT: ./update-docker-hub-readme
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
@@ -349,7 +350,7 @@ docker-build_select-env:
   only:
     changes:
       - "common/**/*"
-      - "select-env/**/*"
+      - "update-docker-hub-readme/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml
@@ -383,15 +384,7 @@ docker-build_select-env:
 #
 docker-manifest:
   extends: .docker-manifest-dockerhub
-  stage: post
-  only:
-    refs:
-      - main
-      - tags
-
-docker-manifest_go:
-  extends: .docker-manifest-dockerhub
-  stage: post
+  stage: manifest
   variables:
     DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
     DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:1.19-alpine-amd64,cenk1cenk2/pipe-go:1.19-alpine-arm64

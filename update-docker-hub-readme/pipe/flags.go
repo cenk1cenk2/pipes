@@ -49,6 +49,7 @@ var Flags = []cli.Flag{
 		Usage:       "Repository for applying the readme on.",
 		EnvVars:     []string{"DOCKER_IMAGE_NAME", "README_REPOSITORY"},
 		Required:    false,
+		Value:       "",
 		Destination: &TL.Pipe.Readme.Repository,
 	},
 
