@@ -84,7 +84,7 @@ docker-manifest-first-go:
         DOCKER_IMAGE_TAGS: 1.19-alpine
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:1.19-alpine-amd64 -a cenk1cenk2/pipe-go:1.19-alpine-arm64"
   needs:
-    - job: docker-build-first_go
+    - job: docker-build-first-go
 
 install:
   stage: install
