@@ -12,14 +12,14 @@ stages:
   - post
 
 .docker-build-vanilla:
-  before_script:
-    - cd $DOCKERFILE_CONTEXT
   variables:
     DOCKER_BUILDKIT: "1"
     GITLAB_CI_ARCH: amd64
     DOCKERFILE_NAME: Dockerfile
     DOCKERFILE_CONTEXT: .
     DOCKER_IMAGE_BUILD_ARGS: ""
+  before_script:
+    - cd $DOCKERFILE_CONTEXT
   script:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
     - docker build --pull -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $DOCKER_IMAGE_BUILD_ARGS -f ${DOCKERFILE_NAME} .
@@ -46,8 +46,8 @@ stages:
     - docker
 
 include:
-  - project: devops/pipes
-    file: /templates/v2/workflow.gitlab-ci.yml
+  # - project: devops/pipes
+  #   file: /templates/v2/workflow.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/v2/go.gitlab-ci.yml
   - project: devops/pipes
@@ -57,7 +57,7 @@ include:
   - project: devops/pipes
     file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
 
-docker-build-first-go:
+docker-build-first_go:
   extends: .docker-build-vanilla
   stage: pre
   variables:
@@ -75,7 +75,7 @@ docker-build-first-go:
         GITLAB_CI_ARCH: arm64
   needs: []
 
-docker-manifest-first-go:
+docker-manifest-first_go:
   extends: .docker-manifest-vanilla
   stage: pre
   parallel:
@@ -84,14 +84,14 @@ docker-manifest-first-go:
         DOCKER_IMAGE_TAGS: 1.19-alpine
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:1.19-alpine-amd64 -a cenk1cenk2/pipe-go:1.19-alpine-arm64"
   needs:
-    - job: docker-build-first-go
+    - job: docker-build-first_go
 
 install:
   stage: install
   script:
     - echo imdat
   needs:
-    - docker-manifest-first-go
+    - docker-manifest-first_go
 # lint:
 #   extends: .go-lint
 #   stage: test
