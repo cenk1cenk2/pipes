@@ -7,7 +7,6 @@ stages:
   - pre
   - test
   - build
-  - pre-publish
   - publish
   - post
 
@@ -89,432 +88,431 @@ docker-manifest-first_go:
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:1.19-alpine-amd64 -a cenk1cenk2/pipe-go:1.19-alpine-arm64"
   needs:
     - job: docker-build-first_go
-
-lint:
-  extends: .go-lint
-  stage: test
-  needs:
-    - job: docker-manifest-first_go
-
-build:
-  extends: .go-build
-  stage: build
-  variables:
-    GO_BUILD_COMMAND: $PIPE:build
-  artifacts:
-    paths:
-      - "./*/dist/"
-  parallel:
-    matrix:
-      - PIPE: template
-      - PIPE: docker
-      - PIPE: gh-release-tracker
-      - PIPE: node
-      - PIPE: gl-artifacts
-      - PIPE: markdown-toc
-      - PIPE: update-docker-hub-readme
-      - PIPE: semantic-release
-      - PIPE: select-env
-      - PIPE: s3-upload
-  needs:
-    - job: lint
-    - job: docker-manifest-first_go
-
-# to stop depending on itself
-
-docker-build-first_docker:
-  extends: .docker-build-vanilla
-  stage: pre-publish
-  variables:
-    DOCKERFILE_CONTEXT: ./docker
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "docker/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: build
-
-docker-manifest-first_docker:
-  extends: .docker-manifest-vanilla
-  stage: pre-publish
-  variables:
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-    DOCKER_IMAGE_TAGS: latest
-    DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
-  needs:
-    - job: docker-build-first_docker
-
-# private images
-
-# public images
-
-docker-build_docker:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./docker
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "docker/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_gl-artifacts:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./gl-artifacts
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "gl-artifacts/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_node:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./node
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
-        DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
-        NODE_VERSION:
-          - 16
-          - 16-alpine
-          - 18
-          - 18-alpine
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
-        DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
-        NODE_VERSION:
-          - 16
-          - 16-alpine
-          - 18
-          - 18-alpine
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "select-env/**/*"
-      - "node/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_gh-release-tracker:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./gh-release-tracker
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "gh-release-tracker/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_markdown-toc:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./markdown-toc
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "markdown-toc/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_update-docker-hub-readme:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./update-docker-hub-readme
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "update-docker-hub-readme/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_semantic-release:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./semantic-release
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "select-env/**/*"
-      - "node/**/*"
-      - "semantic-release/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
-
-docker-build_select-env:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./select-env
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "select-env/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-  needs:
-    - job: docker-manifest-first_docker
-    - job: build
+# lint:
+#   extends: .go-lint
+#   stage: test
+#   needs:
+#     - job: docker-manifest-first_go
 #
-# publish-s3-upload:
-#   extends: .publish-docker-to-public
+# build:
+#   extends: .go-build
+#   stage: build
 #   variables:
-#     DOCKERFILE_CONTEXT: ./s3
-#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3
-#     DOCKER_IMAGE_TAGS: latest
-#     PARENT_DOWNLOAD_ARTIFACTS: "build: [s3]"
-#     parallel:
-#       matrix:
-#         - DOCKER_IMAGE_TAGS: latest-amd64
-#           GITLAB_CI_ARCH: amd64
-#         - DOCKER_IMAGE_TAGS: latest-arm64
-#           GITLAB_CI_ARCH: arm64
+#     GO_BUILD_COMMAND: $PIPE:build
+#   artifacts:
+#     paths:
+#       - "./*/dist/"
+#   parallel:
+#     matrix:
+#       - PIPE: template
+#       - PIPE: docker
+#       - PIPE: gh-release-tracker
+#       - PIPE: node
+#       - PIPE: gl-artifacts
+#       - PIPE: markdown-toc
+#       - PIPE: update-docker-hub-readme
+#       - PIPE: semantic-release
+#       - PIPE: select-env
+#       - PIPE: s3-upload
+#   needs:
+#     - job: lint
+#     - job: docker-manifest-first_go
+#
+# # to stop depending on itself
+#
+# docker-build-first_docker:
+#   extends: .docker-build-vanilla
+#   stage: pre-publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./docker
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
 #   only:
 #     changes:
 #       - "common/**/*"
-#       - "s3/**/*"
+#       - "docker/**/*"
 #       - go.mod
 #       - go.sum
 #       - .gitlab-ci.yml
 #     refs:
 #       - main
 #       - tags
-
-docker-manifest:
-  extends: .docker-manifest-dockerhub
-  stage: post
-  only:
-    refs:
-      - main
-      - tags
-  needs:
-    - job: "docker-build_docker"
-    - job: "docker-build_gh-release-tracker"
-    - job: "docker-build_gl-artifacts"
-    - job: "docker-build_markdown-toc"
-    - job: "docker-build_node"
-    - job: "docker-build_select-env"
-    - job: "docker-build_semantic-release"
-    - job: "docker-build_update-docker-hub-readme"
-
-docker-manifest_go:
-  extends: .docker-manifest-dockerhub
-  stage: post
-  variables:
-    DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
-    DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:1.19-alpine-amd64,cenk1cenk2/pipe-go:1.19-alpine-arm64
-  only:
-    refs:
-      - main
-      - tags
-  needs:
-    - job: "docker-build_docker"
-    - job: "docker-build-first_go"
-
-update-docker-hub-readme:
-  extends: .update-docker-hub-readme
-  stage: post
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-        README_FILE: ./docker/README.md
-        README_DESCRIPTION: |
-          Builds and publishes a Docker image with given conditions.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
-        README_FILE: ./gl-artifacts/README.md
-        README_DESCRIPTION: |
-          Fetches artifacts from a stage in GitLab pipeline.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
-        README_FILE: ./node/README.md
-        README_DESCRIPTION: |
-          Node.JS operations for pipeline.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
-        README_FILE: ./gh-release-tracker/README.md
-        README_DESCRIPTION: |
-          Tracks a GitHub repository and fetches the latest tag.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-        README_FILE: ./go/README.md
-        README_DESCRIPTION: |
-          Generates TOC for markdown files.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
-        README_FILE: ./markdown-toc/README.md
-        README_DESCRIPTION: |
-          Generates TOC for markdown files.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
-        README_FILE: ./update-docker-hub-readme/README.md
-        README_DESCRIPTION: |
-          Updates the README on DockerHub for given repository.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
-        README_FILE: ./semantic-release/README.md
-        README_DESCRIPTION: |
-          Semantic-Release embedded inside a container for CI jobs.
-
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
-        README_FILE: ./select-env/README.md
-        README_DESCRIPTION: |
-          Selects an environment given on the conditions.
-
-      # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3-upload
-      #   README_FILE: ./s3-upload/README.md
-      #   README_DESCRIPTION: |
-      #     Uploads the given artificats to a S3 instance.
-  needs:
-    - job: "docker-build_docker"
-      artifacts: false
-    - job: "docker-build_gh-release-tracker"
-      artifacts: false
-    - job: "docker-build_gl-artifacts"
-      artifacts: false
-    - job: "docker-build_markdown-toc"
-      artifacts: false
-    - job: "docker-build_node"
-      artifacts: false
-    - job: "docker-build_select-env"
-      artifacts: false
-    - job: "docker-build_semantic-release"
-      artifacts: false
-    - job: "docker-build_update-docker-hub-readme"
-      artifacts: false
+#   needs:
+#     - job: build
+#
+# docker-manifest-first_docker:
+#   extends: .docker-manifest-vanilla
+#   stage: pre-publish
+#   variables:
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+#     DOCKER_IMAGE_TAGS: latest
+#     DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
+#   needs:
+#     - job: docker-build-first_docker
+#
+# # private images
+#
+# # public images
+#
+# docker-build_docker:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./docker
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "docker/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_gl-artifacts:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./gl-artifacts
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "gl-artifacts/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_node:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./node
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
+#         DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
+#         NODE_VERSION:
+#           - 16
+#           - 16-alpine
+#           - 18
+#           - 18-alpine
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
+#         DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
+#         NODE_VERSION:
+#           - 16
+#           - 16-alpine
+#           - 18
+#           - 18-alpine
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "select-env/**/*"
+#       - "node/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_gh-release-tracker:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./gh-release-tracker
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "gh-release-tracker/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_markdown-toc:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./markdown-toc
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "markdown-toc/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_update-docker-hub-readme:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./update-docker-hub-readme
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "update-docker-hub-readme/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_semantic-release:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./semantic-release
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "select-env/**/*"
+#       - "node/**/*"
+#       - "semantic-release/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+#
+# docker-build_select-env:
+#   extends: .docker-build-dockerhub
+#   stage: publish
+#   variables:
+#     DOCKERFILE_CONTEXT: ./select-env
+#     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
+#     DOCKER_MANIFEST_TARGET: latest
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_TAGS: latest-amd64
+#         GITLAB_CI_ARCH: amd64
+#       - DOCKER_IMAGE_TAGS: latest-arm64
+#         GITLAB_CI_ARCH: arm64
+#   only:
+#     changes:
+#       - "common/**/*"
+#       - "select-env/**/*"
+#       - go.mod
+#       - go.sum
+#       - .gitlab-ci.yml
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: docker-manifest-first_docker
+#     - job: build
+# #
+# # publish-s3-upload:
+# #   extends: .publish-docker-to-public
+# #   variables:
+# #     DOCKERFILE_CONTEXT: ./s3
+# #     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3
+# #     DOCKER_IMAGE_TAGS: latest
+# #     PARENT_DOWNLOAD_ARTIFACTS: "build: [s3]"
+# #     parallel:
+# #       matrix:
+# #         - DOCKER_IMAGE_TAGS: latest-amd64
+# #           GITLAB_CI_ARCH: amd64
+# #         - DOCKER_IMAGE_TAGS: latest-arm64
+# #           GITLAB_CI_ARCH: arm64
+# #   only:
+# #     changes:
+# #       - "common/**/*"
+# #       - "s3/**/*"
+# #       - go.mod
+# #       - go.sum
+# #       - .gitlab-ci.yml
+# #     refs:
+# #       - main
+# #       - tags
+#
+# docker-manifest:
+#   extends: .docker-manifest-dockerhub
+#   stage: post
+#   only:
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: "docker-build_docker"
+#     - job: "docker-build_gh-release-tracker"
+#     - job: "docker-build_gl-artifacts"
+#     - job: "docker-build_markdown-toc"
+#     - job: "docker-build_node"
+#     - job: "docker-build_select-env"
+#     - job: "docker-build_semantic-release"
+#     - job: "docker-build_update-docker-hub-readme"
+#
+# docker-manifest_go:
+#   extends: .docker-manifest-dockerhub
+#   stage: post
+#   variables:
+#     DOCKER_MANIFEST_TARGETS: cenk1cenk2/pipe-go:1.19-alpine
+#     DOCKER_MANIFEST_IMAGES: cenk1cenk2/pipe-go:1.19-alpine-amd64,cenk1cenk2/pipe-go:1.19-alpine-arm64
+#   only:
+#     refs:
+#       - main
+#       - tags
+#   needs:
+#     - job: "docker-build_docker"
+#     - job: "docker-build-first_go"
+#
+# update-docker-hub-readme:
+#   extends: .update-docker-hub-readme
+#   stage: post
+#   parallel:
+#     matrix:
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
+#         README_FILE: ./docker/README.md
+#         README_DESCRIPTION: |
+#           Builds and publishes a Docker image with given conditions.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gl-artifacts
+#         README_FILE: ./gl-artifacts/README.md
+#         README_DESCRIPTION: |
+#           Fetches artifacts from a stage in GitLab pipeline.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
+#         README_FILE: ./node/README.md
+#         README_DESCRIPTION: |
+#           Node.JS operations for pipeline.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-gh-release-tracker
+#         README_FILE: ./gh-release-tracker/README.md
+#         README_DESCRIPTION: |
+#           Tracks a GitHub repository and fetches the latest tag.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
+#         README_FILE: ./go/README.md
+#         README_DESCRIPTION: |
+#           Generates TOC for markdown files.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
+#         README_FILE: ./markdown-toc/README.md
+#         README_DESCRIPTION: |
+#           Generates TOC for markdown files.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
+#         README_FILE: ./update-docker-hub-readme/README.md
+#         README_DESCRIPTION: |
+#           Updates the README on DockerHub for given repository.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
+#         README_FILE: ./semantic-release/README.md
+#         README_DESCRIPTION: |
+#           Semantic-Release embedded inside a container for CI jobs.
+#
+#       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
+#         README_FILE: ./select-env/README.md
+#         README_DESCRIPTION: |
+#           Selects an environment given on the conditions.
+#
+#       # - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-s3-upload
+#       #   README_FILE: ./s3-upload/README.md
+#       #   README_DESCRIPTION: |
+#       #     Uploads the given artificats to a S3 instance.
+#   needs:
+#     - job: "docker-build_docker"
+#       artifacts: false
+#     - job: "docker-build_gh-release-tracker"
+#       artifacts: false
+#     - job: "docker-build_gl-artifacts"
+#       artifacts: false
+#     - job: "docker-build_markdown-toc"
+#       artifacts: false
+#     - job: "docker-build_node"
+#       artifacts: false
+#     - job: "docker-build_select-env"
+#       artifacts: false
+#     - job: "docker-build_semantic-release"
+#       artifacts: false
+#     - job: "docker-build_update-docker-hub-readme"
+#       artifacts: false
