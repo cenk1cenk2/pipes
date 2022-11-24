@@ -134,7 +134,6 @@ docker-build-first_docker:
 
 docker-manifest-first_docker:
   extends: .docker-manifest-vanilla
-  stage: manifest
   variables:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
