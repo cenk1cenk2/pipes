@@ -90,7 +90,7 @@ install:
   script:
     - echo imdat
   needs:
-    - job: "docker-manifest-first_go: "
+    - job: "docker-manifest-first_go"
 # lint:
 #   extends: .go-lint
 #   stage: test
