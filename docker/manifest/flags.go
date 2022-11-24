@@ -68,5 +68,7 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 		}
 	}
 
+	tl.Pipe.ManifestedImages = make(map[string][]string)
+
 	return nil
 }

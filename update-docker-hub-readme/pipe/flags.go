@@ -98,5 +98,7 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 		return fmt.Errorf("You have to either provide a target via Repository or multiple targets through the Matrix.")
 	}
 
+	tl.Pipe.Ctx.Readme = make(map[string]ParsedReadme)
+
 	return nil
 }
