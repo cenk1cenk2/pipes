@@ -93,8 +93,7 @@ docker-manifest-first_go:
 install:
   extends: .go-install
   stage: install
-  needs:
-    - job: docker-manifest-first_go
+  needs: []
 # lint:
 #   extends: .go-lint
 #   stage: test
