@@ -1,0 +1,10 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/go-run.gitlab-ci.yml
+
+.go-build:
+  extends: .go-run
+  variables:
+    GO_COMMAND_SCRIPT: $GO_BUILD_COMMAND
+    GO_BUILD_COMMAND: build

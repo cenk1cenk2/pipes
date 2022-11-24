@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -71,11 +72,19 @@ func FetchPublishedImagesFromFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 								return err
 							}
 
-							tags := strings.Split(string(content), ",")
-							t.Log.Debugf("Found published images: %v in %s", tags, f)
+							parsed := &DockerManifestMatrixJson{}
+							if err := json.Unmarshal(content, parsed); err != nil {
+								return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
+							}
+
+							if parsed.Target == "" {
+								return nil
+							}
+
+							t.Log.Debugf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f)
 
 							t.Lock.Lock()
-							t.Pipe.Ctx.PublishedImages = append(t.Pipe.Ctx.PublishedImages, tags...)
+							t.Pipe.Ctx.ManifestedImages[parsed.Target] = append(t.Pipe.Ctx.ManifestedImages[parsed.Target], parsed.Images...)
 							t.Lock.Unlock()
 
 							return nil
@@ -97,7 +106,7 @@ func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			t.Lock.Lock()
-			t.Pipe.Ctx.PublishedImages = append(t.Pipe.Ctx.PublishedImages, t.Pipe.DockerManifest.Images...)
+			t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target] = append(t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target], t.Pipe.DockerManifest.Images...)
 			t.Lock.Unlock()
 
 			return nil
@@ -107,38 +116,10 @@ func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
 func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("manifest").
 		Set(func(t *Task[Pipe]) error {
-			for _, target := range t.Pipe.DockerManifest.Targets {
-				func(target string) {
+			for target, images := range t.Pipe.Ctx.ManifestedImages {
+				func(target string, images []string) {
 					t.CreateSubtask(target).
 						Set(func(t *Task[Pipe]) error {
-							var matches = []string{}
-
-							parsed := strings.Split(target, ":")
-							targetName, targetTag := parsed[0], parsed[1]
-
-							if targetName == "" || targetTag == "" {
-								return fmt.Errorf("Error while parsing target tag: %s", target)
-							}
-
-							for _, image := range t.Pipe.Ctx.PublishedImages {
-								parsed := strings.Split(image, ":")
-								name, tag := parsed[0], parsed[1]
-
-								if name == "" || tag == "" {
-									return fmt.Errorf("Error while parsing image tag: %s", image)
-								}
-
-								if targetName == name {
-									t.Log.Debugf("Image matches with target: %s -> %s", image, target)
-
-									matches = append(matches, image)
-								}
-							}
-
-							if len(matches) == 0 {
-								t.Log.Warnf("No matches for given target tag, doing nothing: %s", target)
-							}
-
 							t.
 								CreateCommand(
 									setup.DOCKER_EXE,
@@ -147,7 +128,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 									target,
 								).
 								Set(func(c *Command[Pipe]) error {
-									for _, image := range matches {
+									for _, image := range images {
 										c.AppendArgs(fmt.Sprintf("-a %s", image))
 									}
 
@@ -171,7 +152,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 							return t.RunCommandJobAsJobSequence()
 						}).
 						AddSelfToTheParentAsParallel()
-				}(target)
+				}(target, images)
 			}
 
 			return nil

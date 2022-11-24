@@ -6,9 +6,10 @@ import (
 
 type (
 	DockerManifest struct {
-		Targets []string
-		Images  []string
-		Files   []string
+		Target string
+		Images []string
+		Files  []string
+		Matrix DockerManifestMatrixJson
 	}
 
 	Pipe struct {

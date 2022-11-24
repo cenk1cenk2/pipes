@@ -23,12 +23,16 @@ type (
 		Pull           bool
 		Inspect        bool
 		BuildArgs      []string
-		TagsOutputFile string
 	}
 
 	DockerFile struct {
 		Context string
 		Name    string
+	}
+
+	DockerManifest struct {
+		Target     string
+		OutputFile string
 	}
 
 	Pipe struct {
@@ -38,6 +42,7 @@ type (
 		Docker
 		DockerImage
 		DockerFile
+		DockerManifest
 	}
 )
 

@@ -1,0 +1,12 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/go-run.gitlab-ci.yml
+
+.go-test:
+  extends: .go-run
+  variables:
+    GO_COMMAND_SCRIPT: $GO_TEST_COMMAND
+  when: on_success
+  rules:
+    - if: $GO_TEST_COMMAND

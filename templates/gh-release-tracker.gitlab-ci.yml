@@ -1,18 +1,11 @@
+---
 stages:
   - track
 
+include:
+  - project: devops/pipes
+    file: /templates/v2/gh-release-tracker.gitlab-ci.yml
+
 gh-release-tracker:
   stage: track
-  image: cenk1cenk2/pipe-gh-release-tracker:latest
-  script:
-    - pipe
-  artifacts:
-    paths:
-      - .tags
-      - "**/.tags"
-  only:
-    refs:
-      - master
-      - main
-  tags:
-    - docker
+  extends: .gh-release-tracker

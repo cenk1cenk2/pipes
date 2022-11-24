@@ -1,29 +1,11 @@
-variables:
-  PIPES_VERSION: latest
-  DOCKER_REGISTRY: $CI_REGISTRY
-  DOCKER_REGISTRY_USERNAME: $CI_REGISTRY_USER
-  DOCKER_REGISTRY_PASSWORD: $CI_BUILD_TOKEN
-  DOCKER_IMAGE_NAME: $CI_PROJECT_PATH/$DOCKER_IMAGE_INTERNAL_NAME
-  DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME
-  DOCKERFILE_CONTEXT: "."
-  GITLAB_CI_ARCH: amd64
+---
+stages:
+  - docker
 
 include:
   - project: devops/pipes
-    file: /templates/docker-manifest.gitlab-ci.yml
+    file: /templates/v2/docker-build-internal.gitlab-ci.yml
 
-stages:
-  - docker
-  - post
-
-build-docker-image:
+docker-build:
   stage: docker
-  image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
-  script:
-    - pipe build
-  artifacts:
-    paths:
-      - .published-docker-images*
-      - "**/.published-docker-images*"
-  tags:
-    - ${GITLAB_CI_ARCH}
+  extends: .docker-build-internal

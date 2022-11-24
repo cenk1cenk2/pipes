@@ -1,0 +1,20 @@
+---
+stages:
+  - track
+
+.gh-release-tracker:
+  image: cenk1cenk2/pipe-gh-release-tracker:${PIPES_VERSION}
+  variables:
+    PIPES_VERSION: latest
+  script:
+    - pipe
+  artifacts:
+    paths:
+      - .tags
+      - "**/.tags"
+  only:
+    refs:
+      - master
+      - main
+  tags:
+    - docker

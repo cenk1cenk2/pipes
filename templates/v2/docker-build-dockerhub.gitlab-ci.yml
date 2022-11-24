@@ -1,0 +1,13 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/docker-build.gitlab-ci.yml
+
+.docker-build-dockerhub:
+  extends: .docker-build
+  variables:
+    DOCKER_REGISTRY: ""
+    DOCKER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
+    DOCKER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
+    DOCKER_IMAGE_NAME: $DOCKER_IMAGE_NAME
+    DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME

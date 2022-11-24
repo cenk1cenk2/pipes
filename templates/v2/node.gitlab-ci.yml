@@ -1,0 +1,12 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/node-install.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/node-build.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/node-lint.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/node-run.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/node-test.gitlab-ci.yml

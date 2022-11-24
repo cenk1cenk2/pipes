@@ -1,0 +1,11 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/node-run.gitlab-ci.yml
+
+.node-test:
+  extends: .node-run
+  variables:
+    NODE_COMMAND_SCRIPT: $NODE_TEST_COMMAND
+  rules:
+    - if: $NODE_TEST_COMMAND

@@ -1,18 +1,11 @@
-variables:
-  PIPES_VERSION: latest
-  DOCKER_REGISTRY: ""
-  DOCKER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
-  DOCKER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
-
+---
 stages:
-  - post
+  - .post
 
-manifest-docker-image:
-  stage: post
-  image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
-  script:
-    - pipe manifest
-  tags:
-    - docker
-  rules:
-    - if: $DOCKER_MANIFEST_TARGETS
+include:
+  - project: devops/pipes
+    file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
+
+docker-manifest:
+  stage: .post
+  extends: .docker-manifest-internal

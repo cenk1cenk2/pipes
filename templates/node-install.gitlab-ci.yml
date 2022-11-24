@@ -1,19 +1,11 @@
-variables:
-  GITLAB_CI_ARCH: docker
+---
+stages:
+  - install
+
+include:
+  - project: devops/pipes
+    file: /templates/v2/node-install.gitlab-ci.yml
 
 install:
   stage: install
-  image: cenk1cenk2/pipe-node:${NODE_VERSION}
-  script:
-    - pipe install
-  artifacts:
-    paths:
-      - node_modules/
-      - "**/node_modules/"
-  cache:
-    paths:
-      - node_modules/
-  rules:
-    - when: on_success
-  tags:
-    - ${GITLAB_CI_ARCH}
+  extends: .node-install

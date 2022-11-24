@@ -1,0 +1,19 @@
+---
+.node-install:
+  image: cenk1cenk2/pipe-node:${NODE_VERSION}
+  variables:
+    GITLAB_CI_ARCH: amd64
+  script:
+    - pipe install
+  artifacts:
+    paths:
+      - node_modules/
+      - "**/node_modules/"
+  cache:
+    paths:
+      - node_modules/
+      - "**/node_modules/"
+  rules:
+    - when: on_success
+  tags:
+    - ${GITLAB_CI_ARCH}

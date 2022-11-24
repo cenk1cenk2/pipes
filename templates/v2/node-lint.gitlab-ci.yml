@@ -1,0 +1,11 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/node-run.gitlab-ci.yml
+
+.node-lint:
+  extends: .node-run
+  variables:
+    NODE_COMMAND_SCRIPT: $NODE_LINT_COMMAND
+    NODE_LINT_COMMAND: lint:check
+  when: on_success

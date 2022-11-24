@@ -1,6 +1,6 @@
 package manifest
 
 type Ctx struct {
-	PublishedImages []string
-	Matches         []string
+	ManifestedImages map[string][]string
+	Matches          []string
 }

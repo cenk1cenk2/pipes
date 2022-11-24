@@ -1,19 +1,11 @@
+---
 stages:
-  - post
+  - .post
+
+include:
+  - project: devops/pipes
+    file: /templates/v2/update-docker-hub-readme.gitlab-ci.yml
 
 update-docker-hub-readme:
   stage: post
-  image: cenk1cenk2/pipe-update-docker-hub-readme:latest
-  script:
-    - pipe
-  variables:
-    DOCKER_USERNAME: $DOCKERHUB_USERNAME
-    DOCKER_PASSWORD: $DOCKERHUB_API_PASSWORD
-  only:
-    refs:
-      - master
-      - main
-      - tags
-  tags:
-    - docker
-  when: on_success
+  extends: .update-docker-hub-readme

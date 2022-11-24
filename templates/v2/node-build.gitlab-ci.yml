@@ -1,0 +1,15 @@
+---
+.node-build:
+  image: cenk1cenk2/pipe-node:${NODE_VERSION}
+  variables:
+    GITLAB_CI_ARCH: amd64
+  script:
+    - pipe build
+  artifacts:
+    paths:
+      - dist/
+      - "**/dist/"
+  rules:
+    - when: on_success
+  tags:
+    - ${GITLAB_CI_ARCH}

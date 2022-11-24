@@ -1,12 +1,11 @@
-variables:
-  GITLAB_CI_ARCH: docker
+---
+stages:
+  - build
+
+include:
+  - project: devops/pipes
+    file: /templates/v2/node-lint.gitlab-ci.yml
 
 lint:
   stage: build
-  image: cenk1cenk2/pipe-node:${NODE_VERSION}
-  script:
-    - pipe run ${NODE_LINT_COMMAND}
-  tags:
-    - ${GITLAB_CI_ARCH}
-  rules:
-    - if: $NODE_LINT_COMMAND
+  extends: .node-lint

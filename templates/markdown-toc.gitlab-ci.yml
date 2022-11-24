@@ -1,18 +1,11 @@
+---
 stages:
   - docs
 
-update-markdown-toc:
+include:
+  - project: devops/pipes
+    file: /templates/v2/markdown-toc.gitlab-ci.yml
+
+markdown-toc:
   stage: docs
-  image: cenk1cenk2/pipe-markdown-toc:latest
-  script:
-    - pipe
-  artifacts:
-    paths:
-      - README.md
-      - "packages/*/README.md"
-  only:
-    refs:
-      - master
-      - main
-  tags:
-    - docker
+  extends: .markdown-toc

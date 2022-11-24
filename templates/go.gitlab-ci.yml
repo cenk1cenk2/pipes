@@ -3,9 +3,7 @@ stages:
   - build
 
 variables:
-  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   GO_VERSION: 1.19-alpine
-  GITLAB_CI_ARCH: docker
 
 include:
   - project: devops/pipes

@@ -1,16 +1,19 @@
+---
 variables:
   PIPES_VERSION: latest
-  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  NODE_VERSION: 16-alpine
+  NODE_VERSION: 18-alpine
   NODE_LINT_COMMAND: lint:check
   NODE_TEST_COMMAND: ""
-  GITLAB_CI_ARCH: docker
+  ENVIRONMENT_ENABLE: "false"
 
 stages:
   - install
   - build
 
 include:
+  - project: devops/pipes
+    file: /templates/parent-pipeline-id.gitlab-ci.yml
+
   - project: devops/pipes
     file: /templates/node-install.gitlab-ci.yml
 

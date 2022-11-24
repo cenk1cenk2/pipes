@@ -1,0 +1,12 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/go-install.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/go-build.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/go-lint.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/go-run.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/go-test.gitlab-ci.yml

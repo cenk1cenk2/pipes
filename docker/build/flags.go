@@ -63,16 +63,6 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 
 	&cli.StringFlag{
 		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.tags-output-file",
-		Usage:       "Write all the images that are published in to a file for later use. Template(string)",
-		Required:    false,
-		EnvVars:     []string{"DOCKER_IMAGE_TAGS_OUTPUT_FILE"},
-		Value:       `.published-docker-images_{{ sha256sum $ }}`,
-		Destination: &TL.Pipe.DockerImage.TagsOutputFile,
-	},
-
-	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_file.context",
 		Usage:       "Dockerfile context argument for build operation.",
 		Required:    false,
@@ -150,6 +140,27 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		EnvVars:     []string{"DOCKER_IMAGE_PULL"},
 		Value:       true,
 		Destination: &TL.Pipe.DockerImage.Pull,
+	},
+
+	// CATEGORY_DOCKER_MANIFEST
+
+	&cli.StringFlag{
+		Category:    setup.CATEGORY_DOCKER_MANIFEST,
+		Name:        "docker_manifest.target",
+		Usage:       "Target image names for patching the manifest.",
+		Required:    false,
+		EnvVars:     []string{"DOCKER_MANIFEST_TARGET"},
+		Destination: &TL.Pipe.DockerManifest.Target,
+	},
+
+	&cli.StringFlag{
+		Category:    setup.CATEGORY_DOCKER_IMAGE,
+		Name:        "docker_manifest.output-file",
+		Usage:       "Write all the images that are published in to a file for later use. Template(string)",
+		Required:    false,
+		EnvVars:     []string{"DOCKER_MANIFEST_OUTPUT_FILE"},
+		Value:       `.published-docker-images_{{ sha256sum $ }}`,
+		Destination: &TL.Pipe.DockerManifest.OutputFile,
 	},
 })
 

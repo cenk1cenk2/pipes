@@ -1,6 +1,7 @@
 package build
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -8,6 +9,7 @@ import (
 	"strings"
 
 	u "gitlab.kilic.dev/devops/pipes/common/utils"
+	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
@@ -42,12 +44,19 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 func DockerTagsWriteFile(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags", "file").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerImage.TagsOutputFile == ""
+			return t.Pipe.DockerManifest.OutputFile == "" || t.Pipe.DockerManifest.Target == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
-			tags := strings.Join(t.Pipe.DockerImage.Tags, ",")
+			tags, err := json.Marshal(&manifest.DockerManifestMatrixJson{
+				Target: t.Pipe.DockerManifest.Target,
+				Images: t.Pipe.Ctx.Tags,
+			})
 
-			filename, err := u.InlineTemplate(t.Pipe.DockerImage.TagsOutputFile, tags)
+			if err != nil {
+				return err
+			}
+
+			filename, err := u.InlineTemplate(t.Pipe.DockerManifest.OutputFile, string(tags))
 
 			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
 
@@ -55,11 +64,11 @@ func DockerTagsWriteFile(tl *TaskList[Pipe]) *Task[Pipe] {
 				return err
 			}
 
-			if err := os.WriteFile(filename, []byte(tags), 0600); err != nil {
+			if err := os.WriteFile(filename, tags, 0600); err != nil {
 				return err
 			}
 
-			t.Log.Infof("Wrote image tags to file for later use: %s", filename)
+			t.Log.Infof("Wrote image manifest to file for later use: %s", filename)
 
 			return nil
 		})

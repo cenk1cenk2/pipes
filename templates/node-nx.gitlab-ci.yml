@@ -1,29 +1,4 @@
-variables:
-  PIPES_VERSION: latest
-  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  NODE_VERSION: 16-alpine
-  NODE_LINT_COMMAND: lint:check
-  NODE_TEST_COMMAND: ""
-  ENVIRONMENT_ENABLE: "false"
-  GITLAB_CI_ARCH: docker
-
-stages:
-  - install
-  - build
-
-cache:
-  paths:
-    - node_modules/
-
+---
 include:
   - project: devops/pipes
-    file: /templates/node-install.gitlab-ci.yml
-
-  - project: devops/pipes
-    file: /templates/node-lint.gitlab-ci.yml
-
-  - project: devops/pipes
-    file: /templates/node-test.gitlab-ci.yml
-
-  - project: devops/pipes
-    file: /templates/node-build.gitlab-ci.yml
+    file: /templates/node-nx.gitlab-ci.yml

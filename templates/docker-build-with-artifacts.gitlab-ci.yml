@@ -5,24 +5,14 @@ variables:
 stages:
   - prepare
   - docker
-  - post
 
 include:
   - project: devops/pipes
-    file: /templates/docker-build.gitlab-ci.yml
+    file: /templates/v2/gitlab-artifacts-download.gitlab-ci.yml
+
   - project: devops/pipes
-    file: /templates/docker-manifest.gitlab-ci.yml
+    file: /templates/docker-build-internal.gitlab-ci.yml
 
 prepare:
   stage: prepare
-  image: cenk1cenk2/pipe-gl-artifacts:${PIPES_VERSION}
-  script:
-    - pipe
-  artifacts:
-    paths:
-      - dist/
-      - "**/dist/"
-  tags:
-    - docker
-  rules:
-    - if: $PARENT_DOWNLOAD_ARTIFACTS
+  extends: .gitlab-artifacts-download

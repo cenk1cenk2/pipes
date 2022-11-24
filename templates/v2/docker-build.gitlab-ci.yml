@@ -1,0 +1,14 @@
+---
+.docker-build:
+  image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
+  variables:
+    PIPES_VERSION: latest
+    GITLAB_CI_ARCH: amd64
+  script:
+    - pipe build
+  artifacts:
+    paths:
+      - .published-docker-images*
+      - "**/.published-docker-images*"
+  tags:
+    - ${GITLAB_CI_ARCH}

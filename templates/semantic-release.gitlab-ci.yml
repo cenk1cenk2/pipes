@@ -1,30 +1,11 @@
-variables:
-  PIPES_VERSION: latest
-  GIT_AUTHOR_NAME: semantic-release [bot]
-  GIT_AUTHOR_EMAIL: gitlab@kilic.dev
-  GIT_COMMITTER_NAME: semantic-release [bot]
-  GIT_COMMITTER_EMAIL: gitlab@kilic.dev
-  NPM_TOKEN: $NPM_TOKEN
-
+---
 stages:
   - publish
 
+include:
+  - project: devops/pipes
+    file: /templates/v2/semantic-release.gitlab-ci.yml
+
 semantic-release:
   stage: publish
-  image: cenk1cenk2/pipe-semantic-release:latest
-  script:
-    - pipe
-  artifacts:
-    paths:
-      - .tags
-      - "**/.tags"
-  only:
-    refs:
-      - master
-      - main
-      - alpha
-      - beta
-      - rc
-      - next
-  tags:
-    - docker
+  extends: .semantic-release

@@ -1,0 +1,11 @@
+---
+include:
+  - project: devops/pipes
+    file: /templates/v2/docker-manifest.gitlab-ci.yml
+
+.docker-manifest-dockerhub:
+  extends: .docker-manifest
+  variables:
+    DOCKER_REGISTRY: ""
+    DOCKER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
+    DOCKER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
