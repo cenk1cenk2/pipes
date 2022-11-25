@@ -210,7 +210,7 @@ docker-build_go:
         DOCKER_MANIFEST_TARGET: ${GO_VERSION}
         DOCKERFILE_NAME: Dockerfile-alpine
         GO_VERSION:
-          - ${GO_VERSION}
+          - 1.19-alpine
         GITLAB_CI_ARCH:
           - amd64
           - arm64
