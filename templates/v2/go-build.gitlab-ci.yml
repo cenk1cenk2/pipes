@@ -10,5 +10,4 @@ include:
     GO_COMMAND_SCRIPT: $GO_BUILD_COMMAND
   artifacts:
     paths:
-      - dist/
       - "**/dist/"

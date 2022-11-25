@@ -9,7 +9,6 @@ variables:
     - pipe build
   artifacts:
     paths:
-      - .published-docker-images*
       - "**/.published-docker-images*"
   tags:
     - ${GITLAB_CI_ARCH}

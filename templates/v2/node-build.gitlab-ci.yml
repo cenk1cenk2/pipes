@@ -8,7 +8,6 @@ variables:
     - pipe build
   artifacts:
     paths:
-      - dist/
       - "**/dist/"
   rules:
     - when: on_success

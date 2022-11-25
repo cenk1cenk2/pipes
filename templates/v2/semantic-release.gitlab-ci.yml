@@ -13,7 +13,6 @@ variables:
     - pipe
   artifacts:
     paths:
-      - .tags
       - "**/.tags"
   only:
     refs:

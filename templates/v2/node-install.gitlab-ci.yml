@@ -8,11 +8,9 @@ variables:
     - pipe install
   artifacts:
     paths:
-      - node_modules/
       - "**/node_modules/"
   cache:
     paths:
-      - node_modules/
       - "**/node_modules/"
   rules:
     - when: on_success
