@@ -62,7 +62,6 @@ Build Docker images.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DOCKER_IMAGE_NAME` | Image name for the will be built Docker image. | `String` | `true` |  |
 | `$DOCKER_IMAGE_TAGS` | Image tag for the will be built Docker image. | `StringSlice` | `true` |  |
-| `$DOCKER_IMAGE_TAGS_OUTPUT_FILE` | Write all the images that are published in to a file for later use. | `String`<br/>`Template(string)` | `false` | .published-docker-images_{{ sha256sum $ }} |
 | `$DOCKERFILE_CONTEXT` | Dockerfile context argument for build operation. | `String` | `false` | . |
 | `$DOCKERFILE_NAME` | Dockerfile path for the build operation | `String` | `false` | Dockerfile |
 | `$DOCKER_IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `String`<br/>`json(RegExp[])` | `false` | [ "^tags/v?\\d+.\\d+.\\d+$" ] |
@@ -71,6 +70,13 @@ Build Docker images.
 | `$DOCKER_IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | false |
 | `$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image. | `StringSlice` | `false` |  |
 | `$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
+| `$DOCKER_MANIFEST_OUTPUT_FILE` | Write all the images that are published in to a file for later use. | `String`<br/>`Template(string)` | `false` | .published-docker-images_{{ sha256sum $ }} |
+
+##### Docker Manifest
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$DOCKER_MANIFEST_TARGET` | Target image names for patching the manifest. | `String`<br/>`Template([]string)` | `false` |  |
 
 ##### Docker Registry
 
@@ -115,8 +121,9 @@ Update manifests of the Docker images.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DOCKER_MANIFEST_FILES` | Read published tags from a file. | `StringSlice`<br/>`format(glob)` | `false` | "**/.published-docker-images*" |
-| `$DOCKER_MANIFEST_TARGETS` | Target image names for patching the manifest. | `StringSlice` | `true` |  |
+| `$DOCKER_MANIFEST_TARGET` | Target image names for patching the manifest. | `String` | `false` |  |
 | `$DOCKER_MANIFEST_IMAGES` | Image names for patching the manifest with the given target. | `StringSlice` | `false` |  |
+| `$DOCKER_MANIFEST_MATRIX` | Matrix of all the images that should be manifested. | `String`<br/>`json([]struct{ target: string, images: []string })` | `false` |  |
 
 ##### Docker Registry
 
