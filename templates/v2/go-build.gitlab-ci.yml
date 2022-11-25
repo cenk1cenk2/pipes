@@ -8,3 +8,7 @@ include:
   variables:
     GO_BUILD_COMMAND: build
     GO_COMMAND_SCRIPT: $GO_BUILD_COMMAND
+  artifacts:
+    paths:
+      - node_modules/
+      - "**/node_modules/"

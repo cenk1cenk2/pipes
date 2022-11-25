@@ -6,11 +6,15 @@ include:
 .go-install:
   extends: .go-run
   variables:
+    GOPATH: $CI_PROJECT_DIR/.go
     GO_INSTALL_COMMAND: install
     GO_COMMAND_SCRIPT: $GO_INSTALL_COMMAND
+  before_script:
+    - mkdir -p .go
   artifacts:
     paths:
       - vendor/
   cache:
     paths:
       - vendor/
+      - .go/pkg/mod/
