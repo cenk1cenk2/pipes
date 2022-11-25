@@ -3,11 +3,13 @@ include:
   - project: devops/pipes
     file: /templates/v2/docker-build.gitlab-ci.yml
 
+variables:
+  DOCKER_IMAGE_NAME: $CI_PROJECT_PATH/$DOCKER_IMAGE_INTERNAL_NAME
+  DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME
+
 .docker-build-internal:
   extends: .docker-build
   variables:
     DOCKER_REGISTRY: $CI_REGISTRY
     DOCKER_REGISTRY_USERNAME: $CI_REGISTRY_USER
     DOCKER_REGISTRY_PASSWORD: $CI_BUILD_TOKEN
-    DOCKER_IMAGE_NAME: $CI_PROJECT_PATH/$DOCKER_IMAGE_INTERNAL_NAME
-    DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME

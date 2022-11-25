@@ -1,4 +1,7 @@
 ---
+variables:
+  GITLAB_CI_ARCH: amd64
+
 .node-run:
   image: cenk1cenk2/pipe-node:${NODE_VERSION}
   variables:

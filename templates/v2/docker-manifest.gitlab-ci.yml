@@ -1,8 +1,9 @@
 ---
+variables:
+  PIPES_VERSION: latest
+
 .docker-manifest:
   image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
-  variables:
-    PIPES_VERSION: latest
   script:
     - pipe manifest
   tags:

@@ -1,9 +1,10 @@
 ---
+variables:
+  PIPES_VERSION: latest
+  GITLAB_CI_ARCH: amd64
+
 .docker-build:
   image: cenk1cenk2/pipe-docker:${PIPES_VERSION}
-  variables:
-    PIPES_VERSION: latest
-    GITLAB_CI_ARCH: amd64
   script:
     - pipe build
   artifacts:
