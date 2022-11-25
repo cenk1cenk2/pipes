@@ -47,13 +47,18 @@ func DockerTagsWriteFile(tl *TaskList[Pipe]) *Task[Pipe] {
 			return t.Pipe.DockerManifest.OutputFile == "" || t.Pipe.DockerManifest.Target == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
-			target, err := ProcessDockerTag(t, t.Pipe.DockerManifest.Target)
+			target, err := u.InlineTemplate(t.Pipe.DockerManifest.OutputFile, t.Pipe.Ctx.Tags)
+			if err != nil {
+				return err
+			}
+
+			full, err := ProcessDockerTag(t, target)
 			if err != nil {
 				return err
 			}
 
 			tags, err := json.Marshal(&manifest.DockerManifestMatrixJson{
-				Target: target,
+				Target: full,
 				Images: t.Pipe.Ctx.Tags,
 			})
 

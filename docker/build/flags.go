@@ -147,7 +147,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category:    setup.CATEGORY_DOCKER_MANIFEST,
 		Name:        "docker_manifest.target",
-		Usage:       "Target image names for patching the manifest.",
+		Usage:       "Target image names for patching the manifest. Template([]string)",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_MANIFEST_TARGET"},
 		Destination: &TL.Pipe.DockerManifest.Target,
