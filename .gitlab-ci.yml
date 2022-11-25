@@ -68,14 +68,12 @@ docker-build-first_go:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-amd64
+      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-${GITLAB_CI_ARCH}
         DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
         DOCKERFILE_NAME: Dockerfile-alpine
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-arm64
-        DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
-        DOCKERFILE_NAME: Dockerfile-alpine
-        GITLAB_CI_ARCH: arm64
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
 
 docker-manifest-first_go:
   extends: .docker-manifest-vanilla
@@ -125,10 +123,10 @@ docker-build-first_docker:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -160,10 +158,10 @@ docker-build_docker:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -184,10 +182,10 @@ docker-build_gl-artifacts:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -205,14 +203,17 @@ docker-build_go:
   variables:
     DOCKERFILE_CONTEXT: ./go
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-    DOCKER_MANIFEST_TARGET: ${GO_VERSION}
-    DOCKERFILE_NAME: Dockerfile-alpine
+    DOCKER_IMAGE_BUILD_ARGS: GO_VERSION=${GO_VERSION}
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-${GITLAB_CI_ARCH}
+        DOCKER_MANIFEST_TARGET: ${GO_VERSION}
+        DOCKERFILE_NAME: Dockerfile-alpine
+        GO_VERSION:
+          - ${GO_VERSION}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "go/**/*"
@@ -228,24 +229,18 @@ docker-build_node:
     DOCKERFILE_CONTEXT: ./node
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
     DOCKER_MANIFEST_TARGET: ${NODE_VERSION}
+    DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
-        DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
         NODE_VERSION:
           - 16
           - 16-alpine
           - 18
           - 18-alpine
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: ${NODE_VERSION}-${GITLAB_CI_ARCH}
-        DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION=${NODE_VERSION}
-        NODE_VERSION:
-          - 16
-          - 16-alpine
-          - 18
-          - 18-alpine
-        GITLAB_CI_ARCH: arm64
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -267,10 +262,10 @@ docker-build_gh-release-tracker:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -291,10 +286,10 @@ docker-build_markdown-toc:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -315,10 +310,10 @@ docker-build_select-env:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -339,10 +334,10 @@ docker-build_semantic-release:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
@@ -365,10 +360,10 @@ docker-build_update-docker-hub-readme:
     DOCKER_MANIFEST_TARGET: latest
   parallel:
     matrix:
-      - DOCKER_IMAGE_TAGS: latest-amd64
-        GITLAB_CI_ARCH: amd64
-      - DOCKER_IMAGE_TAGS: latest-arm64
-        GITLAB_CI_ARCH: arm64
+      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
   only:
     changes:
       - "common/**/*"
