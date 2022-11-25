@@ -74,6 +74,13 @@ docker-build-first_go:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  only:
+    changes:
+      - "go/**/*"
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
 
 docker-manifest-first_go:
   extends: .docker-manifest-vanilla
@@ -83,6 +90,13 @@ docker-manifest-first_go:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
         DOCKER_IMAGE_TAGS: 1.19-alpine
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:1.19-alpine-amd64 -a cenk1cenk2/pipe-go:1.19-alpine-arm64"
+  only:
+    changes:
+      - "go/**/*"
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
 
 install:
   extends: .go-install
@@ -145,6 +159,17 @@ docker-manifest-first_docker:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
     DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
+  only:
+    changes:
+      - "common/**/*"
+      - "docker/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
 # private images
 
 # public images
