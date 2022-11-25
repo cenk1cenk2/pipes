@@ -25,7 +25,7 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 					DockerTagsLatest(tl).Job(),
 				),
 				job,
-				DockerTagsWriteFile(tl).Job(),
+				DockerTagsWriteManifestFile(tl).Job(),
 			)
 		}).
 		Set(func(t *Task[Pipe]) error {
@@ -41,24 +41,24 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func DockerTagsWriteFile(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags", "file").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerManifest.OutputFile == "" || t.Pipe.DockerManifest.Target == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
-			target, err := u.InlineTemplate(t.Pipe.DockerManifest.OutputFile, t.Pipe.Ctx.Tags)
+			target, err := u.InlineTemplate(t.Pipe.DockerManifest.Target, t.Pipe.Ctx.Tags)
 			if err != nil {
 				return err
 			}
 
-			full, err := ProcessDockerTag(t, target)
+			image, err := ProcessDockerTag(t, target)
 			if err != nil {
 				return err
 			}
 
 			tags, err := json.Marshal(&manifest.DockerManifestMatrixJson{
-				Target: full,
+				Target: image,
 				Images: t.Pipe.Ctx.Tags,
 			})
 
