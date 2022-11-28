@@ -3,6 +3,9 @@ include:
   - project: devops/pipes
     file: /templates/v2/go-run.gitlab-ci.yml
 
+variables:
+  GO_TEST_COMMAND: ""
+
 .go-test:
   extends: .go-run
   variables:

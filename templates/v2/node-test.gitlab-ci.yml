@@ -3,6 +3,9 @@ include:
   - project: devops/pipes
     file: /templates/v2/node-run.gitlab-ci.yml
 
+variables:
+  NODE_TEST_COMMAND: ""
+
 .node-test:
   extends: .node-run
   variables:

@@ -3,11 +3,13 @@ include:
   - project: devops/pipes
     file: /templates/v2/go-run.gitlab-ci.yml
 
+variables:
+  GO_INSTALL_COMMAND: install
+
 .go-install:
   extends: .go-run
   variables:
     GOPATH: $CI_PROJECT_DIR/.go
-    GO_INSTALL_COMMAND: install
     GO_COMMAND_SCRIPT: $GO_INSTALL_COMMAND
   before_script:
     - mkdir -p .go
