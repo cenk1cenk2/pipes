@@ -1,4 +1,4 @@
 ---
 include:
   - project: devops/pipes
-    file: /templates/node-nx.gitlab-ci.yml
+    file: /templates/node.gitlab-ci.yml
