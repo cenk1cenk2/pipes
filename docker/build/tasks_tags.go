@@ -16,7 +16,7 @@ import (
 )
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags", "parent").
+	return tl.CreateTask("tags").
 		SetJobWrapper(func(job Job) Job {
 			return tl.JobSequence(
 				tl.JobParallel(
