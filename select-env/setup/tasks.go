@@ -101,7 +101,7 @@ func FetchEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			t.Pipe.Ctx.EnvVars["ENVIRONMENT"] = t.Pipe.Ctx.Environment
 
-			t.Log.Debugf("Environment variables that matches the current environment: %s -> %+v", t.Pipe.Ctx.Environment, t.Pipe.Ctx.EnvVars)
+			t.Log.Infof("Environment variables that matches the current environment: %s -> %+v", t.Pipe.Ctx.Environment, t.Pipe.Ctx.EnvVars)
 
 			return nil
 		})
