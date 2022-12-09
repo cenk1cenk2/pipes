@@ -8,7 +8,7 @@ require (
 	github.com/docker/docker v20.10.21+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/ekalinin/github-markdown-toc.go v0.0.0-20220910061337-2d4fdaaf52fa
-	github.com/google/go-github/v48 v48.1.0
+	github.com/google/go-github/v48 v48.2.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
