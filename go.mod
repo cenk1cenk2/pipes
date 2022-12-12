@@ -8,14 +8,14 @@ require (
 	github.com/docker/docker v20.10.21+incompatible
 	github.com/dustin/go-humanize v1.0.0
 	github.com/ekalinin/github-markdown-toc.go v0.0.0-20220910061337-2d4fdaaf52fa
-	github.com/google/go-github/v48 v48.1.0
+	github.com/google/go-github/v48 v48.2.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-	github.com/urfave/cli/v2 v2.23.5
+	github.com/urfave/cli/v2 v2.23.7
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.0.0
-	gitlab.kilic.dev/libraries/plumber/v4 v4.29.0
-	golang.org/x/oauth2 v0.2.0
+	gitlab.kilic.dev/libraries/plumber/v4 v4.30.4
+	golang.org/x/oauth2 v0.3.0
 )
 
 require (
@@ -43,10 +43,10 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	gitlab.kilic.dev/libraries/go-broadcaster v1.1.1 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
-	golang.org/x/exp v0.0.0-20221126150942-6ab00d035af9 // indirect
-	golang.org/x/net v0.2.0 // indirect
-	golang.org/x/sys v0.2.0 // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/exp v0.0.0-20221211140036-ad323defaf05 // indirect
+	golang.org/x/net v0.3.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gotest.tools/v3 v3.2.0 // indirect
