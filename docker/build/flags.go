@@ -127,7 +127,9 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.build_args",
-		Usage:    "Pass in extra build arguments for image.",
+		Usage: `Pass in extra build arguments for image.
+      You can use it as a template with environment variables as the context.
+      Template(map[string]string)`,
 		Required: false,
 		EnvVars:  []string{"DOCKER_IMAGE_BUILD_ARGS"},
 	},

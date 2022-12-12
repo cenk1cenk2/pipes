@@ -80,7 +80,7 @@ func ApplyTagTemplate(t *Task[Pipe], tag string) (string, error) {
 
 		matches := re.FindStringSubmatch(tag)
 
-		t.Log.Debugf("Trying to apply template to tag: %s with %v", tag, re.String())
+		t.Log.Tracef("Trying to apply template to tag: %s with %v", tag, re.String())
 
 		if matches == nil {
 			continue
@@ -92,4 +92,26 @@ func ApplyTagTemplate(t *Task[Pipe], tag string) (string, error) {
 	}
 
 	return tag, nil
+}
+
+func ApplyBuildArgsTemplate(t *Task[Pipe]) ([]string, error) {
+	args := []string{}
+
+	if len(t.Pipe.DockerImage.BuildArgs) == 0 {
+		return args, nil
+	}
+
+	vars := ParseEnvironmentVariablesToMap()
+
+	for _, v := range t.Pipe.DockerImage.BuildArgs {
+		result, err := utils.InlineTemplate(v, vars)
+
+		if err != nil {
+			return nil, err
+		}
+
+		args = append(args, result)
+	}
+
+	return args, nil
 }

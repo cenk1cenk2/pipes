@@ -132,7 +132,13 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 				"build",
 			).
 				Set(func(c *Command[Pipe]) error {
-					for _, v := range t.Pipe.DockerImage.BuildArgs {
+					buildArgs, err := ApplyBuildArgsTemplate(t)
+
+					if err != nil {
+						return err
+					}
+
+					for _, v := range buildArgs {
 						c.AppendArgs("--build-arg", v)
 					}
 

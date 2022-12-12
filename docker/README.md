@@ -68,7 +68,7 @@ Build Docker images.
 | `$DOCKER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.<br />      Template is interpolated with the given matches in the regular expression. | `String`<br/>`json([]struct{ match: RegExp, template: Template(map[string]string) })` | `false` | [<br />  { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }<br />] |
 | `$DOCKER_IMAGE_TAGS_TEMPLATE` | Modifies every tag that matches a certain condition.<br />      Template is interpolated with the given matches in the regular expression. | `String`<br/>`json([]struct{ match: RegExp, template: Template(map[string]string) })` | `false` | [] |
 | `$DOCKER_IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | false |
-| `$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image. | `StringSlice` | `false` |  |
+| `$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image.<br />      You can use it as a template with environment variables as the context. | `StringSlice`<br/>`Template(map[string]string)` | `false` |  |
 | `$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
 | `$DOCKER_MANIFEST_OUTPUT_FILE` | Write all the images that are published in to a file for later use. | `String`<br/>`Template(string)` | `false` | .published-docker-images_{{ sha256sum $ }} |
 
