@@ -190,7 +190,7 @@ docker-build_docker:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [docker]"
   only:
     changes:
       - "common/**/*"
@@ -216,7 +216,7 @@ docker-build_gl-artifacts:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [gl-artifacts]"
   only:
     changes:
       - "common/**/*"
@@ -245,8 +245,7 @@ docker-build_go:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
-  dependencies:
-    - build
+  dependencies: []
   only:
     changes:
       - "go/**/*"
@@ -275,7 +274,7 @@ docker-build_node:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [node]"
   only:
     changes:
       - "common/**/*"
@@ -302,7 +301,7 @@ docker-build_gh-release-tracker:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [gh-release-tracker]"
   only:
     changes:
       - "common/**/*"
@@ -328,7 +327,7 @@ docker-build_markdown-toc:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [markdown-toc]"
   only:
     changes:
       - "common/**/*"
@@ -348,7 +347,7 @@ docker-build_select-env:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
     DOCKER_MANIFEST_TARGET: latest
   dependencies:
-    - build
+    - "build: [select-env]"
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
@@ -380,7 +379,7 @@ docker-build_semantic-release:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [semantic-release]"
   only:
     changes:
       - "common/**/*"
@@ -408,7 +407,7 @@ docker-build_update-docker-hub-readme:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [update-docker-hub-readme]"
   only:
     changes:
       - "common/**/*"
@@ -448,14 +447,14 @@ docker-manifest:
   extends: .docker-manifest-dockerhub
   stage: post
   dependencies:
+    - docker-build_docker
+    - docker-build_gl-artifacts
     - docker-build_go
     - docker-build_node
-    - docker-build_docker
-    - docker-build_select-env
-    - docker-build_gl-artifacts
-    - docker-build_markdown-toc
-    - docker-build_semantic-release
     - docker-build_gh-release-tracker
+    - docker-build_markdown-toc
+    - docker-build_select-env
+    - docker-build_semantic-release
     - docker-build_update-docker-hub-readme
   only:
     refs:
