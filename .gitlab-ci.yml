@@ -140,6 +140,8 @@ docker-build-first_docker:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -158,6 +160,7 @@ docker-manifest-first_docker:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
     DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
+  dependencies: []
   only:
     changes:
       - "common/**/*"
@@ -186,6 +189,8 @@ docker-build_docker:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -210,6 +215,8 @@ docker-build_gl-artifacts:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -238,6 +245,8 @@ docker-build_go:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "go/**/*"
@@ -265,6 +274,8 @@ docker-build_node:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -290,6 +301,8 @@ docker-build_gh-release-tracker:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -314,6 +327,8 @@ docker-build_markdown-toc:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -332,6 +347,8 @@ docker-build_select-env:
     DOCKERFILE_CONTEXT: ./select-env
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
     DOCKER_MANIFEST_TARGET: latest
+  dependencies:
+    - build
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
@@ -362,6 +379,8 @@ docker-build_semantic-release:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -388,6 +407,8 @@ docker-build_update-docker-hub-readme:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
+  dependencies:
+    - build
   only:
     changes:
       - "common/**/*"
@@ -426,6 +447,16 @@ docker-build_update-docker-hub-readme:
 docker-manifest:
   extends: .docker-manifest-dockerhub
   stage: post
+  dependencies:
+    - docker-build_go
+    - docker-build_node
+    - docker-build_docker
+    - docker-build_select-env
+    - docker-build_gl-artifacts
+    - docker-build_markdown-toc
+    - docker-build_semantic-release
+    - docker-build_gh-release-tracker
+    - docker-build_update-docker-hub-readme
   only:
     refs:
       - main
@@ -434,6 +465,7 @@ docker-manifest:
 update-docker-hub-readme:
   extends: .update-docker-hub-readme
   stage: post
+  dependencies: []
   variables:
     README_MATRIX: |
       [
