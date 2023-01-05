@@ -3,7 +3,7 @@ module gitlab.kilic.dev/devops/pipes
 go 1.19
 
 require (
-	github.com/bmatcuk/doublestar/v4 v4.5.0
+	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/docker/docker v20.10.22+incompatible
 	github.com/dustin/go-humanize v1.0.0
