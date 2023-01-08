@@ -15,7 +15,7 @@ require (
 	github.com/urfave/cli/v2 v2.23.7
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.0.0
 	gitlab.kilic.dev/libraries/plumber/v4 v4.31.2
-	golang.org/x/oauth2 v0.3.0
+	golang.org/x/oauth2 v0.4.0
 )
 
 require (
@@ -44,9 +44,9 @@ require (
 	gitlab.kilic.dev/libraries/go-broadcaster v1.1.1 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30 // indirect
-	golang.org/x/net v0.3.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gotest.tools/v3 v3.2.0 // indirect
