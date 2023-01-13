@@ -6,7 +6,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/docker/docker v20.10.22+incompatible
-	github.com/dustin/go-humanize v1.0.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/ekalinin/github-markdown-toc.go v0.0.0-20220910061337-2d4fdaaf52fa
 	github.com/google/go-github/v48 v48.2.0
 	github.com/google/uuid v1.3.0
