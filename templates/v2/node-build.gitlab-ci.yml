@@ -9,6 +9,9 @@ variables:
   artifacts:
     paths:
       - "**/dist/"
+    exclude:
+      - "node_modules*"
+      - "node_modules/**/*"
   rules:
     - when: on_success
   tags:
