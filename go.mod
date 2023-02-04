@@ -10,7 +10,7 @@ require (
 	github.com/ekalinin/github-markdown-toc.go v0.0.0-20220910061337-2d4fdaaf52fa
 	github.com/google/go-github/v49 v49.1.0
 	github.com/google/uuid v1.3.0
-	github.com/joho/godotenv v1.4.0
+	github.com/joho/godotenv v1.5.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.24.3
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.0.0
