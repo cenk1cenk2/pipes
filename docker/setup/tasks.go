@@ -8,7 +8,7 @@ import (
 func SetupDockerClient(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		Set(func(t *Task[Pipe]) error {
-			cli, err := client.NewClientWithOpts(client.FromEnv)
+			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 
 			if err != nil {
 				return err
