@@ -27,7 +27,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
-				DockerLoginParent(tl).Job(),
+				DockerLogin(tl).Job(),
 			)
 		})
 }

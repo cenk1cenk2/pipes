@@ -12,6 +12,8 @@ type (
 	}
 
 	Pipe struct {
+		Ctx
+
 		Docker
 	}
 )
@@ -27,6 +29,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobParallel(
+				SetupDockerClient(tl).Job(),
 				DockerVersion(tl).Job(),
 				DockerBuildXVersion(tl).Job(),
 			)
