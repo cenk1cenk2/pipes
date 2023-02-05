@@ -4,6 +4,8 @@ FROM docker:latest
 ARG BUILDOS
 ARG BUILDARCH
 
+RUN apk add --no-cache --no-progress git
+
 ENV DOCKER_API_VERSION=1.41
 
 COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
