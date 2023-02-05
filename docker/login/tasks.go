@@ -20,11 +20,15 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 				t.Pipe.DockerRegistry.Registry,
 			)
 
-			if _, err := setup.TL.Pipe.Ctx.Client.RegistryLogin(context.Background(), types.AuthConfig{
+			result, err := setup.TL.Pipe.Ctx.Client.RegistryLogin(context.Background(), types.AuthConfig{
 				ServerAddress: t.Pipe.DockerRegistry.Registry,
 				Username:      t.Pipe.DockerRegistry.Username,
 				Password:      t.Pipe.DockerRegistry.Password,
-			}); err != nil {
+			})
+
+			t.Log.Debugf("Result from Docker client: %+v", result)
+
+			if err != nil {
 				return err
 			}
 
