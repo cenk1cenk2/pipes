@@ -21,7 +21,7 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 			)
 
 			if _, err := setup.TL.Pipe.Ctx.Client.RegistryLogin(context.Background(), types.AuthConfig{
-				ServerAddress: t.Pipe.DockerRegistry.Password,
+				ServerAddress: t.Pipe.DockerRegistry.Registry,
 				Username:      t.Pipe.DockerRegistry.Username,
 				Password:      t.Pipe.DockerRegistry.Password,
 			}); err != nil {
