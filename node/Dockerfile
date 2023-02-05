@@ -7,8 +7,7 @@ ARG BUILDOS
 ARG BUILDARCH
 
 RUN \
-  unset NPM_CONFIG_USER && \
-  npm config set unsafe-perm true
+  unset NPM_CONFIG_USER
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
