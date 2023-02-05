@@ -1,6 +1,7 @@
 package build
 
 import (
+	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
@@ -132,7 +133,7 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 				"build",
 			).
 				Set(func(c *Command[Pipe]) error {
-					buildArgs, err := ApplyBuildArgsTemplate(t)
+					buildArgs, err := utils.ApplyEnvironmentTemplates(t.Pipe.DockerImage.BuildArgs)
 
 					if err != nil {
 						return err
