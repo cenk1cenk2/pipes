@@ -7,7 +7,7 @@ require (
 	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/docker/docker v23.0.0+incompatible
 	github.com/dustin/go-humanize v1.0.1
-	github.com/ekalinin/github-markdown-toc.go v0.0.0-20220910061337-2d4fdaaf52fa
+	github.com/ekalinin/github-markdown-toc.go v1.2.1
 	github.com/google/go-github/v49 v49.1.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
