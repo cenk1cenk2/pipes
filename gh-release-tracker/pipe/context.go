@@ -1,7 +1,7 @@
 package pipe
 
 import (
-	"github.com/google/go-github/v49/github"
+	"github.com/google/go-github/v50/github"
 )
 
 type Ctx struct {
