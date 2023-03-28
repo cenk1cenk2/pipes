@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/docker/docker v23.0.1+incompatible
+	github.com/docker/docker v23.0.2+incompatible
 	github.com/dustin/go-humanize v1.0.1
 	github.com/ekalinin/github-markdown-toc.go v1.2.1
 	github.com/google/go-github/v50 v50.2.0
