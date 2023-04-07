@@ -1,4 +1,5 @@
 .report-status-to-github:
+  image: curlimages/curl:latest
   variables:
     GITHUB_STATUS_PROJECT:
     GITHUB_STATUS_NAME: Gitlab
