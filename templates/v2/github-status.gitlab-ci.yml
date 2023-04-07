@@ -6,7 +6,7 @@
     GIT_STRATEGY: none
   script:
     # https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28
-    - "curl -X POST -H 'Authorization: Bearer ${GH_TOKEN}' https://api.github.com/repos/${GITHUB_STATUS_PROJECT}/statuses/${CI_COMMIT_SHA}?state=${GITHUB_STATUS_REPORT}&context=${GITHUB_STATUS_NAME}&target_url=${CI_PIPELINE_URL}"
+    - "curl -X POST -H 'X-GitHub-Api-Version: 2022-11-28' -H 'Authorization: Bearer ${GH_TOKEN}' https://api.github.com/repos/${GITHUB_STATUS_PROJECT}/statuses/${CI_COMMIT_SHA}?state=${GITHUB_STATUS_REPORT}&context=${GITHUB_STATUS_NAME}&target_url=${CI_PIPELINE_URL}"
   dependencies: []
   tags:
     - docker
