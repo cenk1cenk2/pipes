@@ -18,7 +18,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_PACKAGE_MANAGER,
 		Name:        "node.package_manager",
-		Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn")`,
+		Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
 		Required:    false,
 		EnvVars:     []string{"NODE_PACKAGE_MANAGER"},
 		Value:       flags.FLAG_DEFAULT_NODE_PACKAGE_MANAGER,

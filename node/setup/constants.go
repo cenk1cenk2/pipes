@@ -19,6 +19,15 @@ var (
 			Add:             []string{"install", "--unsafe-perm"},
 			Global:          []string{"-g"},
 		},
+
+		"pnpm": {
+			Install:         []string{"i", "--unsafe-perm"},
+			InstallWithLock: []string{"i", "--frozen-lockfile"},
+			Run:             []string{"run"},
+			RunDelimitter:   []string{},
+			Add:             []string{"add"},
+			Global:          []string{"-g"},
+		},
 	}
 )
 

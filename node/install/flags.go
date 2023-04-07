@@ -43,4 +43,44 @@ var Flags = []cli.Flag{
 		Value:       "",
 		Destination: &TL.Pipe.NodeInstall.Args,
 	},
+
+	&cli.BoolFlag{
+		Category:    CATEGORY_NODE_INSTALL,
+		Name:        "node_cache.enable",
+		Usage:       "Enable caching for the package manager.",
+		Required:    false,
+		EnvVars:     []string{"NODE_CACHE_ENABLE"},
+		Value:       true,
+		Destination: &TL.Pipe.NodeCache.Enable,
+	},
+
+	&cli.StringFlag{
+		Category:    CATEGORY_NODE_INSTALL,
+		Name:        "node_cache.npm_cache_folder",
+		Usage:       "Cache folder for package manager: npm",
+		Required:    false,
+		EnvVars:     []string{"NODE_CACHE_NPM_DIR"},
+		Value:       ".npm",
+		Destination: &TL.Pipe.NodeCache.NpmCacheDir,
+	},
+
+	&cli.StringFlag{
+		Category:    CATEGORY_NODE_INSTALL,
+		Name:        "node_cache.yarn_cache_folder",
+		Usage:       "Cache folder for package manager: yarn",
+		Required:    false,
+		EnvVars:     []string{"NODE_CACHE_YARN_DIR"},
+		Value:       ".yarn",
+		Destination: &TL.Pipe.NodeCache.YarnCacheDir,
+	},
+
+	&cli.StringFlag{
+		Category:    CATEGORY_NODE_INSTALL,
+		Name:        "node_cache.pnpm_cache_folder",
+		Usage:       "Cache folder for package manager: pnpm",
+		Required:    false,
+		EnvVars:     []string{"NODE_CACHE_PNPM_DIR"},
+		Value:       ".pnpm",
+		Destination: &TL.Pipe.NodeCache.PnpmCacheDir,
+	},
 }

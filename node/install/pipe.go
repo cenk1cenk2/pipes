@@ -9,10 +9,19 @@ type (
 		Cwd         string `validate:"dir"`
 		UseLockFile bool
 		Args        string
+		Cache       bool
+	}
+
+	NodeCache struct {
+		Enable       bool
+		NpmCacheDir  string
+		YarnCacheDir string
+		PnpmCacheDir string
 	}
 
 	Pipe struct {
 		NodeInstall
+		NodeCache
 	}
 )
 

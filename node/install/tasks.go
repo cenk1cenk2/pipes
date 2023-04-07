@@ -12,21 +12,36 @@ import (
 func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("install").
 		Set(func(t *Task[Pipe]) error {
+			packageManager := setup.TL.Pipe.Ctx.PackageManager
+
 			t.CreateCommand(
-				setup.TL.Pipe.Ctx.PackageManager.Exe,
+				packageManager.Exe,
 			).
 				Set(func(c *Command[Pipe]) error {
 					if TL.Pipe.NodeInstall.UseLockFile {
-						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.InstallWithLock...)
+						c.AppendArgs(packageManager.Commands.InstallWithLock...)
 
 						t.Log.Infoln("Using lockfile for installation.")
 					} else {
-						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Install...)
+						c.AppendArgs(packageManager.Commands.Install...)
 
 						t.Log.Infoln("Installing dependencies without a lockfile.")
 					}
 
 					c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
+
+					if t.Pipe.NodeCache.Enable {
+						t.Log.Infof("Setting up cache for %s.", packageManager.Exe)
+
+						switch packageManager.Exe {
+						case "npm":
+							c.AppendArgs("--cache", t.Pipe.NodeCache.NpmCacheDir, "--prefer-offline")
+						case "yarn":
+							c.AppendArgs("--cache-folder", t.Pipe.NodeCache.YarnCacheDir, "--prefer-offline")
+						case "pnpm":
+							c.AppendArgs("--store-dir", t.Pipe.NodeCache.PnpmCacheDir, "--prefer-offline")
+						}
+					}
 
 					c.SetDir(TL.Pipe.NodeInstall.Cwd)
 

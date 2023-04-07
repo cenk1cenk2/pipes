@@ -7,7 +7,8 @@ ARG BUILDOS
 ARG BUILDARCH
 
 RUN \
-  unset NPM_CONFIG_USER
+  unset NPM_CONFIG_USER && \
+  yarn global add pnpm
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 

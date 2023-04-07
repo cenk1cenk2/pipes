@@ -17,6 +17,8 @@ variables:
     paths:
       - vendor/
   cache:
-    paths:
-      - vendor/
-      - .go/pkg/mod/
+    - key:
+        files:
+          - go.mod
+      paths:
+        - .go/pkg/mod/

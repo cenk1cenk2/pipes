@@ -6,7 +6,7 @@ import (
 
 type (
 	Node struct {
-		PackageManager string `validate:"oneof=npm yarn"`
+		PackageManager string `validate:"oneof=npm yarn pnpm"`
 	}
 
 	Pipe struct {

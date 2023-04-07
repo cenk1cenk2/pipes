@@ -10,8 +10,21 @@ variables:
     paths:
       - "**/node_modules/"
   cache:
-    paths:
-      - "**/node_modules/"
+    - key:
+        files:
+          - package-lock.json
+      paths:
+        - .npm/
+    - key:
+        files:
+          - yarn.lock
+      paths:
+        - .yarn/
+    - key:
+        files:
+          - pnpm-lock.yaml
+      paths:
+        - .pnpm/
   rules:
     - when: on_success
   tags:
