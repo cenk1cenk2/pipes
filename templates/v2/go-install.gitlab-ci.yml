@@ -17,8 +17,8 @@ variables:
     paths:
       - vendor/
   cache:
-    - key:
-        files:
-          - go.mod
+    - key: $CI_JOB_NAME
+      # files:
+      #   - go.mod
       paths:
         - .go/pkg/mod/
