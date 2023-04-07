@@ -2,7 +2,8 @@
   image: curlimages/curl:latest
   variables:
     GITHUB_STATUS_PROJECT:
-    GITHUB_STATUS_NAME: Gitlab
+    GITHUB_STATUS_NAME: Gitlab CI
+    GIT_STRATEGY: none
   script:
     - "curl -X POST -H 'Authorization: token ${GH_TOKEN}' https://api.github.com/repos/${GITHUB_STATUS_PROJECT}/statuses/${CI_COMMIT_SHA}?state=${CI_JOB_NAME}&context=${GITHUB_STATUS_NAME}&target_url=${CI_PIPELINE_URL}"
   dependencies: []
