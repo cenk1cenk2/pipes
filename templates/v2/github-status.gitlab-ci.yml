@@ -1,7 +1,6 @@
 .github-status:
   image: curlimages/curl:latest
   variables:
-    GITHUB_STATUS_PROJECT:
     GIT_STRATEGY: none
   script:
     # https://docs.github.com/en/rest/commits/statuses?apiVersion=2022-11-28
