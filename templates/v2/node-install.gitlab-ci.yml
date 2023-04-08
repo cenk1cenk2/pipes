@@ -8,9 +8,11 @@ variables:
     - pipe install
   artifacts:
     paths:
-      - "node_modules/.cache"
       - "**/node_modules/"
   cache:
+    - key: $CI_JOB_NAME
+      paths:
+        - node_modules/.cache
     - key: $CI_JOB_NAME
       # files:
       #   - package-lock.json
