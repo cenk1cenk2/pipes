@@ -6,6 +6,10 @@ variables:
   image: cenk1cenk2/pipe-node:${NODE_VERSION}
   script:
     - pipe build
+  cache:
+    - key: node-build-cache
+      paths:
+        - node_modules/.cache
   artifacts:
     paths:
       - "**/dist/"

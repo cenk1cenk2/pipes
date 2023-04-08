@@ -10,9 +10,6 @@ variables:
     paths:
       - "**/node_modules/"
   cache:
-    - key: $CI_JOB_NAME-cache
-      paths:
-        - node_modules/.cache
     - key: $CI_JOB_NAME-npm
       # files:
       #   - package-lock.json
