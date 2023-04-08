@@ -1,6 +1,7 @@
 package install
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -30,17 +31,12 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
 
-					if t.Pipe.NodeCache.Enable {
-						t.Log.Infof("Setting up cache for %s.", packageManager.Exe)
+					if t.Pipe.NodeInstall.Cache {
+						cacheDir := fmt.Sprintf(".%s", packageManager.Exe)
+						t.Log.Infof("Setting up cache: %s", cacheDir)
 
-						switch packageManager.Exe {
-						case "npm":
-							c.AppendArgs("--cache", t.Pipe.NodeCache.NpmCacheDir, "--prefer-offline")
-						case "yarn":
-							c.AppendArgs("--cache-folder", t.Pipe.NodeCache.YarnCacheDir, "--prefer-offline")
-						case "pnpm":
-							c.AppendArgs("--store-dir", t.Pipe.NodeCache.PnpmCacheDir, "--prefer-offline")
-						}
+						c.AppendArgs(packageManager.Commands.Cache...)
+						c.AppendArgs(cacheDir)
 					}
 
 					c.SetDir(TL.Pipe.NodeInstall.Cwd)

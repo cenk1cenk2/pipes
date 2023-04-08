@@ -8,6 +8,7 @@ type (
 		RunDelimitter   []string
 		Add             []string
 		Global          []string
+		Cache           []string
 	}
 
 	AvailablePackageManagerCommands map[string]PackageManagerCommands

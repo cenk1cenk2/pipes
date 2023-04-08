@@ -9,6 +9,7 @@ var (
 			RunDelimitter:   []string{},
 			Add:             []string{"add"},
 			Global:          []string{"global"},
+			Cache:           []string{"--prefer-offline", "--cache-folder"},
 		},
 
 		"npm": {
@@ -18,6 +19,7 @@ var (
 			RunDelimitter:   []string{"--"},
 			Add:             []string{"install", "--unsafe-perm"},
 			Global:          []string{"-g"},
+			Cache:           []string{"--prefer-offline", "--cache"},
 		},
 
 		"pnpm": {
@@ -27,6 +29,7 @@ var (
 			RunDelimitter:   []string{},
 			Add:             []string{"add"},
 			Global:          []string{"-g"},
+			Cache:           []string{"--prefer-offline", "--store-dir"},
 		},
 	}
 )

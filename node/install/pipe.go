@@ -12,16 +12,8 @@ type (
 		Cache       bool
 	}
 
-	NodeCache struct {
-		Enable       bool
-		NpmCacheDir  string
-		YarnCacheDir string
-		PnpmCacheDir string
-	}
-
 	Pipe struct {
 		NodeInstall
-		NodeCache
 	}
 )
 

@@ -35,7 +35,7 @@ Login to the given NPM registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | yarn |
 
 ### `install`
 
@@ -52,6 +52,7 @@ Install node.js dependencies with the given package manager.
 | `$NODE_INSTALL_CWD` | Install CWD for the package manager. | `String` | `false` | . |
 | `$NODE_INSTALL_USE_LOCK_FILE` | Use the lockfile while installing the packages. | `Bool` | `false` | false |
 | `$NODE_INSTALL_ARGS` | Arguments to append to install command. | `String` | `false` |  |
+| `$NODE_CACHE_ENABLE` | Enable caching for the package manager. | `Bool` | `false` | false |
 
 ##### Login
 
@@ -65,7 +66,7 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | yarn |
 
 ### `build`
 
@@ -101,7 +102,7 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | yarn |
 
 ### `run`
 
@@ -136,4 +137,4 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn")` | `false` | yarn |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | yarn |
