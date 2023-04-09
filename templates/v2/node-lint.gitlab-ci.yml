@@ -4,7 +4,7 @@ include:
     file: /templates/v2/node-run.gitlab-ci.yml
 
 variables:
-  NODE_LINT_COMMAND: lint:check
+  NODE_LINT_COMMAND: lint
 
 .node-lint:
   extends: .node-run

@@ -16,7 +16,7 @@ const (
 
 	// node.
 
-	FLAG_DEFAULT_NODE_PACKAGE_MANAGER = "yarn"
+	FLAG_DEFAULT_NODE_PACKAGE_MANAGER = "pnpm"
 
 	// select-env.
 
