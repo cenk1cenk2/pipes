@@ -36,6 +36,16 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 				"build",
 			).
 				Set(func(c *Command[Pipe]) error {
+					if setup.TL.Pipe.Docker.UseBuildKit {
+						t.Log.Debugf("Using Docker BuildKit for the build operation.")
+
+						c.AppendEnvironment(
+							map[string]string{
+								"DOCKER_BUILDKIT": "1",
+							},
+						)
+					}
+
 					buildArgs, err := utils.ApplyEnvironmentTemplates(t.Pipe.DockerImage.BuildArgs)
 
 					if err != nil {
@@ -48,6 +58,10 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					if t.Pipe.DockerImage.Pull {
 						c.AppendArgs("--pull")
+					}
+
+					if setup.TL.Pipe.Docker.UseBuildKit {
+						c.AppendArgs("--push")
 					}
 
 					for _, tag := range t.Pipe.Ctx.Tags {
@@ -63,16 +77,6 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.SetDir(t.Pipe.DockerFile.Context)
 					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
-					if setup.TL.Pipe.Docker.UseBuildKit {
-						t.Log.Debugf("Using Docker BuildKit for the build operation.")
-
-						c.AppendEnvironment(
-							map[string]string{
-								"DOCKER_BUILDKIT": "1",
-							},
-						)
-					}
-
 					return nil
 				}).
 				AddSelfToTheTask()
@@ -86,6 +90,9 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 
 func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("push").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return setup.TL.Pipe.Docker.UseBuildKit
+		}).
 		Set(func(t *Task[Pipe]) error {
 			for _, tag := range t.Pipe.Ctx.Tags {
 				func(tag string) {

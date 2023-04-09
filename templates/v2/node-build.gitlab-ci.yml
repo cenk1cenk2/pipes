@@ -7,7 +7,7 @@ variables:
   script:
     - pipe build
   cache:
-    - key: node-build-cache
+    - key: node-cache
       paths:
         - node_modules/.cache
   artifacts:
