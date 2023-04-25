@@ -1,6 +1,6 @@
 ---
 stages:
-  - .post
+  - post
 
 include:
   - project: devops/pipes
