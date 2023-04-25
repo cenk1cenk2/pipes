@@ -10,4 +10,5 @@ variables:
   extends: .node-run
   variables:
     NODE_COMMAND_SCRIPT: $NODE_LINT_COMMAND
-  when: on_success
+  rules:
+    - if: $NODE_LINT_COMMAND

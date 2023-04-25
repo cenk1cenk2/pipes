@@ -270,6 +270,8 @@ docker-build_node:
           - 16-alpine
           - 18
           - 18-alpine
+          - 20
+          - 20-alpine
         GITLAB_CI_ARCH:
           - amd64
           - arm64
