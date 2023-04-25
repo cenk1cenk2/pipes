@@ -11,7 +11,7 @@ include:
     file: /templates/v2/gitlab-artifacts-download.gitlab-ci.yml
 
   - project: devops/pipes
-    file: /templates/docker-build.gitlab-ci.yml
+    file: /templates/docker-build-internal.gitlab-ci.yml
 
 prepare:
   stage: prepare
