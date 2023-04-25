@@ -1,11 +1,4 @@
 ---
-variables:
-  PIPES_VERSION: latest
-  NODE_VERSION: 18-alpine
-  NODE_LINT_COMMAND: lint
-  NODE_TEST_COMMAND: ""
-  ENVIRONMENT_ENABLE: "false"
-
 stages:
   - install
   - build

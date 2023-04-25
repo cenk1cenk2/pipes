@@ -49,7 +49,7 @@ stages:
 
 include:
   - project: devops/pipes
-    file: /templates/v2/workflow.gitlab-ci.yml
+    file: /templates/v2/workflow-on-mr.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/v2/go.gitlab-ci.yml
   - project: devops/pipes
