@@ -37,7 +37,7 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 			).
 				Set(func(c *Command[Pipe]) error {
 					if setup.TL.Pipe.Docker.UseBuildKit {
-						t.Log.Debugf("Using Docker BuildKit for the build operation.")
+						t.Log.Infoln("Using Docker BuildKit for the build operation.")
 
 						c.AppendEnvironment(
 							map[string]string{

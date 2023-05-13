@@ -9,6 +9,7 @@ type (
 		Add             []string
 		Global          []string
 		Cache           []string
+		Version         []string
 	}
 
 	AvailablePackageManagerCommands map[string]PackageManagerCommands

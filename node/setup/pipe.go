@@ -25,6 +25,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				SetupPackageManager(tl).Job(),
+				NodeVersion(tl).Job(),
 			)
 		})
 }

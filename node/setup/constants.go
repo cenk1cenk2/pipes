@@ -10,6 +10,7 @@ var (
 			Add:             []string{"add"},
 			Global:          []string{"global"},
 			Cache:           []string{"--prefer-offline", "--cache-folder"},
+			Version:         []string{"--version"},
 		},
 
 		"npm": {
@@ -20,6 +21,7 @@ var (
 			Add:             []string{"install", "--unsafe-perm"},
 			Global:          []string{"-g"},
 			Cache:           []string{"--prefer-offline", "--cache"},
+			Version:         []string{"--version"},
 		},
 
 		"pnpm": {
@@ -30,6 +32,7 @@ var (
 			Add:             []string{"add"},
 			Global:          []string{"-g"},
 			Cache:           []string{"--prefer-offline", "--store-dir"},
+			Version:         []string{"--version"},
 		},
 	}
 )

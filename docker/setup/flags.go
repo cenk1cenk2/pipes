@@ -24,7 +24,7 @@ var Flags = []cli.Flag{
 		Name:        "docker.use_buildkit",
 		Usage:       "Use Docker BuildKit for building images.",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_USE_BUILDKIT"},
+		EnvVars:     []string{"DOCKER_USE_BUILDKIT", "DOCKER_BUILDKIT"},
 		Value:       true,
 		Destination: &TL.Pipe.Docker.UseBuildKit,
 	},
