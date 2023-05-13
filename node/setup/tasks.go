@@ -45,8 +45,8 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				return err
 			}
 
-			t.Log.Infof("node.js version: %s", node.GetStdoutStream())
-			t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, pm.GetStdoutStream())
+			t.Log.Infof("node.js version: %s", node.GetStdoutStream()[0])
+			t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, pm.GetStdoutStream()[0])
 
 			return nil
 		})
