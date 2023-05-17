@@ -13,8 +13,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.25.3
-	gitlab.kilic.dev/libraries/go-utils/v2 v2.0.1
-	gitlab.kilic.dev/libraries/plumber/v4 v4.32.13
+	gitlab.kilic.dev/libraries/go-utils/v2 v2.0.2
+	gitlab.kilic.dev/libraries/plumber/v4 v4.32.14
 	golang.org/x/oauth2 v0.8.0
 )
 
@@ -45,7 +45,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/sirupsen/logrus v1.9.1 // indirect
+	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	gitlab.kilic.dev/libraries/go-broadcaster v1.1.1 // indirect
