@@ -45,8 +45,15 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				return err
 			}
 
-			t.Log.Infof("node.js version: %s", node.GetStdoutStream()[0])
-			t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, pm.GetStdoutStream()[0])
+			nodeOutput := node.GetCombinedStream()
+			pmOutput := pm.GetCombinedStream()
+
+			if len(nodeOutput) > 0 && len(pmOutput) > 0 {
+				t.Log.Infof("node.js version: %s", nodeOutput[0])
+				t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, pmOutput[0])
+			} else {
+				t.Log.Warnln("Can not determine versions.")
+			}
 
 			return nil
 		})
