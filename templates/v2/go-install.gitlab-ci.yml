@@ -18,9 +18,9 @@ variables:
       - vendor/
   cache:
     - key: $CI_JOB_NAME_SLUG
-      files:
-        - go.mod
-        - go.sum
-        - go.work
+      # files:
+      #   - go.mod
+      #   - go.sum
+      #   - go.work
       paths:
         - .go/pkg/mod/
