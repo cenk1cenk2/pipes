@@ -10,19 +10,22 @@ variables:
     paths:
       - "**/node_modules/"
   cache:
-    - key: npm-cache
-      # files:
-      #   - package-lock.json
+    - key: $CI_JOB_NAME_SLUG-npm-cache
+      files:
+        - package.json
+        - package-lock.json
       paths:
         - .npm/
-    - key: yarn-cache
-      # files:
-      #   - yarn.lock
+    - key: $CI_JOB_NAME_SLUG-yarn-cache
+      files:
+        - package.json
+        - yarn.lock
       paths:
         - .yarn/
-    - key: pnpm-cache
-      # files:
-      #   - pnpm-lock.yaml
+    - key: $CI_JOB_NAME_SLUG-pnpm-cache
+      files:
+        - package.json
+        - pnpm-lock.yaml
       paths:
         - .pnpm/
   rules:
