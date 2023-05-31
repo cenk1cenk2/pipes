@@ -21,15 +21,20 @@ func SetupPackageManager(tl *TaskList[Pipe]) *Task[Pipe] {
 func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("version").
 		Set(func(t *Task[Pipe]) error {
-			node := t.CreateCommand(
+			t.CreateCommand(
 				"node",
 				"--version",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
+				ShouldRunAfter(func(c *Command[Pipe]) error {
+					t.Log.Infof("node.js version: %s", c.GetCombinedStream()[0])
+
+					return nil
+				}).
 				AddSelfToTheTask()
 
-			pm := t.CreateCommand(
+			t.CreateCommand(
 				t.Pipe.Ctx.PackageManager.Exe,
 			).
 				Set(func(c *Command[Pipe]) error {
@@ -39,21 +44,12 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				}).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
+				ShouldRunAfter(func(c *Command[Pipe]) error {
+					t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, c.GetCombinedStream()[0])
+
+					return nil
+				}).
 				AddSelfToTheTask()
-
-			if err := t.RunCommandJobAsJobParallel(); err != nil {
-				return err
-			}
-
-			nodeOutput := node.GetCombinedStream()
-			pmOutput := pm.GetCombinedStream()
-
-			if len(nodeOutput) > 0 && len(pmOutput) > 0 {
-				t.Log.Infof("node.js version: %s", nodeOutput[0])
-				t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, pmOutput[0])
-			} else {
-				t.Log.Warnln("Can not determine versions.")
-			}
 
 			return nil
 		})
