@@ -52,5 +52,8 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				AddSelfToTheTask()
 
 			return nil
+		}).
+		ShouldRunAfter(func(t *Task[Pipe]) error {
+			return t.RunCommandJobAsJobParallel()
 		})
 }
