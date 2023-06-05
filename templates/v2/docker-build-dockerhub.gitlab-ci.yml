@@ -4,7 +4,7 @@ include:
     file: /templates/v2/docker-build.gitlab-ci.yml
 
 variables:
-  DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME
+  DOCKER_IMAGE_TAGS: $CI_COMMIT_REF_NAME
 
 .docker-build-dockerhub:
   extends: .docker-build

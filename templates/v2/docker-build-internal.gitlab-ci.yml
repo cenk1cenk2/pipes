@@ -5,7 +5,7 @@ include:
 
 variables:
   DOCKER_IMAGE_NAME: $CI_PROJECT_PATH/$DOCKER_IMAGE_INTERNAL_NAME
-  DOCKER_IMAGE_TAGS: $CI_BUILD_REF_NAME
+  DOCKER_IMAGE_TAGS: $CI_COMMIT_REF_NAME
 
 .docker-build-internal:
   extends: .docker-build
