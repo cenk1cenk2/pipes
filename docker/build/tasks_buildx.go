@@ -1,6 +1,10 @@
 package build
 
 import (
+	"crypto/rand"
+	"fmt"
+	"math/big"
+
 	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
@@ -14,7 +18,6 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 		SetJobWrapper(func(job Job) Job {
 			return tl.JobSequence(
 				DockerBuildXCreate(tl).Job(),
-				DockerBuildXUse(tl).Job(),
 				DockerBuildxSetupQemu(tl).Job(),
 				DockerBuildX(tl).Job(),
 			)
@@ -24,54 +27,29 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("buildx", "create").
 		Set(func(t *Task[Pipe]) error {
+			r, err := rand.Int(rand.Reader, big.NewInt(1000))
+
+			if err != nil {
+				return err
+			}
+
+			instance := fmt.Sprintf("%s_%d", setup.TL.Pipe.Docker.BuildxInstance, r)
+
 			t.CreateCommand(
 				setup.DOCKER_EXE,
 				"buildx",
 				"create",
 				"--use",
 				"--name",
-				setup.TL.Pipe.Docker.BuildxInstance,
+				instance,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				SetIgnoreError().
 				Set(func(c *Command[Pipe]) error {
 					c.Log.Infoln("Creating a new instance of docker buildx.")
 
 					return nil
 				}).
 				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			if err := t.RunCommandJobAsJobSequence(); err != nil {
-				t.Pipe.Ctx.UseExistingBuildXInstance = true
-			}
-
-			return nil
-		})
-}
-
-func DockerBuildXUse(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("buildx", "use").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !t.Pipe.Ctx.UseExistingBuildXInstance
-		}).
-		Set(func(t *Task[Pipe]) error {
-			t.CreateCommand(
-				setup.DOCKER_EXE,
-				"buildx",
-				"use",
-				setup.TL.Pipe.Docker.BuildxInstance,
-			).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				Set(func(c *Command[Pipe]) error {
-					c.Log.Warnln(
-						"Creating a new docker buildx instance failed, trying to use the existing one.",
-					)
-
-					return nil
-				}).AddSelfToTheTask()
 
 			return nil
 		}).

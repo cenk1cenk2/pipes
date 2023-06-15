@@ -1,7 +1,6 @@
 package build
 
 type Ctx struct {
-	Tags                      []string
-	References                []string
-	UseExistingBuildXInstance bool
+	Tags       []string
+	References []string
 }
