@@ -109,6 +109,7 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 				setup.DOCKER_EXE,
 				"buildx",
 				"build",
+				"--provenance=false",
 			).
 				Set(func(c *Command[Pipe]) error {
 					buildArgs, err := utils.ApplyEnvironmentTemplates(t.Pipe.DockerImage.BuildArgs)
