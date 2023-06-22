@@ -8,7 +8,7 @@ require (
 	github.com/docker/docker v23.0.6+incompatible
 	github.com/dustin/go-humanize v1.0.1
 	github.com/ekalinin/github-markdown-toc.go v1.2.1
-	github.com/google/go-github/v52 v52.0.0
+	github.com/google/go-github/v53 v53.2.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
@@ -23,7 +23,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20230424174541-a2e3b023bd29 // indirect
-	github.com/cloudflare/circl v1.3.2 // indirect
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/creasty/defaults v1.7.0 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
