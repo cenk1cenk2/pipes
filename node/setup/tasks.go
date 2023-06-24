@@ -51,13 +51,14 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command[Pipe]) error {
-					if len(c.GetCombinedStream()) > 0 {
+					stream := c.GetCombinedStream()
+					if len(stream) == 0 {
 						t.Log.Debugln("Can not fetch package manager version.")
 
 						return nil
 					}
 
-					t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, c.GetCombinedStream()[0])
+					t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, stream[0])
 
 					return nil
 				}).
