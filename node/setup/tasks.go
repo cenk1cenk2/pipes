@@ -28,13 +28,15 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command[Pipe]) error {
-					if len(c.GetCombinedStream()) > 0 {
+					stream := c.GetCombinedStream()
+
+					if len(stream) == 0 {
 						t.Log.Debugln("Can not fetch node.js version.")
 
 						return nil
 					}
 
-					t.Log.Infof("node.js version: %s", c.GetCombinedStream()[0])
+					t.Log.Infof("node.js version: %s", stream[0])
 
 					return nil
 				}).
@@ -52,6 +54,7 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command[Pipe]) error {
 					stream := c.GetCombinedStream()
+
 					if len(stream) == 0 {
 						t.Log.Debugln("Can not fetch package manager version.")
 
