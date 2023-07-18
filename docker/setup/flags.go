@@ -3,6 +3,7 @@ package setup
 import (
 	"github.com/urfave/cli/v2"
 
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
@@ -25,7 +26,7 @@ var Flags = []cli.Flag{
 		Usage:       "Use Docker BuildKit for building images.",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_USE_BUILDKIT", "DOCKER_BUILDKIT"},
-		Value:       true,
+		Value:       flags.FLAG_DOCKER_USE_BUILD_KIT,
 		Destination: &TL.Pipe.Docker.UseBuildKit,
 	},
 

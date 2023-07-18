@@ -9,6 +9,7 @@ package flags
 const (
 	// docker.
 
+	FLAG_DOCKER_USE_BUILD_KIT               = true
 	FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST = `[ "^tags/v?\\d+.\\d+.\\d+$" ]`
 	FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS = `[
     { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }
