@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile-upstream:master-labs
 FROM docker:latest
 
-ARG BUILDOS
-ARG BUILDARCH
+ARG BUILDOS=linux
+ARG BUILDARCH=amd64
 
 RUN apk add --no-cache --no-progress git
 
