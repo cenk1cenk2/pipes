@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile-upstream:master-labs
 FROM node:20-alpine
 
-ARG BUILDOS=linux
-ARG BUILDARCH=amd64
+ARG BUILDOS
+ARG BUILDARCH
 
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
