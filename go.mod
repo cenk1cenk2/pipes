@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/docker/docker v23.0.6+incompatible
+	github.com/docker/docker v24.0.5+incompatible
 	github.com/dustin/go-humanize v1.0.1
 	github.com/ekalinin/github-markdown-toc.go v1.2.1
 	github.com/google/go-github/v53 v53.2.0
@@ -38,7 +38,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
-	github.com/imdario/mergo v0.3.15 // indirect
+	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/moby/term v0.0.0-20221205130635-1aeaba878587 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect

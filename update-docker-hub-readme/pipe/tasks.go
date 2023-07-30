@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
 )
 
 func LoginToDockerHubRegistry(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login").
 		Set(func(t *Task[Pipe]) error {
-			login, err := json.Marshal(types.AuthConfig{
+			login, err := json.Marshal(registry.AuthConfig{
 				Username: t.Pipe.DockerHub.Username,
 				Password: t.Pipe.DockerHub.Password,
 			})
