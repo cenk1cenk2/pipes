@@ -63,4 +63,6 @@ require (
 	gotest.tools/v3 v3.2.0 // indirect
 )
 
+replace github.com/imdario/mergo => dario.cat/mergo v1.0.0
+
 // replace gitlab.kilic.dev/libraries/plumber/v4 => /home/cenk/development/plumber
