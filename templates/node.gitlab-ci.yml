@@ -5,6 +5,9 @@ stages:
 
 include:
   - project: devops/pipes
+    file: /templates/v2/workflow-prioritize-mr.gitlab-ci.yml
+
+  - project: devops/pipes
     file: /templates/parent-pipeline-id.gitlab-ci.yml
 
   - project: devops/pipes
