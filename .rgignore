@@ -2,7 +2,5 @@ go.mod
 go.sum
 LICENSE
 **/README.md
-**/Makefile
 renovate.json
-.tasks.json
 .golangci.yml
