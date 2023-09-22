@@ -7,7 +7,7 @@ replace github.com/imdario/mergo => dario.cat/mergo v1.0.0
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/docker/docker v24.0.5+incompatible
+	github.com/docker/docker v24.0.6+incompatible
 	github.com/dustin/go-humanize v1.0.1
 	github.com/ekalinin/github-markdown-toc.go v1.2.1
 	github.com/google/go-github/v54 v54.0.0
@@ -16,8 +16,8 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.25.7
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.0.3
-	gitlab.kilic.dev/libraries/plumber/v4 v4.32.33
-	golang.org/x/oauth2 v0.11.0
+	gitlab.kilic.dev/libraries/plumber/v4 v4.32.35
+	golang.org/x/oauth2 v0.12.0
 )
 
 require (
