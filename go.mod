@@ -1,6 +1,6 @@
 module gitlab.kilic.dev/devops/pipes
 
-go 1.21
+go 1.21.3
 
 replace github.com/imdario/mergo => dario.cat/mergo v1.0.0
 
