@@ -19,8 +19,8 @@ github.com/docker/docker v24.0.7+incompatible h1:Wo6l37AuwP3JaMnZa226lzVXGA3F9Ig
 github.com/docker/docker v24.0.7+incompatible/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
-github.com/ekalinin/github-markdown-toc.go v1.3.0 h1:VUHCtATQgzBW2Dse1xpCYhnTngg8fw1ni3FrsUOA5Qw=
-github.com/ekalinin/github-markdown-toc.go v1.3.0/go.mod h1:V5aiwoSLm1+er91D4l0AXn8vr4FX07Iu+zgDMFj3FeU=
+github.com/ekalinin/github-markdown-toc.go v1.3.1 h1:QRFxDXFksfjALIBySYFUB7Z8bNKU4Nox695f0OJRt4A=
+github.com/ekalinin/github-markdown-toc.go v1.3.1/go.mod h1:V5aiwoSLm1+er91D4l0AXn8vr4FX07Iu+zgDMFj3FeU=
 github.com/gabriel-vasile/mimetype v1.4.3 h1:in2uUcidCuFcDKtdcBxlR0rJ1+fsokWf+uqxgUFjbI0=
 github.com/gabriel-vasile/mimetype v1.4.3/go.mod h1:d8uq/6HKRL6CGdk+aubisF/M5GcPfT7nKyLpA0lbSSk=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
