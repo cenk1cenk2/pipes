@@ -85,8 +85,8 @@ github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9dec
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 gitlab.kilic.dev/libraries/go-broadcaster v1.1.1 h1:3KSjoM1OS2HPKXnCoD1pJ7kIHNqeHczB/BITL78UcqI=
 gitlab.kilic.dev/libraries/go-broadcaster v1.1.1/go.mod h1:3u3hNGMPYdT90k0sxrNmtprObjyD22BFsfn34AqG7sE=
-gitlab.kilic.dev/libraries/go-utils/v2 v2.1.0 h1:wYeRAcI5+YjkLQBzp0cfY1OP4q2RPSZgWQ+IqsCDeTc=
-gitlab.kilic.dev/libraries/go-utils/v2 v2.1.0/go.mod h1:New/6vYFCgifqm9UIbkervQQP9873af9ECrMFN5t74U=
+gitlab.kilic.dev/libraries/go-utils/v2 v2.1.1 h1:VBwLic+F0RAqZoUVPkDQ8UNCKlA+sO+mH9ch5oT6gJI=
+gitlab.kilic.dev/libraries/go-utils/v2 v2.1.1/go.mod h1:mp6/V3uWdOlUN1dCTq9FlfW0u+n/Wn9+nBdCyzaA1HE=
 gitlab.kilic.dev/libraries/plumber/v4 v4.35.0 h1:PU3Uq4uFlwWbYJ1bd4mmPgCEk64sPqwHBnqwn/WsVl8=
 gitlab.kilic.dev/libraries/plumber/v4 v4.35.0/go.mod h1:XcIFlF8uhH4RIOZxIATqtHfbDUTBLQVZt76ZUkdTO7w=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
