@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
@@ -26,7 +25,7 @@ func AddNodeModules(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Add...)
 
 					if t.Pipe.NodeAdd.ScriptArgs != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.NodeAdd.ScriptArgs, ctx)
+						tmpl, err := InlineTemplate(t.Pipe.NodeAdd.ScriptArgs, ctx)
 
 						if err != nil {
 							return err

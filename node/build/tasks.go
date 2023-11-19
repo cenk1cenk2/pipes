@@ -3,7 +3,6 @@ package build
 import (
 	"os"
 
-	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
@@ -24,7 +23,7 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...)
 
 					if t.Pipe.NodeBuild.Script != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.NodeBuild.Script, ctx)
+						tmpl, err := InlineTemplate(t.Pipe.NodeBuild.Script, ctx)
 
 						if err != nil {
 							return err
@@ -36,7 +35,7 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.RunDelimitter...)
 
 					if t.Pipe.NodeBuild.ScriptArgs != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.NodeBuild.ScriptArgs, ctx)
+						tmpl, err := InlineTemplate(t.Pipe.NodeBuild.ScriptArgs, ctx)
 
 						if err != nil {
 							return err

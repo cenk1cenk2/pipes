@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strings"
 
-	u "gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
@@ -47,7 +46,7 @@ func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
 			return t.Pipe.DockerManifest.OutputFile == "" || t.Pipe.DockerManifest.Target == ""
 		}).
 		Set(func(t *Task[Pipe]) error {
-			target, err := u.InlineTemplate(t.Pipe.DockerManifest.Target, t.Pipe.Ctx.Tags)
+			target, err := InlineTemplate(t.Pipe.DockerManifest.Target, t.Pipe.Ctx.Tags)
 			if err != nil {
 				return err
 			}
@@ -66,7 +65,7 @@ func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
 				return err
 			}
 
-			filename, err := u.InlineTemplate(t.Pipe.DockerManifest.OutputFile, string(tags))
+			filename, err := InlineTemplate(t.Pipe.DockerManifest.OutputFile, string(tags))
 
 			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
 

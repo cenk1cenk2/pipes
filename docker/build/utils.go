@@ -64,7 +64,7 @@ func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
 
 		t.Log.Debugf("Sanitizing since condition matched for given tag: %s -> %s with %v", tag, re.String(), matches)
 
-		return utils.InlineTemplate(s.Template, matches)
+		return InlineTemplate(s.Template, matches)
 	}
 
 	return tag, nil
@@ -88,7 +88,7 @@ func ApplyTagTemplate(t *Task[Pipe], tag string) (string, error) {
 
 		t.Log.Debugf("Applying template since condition matched for given tag: %s -> %s with %v", tag, re.String(), matches)
 
-		return utils.InlineTemplate(s.Template, matches)
+		return InlineTemplate(s.Template, matches)
 	}
 
 	if len(t.Pipe.DockerImage.TagsTemplate) == 0 {

@@ -1,7 +1,6 @@
 package run
 
 import (
-	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v4"
@@ -22,7 +21,7 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...)
 
 					if t.Pipe.Ctx.Script != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.Ctx.Script, ctx)
+						tmpl, err := InlineTemplate(t.Pipe.Ctx.Script, ctx)
 
 						if err != nil {
 							return err
@@ -34,7 +33,7 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.RunDelimitter...)
 
 					if t.Pipe.Ctx.ScriptArgs != "" {
-						tmpl, err := utils.InlineTemplate(t.Pipe.Ctx.ScriptArgs, ctx)
+						tmpl, err := InlineTemplate(t.Pipe.Ctx.ScriptArgs, ctx)
 
 						if err != nil {
 							return err
