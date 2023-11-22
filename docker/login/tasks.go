@@ -1,6 +1,9 @@
 package login
 
 import (
+	"io"
+	"strings"
+
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
@@ -42,9 +45,8 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 					return nil
 				}).
-				SetScript(&CommandScript{
-					Inline: "{{ . }}",
-					Ctx:    t.Pipe.DockerRegistry.Password,
+				SetStdin(func(c *Command[Pipe]) io.Reader {
+					return strings.NewReader(t.Pipe.DockerRegistry.Password)
 				}).
 				AddSelfToTheTask()
 

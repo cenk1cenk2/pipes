@@ -161,7 +161,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Usage:       "Write all the images that are published in to a file for later use. Template(string)",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_MANIFEST_OUTPUT_FILE"},
-		Value:       `.published-docker-images_{{ sha256sum $ }}`,
+		Value:       `.published-docker-images_{{ $ | join "," | sha256sum }}`,
 		Destination: &TL.Pipe.DockerManifest.OutputFile,
 	},
 })
