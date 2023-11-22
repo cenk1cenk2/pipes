@@ -8,7 +8,7 @@ import (
 	node "gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func main() {

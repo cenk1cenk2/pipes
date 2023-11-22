@@ -9,7 +9,7 @@ import (
 	"os"
 
 	"github.com/docker/docker/api/types/registry"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func LoginToDockerHubRegistry(tl *TaskList[Pipe]) *Task[Pipe] {

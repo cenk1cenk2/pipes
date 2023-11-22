@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -87,7 +87,7 @@ func DiscoverArtifacts(tl *TaskList[Pipe]) *Task[Pipe] {
 									step,
 								)
 
-								var available []string = []string{}
+								available := []string{}
 
 								for _, v := range t.Pipe.Ctx.StepsResponse {
 									available = append(available, v.Name)

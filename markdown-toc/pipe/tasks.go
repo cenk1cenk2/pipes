@@ -11,7 +11,7 @@ import (
 
 	glob "github.com/bmatcuk/doublestar/v4"
 	toc "github.com/ekalinin/github-markdown-toc.go"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func FindMarkdownFiles(tl *TaskList[Pipe]) *Task[Pipe] {

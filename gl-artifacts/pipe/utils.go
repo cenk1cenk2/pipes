@@ -11,7 +11,7 @@ import (
 	"github.com/cavaliergopher/grab/v3"
 	"github.com/dustin/go-humanize"
 	"github.com/google/uuid"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func DownloadArtifact(t *Task[Pipe], url string) (string, error) {

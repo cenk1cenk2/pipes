@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/nochso/gomd/eol"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {

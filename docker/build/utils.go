@@ -6,7 +6,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/login"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func AddDockerTag(t *Task[Pipe], tag string) error {

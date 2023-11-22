@@ -11,12 +11,12 @@ import (
 	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags").
-		SetJobWrapper(func(job Job) Job {
+		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
 			return tl.JobSequence(
 				tl.JobParallel(
 					DockerTagsUser(tl).Job(),

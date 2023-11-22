@@ -7,7 +7,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -15,7 +15,7 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !setup.TL.Pipe.Docker.UseBuildx
 		}).
-		SetJobWrapper(func(job Job) Job {
+		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
 			return tl.JobSequence(
 				DockerBuildXCreate(tl).Job(),
 				DockerBuildxSetupQemu(tl).Job(),

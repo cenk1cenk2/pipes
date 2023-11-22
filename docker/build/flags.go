@@ -8,7 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 //revive:disable:line-length-limit

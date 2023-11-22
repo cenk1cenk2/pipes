@@ -7,7 +7,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {

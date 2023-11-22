@@ -1,7 +1,7 @@
 package utils
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 var vars map[string]string

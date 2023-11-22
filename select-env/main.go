@@ -5,7 +5,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/select-env/pipe"
 	"gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func main() {

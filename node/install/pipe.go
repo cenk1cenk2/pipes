@@ -1,7 +1,7 @@
 package install
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 type (

@@ -9,7 +9,7 @@ import (
 	glob "github.com/bmatcuk/doublestar/v4"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {

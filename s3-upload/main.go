@@ -4,7 +4,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	pipe "gitlab.kilic.dev/devops/pipes/s3-upload/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func main() {

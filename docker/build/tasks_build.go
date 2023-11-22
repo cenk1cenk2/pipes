@@ -5,7 +5,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v4"
+	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -13,7 +13,7 @@ func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return setup.TL.Pipe.Docker.UseBuildx
 		}).
-		SetJobWrapper(func(job Job) Job {
+		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
 			return tl.JobSequence(
 				DockerBuild(tl).Job(),
 				DockerPush(tl).Job(),
@@ -109,7 +109,10 @@ func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 
 							return nil
 						}).
-						SetRetries(3, false, time.Second*10).
+						SetRetries(&CommandRetry{
+							Tries: 3,
+							Delay: time.Second * 10,
+						}).
 						AddSelfToTheTask()
 				}(tag)
 			}

@@ -3,8 +3,7 @@
 
 version: "3"
 
-vars:
-  GO_VERSION: 1.21
+vars: {}
 
 env:
   CGO_ENABLED: 0
