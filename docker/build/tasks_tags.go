@@ -65,7 +65,7 @@ func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
 				return err
 			}
 
-			filename, err := InlineTemplate(t.Pipe.DockerManifest.OutputFile, string(tags))
+			filename, err := InlineTemplate(t.Pipe.DockerManifest.OutputFile, t.Pipe.Ctx.Tags)
 
 			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
 

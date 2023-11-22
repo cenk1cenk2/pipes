@@ -1,6 +1,7 @@
 package login
 
 import (
+	"io"
 	"strings"
 
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
@@ -37,14 +38,15 @@ func DockerLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command[Pipe]) error {
-					c.Command.Stdin = strings.NewReader(t.Pipe.DockerRegistry.Password)
-
 					c.Log.Infof(
 						"Logging in to Docker registry: %s",
 						t.Pipe.DockerRegistry.Registry,
 					)
 
 					return nil
+				}).
+				SetStdin(func(c *Command[Pipe]) io.Reader {
+					return strings.NewReader(t.Pipe.DockerRegistry.Password)
 				}).
 				AddSelfToTheTask()
 
