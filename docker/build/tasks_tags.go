@@ -41,7 +41,7 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("tags", "file").
+	return tl.CreateTask("tags", "manifest").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.DockerManifest.OutputFile == "" || t.Pipe.DockerManifest.Target == ""
 		}).
