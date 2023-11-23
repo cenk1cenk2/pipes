@@ -169,7 +169,7 @@ func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.Log.Debugf("Trying to match condition for given reference: %s with %v", reference, re.String())
 
 					if re.MatchString(reference) {
-						if err := AppendDockerTag(t, setup.DOCKER_LATEST_TAG); err != nil {
+						if err := AddDockerTag(t, setup.DOCKER_LATEST_TAG); err != nil {
 							return err
 						}
 
