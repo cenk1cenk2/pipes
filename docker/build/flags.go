@@ -124,7 +124,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Destination: &TL.Pipe.DockerImage.Inspect,
 	},
 
-	&cli.StringFlag{
+	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.build_args",
 		Usage: `Pass in extra build arguments for image.
