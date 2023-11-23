@@ -97,7 +97,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:     "docker_image.sanitize_tags",
 		Usage: `Sanitizes the given regex pattern out of tag name.
       Template is interpolated with the given matches in the regular expression.
-      json([]struct{ match: RegExp, template: Template(map[string]string) })`,
+      json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
 		Required: false,
 		EnvVars:  []string{"DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
@@ -108,7 +108,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Name:     "docker_image.tags_template",
 		Usage: `Modifies every tag that matches a certain condition.
       Template is interpolated with the given matches in the regular expression.
-      json([]struct{ match: RegExp, template: Template(map[string]string) })`,
+      json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
 		Required: false,
 		EnvVars:  []string{"DOCKER_IMAGE_TAGS_TEMPLATE"},
 		Value:    "[]",
@@ -124,12 +124,12 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 		Destination: &TL.Pipe.DockerImage.Inspect,
 	},
 
-	&cli.StringSliceFlag{
+	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker_image.build_args",
 		Usage: `Pass in extra build arguments for image.
       You can use it as a template with environment variables as the context.
-      Template(map[string]string)`,
+      format(map[string]Template[string]())`,
 		Required: false,
 		EnvVars:  []string{"DOCKER_IMAGE_BUILD_ARGS"},
 	},
@@ -149,7 +149,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category:    setup.CATEGORY_DOCKER_MANIFEST,
 		Name:        "docker_manifest.target",
-		Usage:       "Target image names for patching the manifest. Template([]string)",
+		Usage:       "Target image names for patching the manifest. format(Template[string]([]string))",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_MANIFEST_TARGET"},
 		Destination: &TL.Pipe.DockerManifest.Target,
@@ -158,7 +158,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category:    setup.CATEGORY_DOCKER_IMAGE,
 		Name:        "docker_manifest.output-file",
-		Usage:       "Write all the images that are published in to a file for later use. Template(string)",
+		Usage:       "Write all the images that are published in to a file for later use. format(Template[string]([]string))",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_MANIFEST_OUTPUT_FILE"},
 		Value:       `.published-docker-images_{{ $ | join "," | sha256sum }}`,
@@ -189,18 +189,4 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 	tl.Pipe.DockerImage.BuildArgs = tl.CliContext.StringSlice("docker_image.build_args")
 
 	return nil
-}
-
-var DeprecationNotices = []DeprecationNotice{
-	{
-		Level:       LOG_LEVEL_ERROR,
-		Environment: []string{"TAG_AS_LATEST_FOR_BRANCHES_REGEX", "TAG_AS_LATEST_FOR_TAGS_REGEX"},
-		Flag:        []string{"--docker_image.tag_as_latest_for_branches_regex", "--docker_image.tag_as_latest_for_tags_regex"},
-		Message:     `"%s" is deprecated, please use the "TAG_AS_LATEST" format.`,
-	},
-	{
-		Level:       LOG_LEVEL_ERROR,
-		Environment: []string{"IMAGE_NAME", "IMAGE_TAGS", "IMAGE_TAG_AS_LATEST", "IMAGE_SANITIZE_TAGS", "IMAGE_SANITIZE_TAGS", "IMAGE_INSPECT", "BUILD_ARGS", "IMAGE_PULL"},
-		Message:     `"%s" is deprecated, please use the environment variable with the "DOCKER_" prefix instead.`,
-	},
 }

@@ -16,11 +16,6 @@ func main() {
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
 				Flags:       pipe.Flags,
-				Before: func(ctx *cli.Context) error {
-					p.SetDeprecationNotices(pipe.DeprecationNotices)
-
-					return nil
-				},
 				Action: func(c *cli.Context) error {
 					tl := &pipe.TL
 

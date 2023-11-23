@@ -18,8 +18,8 @@ Selects an set of environment variable prefix depending on the condition.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `String`<br/>`json([]struct{ match: RegExp, environment: string })` | `false` | [<br />  { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },<br />  { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },<br />  { "match" :"^heads/main$", "environment": "develop" },<br />  { "match": "^heads/master$", "environment": "develop" }<br />] |
-| `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | false |
-| `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | false |
+| `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | true |
+| `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | true |
 | `$ENVIRONMENT_FILE` | File for writing the environment variables for selected environment. | `String` | `true` | env.environment |
 
 ### GIT

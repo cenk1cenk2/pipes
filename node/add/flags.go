@@ -34,7 +34,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    flags.CATEGORY_PACKAGES,
 		Name:        "packages.node.script_args",
-		Usage:       fmt.Sprintf("package.json script arguments for building operation. format(%s)", environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE),
+		Usage:       fmt.Sprintf("package.json script arguments for building operation. %s", environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE),
 		Required:    false,
 		EnvVars:     []string{"PACKAGES_NODE_SCRIPT_ARGS"},
 		Value:       "",

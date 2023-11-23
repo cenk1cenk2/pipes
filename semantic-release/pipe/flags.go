@@ -53,16 +53,3 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 
 	return nil
 }
-
-var DeprecationNotices = []DeprecationNotice{
-	{
-		Environment: []string{"DRY_RUN", "RUN_MULTI"},
-		Level:       LOG_LEVEL_ERROR,
-		Message:     `"%s" is deprecated, please use the environment variable with the "SEMANTIC_RELEASE_" prefix instead.`,
-	},
-	{
-		Environment: []string{"ADD_MODULES"},
-		Level:       LOG_LEVEL_ERROR,
-		Message:     `"%s" is deprecated, please use the environment variable "ADD_NODE_MODULES" through node pipe instead.`,
-	},
-}

@@ -75,7 +75,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_README,
 		Name:     "readme.matrix",
-		Usage:    "Matrix of multiple README files to update. json([]struct{ repository: string, file: string, description?: string })",
+		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
 		EnvVars:  []string{"README_MATRIX"},
 		Required: false,
 	},

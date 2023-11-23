@@ -23,7 +23,7 @@ var Flags = []cli.Flag{
 		Category: CATEGORY_NODE_COMMAND,
 		Name:     "node.command_script",
 		Usage: fmt.Sprintf(
-			"package.json script for given command operation. format(%s)",
+			"package.json script for given command operation. %s",
 			environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE,
 		),
 		Required:    false,

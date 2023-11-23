@@ -107,6 +107,11 @@ func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
 		Set(func(t *Task[Pipe]) error {
 			if t.Pipe.DockerManifest.Target != "" && len(t.Pipe.DockerManifest.Images) > 0 {
 				t.Lock.Lock()
+				var err error
+				if t.Pipe.DockerManifest.Target, err = InlineTemplate[any](t.Pipe.DockerManifest.Target, nil); err != nil {
+					return err
+				}
+
 				t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target] = append(t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target], t.Pipe.DockerManifest.Images...)
 				t.Lock.Unlock()
 

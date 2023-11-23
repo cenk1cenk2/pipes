@@ -28,4 +28,4 @@ Updates the readme file on DockerHub or any compatible API.
 | `$DOCKER_IMAGE_NAME`<br/>`$README_REPOSITORY` | Repository for applying the readme on. | `String` | `false` |  |
 | `$README_FILE` | Readme file for the given repository. | `String` | `false` | README.md |
 | `$README_DESCRIPTION` | Short description to display on DockerHub. | `String` | `false` |  |
-| `$README_MATRIX` | Matrix of multiple README files to update. | `String`<br/>`json([]struct{ repository: string, file: string, description?: string })` | `false` |  |
+| `$README_MATRIX` | Matrix of multiple README files to update. | `String`<br/>`json([]struct { repository: string, file: string, description?: string })` | `false` |  |

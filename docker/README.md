@@ -27,7 +27,7 @@ Login to the given Docker registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$DOCKER_USE_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | false |
+| `$DOCKER_USE_BUILDKIT`<br/>`$DOCKER_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | true |
 | `$DOCKER_USE_BUILDX` | Use Docker BuildX builder for multi-platform builds. | `Bool` | `false` | false |
 | `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` | CI |
 
@@ -51,7 +51,7 @@ Build Docker images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$DOCKER_USE_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | false |
+| `$DOCKER_USE_BUILDKIT`<br/>`$DOCKER_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | true |
 | `$DOCKER_USE_BUILDX` | Use Docker BuildX builder for multi-platform builds. | `Bool` | `false` | false |
 | `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` | CI |
 | `$DOCKER_BUILDX_PLATFORMS` | Platform arguments for Docker BuildX. | `String` | `false` | linux/amd64 |
@@ -65,18 +65,18 @@ Build Docker images.
 | `$DOCKERFILE_CONTEXT` | Dockerfile context argument for build operation. | `String` | `false` | . |
 | `$DOCKERFILE_NAME` | Dockerfile path for the build operation | `String` | `false` | Dockerfile |
 | `$DOCKER_IMAGE_TAG_AS_LATEST` | Regex pattern to tag the image as latest.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `String`<br/>`json(RegExp[])` | `false` | [ "^tags/v?\\d+.\\d+.\\d+$" ] |
-| `$DOCKER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.<br />      Template is interpolated with the given matches in the regular expression. | `String`<br/>`json([]struct{ match: RegExp, template: Template(map[string]string) })` | `false` | [<br />  { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }<br />] |
-| `$DOCKER_IMAGE_TAGS_TEMPLATE` | Modifies every tag that matches a certain condition.<br />      Template is interpolated with the given matches in the regular expression. | `String`<br/>`json([]struct{ match: RegExp, template: Template(map[string]string) })` | `false` | [] |
-| `$DOCKER_IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | false |
-| `$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image.<br />      You can use it as a template with environment variables as the context. | `StringSlice`<br/>`Template(map[string]string)` | `false` |  |
-| `$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | false |
-| `$DOCKER_MANIFEST_OUTPUT_FILE` | Write all the images that are published in to a file for later use. | `String`<br/>`Template(string)` | `false` | .published-docker-images_{{ sha256sum $ }} |
+| `$DOCKER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.<br />      Template is interpolated with the given matches in the regular expression. | `String`<br/>`json([]struct { match: RegExp, template: Template[string](RegExpMatch) })` | `false` | [<br />  { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }<br />] |
+| `$DOCKER_IMAGE_TAGS_TEMPLATE` | Modifies every tag that matches a certain condition.<br />      Template is interpolated with the given matches in the regular expression. | `String`<br/>`json([]struct { match: RegExp, template: Template[string](RegExpMatch) })` | `false` | [] |
+| `$DOCKER_IMAGE_INSPECT` | Inspect after pushing the image. | `Bool` | `false` | true |
+| `$DOCKER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image.<br />      You can use it as a template with environment variables as the context. | `String`<br/>`format(map[string]Template[string]())` | `false` |  |
+| `$DOCKER_IMAGE_PULL` | Pull before building the image. | `Bool` | `false` | true |
+| `$DOCKER_MANIFEST_OUTPUT_FILE` | Write all the images that are published in to a file for later use. | `String`<br/>`format(Template[string]([]string))` | `false` | .published-docker-images_{{ $ | join "," | sha256sum }} |
 
 ##### Docker Manifest
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$DOCKER_MANIFEST_TARGET` | Target image names for patching the manifest. | `String`<br/>`Template([]string)` | `false` |  |
+| `$DOCKER_MANIFEST_TARGET` | Target image names for patching the manifest. | `String`<br/>`format(Template[string]([]string))` | `false` |  |
 
 ##### Docker Registry
 
@@ -112,7 +112,7 @@ Update manifests of the Docker images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$DOCKER_USE_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | false |
+| `$DOCKER_USE_BUILDKIT`<br/>`$DOCKER_BUILDKIT` | Use Docker BuildKit for building images. | `Bool` | `false` | true |
 | `$DOCKER_USE_BUILDX` | Use Docker BuildX builder for multi-platform builds. | `Bool` | `false` | false |
 | `$DOCKER_BUILDX_INSTANCE` | Docker BuildX instance to be started or to use. | `String` | `false` | CI |
 
@@ -121,9 +121,9 @@ Update manifests of the Docker images.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DOCKER_MANIFEST_FILES` | Read published tags from a file. | `StringSlice`<br/>`format(glob)` | `false` | "**/.published-docker-images*" |
-| `$DOCKER_MANIFEST_TARGET` | Target image names for patching the manifest. | `String` | `false` |  |
+| `$DOCKER_MANIFEST_TARGET` | Target image names for patching the manifest. | `String`<br/>`format(Template[string]())` | `false` |  |
 | `$DOCKER_MANIFEST_IMAGES` | Image names for patching the manifest with the given target. | `StringSlice` | `false` |  |
-| `$DOCKER_MANIFEST_MATRIX` | Matrix of all the images that should be manifested. | `String`<br/>`json([]struct{ target: string, images: []string })` | `false` |  |
+| `$DOCKER_MANIFEST_MATRIX` | Matrix of all the images that should be manifested. | `String`<br/>`json([]struct { target: string, images: []string })` | `false` |  |
 
 ##### Docker Registry
 

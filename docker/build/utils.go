@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/login"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
@@ -91,9 +90,5 @@ func ApplyTagTemplate(t *Task[Pipe], tag string) (string, error) {
 		return InlineTemplate(s.Template, matches)
 	}
 
-	if len(t.Pipe.DockerImage.TagsTemplate) == 0 {
-		return utils.ApplyEnvironmentTemplate(tag)
-	}
-
-	return tag, nil
+	return InlineTemplate[any](tag, nil)
 }

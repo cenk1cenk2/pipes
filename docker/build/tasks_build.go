@@ -3,7 +3,6 @@ package build
 import (
 	"time"
 
-	"gitlab.kilic.dev/devops/pipes/common/utils"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
@@ -46,13 +45,12 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 						)
 					}
 
-					buildArgs, err := utils.ApplyEnvironmentTemplates(t.Pipe.DockerImage.BuildArgs)
-
-					if err != nil {
+					var err error
+					if t.Pipe.DockerImage.BuildArgs, err = InlineTemplates[any](t.Pipe.DockerImage.BuildArgs, nil); err != nil {
 						return err
 					}
 
-					for _, v := range buildArgs {
+					for _, v := range t.Pipe.DockerImage.BuildArgs {
 						c.AppendArgs("--build-arg", v)
 					}
 

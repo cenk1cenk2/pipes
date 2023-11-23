@@ -28,7 +28,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    setup.CATEGORY_DOCKER_MANIFEST,
 		Name:        "docker_manifest.target",
-		Usage:       "Target image names for patching the manifest.",
+		Usage:       "Target image names for patching the manifest. format(Template[string]())",
 		Required:    false,
 		EnvVars:     []string{"DOCKER_MANIFEST_TARGET"},
 		Destination: &TL.Pipe.DockerManifest.Target,
@@ -45,7 +45,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
 		Name:     "docker_manifest.matrix",
-		Usage:    "Matrix of all the images that should be manifested. json([]struct{ target: string, images: []string })",
+		Usage:    "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
 		Required: false,
 		EnvVars:  []string{"DOCKER_MANIFEST_MATRIX"},
 	},

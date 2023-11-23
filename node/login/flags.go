@@ -21,7 +21,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_NODE_LOGIN,
 		Name:     "npm.login",
-		Usage:    "npm registries to login to. json([]struct{ username: string, password: string, registry?: string, useHttps?: boolean })",
+		Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
 		Required: false,
 		EnvVars:  []string{"NPM_LOGIN"},
 		Value:    "",
@@ -39,7 +39,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_NODE_LOGIN,
 		Name:        "npm.npmrc",
-		Usage:       "Pass direct contents of the NPMRC file.",
+		Usage:       "Direct contents of .npmrc file.",
 		Required:    false,
 		EnvVars:     []string{"NPM_NPMRC"},
 		Value:       "",

@@ -39,11 +39,6 @@ func main() {
 						Name:        "build",
 						Description: "Build Docker images.",
 						Flags:       p.AppendFlags(setup.Flags, login.Flags, build.Flags),
-						Before: func(ctx *cli.Context) error {
-							p.SetDeprecationNotices(build.DeprecationNotices)
-
-							return nil
-						},
 						Action: func(c *cli.Context) error {
 							tl := &build.TL
 

@@ -66,11 +66,6 @@ func main() {
 					{
 						Name:  "build",
 						Flags: p.AppendFlags(setup.Flags, environment.Flags, build.Flags),
-						Before: func(ctx *cli.Context) error {
-							p.SetDeprecationNotices(build.DeprecationNotices)
-
-							return nil
-						},
 						Action: func(c *cli.Context) error {
 							tl := &build.TL
 

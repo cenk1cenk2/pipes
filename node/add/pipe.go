@@ -23,6 +23,7 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
+		SetRuntimeDepth(3).
 		ShouldDisable(func(tl *TaskList[Pipe]) bool {
 			return len(tl.Pipe.NodeAdd.Packages) == 0
 		}).

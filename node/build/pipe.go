@@ -26,6 +26,7 @@ var TL = TaskList[Pipe]{
 
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
+		SetRuntimeDepth(3).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				BuildNodeApplication(tl).Job(),

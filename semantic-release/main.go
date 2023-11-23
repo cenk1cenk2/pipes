@@ -37,11 +37,6 @@ func main() {
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
 				Flags:       p.AppendFlags(environment.Flags, node.Flags, login.Flags, node_add.Flags, pipe.Flags),
-				Before: func(ctx *cli.Context) error {
-					p.SetDeprecationNotices(pipe.DeprecationNotices)
-
-					return nil
-				},
 				Action: func(c *cli.Context) error {
 					tl := &pipe.TL
 

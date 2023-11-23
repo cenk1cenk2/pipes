@@ -14,7 +14,7 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.25.7
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.1
-	gitlab.kilic.dev/libraries/plumber/v5 v5.2.2
+	gitlab.kilic.dev/libraries/plumber/v5 v5.3.4
 	golang.org/x/oauth2 v0.14.0
 )
 
@@ -46,3 +46,5 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gotest.tools/v3 v3.2.0 // indirect
 )
+
+// replace gitlab.kilic.dev/libraries/plumber/v5 => /home/cenk/development/plumber
