@@ -20,15 +20,6 @@ func AddDockerTag(t *Task[Pipe], tag string) error {
 
 func AppendDockerTag(t *Task[Pipe], tag string) error {
 	t.Lock.Lock()
-	if tag == "" {
-		return fmt.Errorf("Can not add empty tag to list.")
-	}
-
-	if login.TL.Pipe.DockerRegistry.Registry != "" {
-		tag = fmt.Sprintf("%s/%s:%s", login.TL.Pipe.DockerRegistry.Registry, t.Pipe.DockerImage.Name, tag)
-	} else {
-		tag = fmt.Sprintf("%s:%s", t.Pipe.DockerImage.Name, tag)
-	}
 	t.Pipe.Ctx.Tags = append(t.Pipe.Ctx.Tags, tag)
 	t.Lock.Unlock()
 
@@ -43,6 +34,16 @@ func ProcessDockerTag(t *Task[Pipe], tag string) (string, error) {
 
 	if tag, err = SanitizeDockerTag(t, tag); err != nil {
 		return "", err
+	}
+
+	if tag == "" {
+		return tag, fmt.Errorf("Can not add empty tag to list.")
+	}
+
+	if login.TL.Pipe.DockerRegistry.Registry != "" {
+		tag = fmt.Sprintf("%s/%s:%s", login.TL.Pipe.DockerRegistry.Registry, t.Pipe.DockerImage.Name, tag)
+	} else {
+		tag = fmt.Sprintf("%s:%s", t.Pipe.DockerImage.Name, tag)
 	}
 
 	return tag, nil
