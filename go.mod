@@ -4,12 +4,9 @@ go 1.21.4
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
-	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/docker/docker v24.0.7+incompatible
-	github.com/dustin/go-humanize v1.0.1
 	github.com/ekalinin/github-markdown-toc.go v1.3.1
 	github.com/google/go-github/v56 v56.0.0
-	github.com/google/uuid v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/urfave/cli/v2 v2.25.7

@@ -18,17 +18,11 @@ includes:
   gh-release-tracker:
     dir: ./gh-release-tracker
     taskfile: ./Taskfile.pipe.yml
-  gl-artifacts:
-    dir: ./gl-artifacts
-    taskfile: ./Taskfile.pipe.yml
   markdown-toc:
     dir: ./markdown-toc
     taskfile: ./Taskfile.pipe.yml
   node:
     dir: ./node
-    taskfile: ./Taskfile.pipe.yml
-  s3-upload:
-    dir: ./s3-upload
     taskfile: ./Taskfile.pipe.yml
   select-env:
     dir: ./select-env
@@ -83,10 +77,8 @@ tasks:
       - task: "template:{{ .command }}"
       - task: "docker:{{ .command }}"
       - task: "gh-release-tracker:{{ .command }}"
-      - task: "gl-artifacts:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"
-      - task: "s3-upload:{{ .command }}"
       - task: "select-env:{{ .command }}"
       - task: "semantic-release:{{ .command }}"
       - task: "update-docker-hub-readme:{{ .command }}"
