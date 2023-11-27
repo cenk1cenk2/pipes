@@ -240,8 +240,6 @@ docker-build_node:
     matrix:
       - DOCKER_IMAGE_TAGS: '{{ env "NODE_VERSION" }}-{{ env "GITLAB_CI_ARCH" }}'
         NODE_VERSION:
-          - 16
-          - 16-alpine
           - 18
           - 18-alpine
           - 20
