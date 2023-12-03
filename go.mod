@@ -12,7 +12,7 @@ require (
 	github.com/urfave/cli/v2 2.26.0
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.1
 	gitlab.kilic.dev/libraries/plumber/v5 v5.3.5
-	golang.org/x/oauth2 v0.14.0
+	golang.org/x/oauth2 v0.15.0
 )
 
 require (
