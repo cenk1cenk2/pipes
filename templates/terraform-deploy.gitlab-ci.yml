@@ -43,8 +43,8 @@ tf-apply:
   extends: .tf-apply
   needs:
     - tf-install
-    - tf-build
+    - tf-plan
     - tf-lint
   dependencies:
     - tf-install
-    - tf-build
+    - tf-plan
