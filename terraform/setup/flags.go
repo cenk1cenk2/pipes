@@ -18,7 +18,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category:    CATEGORY_CONFIG,
 		Name:        "terraform-config.log-level",
-		Usage:       "Terraform log level.",
+		Usage:       `Terraform log level. enum("trace", "debug", "info", "warn", "error")`,
 		Required:    false,
 		EnvVars:     []string{"TF_LOG_LEVEL", "TF_LOG"},
 		Value:       "info",
