@@ -15,10 +15,14 @@ func InitTerraform(tl *TaskList[Pipe]) *Task[Pipe] {
 			).
 				Set(func(c *Command[Pipe]) error {
 					if t.Pipe.Install.Reconfigure {
+						t.Log.Infoln("Will reconfigure state.")
+
 						c.AppendArgs("-reconfigure")
 					}
 
 					if t.Pipe.Install.UseLockfile {
+						t.Log.Infoln("Using lockfile.")
+
 						c.AppendArgs("-lockfile=readonly")
 					}
 

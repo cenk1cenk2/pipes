@@ -22,7 +22,7 @@ type (
 	}
 
 	Config struct {
-		LogLevel string `validate:"oneof=trace debug info warn error"`
+		LogLevel string `validate:"omitempty,oneof=trace debug info warn error"`
 	}
 
 	Pipe struct {
