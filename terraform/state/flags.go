@@ -86,7 +86,7 @@ var Flags = []cli.Flag{
 		Name:        "terraform-state.gitlab-http.http-username",
 		Usage:       "State configuration for terraform: http-username",
 		Required:    false,
-		EnvVars:     []string{"TF_HTTP_USERNAME", "TF_USERNAME", "CI_DEPLOY_USER", "GITLAB_USER_LOGIN"},
+		EnvVars:     []string{"TF_HTTP_USERNAME", "TF_USERNAME"},
 		Value:       "gitlab-ci-token",
 		Destination: &TL.Pipe.GitlabHttpState.HttpUsername,
 	},
