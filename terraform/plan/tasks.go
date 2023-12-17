@@ -25,6 +25,7 @@ func TerraformPlan(tl *TaskList[Pipe]) *Task[Pipe] {
 					return nil
 				}).
 				SetDir(setup.TL.Pipe.Project.Cwd).
+				AppendEnvironment(setup.TL.Pipe.Ctx.EnvVars).
 				AddSelfToTheTask()
 
 			return nil
