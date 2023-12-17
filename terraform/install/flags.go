@@ -22,7 +22,7 @@ var Flags = []cli.Flag{
 		Usage:       "Use lockfile for terraform init.",
 		Required:    false,
 		EnvVars:     []string{"TF_INSTALL_USE_LOCKFILE"},
-		Value:       true,
+		Value:       false,
 		Destination: &TL.Pipe.Install.UseLockfile,
 	},
 
