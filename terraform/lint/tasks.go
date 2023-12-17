@@ -36,6 +36,7 @@ func TerraformFmtCheck(tl *TaskList[Pipe]) *Task[Pipe] {
 					return nil
 				}).
 				SetDir(setup.TL.Pipe.Project.Cwd).
+				AppendEnvironment(setup.TL.Pipe.Ctx.EnvVars).
 				AddSelfToTheTask()
 
 			return nil
@@ -63,6 +64,7 @@ func TerraformValidate(tl *TaskList[Pipe]) *Task[Pipe] {
 					return nil
 				}).
 				SetDir(setup.TL.Pipe.Project.Cwd).
+				AppendEnvironment(setup.TL.Pipe.Ctx.EnvVars).
 				AddSelfToTheTask()
 
 			return nil

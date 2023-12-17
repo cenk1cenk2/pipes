@@ -61,6 +61,10 @@ func GenerateTerraformEnvVars(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			t.Pipe.Ctx.EnvVars["TF_IN_AUTOMATION"] = "true"
 
+			t.Pipe.Ctx.EnvVars["TF_LOG"] = t.Pipe.Config.LogLevel
+
+			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", t.Pipe.Ctx.EnvVars)
+
 			return nil
 		})
 }

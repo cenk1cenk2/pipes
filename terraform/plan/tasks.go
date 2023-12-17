@@ -1,6 +1,8 @@
 package plan
 
 import (
+	"fmt"
+
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
@@ -15,7 +17,7 @@ func TerraformPlan(tl *TaskList[Pipe]) *Task[Pipe] {
 			).
 				Set(func(c *Command[Pipe]) error {
 					if t.Pipe.Plan.Output != "" {
-						c.AppendArgs(t.Pipe.Plan.Output)
+						c.AppendArgs(fmt.Sprintf("-out=%s", t.Pipe.Plan.Output))
 					}
 
 					if t.Pipe.Plan.Args != "" {

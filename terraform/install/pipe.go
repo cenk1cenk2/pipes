@@ -6,6 +6,7 @@ import (
 
 type (
 	Install struct {
+		UseLockfile bool
 		Reconfigure bool
 		Args        string
 	}

@@ -17,6 +17,15 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Install.Reconfigure,
 	},
 
+	&cli.BoolFlag{
+		Name:        "terraform-install.use-lockfile",
+		Usage:       "Use lockfile for terraform init.",
+		Required:    false,
+		EnvVars:     []string{"TF_INSTALL_USE_LOCKFILE"},
+		Value:       true,
+		Destination: &TL.Pipe.Install.UseLockfile,
+	},
+
 	&cli.StringFlag{
 		Name:        "terraform-install.args",
 		Usage:       "Additional arguments for terraform init.",

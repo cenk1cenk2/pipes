@@ -43,12 +43,13 @@ func main() {
 					{
 						Name:        "lint",
 						Description: "Lint terraform project with terraform.",
-						Flags:       p.AppendFlags(lint.Flags),
+						Flags:       p.AppendFlags(setup.Flags, lint.Flags),
 						Action: func(c *cli.Context) error {
 							tl := &lint.TL
 
 							return tl.RunJobs(
 								tl.JobSequence(
+									setup.New(p).SetCliContext(c).Job(),
 									lint.New(p).SetCliContext(c).Job(),
 								),
 							)

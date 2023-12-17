@@ -74,8 +74,11 @@ func GenerateTerraformEnvVarsGitlabState(tl *TaskList[Pipe]) *Task[Pipe] {
 				return fmt.Errorf("TF_HTTP_PASSWORD is required for state type: %s", t.Pipe.State.Type)
 			}
 			setup.TL.Pipe.Ctx.EnvVars["TF_HTTP_PASSWORD"] = t.Pipe.GitlabHttpState.HttpPassword
+			t.Plumber.AppendSecrets(t.Pipe.GitlabHttpState.HttpPassword)
 
 			setup.TL.Pipe.Ctx.EnvVars["TF_HTTP_RETRY_WAIT_MIN"] = t.Pipe.GitlabHttpState.HttpRetryWaitMin
+
+			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", setup.TL.Pipe.Ctx.EnvVars)
 
 			return nil
 		})

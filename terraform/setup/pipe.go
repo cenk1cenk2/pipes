@@ -21,10 +21,15 @@ type (
 		ApiUrl           string
 	}
 
+	Config struct {
+		LogLevel string `validate:"oneof=trace,debug,info,warn,error"`
+	}
+
 	Pipe struct {
 		Ctx
 
 		Project
+		Config
 		CiVariables
 	}
 )

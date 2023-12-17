@@ -18,6 +18,10 @@ func InitTerraform(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs("-reconfigure")
 					}
 
+					if t.Pipe.Install.UseLockfile {
+						c.AppendArgs("-lockfile=readonly")
+					}
+
 					if t.Pipe.Install.Args != "" {
 						c.AppendArgs(t.Pipe.Install.Args)
 					}

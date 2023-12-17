@@ -8,11 +8,23 @@ import (
 //revive:disable:line-length-limit
 
 const (
+	CATEGORY_CONFIG       = "Config"
 	CATEGORY_PROJECT      = "Project"
 	CATEGORY_CI_VARIABLES = "Injected Variables"
 )
 
 var Flags = []cli.Flag{
+	// CATEGORY_CONFIG
+	&cli.StringFlag{
+		Category:    CATEGORY_CONFIG,
+		Name:        "terraform-config.log-level",
+		Usage:       "Terraform log level.",
+		Required:    false,
+		EnvVars:     []string{"TF_LOG_LEVEL", "TF_LOG"},
+		Value:       "info",
+		Destination: &TL.Pipe.Config.LogLevel,
+	},
+
 	// CATEGORY_PROJECT
 
 	&cli.StringFlag{
