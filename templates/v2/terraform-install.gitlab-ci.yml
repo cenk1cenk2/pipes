@@ -4,7 +4,7 @@ variables:
   TF_VERSION: latest
   TF_ROOT: .
 
-.terraform-install:
+.tf-install:
   image: cenk1cenk2/pipe-terraform:${TF_VERSION}
   environment:
     name: $TF_STATE_NAME

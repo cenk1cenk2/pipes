@@ -7,7 +7,7 @@ variables:
   TF_STATE_NAME: default
   TF_PLAN_OUTPUT: plan
 
-.terraform-plan:
+.tf-plan:
   image: cenk1cenk2/pipe-terraform:${TF_VERSION}
   environment:
     name: $TF_STATE_NAME
