@@ -1,6 +1,11 @@
 # syntax=docker/dockerfile-upstream:master-labs
-FROM hashicorp/terraform:latest
+ARG TF_VERSION=latest
 
-COPY --chmod=777 ./dist/pipe /usr/bin/pipe
+FROM hashicorp/terraform:${TF_VERSION}
+
+ARG BUILDOS
+ARG BUILDARCH
+
+COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
 RUN pipe --help
