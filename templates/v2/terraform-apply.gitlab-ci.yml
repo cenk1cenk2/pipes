@@ -1,0 +1,19 @@
+---
+variables:
+  GITLAB_CI_ARCH: docker
+  TF_VERSION: latest
+  TF_ROOT: .
+  TF_STATE_TYPE: gitlab-http
+  TF_STATE_NAME: default
+  TF_PLAN_OUTPUT: plan
+
+.terraform-apply:
+  image: cenk1cenk2/pipe-terraform:${TF_VERSION}
+  environment:
+    name: $TF_STATE_NAME
+  script:
+    - pipe apply
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags:
+    - ${GITLAB_CI_ARCH}

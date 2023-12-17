@@ -85,6 +85,7 @@ docker-build-first_go:
 docker-manifest-first_go:
   extends: .docker-manifest-vanilla
   stage: first-manifest
+  dependencies: []
   parallel:
     matrix:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
@@ -122,15 +123,18 @@ build:
       - PIPE: gh-release-tracker
       - PIPE: node
       - PIPE: markdown-toc
-      - PIPE: update-docker-hub-readme
       - PIPE: semantic-release
       - PIPE: select-env
+      - PIPE: terraform
+      - PIPE: update-docker-hub-readme
 
 # to stop depending on itself
 
 docker-build-first_docker:
   extends: .docker-build-vanilla
   stage: pre-publish
+  dependencies:
+    - "build: [docker]"
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
@@ -140,8 +144,6 @@ docker-build-first_docker:
         GITLAB_CI_ARCH:
           - amd64
           - arm64
-  dependencies:
-    - build
   only:
     changes:
       - "common/**/*"
@@ -156,11 +158,11 @@ docker-build-first_docker:
 docker-manifest-first_docker:
   extends: .docker-manifest-vanilla
   stage: pre-manifest
+  dependencies: []
   variables:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
     DOCKER_IMAGE_TAGS: latest
     DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
-  dependencies: []
   only:
     changes:
       - "common/**/*"
@@ -367,6 +369,32 @@ docker-build_semantic-release:
       - main
       - tags
 
+docker-build_terraform:
+  extends: .docker-build-dockerhub
+  stage: publish
+  variables:
+    DOCKERFILE_CONTEXT: ./terraform
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-terraform
+    DOCKER_MANIFEST_TARGET: latest
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
+  dependencies:
+    - "build: [terraform]"
+  only:
+    changes:
+      - "common/**/*"
+      - "terraform/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
 docker-build_update-docker-hub-readme:
   extends: .docker-build-dockerhub
   stage: publish
@@ -404,6 +432,7 @@ docker-manifest:
     - docker-build_markdown-toc
     - docker-build_select-env
     - docker-build_semantic-release
+    - docker-build_terraform
     - docker-build_update-docker-hub-readme
   only:
     refs:
@@ -443,11 +472,6 @@ update-docker-hub-readme:
           "description": "Generates TOC for markdown files."
         },
         {
-          "repository": "cenk1cenk2/pipe-update-docker-hub-readme",
-          "file": "./update-docker-hub-readme/README.md",
-          "description": "Updates the README on DockerHub for given repository."
-        },
-        {
           "repository": "cenk1cenk2/pipe-semantic-release",
           "file": "./semantic-release/README.md",
           "description": "Semantic-Release embedded inside a container for CI jobs."
@@ -456,5 +480,15 @@ update-docker-hub-readme:
           "repository": "cenk1cenk2/pipe-select-env",
           "file": "./select-env/README.md",
           "description": "Selects an environment given on the conditions."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-terraform",
+          "file": "./terraform/README.md",
+          "description": "Terraform helper pipe."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-update-docker-hub-readme",
+          "file": "./update-docker-hub-readme/README.md",
+          "description": "Updates the README on DockerHub for given repository."
         }
       ]

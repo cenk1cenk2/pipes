@@ -1,0 +1,50 @@
+---
+stages:
+  - install
+  - build
+  - deploy
+
+include:
+  - project: devops/pipes
+    file: /templates/v2/terraform-install.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/v2/terraform-lint.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/v2/terraform-plan.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/v2/terraform-apply.gitlab-ci.yml
+
+tf-install:
+  stage: install
+  extends: .tf-install
+  needs: []
+
+tf-lint:
+  stage: build
+  extends: .tf-lint
+  needs:
+    - tf-install
+  dependencies:
+    - tf-install
+
+tf-plan:
+  stage: build
+  extends: .tf-plan
+  needs:
+    - tf-install
+  dependencies:
+    - tf-install
+
+tf-apply:
+  stage: deploy
+  extends: .tf-apply
+  needs:
+    - tf-install
+    - tf-build
+    - tf-lint
+  dependencies:
+    - tf-install
+    - tf-build
