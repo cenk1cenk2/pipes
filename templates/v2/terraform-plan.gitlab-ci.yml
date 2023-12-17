@@ -1,0 +1,26 @@
+---
+variables:
+  GITLAB_CI_ARCH: docker
+  TF_VERSION: latest
+  TF_ROOT: .
+  TF_STATE_TYPE: gitlab-http
+  TF_STATE_NAME: default
+  TF_PLAN_OUTPUT: plan
+
+.terraform-plan:
+  image: cenk1cenk2/pipe-terraform:${TF_VERSION}
+  environment:
+    name: $TF_STATE_NAME
+  script:
+    - pipe plan
+  artifacts:
+    paths:
+      - "${TF_ROOT}/${TF_PLAN_OUTPUT}"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_OPEN_MERGE_REQUESTS # Don't add it to a *branch* pipeline if it's already in a merge request pipeline.
+      when: never
+    - if: $CI_COMMIT_BRANCH # If there's no open merge request, add it to a *branch* pipeline instead.
+    - if: $CI_COMMIT_TAG
+  tags:
+    - ${GITLAB_CI_ARCH}

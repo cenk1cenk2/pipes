@@ -30,6 +30,9 @@ includes:
   semantic-release:
     dir: ./semantic-release
     taskfile: ./Taskfile.pipe.yml
+  terraform:
+    dir: ./terraform
+    taskfile: ./Taskfile.pipe.yml
   update-docker-hub-readme:
     dir: ./update-docker-hub-readme
     taskfile: ./Taskfile.pipe.yml
@@ -81,6 +84,7 @@ tasks:
       - task: "node:{{ .command }}"
       - task: "select-env:{{ .command }}"
       - task: "semantic-release:{{ .command }}"
+      - task: "terraform:{{ .command }}"
       - task: "update-docker-hub-readme:{{ .command }}"
 
   build:
