@@ -9,7 +9,7 @@ require (
 	github.com/google/go-github/v57 v57.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-	github.com/urfave/cli/v2 v2.26.0
+	github.com/urfave/cli/v2 v2.27.0
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.2
 	gitlab.kilic.dev/libraries/plumber/v5 v5.4.2
 	golang.org/x/oauth2 v0.15.0
