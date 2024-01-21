@@ -11,6 +11,13 @@ import (
 
 func GenerateTerraformEnvVarsState(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("state").
+		Set(func(t *Task[Pipe]) error {
+			if t.Pipe.State.Strict && t.Pipe.State.Type == "" {
+				return fmt.Errorf("State has to be setup when in strict mode.")
+			}
+
+			return nil
+		}).
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
 			return t.TL.JobParallel(
 				job,
@@ -22,7 +29,7 @@ func GenerateTerraformEnvVarsState(tl *TaskList[Pipe]) *Task[Pipe] {
 func GenerateTerraformEnvVarsGitlabState(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("state", "gitlab-http").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.State.Type != "gitlab-http"
+			return t.Pipe.State.Type != TF_STATE_TYPE_GITLAB_HTTP
 		}).
 		Set(func(t *Task[Pipe]) error {
 			if t.Pipe.GitlabHttpState.HttpAddress == "" {

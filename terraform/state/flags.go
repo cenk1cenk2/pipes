@@ -18,7 +18,7 @@ var Flags = []cli.Flag{
 		Category:    CATEGORY_STATE,
 		Name:        "terraform-state.type",
 		Usage:       `Terraform state type. enum("gitlab-http")`,
-		Required:    true,
+		Required:    false,
 		EnvVars:     []string{"TF_STATE_TYPE"},
 		Value:       "",
 		Destination: &TL.Pipe.State.Type,
@@ -28,10 +28,20 @@ var Flags = []cli.Flag{
 		Category:    CATEGORY_STATE,
 		Name:        "terraform-state.name",
 		Usage:       "Terraform state name.",
-		Required:    true,
+		Required:    false,
 		EnvVars:     []string{"TF_STATE_NAME"},
-		Value:       "",
+		Value:       "default",
 		Destination: &TL.Pipe.State.Name,
+	},
+
+	&cli.BoolFlag{
+		Category:    CATEGORY_STATE,
+		Name:        "terraform-state.strict",
+		Usage:       "Terraform state strict.",
+		Required:    true,
+		EnvVars:     []string{"TF_STATE_STRICT"},
+		Value:       false,
+		Destination: &TL.Pipe.State.Strict,
 	},
 
 	// gitlab http state

@@ -1,7 +1,7 @@
 ---
 stages:
   - install
- # - lint
+  - lint
   - version
   - publish
 
@@ -9,8 +9,8 @@ include:
   - project: devops/pipes
     file: /templates/v2/terraform-install.gitlab-ci.yml
 
-  #- project: devops/pipes
-  #  file: /templates/v2/terraform-lint.gitlab-ci.yml
+  - project: devops/pipes
+    file: /templates/v2/terraform-lint.gitlab-ci.yml
 
   - project: devops/pipes
     file: /templates/v2/semantic-release.gitlab-ci.yml
@@ -22,11 +22,11 @@ tf-install:
   stage: install
   extends: .tf-install
 
-#tf-lint:
-  #stage: lint
-  #extends: .tf-lint
-  #dependencies:
-   # - tf-install
+tf-lint:
+  stage: lint
+  extends: .tf-lint
+  dependencies:
+    - tf-install
 
 semantic-release:
   stage: version

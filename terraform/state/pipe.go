@@ -6,8 +6,9 @@ import (
 
 type (
 	State struct {
-		Type string `validate:"oneof=gitlab-http"`
-		Name string
+		Type   string `validate:"oneof=gitlab-http"`
+		Name   string
+		Strict bool
 	}
 
 	Credentials struct {

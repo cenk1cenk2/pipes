@@ -22,7 +22,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
 	flags.TagsFileFlagsSetup{
 		TagsFileDestination: &TL.Pipe.Module.TagsFile,
 		TagsFileRequired:    true,
-		TagsFileValue: ".tags",
+		TagsFileValue:       ".tags",
 	},
 ), []cli.Flag{
 	// CATEGORY_MODULE

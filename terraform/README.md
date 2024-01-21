@@ -141,8 +141,9 @@ Plan terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `true` |  |
-| `$TF_STATE_NAME` | Terraform state name. | `String` | `true` |  |
+| `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `false` |  |
+| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` |  |
+| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `true` | false |
 | `$TF_HTTP_ADDRESS`<br/>`$TF_ADDRESS` | State configuration for terraform: http-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `String` | `false` | POST |
@@ -196,8 +197,9 @@ Apply terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `true` |  |
-| `$TF_STATE_NAME` | Terraform state name. | `String` | `true` |  |
+| `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `false` |  |
+| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` |  |
+| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `true` | false |
 | `$TF_HTTP_ADDRESS`<br/>`$TF_ADDRESS` | State configuration for terraform: http-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `String` | `false` | POST |
@@ -241,4 +243,4 @@ Publish terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TAGS_FILE` | Read tags from a file. | `String` | `true` |  |
+| `$TAGS_FILE` | Read tags from a file. | `String` | `true` | .tags |
