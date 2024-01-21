@@ -21,22 +21,20 @@ include:
 tf-install:
   stage: install
   extends: .tf-install
-  needs: []
 
 tf-lint:
   stage: lint
   extends: .tf-lint
-  needs:
-    - tf-install
   dependencies:
     - tf-install
 
 semantic-release:
   stage: version
   extends: .semantic-release
-  needs: []
+  dependencies: []
 
 tf-publish:
   stage: publish
   extends: .tf-publish
-  needs: []
+  dependencies:
+    - semantic-release

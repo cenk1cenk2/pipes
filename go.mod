@@ -9,9 +9,11 @@ require (
 	github.com/google/go-github/v57 v57.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
+	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli/v2 v2.27.1
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.2
 	gitlab.kilic.dev/libraries/plumber/v5 v5.4.9
+	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
 	golang.org/x/oauth2 v0.16.0
 )
 
@@ -30,12 +32,10 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	gitlab.kilic.dev/libraries/go-broadcaster v1.1.2 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
