@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 		Category:    CATEGORY_STATE,
 		Name:        "terraform-state.strict",
 		Usage:       "Terraform state strict.",
-		Required:    true,
+		Required:    false,
 		EnvVars:     []string{"TF_STATE_STRICT"},
 		Value:       false,
 		Destination: &TL.Pipe.State.Strict,
