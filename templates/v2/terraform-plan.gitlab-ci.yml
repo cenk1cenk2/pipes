@@ -9,8 +9,6 @@ variables:
 
 .tf-plan:
   image: cenk1cenk2/pipe-terraform:${TF_VERSION}
-  environment:
-    name: $TF_STATE_NAME
   script:
     - pipe plan
   artifacts:

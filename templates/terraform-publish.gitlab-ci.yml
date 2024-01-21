@@ -20,16 +20,12 @@ include:
 
 tf-install:
   stage: install
-  variables:
-    TF_ROOT: $TF_MODULE_CWD
   extends: .tf-install
   needs: []
 
 tf-lint:
   stage: lint
   extends: .tf-lint
-  variables:
-    TF_ROOT: $TF_MODULE_CWD
   needs:
     - tf-install
   dependencies:

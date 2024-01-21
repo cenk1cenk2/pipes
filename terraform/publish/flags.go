@@ -41,7 +41,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
 		Name:        "terraform-module.cwd",
 		Usage:       "Directory for the module that will be published.",
 		Required:    false,
-		EnvVars:     []string{"TF_MODULE_CWD"},
+		EnvVars:     []string{"TF_MODULE_CWD", "TF_ROOT"},
 		Value:       ".",
 		Destination: &TL.Pipe.Module.Cwd,
 	},
