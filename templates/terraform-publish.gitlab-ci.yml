@@ -1,0 +1,29 @@
+---
+stages:
+  - lint
+  - build
+  - publish
+
+include:
+  - project: devops/pipes
+    file: /templates/v2/terraform-lint.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/v2/semantic-release.gitlab-ci.yml
+
+  - project: devops/pipes
+    file: /templates/v2/terraform-publish.gitlab-ci.yml
+
+tf-lint:
+  stage: lint
+  extends: .tf-lint
+  variables:
+    TF_ROOT: $TF_MODULE_CWD
+
+semantic-release:
+  stage: build
+  extends: .semantic-release
+
+tf-publish:
+  stage: publish
+  extends: .tf-publish

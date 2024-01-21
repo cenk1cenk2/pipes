@@ -8,6 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/lint"
 	"gitlab.kilic.dev/devops/pipes/terraform/login"
 	"gitlab.kilic.dev/devops/pipes/terraform/plan"
+	"gitlab.kilic.dev/devops/pipes/terraform/publish"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
@@ -87,6 +88,21 @@ func main() {
 									login.New(p).SetCliContext(c).Job(),
 									state.New(p).SetCliContext(c).Job(),
 									apply.New(p).SetCliContext(c).Job(),
+								),
+							)
+						},
+					},
+
+					{
+						Name:        "publish",
+						Description: "Publish terraform project.",
+						Flags:       p.AppendFlags(publish.Flags),
+						Action: func(c *cli.Context) error {
+							tl := &publish.TL
+
+							return tl.RunJobs(
+								tl.JobSequence(
+									publish.New(p).SetCliContext(c).Job(),
 								),
 							)
 						},

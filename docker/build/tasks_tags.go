@@ -2,12 +2,12 @@ package build
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
+	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
@@ -104,44 +104,20 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			// add tags through tags file
-			if _, err := os.Stat(t.Pipe.DockerImage.TagsFile); err == nil {
-				t.Log.Infof(
-					"Tags file exists: %s",
-					t.Pipe.DockerImage.TagsFile,
-				)
+			tags, err := parser.ParseTagsFile(t.Log, t.Pipe.DockerImage.TagsFile, t.Pipe.DockerImage.TagsFileStrict)
 
-				content, err := os.ReadFile(t.Pipe.DockerImage.TagsFile)
-				if err != nil {
-					return err
-				}
+			if err != nil {
+				return err
+			}
 
-				tags := strings.Split(string(content), ",")
-
-				t.Pipe.Ctx.Tags = []string{}
-
-				re := regexp.MustCompile(`\r?\n`)
-
-				for _, v := range tags {
-					func(v string) {
-						t.CreateSubtask(v).
-							Set(func(t *Task[Pipe]) error {
-								return AddDockerTag(t, re.ReplaceAllString(v, ""))
-							}).
-							AddSelfToTheParentAsParallel()
-					}(v)
-				}
-			} else if errors.Is(err, os.ErrNotExist) && t.Pipe.DockerImage.TagsFile != "" {
-				if t.Pipe.DockerImage.TagsFileStrict {
-					t.Log.Warnf("Tags file is set but it does not exists: %s", t.Pipe.DockerImage.TagsFile)
-
-					t.SendExit(0)
-
-					return nil
-				}
-
-				return nil
-			} else {
-				return fmt.Errorf("Can not read the tags file: %s", t.Pipe.DockerImage.TagsFile)
+			for _, v := range tags {
+				func(v string) {
+					t.CreateSubtask(v).
+						Set(func(t *Task[Pipe]) error {
+							return AddDockerTag(t, v)
+						}).
+						AddSelfToTheParentAsParallel()
+				}(v)
 			}
 
 			return nil
