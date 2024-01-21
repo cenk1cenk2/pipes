@@ -33,7 +33,7 @@ func TerraformTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformPackage(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("package").
+	return tl.CreateTask("package", tl.Pipe.Module.Name, tl.Pipe.Module.System).
 		Set(func(t *Task[Pipe]) error {
 			for _, tag := range t.Pipe.Ctx.Tags {
 				func(tag string) {
@@ -93,7 +93,7 @@ func TerraformPublish(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformPublishGitlab(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask(TF_REGISTRY_GITLAB, tl.Pipe.Module.Name, tl.Pipe.Module.System).
+	return tl.CreateTask("publish", TF_REGISTRY_GITLAB, tl.Pipe.Module.Name, tl.Pipe.Module.System).
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return t.Pipe.Registry.Name != TF_REGISTRY_GITLAB
 		}).
@@ -143,7 +143,9 @@ func TerraformPublishGitlab(tl *TaskList[Pipe]) *Task[Pipe] {
 								return err
 							}
 
-							if res.StatusCode == http.StatusOK {
+							if res.StatusCode == http.StatusCreated {
+								t.Log.Infof("Package has been published: %s@%s", t.Pipe.Module.Name, p.Tag)
+
 								t.Log.Debugln(string(body))
 							} else {
 								t.Log.Warnln(string(body))
