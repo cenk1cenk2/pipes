@@ -1,10 +1,14 @@
 ---
 stages:
+  - install
   - lint
-  - build
+  - version
   - publish
 
 include:
+  - project: devops/pipes
+    file: /templates/v2/terraform-install.gitlab-ci.yml
+
   - project: devops/pipes
     file: /templates/v2/terraform-lint.gitlab-ci.yml
 
@@ -14,16 +18,29 @@ include:
   - project: devops/pipes
     file: /templates/v2/terraform-publish.gitlab-ci.yml
 
+tf-install:
+  stage: install
+  variables:
+    TF_ROOT: $TF_MODULE_CWD
+  extends: .tf-install
+  needs: []
+
 tf-lint:
   stage: lint
   extends: .tf-lint
   variables:
     TF_ROOT: $TF_MODULE_CWD
+  needs:
+    - tf-install
+  dependencies:
+    - tf-install
 
 semantic-release:
-  stage: build
+  stage: version
   extends: .semantic-release
+  needs: []
 
 tf-publish:
   stage: publish
   extends: .tf-publish
+  needs: []
