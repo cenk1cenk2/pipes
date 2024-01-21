@@ -26,7 +26,7 @@ func main() {
 					{
 						Name:        "install",
 						Description: "Install terraform project.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags, state.Flags, install.Flags),
+						Flags:       p.AppendFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(c *cli.Context) error {
 							tl := &install.TL
 
@@ -34,7 +34,6 @@ func main() {
 								tl.JobSequence(
 									setup.New(p).SetCliContext(c).Job(),
 									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
 									install.New(p).SetCliContext(c).Job(),
 								),
 							)
