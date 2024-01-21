@@ -6,7 +6,7 @@ import (
 
 type (
 	State struct {
-		Type   string `validate:"oneof=gitlab-http"`
+		Type   string `validate:"omitempty,oneof=gitlab-http"`
 		Name   string
 		Strict bool
 	}
