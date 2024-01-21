@@ -27,14 +27,14 @@ Install terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `String`<br/>`json([]struct { registry: string, token: string })` | `false` |  |
 | `$TF_INSTALL_RECONFIGURE` | Reconfigure flag for terraform init. | `Bool` | `false` | false |
-| `$TF_INSTALL_USE_LOCKFILE` | Use lockfile for terraform init. | `Bool` | `false` | true |
+| `$TF_INSTALL_USE_LOCKFILE` | Use lockfile for terraform init. | `Bool` | `false` | false |
 | `$TF_INSTALL_ARGS` | Additional arguments for terraform init. | `String` | `false` |  |
 
 ##### Config
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | info |
+| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
 ##### Injected Variables
 
@@ -56,21 +56,6 @@ Install terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
 
-##### State
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `true` |  |
-| `$TF_STATE_NAME` | Terraform state name. | `String` | `true` |  |
-| `$TF_HTTP_ADDRESS`<br/>`$TF_ADDRESS` | State configuration for terraform: http-address | `String` | `false` |  |
-| `$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `String` | `false` |  |
-| `$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `String` | `false` | POST |
-| `$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `String` | `false` |  |
-| `$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `String` | `false` | DELETE |
-| `$TF_HTTP_USERNAME`<br/>`$TF_USERNAME` | State configuration for terraform: http-username | `String` | `false` | gitlab-ci-token |
-| `$TF_HTTP_PASSWORD`<br/>`$TF_PASSWORD`<br/>`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `String` | `false` |  |
-| `$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `String` | `false` | 5 |
-
 ### `lint`
 
 Lint terraform project with terraform.
@@ -90,7 +75,7 @@ Lint terraform project with terraform.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | info |
+| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
 ##### Injected Variables
 
@@ -130,7 +115,7 @@ Plan terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | info |
+| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
 ##### Injected Variables
 
@@ -185,7 +170,7 @@ Apply terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | info |
+| `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
 ##### Injected Variables
 
@@ -221,3 +206,39 @@ Apply terraform project.
 | `$TF_HTTP_USERNAME`<br/>`$TF_USERNAME` | State configuration for terraform: http-username | `String` | `false` | gitlab-ci-token |
 | `$TF_HTTP_PASSWORD`<br/>`$TF_PASSWORD`<br/>`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `String` | `false` |  |
 | `$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `String` | `false` | 5 |
+
+### `publish`
+
+Publish terraform project.
+
+`pipe-terraform publish [GLOBAL FLAGS] [FLAGS]`
+
+#### Flags
+
+##### Module
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_MODULE_NAME`<br/>`$CI_PROJECT_NAME` | Name for the module that will be published. | `String` | `true` |  |
+| `$TF_MODULE_CWD`<br/>`$TF_ROOT` | Directory for the module that will be published. | `String` | `false` | . |
+| `$TF_MODULE_SYSTEM` | Module system for the module that will be published. | `String` | `false` | local |
+
+##### Registry
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_MODULE_REGISTRY` | Registry of the module that will be published. | `String` | `false` | gitlab |
+
+##### Registry - Gitlab
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$CI_API_V4_URL` | Gitlab API URL for publish call. | `String` | `false` |  |
+| `$CI_PROJECT_ID` | Gitlab project id for publish call. | `String` | `false` |  |
+| `$CI_JOB_TOKEN` | Gitlab API token for publish call. | `String` | `false` |  |
+
+##### Tags File
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TAGS_FILE` | Read tags from a file. | `String` | `true` |  |
