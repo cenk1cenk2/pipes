@@ -9,8 +9,8 @@ include:
   - project: devops/pipes
     file: /templates/v2/terraform-install.gitlab-ci.yml
 
-  - project: devops/pipes
-    file: /templates/v2/terraform-lint.gitlab-ci.yml
+  #- project: devops/pipes
+  #  file: /templates/v2/terraform-lint.gitlab-ci.yml
 
   - project: devops/pipes
     file: /templates/v2/semantic-release.gitlab-ci.yml
