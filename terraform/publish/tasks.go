@@ -118,6 +118,7 @@ func TerraformPublishGitlab(tl *TaskList[Pipe]) *Task[Pipe] {
 							}
 
 							req.Header.Set("Content-Type", "application/tar+gzip")
+							req.Header.Set("JOB-TOKEN", t.Pipe.Registry.Gitlab.Token)
 
 							client := &http.Client{}
 
