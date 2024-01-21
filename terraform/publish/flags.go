@@ -21,7 +21,7 @@ const (
 var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
 	flags.TagsFileFlagsSetup{
 		TagsFileDestination: &TL.Pipe.Module.TagsFile,
-		TagsFileRequired:    true,
+		TagsFileRequired:    false,
 		TagsFileValue:       ".tags",
 	},
 ), []cli.Flag{
