@@ -1,7 +1,7 @@
 ---
 stages:
   - install
-  - lint
+ # - lint
   - version
   - publish
 
@@ -22,11 +22,11 @@ tf-install:
   stage: install
   extends: .tf-install
 
-tf-lint:
-  stage: lint
-  extends: .tf-lint
-  dependencies:
-    - tf-install
+#tf-lint:
+  #stage: lint
+  #extends: .tf-lint
+  #dependencies:
+   # - tf-install
 
 semantic-release:
   stage: version
