@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"regexp"
 	"strings"
 
@@ -104,7 +105,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			// add tags through tags file
-			tags, err := parser.ParseTagsFile(t.Log, t.Pipe.DockerImage.TagsFile, t.Pipe.DockerImage.TagsFileStrict)
+			tags, err := parser.ParseTagsFile(t.Log, path.Join(t.Pipe.DockerFile.Context, t.Pipe.DockerImage.TagsFile), t.Pipe.DockerImage.TagsFileStrict)
 
 			if err != nil {
 				return err

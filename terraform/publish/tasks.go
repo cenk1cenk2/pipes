@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 
 	"gitlab.kilic.dev/devops/pipes/common/parser"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
@@ -13,13 +14,19 @@ import (
 func TerraformTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags").
 		Set(func(t *Task[Pipe]) error {
-			tags, err := parser.ParseTagsFile(t.Log, t.Pipe.Module.TagsFile, true)
+			tags, err := parser.ParseTagsFile(t.Log, path.Join(t.Pipe.Module.Cwd, t.Pipe.Module.TagsFile), false)
 
 			if err != nil {
 				return err
 			}
 
 			t.Pipe.Ctx.Tags = tags
+
+			if len(t.Pipe.Ctx.Tags) > 0 {
+				t.Log.Infof("Tags file has been parsed: %+v", t.Pipe.Ctx.Tags)
+			} else {
+				t.Log.Warnln("Tags file does not contain any tags, doing nothing.")
+			}
 
 			return nil
 		})
