@@ -6,7 +6,7 @@ import (
 )
 
 func TerraformInstall(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("install").
+	return tl.CreateTask().
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
 			return tl.JobParallel(
 				TerraformInstallCwd(tl).Job(),
@@ -16,7 +16,7 @@ func TerraformInstall(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformInstallCwd(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask(setup.TL.Pipe.Cwd).
+	return tl.CreateTask("install", setup.TL.Pipe.Cwd).
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(setup.TL.Pipe.Project.Workspaces) > 0
 		}).
@@ -29,7 +29,7 @@ func TerraformInstallCwd(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformInstallWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask().
+	return tl.CreateTask("install").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(setup.TL.Pipe.Project.Workspaces) == 0
 		}).

@@ -6,7 +6,7 @@ import (
 )
 
 func TerraformLint(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("parent").
+	return tl.CreateTask().
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
 			return t.TL.JobParallel(
 				TerraformFmtCheck(t.TL).Job(),
@@ -16,7 +16,7 @@ func TerraformLint(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformFmtCheck(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("fmt", "check").
+	return tl.CreateTask().
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Lint.FormatCheckEnable
 		}).
@@ -29,7 +29,7 @@ func TerraformFmtCheck(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformFmtCheckCwd(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask(setup.TL.Pipe.Cwd).
+	return tl.CreateTask("fmt", "check", setup.TL.Pipe.Cwd).
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(setup.TL.Pipe.Project.Workspaces) > 0
 		}).
@@ -42,7 +42,7 @@ func TerraformFmtCheckCwd(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformFmtCheckWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask().
+	return tl.CreateTask("fmt", "check").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(setup.TL.Pipe.Project.Workspaces) == 0
 		}).
@@ -68,7 +68,7 @@ func TerraformFmtCheckWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformValidate(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("validate").
+	return tl.CreateTask().
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return !t.Pipe.Lint.ValidateEnable
 		}).
@@ -81,7 +81,7 @@ func TerraformValidate(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformValidateCwd(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask(setup.TL.Pipe.Cwd).
+	return tl.CreateTask("validate", setup.TL.Pipe.Cwd).
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(setup.TL.Pipe.Project.Workspaces) > 0
 		}).
@@ -94,7 +94,7 @@ func TerraformValidateCwd(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 func TerraformValidateWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("workspace").
+	return tl.CreateTask("validate").
 		ShouldDisable(func(t *Task[Pipe]) bool {
 			return len(setup.TL.Pipe.Project.Workspaces) == 0
 		}).
