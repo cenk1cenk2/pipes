@@ -44,41 +44,44 @@ func Version(tl *TaskList[Pipe]) *Task[Pipe] {
 
 func DiscoverWorkspaces(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("workspaces").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.Project.Workspaces) == 0
-		}).
 		Set(func(t *Task[Pipe]) error {
-			fs := os.DirFS(t.Pipe.Project.Cwd)
+			if len(t.Pipe.Project.Workspaces) > 0 {
+				fs := os.DirFS(t.Pipe.Project.Cwd)
 
-			t.Log.Debugf(
-				"Trying to match patterns: %s",
-				strings.Join(t.Pipe.Project.Workspaces, ", "),
-			)
-
-			matches := []string{}
-
-			for _, v := range t.Pipe.Project.Workspaces {
-				match, err := glob.Glob(fs, v)
-
-				if err != nil {
-					return err
-				}
-
-				matches = append(matches, match...)
-			}
-
-			if len(matches) == 0 {
-				return fmt.Errorf(
-					"Can not match any files with the given pattern: %s",
+				t.Log.Debugf(
+					"Trying to match patterns: %s",
 					strings.Join(t.Pipe.Project.Workspaces, ", "),
 				)
+
+				matches := []string{}
+
+				for _, v := range t.Pipe.Project.Workspaces {
+					match, err := glob.Glob(fs, v)
+
+					if err != nil {
+						return err
+					}
+
+					matches = append(matches, match...)
+				}
+
+				if len(matches) == 0 {
+					return fmt.Errorf(
+						"Can not match any files with the given pattern: %s",
+						strings.Join(t.Pipe.Project.Workspaces, ", "),
+					)
+				}
+
+				matches = utils.RemoveDuplicateStr(matches)
+
+				t.Log.Infof("Paths matched for given pattern as workspace: %s", strings.Join(matches, ", "))
+
+				t.Pipe.Project.Workspaces = matches
+			} else {
+				t.Pipe.Project.Workspaces = []string{t.Pipe.Project.Cwd}
+
+				t.Log.Debugln("Using project root as workspace since there is no defined.")
 			}
-
-			matches = utils.RemoveDuplicateStr(matches)
-
-			t.Log.Infof("Paths matched for given pattern as workspace: %s", strings.Join(matches, ", "))
-
-			t.Pipe.Project.Workspaces = matches
 
 			return nil
 		})
