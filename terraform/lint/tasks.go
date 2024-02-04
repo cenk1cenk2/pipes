@@ -53,6 +53,9 @@ func TerraformFmtCheckWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
 						Set(func(t *Task[Pipe]) error {
 							return createFmtCheckCommand(t, ws)
 						}).
+						ShouldRunAfter(func(t *Task[Pipe]) error {
+							return t.RunCommandJobAsJobSequence()
+						}).
 						AddSelfToTheParentAsParallel()
 				}(ws)
 			}
@@ -101,6 +104,9 @@ func TerraformValidateWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
 					t.CreateSubtask(ws).
 						Set(func(t *Task[Pipe]) error {
 							return createValidateCommand(t, ws)
+						}).
+						ShouldRunAfter(func(t *Task[Pipe]) error {
+							return t.RunCommandJobAsJobSequence()
 						}).
 						AddSelfToTheParentAsParallel()
 				}(ws)

@@ -40,6 +40,9 @@ func TerraformInstallWorkspace(tl *TaskList[Pipe]) *Task[Pipe] {
 						Set(func(t *Task[Pipe]) error {
 							return createInstallCmd(t, ws)
 						}).
+						ShouldRunAfter(func(t *Task[Pipe]) error {
+							return t.RunCommandJobAsJobSequence()
+						}).
 						AddSelfToTheParentAsParallel()
 				}(ws)
 			}
