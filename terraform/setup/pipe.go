@@ -7,7 +7,7 @@ import (
 type (
 	Project struct {
 		Cwd        string   `validate:"omitempty,dir"`
-		Workspaces []string `validate:"omitempty,dive,dir"`
+		Workspaces []string `validate:"omitempty"`
 	}
 
 	CiVariables struct {
