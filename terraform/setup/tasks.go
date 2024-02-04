@@ -1,20 +1,15 @@
 package setup
 
 import (
+	"fmt"
+	"os"
 	"regexp"
 	"strings"
 
+	glob "github.com/bmatcuk/doublestar/v4"
+	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
-
-func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("init").
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.EnvVars = make(map[string]string)
-
-			return nil
-		})
-}
 
 func Version(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("version").
@@ -44,6 +39,48 @@ func Version(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		ShouldRunAfter(func(t *Task[Pipe]) error {
 			return t.RunCommandJobAsJobSequence()
+		})
+}
+
+func DiscoverWorkspaces(tl *TaskList[Pipe]) *Task[Pipe] {
+	return tl.CreateTask("workspaces").
+		ShouldDisable(func(t *Task[Pipe]) bool {
+			return len(t.Pipe.Project.Workspaces) == 0
+		}).
+		Set(func(t *Task[Pipe]) error {
+			fs := os.DirFS(t.Pipe.Project.Cwd)
+
+			t.Log.Debugf(
+				"Trying to match patterns: %s",
+				strings.Join(t.Pipe.Project.Workspaces, ", "),
+			)
+
+			matches := []string{}
+
+			for _, v := range t.Pipe.Project.Workspaces {
+				match, err := glob.Glob(fs, v)
+
+				if err != nil {
+					return err
+				}
+
+				matches = append(matches, match...)
+			}
+
+			if len(matches) == 0 {
+				return fmt.Errorf(
+					"Can not match any files with the given pattern: %s",
+					strings.Join(t.Pipe.Project.Workspaces, ", "),
+				)
+			}
+
+			matches = utils.RemoveDuplicateStr(matches)
+
+			t.Log.Infof("Paths matched for given pattern as workspace: %s", strings.Join(matches, ", "))
+
+			t.Pipe.Project.Workspaces = matches
+
+			return nil
 		})
 }
 

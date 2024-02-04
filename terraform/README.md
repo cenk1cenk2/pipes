@@ -55,6 +55,23 @@ Install terraform project.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
+| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
+
+##### State
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `false` |  |
+| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` | default |
+| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `false` | false |
+| `$TF_HTTP_ADDRESS`<br/>`$TF_ADDRESS` | State configuration for terraform: http-address | `String` | `false` |  |
+| `$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `String` | `false` |  |
+| `$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `String` | `false` | POST |
+| `$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `String` | `false` |  |
+| `$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `String` | `false` | DELETE |
+| `$TF_HTTP_USERNAME`<br/>`$TF_USERNAME` | State configuration for terraform: http-username | `String` | `false` | gitlab-ci-token |
+| `$TF_HTTP_PASSWORD`<br/>`$TF_PASSWORD`<br/>`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `String` | `false` |  |
+| `$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `String` | `false` | 5 |
 
 ### `lint`
 
@@ -96,6 +113,7 @@ Lint terraform project with terraform.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
+| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
 
 ### `plan`
 
@@ -136,14 +154,15 @@ Plan terraform project.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
+| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
 
 ##### State
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `false` |  |
-| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` |  |
-| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `true` | false |
+| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` | default |
+| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `false` | false |
 | `$TF_HTTP_ADDRESS`<br/>`$TF_ADDRESS` | State configuration for terraform: http-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `String` | `false` | POST |
@@ -192,14 +211,15 @@ Apply terraform project.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
+| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
 
 ##### State
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_STATE_TYPE` | Terraform state type. | `String`<br/>`enum("gitlab-http")` | `false` |  |
-| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` |  |
-| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `true` | false |
+| `$TF_STATE_NAME` | Terraform state name. | `String` | `false` | default |
+| `$TF_STATE_STRICT` | Terraform state strict. | `Bool` | `false` | false |
 | `$TF_HTTP_ADDRESS`<br/>`$TF_ADDRESS` | State configuration for terraform: http-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `String` | `false` |  |
 | `$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `String` | `false` | POST |
@@ -243,4 +263,4 @@ Publish terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TAGS_FILE` | Read tags from a file. | `String` | `true` | .tags |
+| `$TAGS_FILE` | Read tags from a file. | `String` | `false` | .tags |

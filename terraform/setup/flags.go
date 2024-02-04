@@ -37,6 +37,14 @@ var Flags = []cli.Flag{
 		Destination: &TL.Pipe.Project.Cwd,
 	},
 
+	&cli.StringSliceFlag{
+		Category: CATEGORY_PROJECT,
+		Name:     "terraform-project.workspaces",
+		Usage:    "Workspaces that this command will be executed on.",
+		Required: false,
+		EnvVars:  []string{"TF_WORKSPACES"},
+	},
+
 	// CATEGORY_CI_VARIABLES
 
 	&cli.StringFlag{
@@ -124,5 +132,9 @@ var Flags = []cli.Flag{
 
 //revive:disable:unused-parameter
 func ProcessFlags(tl *TaskList[Pipe]) error {
+	tl.Pipe.Project.Workspaces = tl.CliContext.StringSlice("terraform-project.workspaces")
+
+	tl.Pipe.Ctx.EnvVars = make(map[string]string)
+
 	return nil
 }

@@ -28,7 +28,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
-				InitTerraform(tl).Job(),
+				TerraformInstall(tl).Job(),
 			)
 		})
 }

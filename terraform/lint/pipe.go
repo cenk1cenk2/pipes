@@ -29,7 +29,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
-				LintTerraform(tl).Job(),
+				TerraformLint(tl).Job(),
 			)
 		})
 }
