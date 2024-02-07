@@ -69,49 +69,47 @@ func RunMarkdownToc(tl *TaskList[Pipe]) *Task[Pipe] {
 			t.Log.Debugf("Using expression: %s", expr)
 
 			for _, match := range t.Pipe.Ctx.Matches {
-				func(match string) {
-					t.CreateSubtask(match).
-						Set(func(t *Task[Pipe]) error {
-							parser := toc.NewGHDoc(match, false, t.Pipe.Markdown.StartDepth, t.Pipe.Markdown.EndDepth, false, "", t.Pipe.Markdown.Indentation, false)
+				t.CreateSubtask(match).
+					Set(func(t *Task[Pipe]) error {
+						parser := toc.NewGHDoc(match, false, t.Pipe.Markdown.StartDepth, t.Pipe.Markdown.EndDepth, false, "", t.Pipe.Markdown.Indentation, false)
 
-							p := parser.GetToc()
+						p := parser.GetToc()
 
-							var b bytes.Buffer
+						var b bytes.Buffer
 
-							p.Print(&b)
+						p.Print(&b)
 
-							s := b.String()
+						s := b.String()
 
-							marker := regexp.MustCompile(`(?m)^(\s+)?\*`)
+						marker := regexp.MustCompile(`(?m)^(\s+)?\*`)
 
-							s = marker.ReplaceAllString(s, fmt.Sprintf(`$1%s`, t.Pipe.Markdown.ListIdentifier))
+						s = marker.ReplaceAllString(s, fmt.Sprintf(`$1%s`, t.Pipe.Markdown.ListIdentifier))
 
-							t.Log.Debugf("Trying to read file: %s", match)
+						t.Log.Debugf("Trying to read file: %s", match)
 
-							content, err := os.ReadFile(match)
+						content, err := os.ReadFile(match)
 
-							if err != nil {
-								return err
-							}
+						if err != nil {
+							return err
+						}
 
-							readme := string(content)
+						readme := string(content)
 
-							r := regexp.MustCompile(expr)
+						r := regexp.MustCompile(expr)
 
-							replace := strings.Join([]string{start, "", strings.TrimSpace(s), "", end}, "\n")
+						replace := strings.Join([]string{start, "", strings.TrimSpace(s), "", end}, "\n")
 
-							result := r.ReplaceAllString(readme, replace)
+						result := r.ReplaceAllString(readme, replace)
 
-							if err := os.WriteFile(match, []byte(result), 0600); err != nil {
-								return err
-							}
+						if err := os.WriteFile(match, []byte(result), 0600); err != nil {
+							return err
+						}
 
-							t.Log.Infof("Processed file: %s", match)
+						t.Log.Infof("Processed file: %s", match)
 
-							return nil
-						}).
-						AddSelfToTheParentAsParallel()
-				}(match)
+						return nil
+					}).
+					AddSelfToTheParentAsParallel()
 			}
 
 			return nil

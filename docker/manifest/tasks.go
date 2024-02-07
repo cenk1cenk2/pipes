@@ -64,33 +64,31 @@ func FetchPublishedImagesFromFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			for _, f := range t.Pipe.Ctx.Matches {
-				func(f string) {
-					t.CreateSubtask(f).
-						Set(func(t *Task[Pipe]) error {
-							content, err := os.ReadFile(f)
-							if err != nil {
-								return err
-							}
+				t.CreateSubtask(f).
+					Set(func(t *Task[Pipe]) error {
+						content, err := os.ReadFile(f)
+						if err != nil {
+							return err
+						}
 
-							parsed := &DockerManifestMatrixJson{}
-							if err := json.Unmarshal(content, parsed); err != nil {
-								return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
-							}
+						parsed := &DockerManifestMatrixJson{}
+						if err := json.Unmarshal(content, parsed); err != nil {
+							return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
+						}
 
-							if parsed.Target == "" {
-								return nil
-							}
-
-							t.Log.Debugf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f)
-
-							t.Lock.Lock()
-							t.Pipe.Ctx.ManifestedImages[parsed.Target] = append(t.Pipe.Ctx.ManifestedImages[parsed.Target], parsed.Images...)
-							t.Lock.Unlock()
-
+						if parsed.Target == "" {
 							return nil
-						}).
-						AddSelfToTheParentAsParallel()
-				}(f)
+						}
+
+						t.Log.Debugf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f)
+
+						t.Lock.Lock()
+						t.Pipe.Ctx.ManifestedImages[parsed.Target] = append(t.Pipe.Ctx.ManifestedImages[parsed.Target], parsed.Images...)
+						t.Lock.Unlock()
+
+						return nil
+					}).
+					AddSelfToTheParentAsParallel()
 			}
 			return nil
 		}).
@@ -134,42 +132,40 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("manifest").
 		Set(func(t *Task[Pipe]) error {
 			for target, images := range t.Pipe.Ctx.ManifestedImages {
-				func(target string, images []string) {
-					t.CreateSubtask(target).
-						Set(func(t *Task[Pipe]) error {
-							t.
-								CreateCommand(
-									setup.DOCKER_EXE,
-									"manifest",
-									"create",
-									target,
-								).
-								Set(func(c *Command[Pipe]) error {
-									for _, image := range images {
-										c.AppendArgs(fmt.Sprintf("-a %s", image))
-									}
+				t.CreateSubtask(target).
+					Set(func(t *Task[Pipe]) error {
+						t.
+							CreateCommand(
+								setup.DOCKER_EXE,
+								"manifest",
+								"create",
+								target,
+							).
+							Set(func(c *Command[Pipe]) error {
+								for _, image := range images {
+									c.AppendArgs(fmt.Sprintf("-a %s", image))
+								}
 
-									return nil
-								}).
-								AddSelfToTheTask()
+								return nil
+							}).
+							AddSelfToTheTask()
 
-							t.
-								CreateCommand(
-									setup.DOCKER_EXE,
-									"manifest",
-									"push",
-									"-p",
-									target,
-								).
-								AddSelfToTheTask()
+						t.
+							CreateCommand(
+								setup.DOCKER_EXE,
+								"manifest",
+								"push",
+								"-p",
+								target,
+							).
+							AddSelfToTheTask()
 
-							return nil
-						}).
-						ShouldRunAfter(func(t *Task[Pipe]) error {
-							return t.RunCommandJobAsJobSequence()
-						}).
-						AddSelfToTheParentAsParallel()
-				}(target, images)
+						return nil
+					}).
+					ShouldRunAfter(func(t *Task[Pipe]) error {
+						return t.RunCommandJobAsJobSequence()
+					}).
+					AddSelfToTheParentAsParallel()
 			}
 
 			return nil

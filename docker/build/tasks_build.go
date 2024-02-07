@@ -93,26 +93,24 @@ func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			for _, tag := range t.Pipe.Ctx.Tags {
-				func(tag string) {
-					t.CreateCommand(
-						setup.DOCKER_EXE,
-						"push",
-						tag,
-					).
-						Set(func(c *Command[Pipe]) error {
-							c.Log.Infof(
-								"Pushing Docker image: %s",
-								tag,
-							)
+				t.CreateCommand(
+					setup.DOCKER_EXE,
+					"push",
+					tag,
+				).
+					Set(func(c *Command[Pipe]) error {
+						c.Log.Infof(
+							"Pushing Docker image: %s",
+							tag,
+						)
 
-							return nil
-						}).
-						SetRetries(&CommandRetry{
-							Tries: 3,
-							Delay: time.Second * 10,
-						}).
-						AddSelfToTheTask()
-				}(tag)
+						return nil
+					}).
+					SetRetries(&CommandRetry{
+						Tries: 3,
+						Delay: time.Second * 10,
+					}).
+					AddSelfToTheTask()
 			}
 
 			return nil

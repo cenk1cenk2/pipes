@@ -34,24 +34,22 @@ func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
 		}).
 		Set(func(t *Task[Pipe]) error {
 			for _, tag := range t.Pipe.Ctx.Tags {
-				func(tag string) {
-					t.CreateCommand(
-						setup.DOCKER_EXE,
-						"manifest",
-						"inspect",
-						tag,
-					).
-						SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-						Set(func(c *Command[Pipe]) error {
-							c.Log.Infof(
-								"Inspecting Docker image: %s",
-								tag,
-							)
+				t.CreateCommand(
+					setup.DOCKER_EXE,
+					"manifest",
+					"inspect",
+					tag,
+				).
+					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+					Set(func(c *Command[Pipe]) error {
+						c.Log.Infof(
+							"Inspecting Docker image: %s",
+							tag,
+						)
 
-							return nil
-						}).
-						AddSelfToTheTask()
-				}(tag)
+						return nil
+					}).
+					AddSelfToTheTask()
 			}
 
 			return nil

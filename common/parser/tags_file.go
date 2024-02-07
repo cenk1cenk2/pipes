@@ -36,9 +36,7 @@ func ParseTagsFile(log *logrus.Entry, file string, strict bool) ([]string, error
 		re := regexp.MustCompile(`\r?\n`)
 
 		for _, v := range tags {
-			func(v string) {
-				t = append(t, re.ReplaceAllString(v, ""))
-			}(v)
+			t = append(t, re.ReplaceAllString(v, ""))
 		}
 
 		return t, nil
