@@ -8,6 +8,8 @@ vars: {}
 env:
   CGO_ENABLED: 0
 
+output: "prefixed"
+
 includes:
   template:
     dir: ./_template
