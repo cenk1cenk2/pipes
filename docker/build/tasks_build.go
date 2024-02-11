@@ -43,6 +43,14 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 								"DOCKER_BUILDKIT": "1",
 							},
 						)
+					} else {
+						t.Log.Infoln("Forcing Docker to use legacy build mode.")
+
+						c.AppendEnvironment(
+							map[string]string{
+								"DOCKER_BUILDKIT": "0",
+							},
+						)
 					}
 
 					var err error
