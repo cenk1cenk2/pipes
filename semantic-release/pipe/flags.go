@@ -34,6 +34,8 @@ var Flags = []cli.Flag{
 		Value:       false,
 		Destination: &TL.Pipe.SemanticRelease.Workspace,
 	},
+
+	// TODO: add git branch/tag parsing and depending on that a json match to do prereleases
 }
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
