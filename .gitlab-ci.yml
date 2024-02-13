@@ -123,8 +123,9 @@ build:
       - PIPE: gh-release-tracker
       - PIPE: node
       - PIPE: markdown-toc
-      - PIPE: semantic-release
+      - PIPE: release-it
       - PIPE: select-env
+      - PIPE: semantic-release
       - PIPE: terraform
       - PIPE: update-docker-hub-readme
 
@@ -308,6 +309,33 @@ docker-build_markdown-toc:
     changes:
       - "common/**/*"
       - "markdown-toc/**/*"
+      - go.mod
+      - go.sum
+      - .gitlab-ci.yml
+    refs:
+      - main
+      - tags
+
+docker-build_release-it:
+  extends: .docker-build-dockerhub
+  stage: publish
+  variables:
+    DOCKERFILE_CONTEXT: ./release-it
+    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-release-it
+    DOCKER_MANIFEST_TARGET: latest
+  dependencies:
+    - "build: [release-it]"
+  parallel:
+    matrix:
+      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
+        GITLAB_CI_ARCH:
+          - amd64
+          - arm64
+  only:
+    changes:
+      - "common/**/*"
+      - "node/**/*"
+      - "release-it/**/*"
       - go.mod
       - go.sum
       - .gitlab-ci.yml

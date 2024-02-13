@@ -5,15 +5,13 @@ import (
 )
 
 type (
-	SemanticRelease struct {
-		IsDryRun  bool
-		Workspace bool
+	ReleaseIt struct {
+		IsDryRun   bool
+		ConfigFile string
 	}
 
 	Pipe struct {
-		Ctx
-
-		SemanticRelease
+		ReleaseIt
 	}
 )
 
@@ -29,7 +27,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
-				RunSemanticRelease(tl).Job(),
+				RunReleaseIt(tl).Job(),
 			)
 		})
 }

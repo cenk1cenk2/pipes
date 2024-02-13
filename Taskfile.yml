@@ -8,7 +8,7 @@ vars: {}
 env:
   CGO_ENABLED: 0
 
-output: "prefixed"
+output: prefixed
 
 includes:
   template:
@@ -25,6 +25,9 @@ includes:
     taskfile: ./Taskfile.pipe.yml
   node:
     dir: ./node
+    taskfile: ./Taskfile.pipe.yml
+  release-it:
+    dir: ./release-it
     taskfile: ./Taskfile.pipe.yml
   select-env:
     dir: ./select-env
@@ -84,6 +87,7 @@ tasks:
       - task: "gh-release-tracker:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"
+      - task: "release-it:{{ .command }}"
       - task: "select-env:{{ .command }}"
       - task: "semantic-release:{{ .command }}"
       - task: "terraform:{{ .command }}"

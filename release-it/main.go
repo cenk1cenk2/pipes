@@ -5,8 +5,8 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	node "gitlab.kilic.dev/devops/pipes/node/setup"
+	"gitlab.kilic.dev/devops/pipes/release-it/pipe"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 

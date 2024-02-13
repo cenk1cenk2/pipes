@@ -2,7 +2,6 @@ package pipe
 
 import (
 	"github.com/urfave/cli/v2"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
@@ -14,23 +13,12 @@ const (
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_PACKAGES
-
-	&cli.StringSliceFlag{
-		Category: flags.CATEGORY_PACKAGES,
-		Name:     "packages.apk",
-		Usage:    "APK applications to install before running semantic-release.",
-		Required: false,
-		EnvVars:  []string{"ADD_APKS"},
-		Value:    &cli.StringSlice{},
-	},
-
 	// CATEGORY_SEMANTIC_RELEASE
 
 	&cli.BoolFlag{
 		Category:    CATEGORY_SEMANTIC_RELEASE,
 		Name:        "semantic_release.dry_run",
-		Usage:       "Node packages to install before running semantic-release.",
+		Usage:       "Run semantic-release in dry mode without making changes.",
 		Required:    false,
 		EnvVars:     []string{"SEMANTIC_RELEASE_DRY_RUN"},
 		Value:       false,
@@ -49,7 +37,20 @@ var Flags = []cli.Flag{
 }
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.Apk = tl.CliContext.StringSlice("packages.apk")
+	tl.Plumber.SetDeprecationNotices([]DeprecationNotice{
+		{
+			Flag:        []string{"packages.apk"},
+			Environment: []string{"ADD_APKS"},
+			Level:       LOG_LEVEL_ERROR,
+			Message:     "Installing os packages directly through this pipe is deprecated whereas argument has been found: %s",
+		},
+		{
+			Flag:        []string{"packages.node", "packages.node.global"},
+			Environment: []string{"PACKAGES_NODE", "PACKAGES_NODE_GLOBAL"},
+			Level:       LOG_LEVEL_ERROR,
+			Message:     "Installing node packages directly through this pipe is deprecated whereas argument has been found: %s",
+		},
+	})
 
 	return nil
 }

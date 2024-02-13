@@ -1,41 +1,8 @@
 package pipe
 
 import (
-	"strings"
-
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
-
-func InstallApkPackages(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("apks").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.Apk) == 0
-		}).
-		Set(func(t *Task[Pipe]) error {
-			apks := t.Pipe.Apk
-
-			t.Log.Debugf(
-				"Will install packages from APK repository: %s",
-				strings.Join(apks, ", "),
-			)
-
-			t.CreateCommand(
-				"apk",
-				"--no-cache",
-			).
-				Set(func(c *Command[Pipe]) error {
-					c.AppendArgs(apks...)
-
-					return nil
-				}).
-				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
-			return t.RunCommandJobAsJobParallel()
-		})
-}
 
 func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("release").

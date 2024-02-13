@@ -8,7 +8,8 @@ ARG BUILDARCH
 
 RUN \
   unset NPM_CONFIG_USER && \
-  yarn global add pnpm
+  corepack enable pnpm && \
+  corepack use pnpm@latest
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 

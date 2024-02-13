@@ -1,8 +1,8 @@
-# pipe-semantic-release
+# pipe-release-it
 
-Releases applications through semantic-release library.
+Releases applications through release-it library.
 
-`pipe-semantic-release [FLAGS]`
+`pipe-release-it [FLAGS]`
 
 ## Flags
 
@@ -43,9 +43,19 @@ Releases applications through semantic-release library.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | pnpm |
 
+### Packages
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$PACKAGES_NODE` | Install node packages before performing operations. | `StringSlice` | `false` |  |
+| `$PACKAGES_NODE_GLOBAL` | Install node packages globally. | `Bool` | `false` | true |
+| `$PACKAGES_NODE_SCRIPT_ARGS` | package.json script arguments for building operation. | `String`<br/>`Template(struct { Environment: string, EnvVars: map[string]string })` | `false` |  |
+| `$PACKAGES_NODE_CWD` | Working directory for build operation. | `String` | `false` | . |
+| `$ADD_APKS` | APK applications to install before running release-it. | `StringSlice` | `false` |  |
+
 ### Semantic Release
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$SEMANTIC_RELEASE_DRY_RUN` | Node packages to install before running semantic-release. | `Bool` | `false` | false |
-| `$SEMANTIC_RELEASE_WORKSPACE` | Use @qiwi/multi-semantic-release package to do a workspace release. | `Bool` | `false` | false |
+| `$RELEASE_IT_DRY_RUN` | Node packages to install before running release-it. | `Bool` | `false` | false |
+| `$RELEASE_IT_WORKSPACE` | Use @qiwi/multi-release-it package to do a workspace release. | `Bool` | `false` | false |
