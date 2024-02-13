@@ -7,7 +7,6 @@ ARG BUILDARCH
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
   corepack enable pnpm && \
-  corepack use pnpm@latest && \
   npm -g config set workspaces-update false && \
   yarn global add release-it @release-it/bumper @release-it/conventional-changelog @release-it-plugins/workspaces @j-ulrich/release-it-regex-bumper && \
   yarn cache clean

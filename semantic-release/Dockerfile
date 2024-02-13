@@ -10,7 +10,6 @@ RUN \
   # npm i -g npm@8.4
   npm -g config set workspaces-update false && \
   corepack enable pnpm && \
-  corepack use pnpm@latest && \
   yarn global add semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec semantic-release-docker semantic-release-replace-plugin && \
   yarn cache clean
 
