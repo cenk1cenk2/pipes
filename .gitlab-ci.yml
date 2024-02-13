@@ -458,6 +458,7 @@ docker-manifest:
     - docker-build_node
     - docker-build_gh-release-tracker
     - docker-build_markdown-toc
+    - docker-build_release-it
     - docker-build_select-env
     - docker-build_semantic-release
     - docker-build_terraform
@@ -500,14 +501,19 @@ update-docker-hub-readme:
           "description": "Generates TOC for markdown files."
         },
         {
-          "repository": "cenk1cenk2/pipe-semantic-release",
-          "file": "./semantic-release/README.md",
-          "description": "Semantic-Release embedded inside a container for CI jobs."
+          "repository": "cenk1cenk2/pipe-release-it",
+          "file": "./release-it/README.md",
+          "description": "release-it embedded inside a container for CI jobs."
         },
         {
           "repository": "cenk1cenk2/pipe-select-env",
           "file": "./select-env/README.md",
           "description": "Selects an environment given on the conditions."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-semantic-release",
+          "file": "./semantic-release/README.md",
+          "description": "semantic-release embedded inside a container for CI jobs."
         },
         {
           "repository": "cenk1cenk2/pipe-terraform",

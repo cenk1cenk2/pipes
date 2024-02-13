@@ -1,6 +1,6 @@
 # pipe-release-it
 
-Releases applications through release-it library.
+Releases applications through the release-it library.
 
 `pipe-release-it [FLAGS]`
 
@@ -43,19 +43,9 @@ Releases applications through release-it library.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | pnpm |
 
-### Packages
+### release-it
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$PACKAGES_NODE` | Install node packages before performing operations. | `StringSlice` | `false` |  |
-| `$PACKAGES_NODE_GLOBAL` | Install node packages globally. | `Bool` | `false` | true |
-| `$PACKAGES_NODE_SCRIPT_ARGS` | package.json script arguments for building operation. | `String`<br/>`Template(struct { Environment: string, EnvVars: map[string]string })` | `false` |  |
-| `$PACKAGES_NODE_CWD` | Working directory for build operation. | `String` | `false` | . |
-| `$ADD_APKS` | APK applications to install before running release-it. | `StringSlice` | `false` |  |
-
-### Semantic Release
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$RELEASE_IT_DRY_RUN` | Node packages to install before running release-it. | `Bool` | `false` | false |
-| `$RELEASE_IT_WORKSPACE` | Use @qiwi/multi-release-it package to do a workspace release. | `Bool` | `false` | false |
+| `$RELEASE_IT_DRY_RUN` | Run release-it in dry mode without making changes. | `Bool` | `false` | false |
+| `$RELEASE_IT_CONFIG_FILE` | release-it configuration file. | `String` | `false` |  |
