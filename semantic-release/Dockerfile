@@ -6,7 +6,7 @@ ARG BUILDARCH
 
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
-  corepack enable pnpm && \
+  corepack enable pnpm && pnpm setup && \
   pnpm add -g semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec semantic-release-docker semantic-release-replace-plugin && \
   pnpm store prune && \
   # # https://github.com/npm/cli/issues/4605
