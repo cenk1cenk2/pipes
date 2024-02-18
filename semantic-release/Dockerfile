@@ -3,14 +3,13 @@ FROM node:20-alpine
 
 ARG BUILDOS
 ARG BUILDARCH
-ARG PNPM_VERSION=latest
 
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
 
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
-  corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate && \
+  corepack enable && corepack prepare pnpm@latest --activate && \
   pnpm add -g semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec semantic-release-docker semantic-release-replace-plugin && \
   pnpm store prune && \
   # # https://github.com/npm/cli/issues/4605

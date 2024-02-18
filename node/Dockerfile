@@ -5,14 +5,13 @@ FROM node:${NODE_VERSION}
 
 ARG BUILDOS
 ARG BUILDARCH
-ARG PNPM_VERSION=latest
 
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
 
 RUN \
   unset NPM_CONFIG_USER && \
-  corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+  corepack enable && corepack prepare pnpm@latest --activate
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
