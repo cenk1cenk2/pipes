@@ -1,6 +1,6 @@
 module gitlab.kilic.dev/devops/pipes
 
-go 1.22.0
+go 1.22.1
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
