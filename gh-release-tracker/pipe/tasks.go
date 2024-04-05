@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/google/go-github/v60/github"
+	"github.com/google/go-github/v61/github"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
 	"golang.org/x/oauth2"
 )
