@@ -4,7 +4,7 @@ go 1.22.3
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
-	github.com/docker/docker v26.1.2+incompatible
+	github.com/docker/docker v26.1.3+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/google/go-github/v61 v61.0.0
 	github.com/joho/godotenv v1.5.1
