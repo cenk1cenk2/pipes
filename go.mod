@@ -1,6 +1,6 @@
 module gitlab.kilic.dev/devops/pipes
 
-go 1.22.3
+go 1.22.4
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
@@ -14,7 +14,7 @@ require (
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.3
 	gitlab.kilic.dev/libraries/plumber/v5 v5.4.18
 	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a
-	golang.org/x/oauth2 v0.20.0
+	golang.org/x/oauth2 v0.21.0
 )
 
 require (
