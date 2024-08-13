@@ -1,10 +1,10 @@
 module gitlab.kilic.dev/devops/pipes
 
-go 1.22.6
+go 1.23.0
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1
-	github.com/docker/docker v27.1.1+incompatible
+	github.com/docker/docker v27.1.2+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/google/go-github/v63 v63.0.0
 	github.com/joho/godotenv v1.5.1
