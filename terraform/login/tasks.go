@@ -10,7 +10,7 @@ import (
 func GenerateTerraformRegistryCredentilsEnvVars(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("environment", "credentials").
 		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Registry.Credentials == nil || len(t.Pipe.Registry.Credentials) == 0
+			return len(t.Pipe.Registry.Credentials) == 0
 		}).
 		Set(func(t *Task[Pipe]) error {
 			for _, c := range t.Pipe.Registry.Credentials {
