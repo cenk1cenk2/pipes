@@ -6,14 +6,14 @@ Releases applications through the semantic-release library.
 
 ## Flags
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warn", "info", "debug", "trace")` | `false` | info |
 | `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
-### Environment
+**Environment**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -22,14 +22,14 @@ Releases applications through the semantic-release library.
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | true |
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | true |
 
-### GIT
+**GIT**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
 | `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
 
-### Login
+**Login**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -37,13 +37,13 @@ Releases applications through the semantic-release library.
 | `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | ".npmrc" |
 | `$NPM_NPMRC` | Direct contents of .npmrc file. | `String` | `false` |  |
 
-### Package Manager
+**Package Manager**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `String`<br/>`enum("npm", "yarn", "pnpm")` | `false` | pnpm |
 
-### Semantic Release
+**Semantic Release**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |

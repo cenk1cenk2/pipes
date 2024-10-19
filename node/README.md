@@ -6,7 +6,7 @@ Pipe for installing node.js dependencies and building node.js applications on CI
 
 ## Global Flags
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -19,11 +19,9 @@ Pipe for installing node.js dependencies and building node.js applications on CI
 
 Login to the given NPM registries.
 
-`pipe-node login [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
-##### Login
+**Login**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -31,7 +29,7 @@ Login to the given NPM registries.
 | `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | ".npmrc" |
 | `$NPM_NPMRC` | Direct contents of .npmrc file. | `String` | `false` |  |
 
-##### Package Manager
+**Package Manager**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -41,11 +39,9 @@ Login to the given NPM registries.
 
 Install node.js dependencies with the given package manager.
 
-`pipe-node install [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
-##### Install
+**Install**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -54,7 +50,7 @@ Install node.js dependencies with the given package manager.
 | `$NODE_INSTALL_ARGS` | Arguments to append to install command. | `String` | `false` |  |
 | `$NODE_INSTALL_CACHE_ENABLE` | Enable caching for the package manager. | `Bool` | `false` | true |
 
-##### Login
+**Login**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -62,7 +58,7 @@ Install node.js dependencies with the given package manager.
 | `$NPM_NPMRC_FILE` | .npmrc file to use. | `StringSlice` | `false` | ".npmrc" |
 | `$NPM_NPMRC` | Direct contents of .npmrc file. | `String` | `false` |  |
 
-##### Package Manager
+**Package Manager**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -70,11 +66,9 @@ Install node.js dependencies with the given package manager.
 
 ### `build`
 
-`pipe-node build [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
-##### Build
+**Build**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -82,7 +76,7 @@ Install node.js dependencies with the given package manager.
 | `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for building operation. | `String`<br/>`Template(struct { Environment: string, EnvVars: map[string]string })` | `false` |  |
 | `$NODE_BUILD_CWD` | Working directory for build operation. | `String` | `false` | . |
 
-##### Environment
+**Environment**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -91,14 +85,14 @@ Install node.js dependencies with the given package manager.
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | true |
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | true |
 
-##### GIT
+**GIT**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
 | `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
 
-##### Package Manager
+**Package Manager**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -106,18 +100,16 @@ Install node.js dependencies with the given package manager.
 
 ### `run`
 
-`pipe-node run [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
-##### Command
+**Command**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$NODE_COMMAND_SCRIPT` | package.json script for given command operation. | `String`<br/>`Template(struct { Environment: string, EnvVars: map[string]string })` | `false` |  |
 | `$NODE_COMMAND_CWD` | Working directory for the given command operation. | `String` | `false` | . |
 
-##### Environment
+**Environment**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -126,14 +118,14 @@ Install node.js dependencies with the given package manager.
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `Bool` | `false` | true |
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | true |
 
-##### GIT
+**GIT**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `String` | `false` |  |
 | `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `String` | `false` |  |
 
-##### Package Manager
+**Package Manager**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |

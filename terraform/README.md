@@ -6,7 +6,7 @@ Running terraform inside the pipelines.
 
 ## Global Flags
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -19,8 +19,6 @@ Running terraform inside the pipelines.
 
 Install terraform project.
 
-`pipe-terraform install [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -30,13 +28,13 @@ Install terraform project.
 | `$TF_INSTALL_USE_LOCKFILE` | Use lockfile for terraform init. | `Bool` | `false` | false |
 | `$TF_INSTALL_ARGS` | Additional arguments for terraform init. | `String` | `false` |  |
 
-##### Config
+**Config**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
-##### Injected Variables
+**Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -50,14 +48,14 @@ Install terraform project.
 | `$TF_VAR_CI_PROJECT_URL`<br/>`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `String` | `false` |  |
 | `$TF_VAR_CI_API_V4_URL`<br/>`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `String` | `false` |  |
 
-##### Project
+**Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
 | `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
 
-##### State
+**State**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -77,8 +75,6 @@ Install terraform project.
 
 Lint terraform project with terraform.
 
-`pipe-terraform lint [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -88,13 +84,13 @@ Lint terraform project with terraform.
 | `$TF_LINT_VALIDATE_ENABLE` | Enable terraform validate. | `Bool` | `false` | true |
 | `$TF_LINT_VALIDATE_ARGS` | Additional arguments for terraform validate. | `String` | `false` |  |
 
-##### Config
+**Config**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
-##### Injected Variables
+**Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -108,7 +104,7 @@ Lint terraform project with terraform.
 | `$TF_VAR_CI_PROJECT_URL`<br/>`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `String` | `false` |  |
 | `$TF_VAR_CI_API_V4_URL`<br/>`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `String` | `false` |  |
 
-##### Project
+**Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -119,8 +115,6 @@ Lint terraform project with terraform.
 
 Plan terraform project.
 
-`pipe-terraform plan [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -129,13 +123,13 @@ Plan terraform project.
 | `$TF_PLAN_CACHE`<br/>`$TF_APPLY_OUTPUT`<br/>`$TF_PLAN_OUTPUT` | Output file for terraform plan. | `String` | `false` | plan |
 | `$TF_PLAN_ARGS` | Additional arguments for terraform plan. | `String` | `false` |  |
 
-##### Config
+**Config**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
-##### Injected Variables
+**Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -149,14 +143,14 @@ Plan terraform project.
 | `$TF_VAR_CI_PROJECT_URL`<br/>`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `String` | `false` |  |
 | `$TF_VAR_CI_API_V4_URL`<br/>`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `String` | `false` |  |
 
-##### Project
+**Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
 | `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
 
-##### State
+**State**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -176,8 +170,6 @@ Plan terraform project.
 
 Apply terraform project.
 
-`pipe-terraform apply [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -186,13 +178,13 @@ Apply terraform project.
 | `$TF_PLAN_CACHE`<br/>`$TF_APPLY_OUTPUT`<br/>`$TF_PLAN_OUTPUT` | Output file for terraform apply. | `String` | `false` | plan |
 | `$TF_APPLY_ARGS` | Additional arguments for terraform apply. | `String` | `false` |  |
 
-##### Config
+**Config**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `String`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` |  |
 
-##### Injected Variables
+**Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -206,14 +198,14 @@ Apply terraform project.
 | `$TF_VAR_CI_PROJECT_URL`<br/>`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `String` | `false` |  |
 | `$TF_VAR_CI_API_V4_URL`<br/>`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `String` | `false` |  |
 
-##### Project
+**Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `String` | `false` | . |
 | `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `StringSlice` | `false` |  |
 
-##### State
+**State**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -233,11 +225,9 @@ Apply terraform project.
 
 Publish terraform project.
 
-`pipe-terraform publish [GLOBAL FLAGS] [FLAGS]`
-
 #### Flags
 
-##### Module
+**Module**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -245,13 +235,13 @@ Publish terraform project.
 | `$TF_MODULE_CWD`<br/>`$TF_ROOT` | Directory for the module that will be published. | `String` | `false` | . |
 | `$TF_MODULE_SYSTEM` | Module system for the module that will be published. | `String` | `false` | local |
 
-##### Registry
+**Registry**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_MODULE_REGISTRY` | Registry of the module that will be published. | `String` | `false` | gitlab |
 
-##### Registry - Gitlab
+**Registry - Gitlab**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -259,7 +249,7 @@ Publish terraform project.
 | `$CI_PROJECT_ID` | Gitlab project id for publish call. | `String` | `false` |  |
 | `$CI_JOB_TOKEN` | Gitlab API token for publish call. | `String` | `false` |  |
 
-##### Tags File
+**Tags File**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |

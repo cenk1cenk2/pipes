@@ -6,14 +6,14 @@ Selects an set of environment variable prefix depending on the condition.
 
 ## Flags
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warn", "info", "debug", "trace")` | `false` | info |
 | `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
-### Environment
+**Environment**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -22,7 +22,7 @@ Selects an set of environment variable prefix depending on the condition.
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `Bool` | `false` | true |
 | `$ENVIRONMENT_FILE` | File for writing the environment variables for selected environment. | `String` | `true` | env.environment |
 
-### GIT
+**GIT**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |

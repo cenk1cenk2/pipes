@@ -14,7 +14,7 @@ Finds the markdown files and adds TOC to them.
 | `$MARKDOWN_TOC_INDENTATION` | Indentation for each element. | `Int` | `false` | 2 |
 | `$MARKDOWN_TOC_LIST_IDENTIFIER` | Identifier for each list element. | `String` | `false` | - |
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |

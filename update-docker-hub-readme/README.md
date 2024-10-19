@@ -6,14 +6,14 @@ Updates the readme file on DockerHub or any compatible API.
 
 ## Flags
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$LOG_LEVEL` | Define the log level for the application. | `String`<br/>`enum("panic", "fatal", "warn", "info", "debug", "trace")` | `false` | info |
 | `$ENV_FILE` | Environment files to inject. | `StringSlice` | `false` |  |
 
-### DockerHub
+**DockerHub**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -21,7 +21,7 @@ Updates the readme file on DockerHub or any compatible API.
 | `$DOCKER_PASSWORD` | DockerHub password for updating the readme. | `String` | `true` |  |
 | `$DOCKER_HUB_ADDRESS` | HTTP address for the DockerHub compatible service. | `String` | `false` | https://hub.docker.com/v2/repositories |
 
-### Readme
+**Readme**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |

@@ -10,7 +10,7 @@ template-cli
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$DEFAULT_FLAG` | Some default flag. | `String` | `false` |  |
 
-### CLI
+**CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
