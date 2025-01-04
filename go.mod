@@ -1,10 +1,10 @@
 module gitlab.kilic.dev/devops/pipes
 
-go 1.23.2
+go 1.23.4
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.7.1
-	github.com/docker/docker v27.3.1+incompatible
+	github.com/docker/docker v27.4.1+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/google/go-github/v68 v68.0.0
 	github.com/joho/godotenv v1.5.1
@@ -14,7 +14,7 @@ require (
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.3
 	gitlab.kilic.dev/libraries/plumber/v5 v5.6.4
 	golang.org/x/exp v0.0.0-20240213143201-ec583247a57a
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.25.0
 )
 
 require (
