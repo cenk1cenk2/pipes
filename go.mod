@@ -1,6 +1,6 @@
 module gitlab.kilic.dev/devops/pipes
 
-go 1.24.0
+go 1.24.4
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.8.1
@@ -10,15 +10,15 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/sirupsen/logrus v1.9.3
-	github.com/urfave/cli/v2 v2.27.5
+	github.com/urfave/cli/v2 v2.27.7
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.1.3
 	gitlab.kilic.dev/libraries/plumber/v5 v5.6.5
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
-	golang.org/x/oauth2 v0.27.0
+	golang.org/x/oauth2 v0.30.0
 )
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/creasty/defaults v1.8.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
