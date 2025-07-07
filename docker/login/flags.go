@@ -1,7 +1,7 @@
 package login
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "gitlab.kilic.dev/libraries/plumber/v5"
