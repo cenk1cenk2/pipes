@@ -52,7 +52,6 @@ tasks:
   format:
     desc: Formats the current code base.
     cmds:
-      - goimports -w .
       - golangci-lint run --fix
 
   lint:
