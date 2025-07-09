@@ -15,9 +15,9 @@ import (
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 )
 
-func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsParent(tl *TaskList) *Task {
 	return tl.CreateTask("tags").
-		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
+		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobSequence(
 				JobParallel(
 					DockerTagsUser(tl).Job(),
@@ -28,26 +28,26 @@ func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 				DockerTagsWriteManifestFile(tl).Job(),
 			)
 		}).
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.Tags = utils.RemoveDuplicateStr(
-				utils.DeleteEmptyStringsFromSlice(t.Pipe.Ctx.Tags),
+		Set(func(t *Task) error {
+			C.Tags = utils.RemoveDuplicateStr(
+				utils.DeleteEmptyStringsFromSlice(C.Tags),
 			)
 
 			t.Log.Infof(
-				"Image tags: %s", strings.Join(t.Pipe.Ctx.Tags, ", "),
+				"Image tags: %s", strings.Join(C.Tags, ", "),
 			)
 
 			return nil
 		})
 }
 
-func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsWriteManifestFile(tl *TaskList) *Task {
 	return tl.CreateTask("tags", "manifest").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerManifest.OutputFile == "" || t.Pipe.DockerManifest.Target == ""
+		ShouldDisable(func(t *Task) bool {
+			return P.DockerManifest.OutputFile == "" || P.DockerManifest.Target == ""
 		}).
-		Set(func(t *Task[Pipe]) error {
-			target, err := InlineTemplate(t.Pipe.DockerManifest.Target, t.Pipe.Ctx.Tags)
+		Set(func(t *Task) error {
+			target, err := InlineTemplate(P.DockerManifest.Target, C.Tags)
 			if err != nil {
 				return err
 			}
@@ -59,14 +59,14 @@ func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			tags, err := json.Marshal(&manifest.DockerManifestMatrixJson{
 				Target: image,
-				Images: t.Pipe.Ctx.Tags,
+				Images: C.Tags,
 			})
 
 			if err != nil {
 				return err
 			}
 
-			filename, err := InlineTemplate(t.Pipe.DockerManifest.OutputFile, t.Pipe.Ctx.Tags)
+			filename, err := InlineTemplate(P.DockerManifest.OutputFile, C.Tags)
 
 			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
 
@@ -84,11 +84,11 @@ func DockerTagsWriteManifestFile(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsUser(tl *TaskList) *Task {
 	return tl.CreateTask("tags", "user").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			// add all the specified tags
-			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(t.Pipe.DockerImage.Tags)) {
+			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(P.DockerImage.Tags)) {
 				if err := AddDockerTag(t, v); err != nil {
 					return err
 				}
@@ -98,14 +98,14 @@ func DockerTagsUser(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsFile(tl *TaskList) *Task {
 	return tl.CreateTask("tags", "file").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerImage.TagsFile == ""
+		ShouldDisable(func(t *Task) bool {
+			return P.DockerImage.TagsFile == ""
 		}).
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			// add tags through tags file
-			tags, err := parser.ParseTagsFile(t.Log, path.Join(t.Pipe.DockerFile.Context, t.Pipe.DockerImage.TagsFile), t.Pipe.DockerImage.TagsFileStrict)
+			tags, err := parser.ParseTagsFile(t.Log, path.Join(P.DockerFile.Context, P.DockerImage.TagsFile), P.DockerImage.TagsFileStrict)
 
 			if err != nil {
 				return err
@@ -113,7 +113,7 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			for _, v := range tags {
 				t.CreateSubtask(v).
-					Set(func(t *Task[Pipe]) error {
+					Set(func(t *Task) error {
 						return AddDockerTag(t, v)
 					}).
 					AddSelfToTheParentAsParallel()
@@ -121,20 +121,20 @@ func DockerTagsFile(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }
 
-func DockerTagsLatest(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerTagsLatest(tl *TaskList) *Task {
 	return tl.CreateTask("tags", "latest").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.DockerImage.TagAsLatest == nil
+		ShouldDisable(func(t *Task) bool {
+			return P.DockerImage.TagAsLatest == nil
 		}).
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 		out:
-			for _, expression := range t.Pipe.DockerImage.TagAsLatest {
-				for _, reference := range t.Pipe.Ctx.References {
+			for _, expression := range P.DockerImage.TagAsLatest {
+				for _, reference := range C.References {
 					re, err := regexp.Compile(expression)
 
 					if err != nil {

@@ -24,12 +24,12 @@ func main() {
 					{
 						Name:        "login",
 						Description: "Login to the given Docker registries.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags),
+						Flags:       CombineFlags(setup.Flags, login.Flags),
 						Action: func(ctx context.Context, command *cli.Command) error {
 							return p.RunJobs(
 								JobSequence(
-									setup.New(p).SetCli(command).Job(),
-									login.New(p).SetCli(command).Job(),
+									setup.New(p).Job(),
+									login.New(p).Job(),
 								),
 							)
 						},
@@ -38,13 +38,13 @@ func main() {
 					{
 						Name:        "build",
 						Description: "Build Docker images.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags, build.Flags),
+						Flags:       CombineFlags(setup.Flags, login.Flags, build.Flags),
 						Action: func(ctx context.Context, command *cli.Command) error {
 							return p.RunJobs(
 								JobSequence(
-									setup.New(p).SetCli(command).Job(),
-									login.New(p).SetCli(command).Job(),
-									build.New(p).SetCli(command).Job(),
+									setup.New(p).Job(),
+									login.New(p).Job(),
+									build.New(p).Job(),
 								),
 							)
 						},
@@ -53,14 +53,13 @@ func main() {
 					{
 						Name:        "manifest",
 						Description: "Update manifests of the Docker images.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags, manifest.Flags),
+						Flags:       CombineFlags(setup.Flags, login.Flags, manifest.Flags),
 						Action: func(ctx context.Context, command *cli.Command) error {
-
 							return p.RunJobs(
 								JobSequence(
-									setup.New(p).SetCli(command).Job(),
-									login.New(p).SetCli(command).Job(),
-									manifest.New(p).SetCli(command).Job(),
+									setup.New(p).Job(),
+									login.New(p).Job(),
+									manifest.New(p).Job(),
 								),
 							)
 						},
@@ -69,8 +68,7 @@ func main() {
 			}
 		}).
 		SetDocumentationOptions(DocumentationOptions{
-			ExcludeFlags:       true,
-			ExcludeHelpCommand: true,
+			ExcludeFlags: true,
 		}).
 		Run()
 }

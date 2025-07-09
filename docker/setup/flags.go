@@ -21,7 +21,7 @@ var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
 		Category: CATEGORY_DOCKER,
-		Name:     "docker.use_buildkit",
+		Name:     "docker.use-buildkit",
 		Usage:    "Use Docker BuildKit for building images.",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
@@ -29,30 +29,30 @@ var Flags = []cli.Flag{
 			cli.EnvVar("DOCKER_USE_BUILDKIT"),
 		),
 		Value:       flags.FLAG_DOCKER_USE_BUILD_KIT,
-		Destination: &TL.Pipe.Docker.UseBuildKit,
+		Destination: &P.Docker.UseBuildKit,
 	},
 
 	&cli.BoolFlag{
 		Category: CATEGORY_DOCKER,
-		Name:     "docker.use_buildx",
+		Name:     "docker.use-buildx",
 		Usage:    "Use Docker BuildX builder for multi-platform builds.",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_USE_BUILDX"),
 		),
 		Value:       false,
-		Destination: &TL.Pipe.Docker.UseBuildx,
+		Destination: &P.Docker.UseBuildx,
 	},
 
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER,
-		Name:     "docker.buildx_instance",
+		Name:     "docker.buildx-instance",
 		Usage:    "Docker BuildX instance to be started or to use.",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_BUILDX_INSTANCE"),
 		),
 		Value:       "CI",
-		Destination: &TL.Pipe.Docker.BuildxInstance,
+		Destination: &P.Docker.BuildxInstance,
 	},
 }

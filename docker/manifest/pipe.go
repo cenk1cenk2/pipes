@@ -16,29 +16,32 @@ type (
 	}
 
 	Pipe struct {
-		Ctx
-
 		DockerManifest
 	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+var C = &Ctx{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			if login.TL.Pipe.DockerRegistry.Registry != "" {
-				tl.Pipe.DockerManifest.Target = fmt.Sprintf("%s/%s", login.TL.Pipe.DockerRegistry.Registry, tl.Pipe.DockerManifest.Target)
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validator.Struct(P); err != nil {
+				return err
 			}
 
-			tl.Pipe.ManifestedImages = make(map[string][]string)
+			if login.P.DockerRegistry.Registry != "" {
+				P.DockerManifest.Target = fmt.Sprintf("%s/%s", login.P.DockerRegistry.Registry, P.DockerManifest.Target)
+			}
+
+			C.ManifestedImages = make(map[string][]string)
 
 			return nil
 		}).
-		Set(func(tl *TaskList[Pipe]) Job {
+		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				JobParallel(
 					JobSequence(

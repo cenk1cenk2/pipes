@@ -12,20 +12,25 @@ type (
 	}
 
 	Pipe struct {
-		Ctx
-
 		Docker
 	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		Set(func(tl *TaskList[Pipe]) Job {
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validator.Struct(P); err != nil {
+				return err
+			}
+
+			return nil
+		}).
+		Set(func(tl *TaskList) Job {
 			return JobParallel(
 				DockerVersion(tl).Job(),
 				DockerBuildXVersion(tl).Job(),

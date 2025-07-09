@@ -9,30 +9,33 @@ import (
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 )
 
-func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildXParent(tl *TaskList) *Task {
 	return tl.CreateTask("buildx", "parent").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !setup.TL.Pipe.Docker.UseBuildx
+		ShouldDisable(func(t *Task) bool {
+			return !setup.P.Docker.UseBuildx
 		}).
-		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
+		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobSequence(
 				DockerBuildXCreate(tl).Job(),
 				DockerBuildxSetupQemu(tl).Job(),
 				DockerBuildX(tl).Job(),
 			)
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
 		})
 }
 
-func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildXCreate(tl *TaskList) *Task {
 	return tl.CreateTask("buildx", "create").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			r, err := rand.Int(rand.Reader, big.NewInt(1000))
 
 			if err != nil {
 				return err
 			}
 
-			instance := fmt.Sprintf("%s_%d", setup.TL.Pipe.Docker.BuildxInstance, r)
+			instance := fmt.Sprintf("%s_%d", setup.P.Docker.BuildxInstance, r)
 
 			t.CreateCommand(
 				setup.DOCKER_EXE,
@@ -43,7 +46,7 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 				instance,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					c.Log.Infoln("Creating a new instance of docker buildx.")
 
 					return nil
@@ -52,14 +55,14 @@ func DockerBuildXCreate(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }
 
-func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildxSetupQemu(tl *TaskList) *Task {
 	return tl.CreateTask("buildx", "qemu").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			// spawn virtual machine
 			t.CreateCommand(
 				setup.DOCKER_EXE,
@@ -87,18 +90,18 @@ func DockerBuildxSetupQemu(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }
 
-func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildX(tl *TaskList) *Task {
 	return tl.CreateTask("buildx").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.Log.Infof(
 				"Building Docker image: %s in %s",
-				t.Pipe.DockerFile.Name,
-				t.Pipe.DockerFile.Context,
+				P.DockerFile.Name,
+				P.DockerFile.Context,
 			)
 
 			t.Log.Infoln("Using Docker Buildx for building the Docker image.")
@@ -110,37 +113,37 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 				"build",
 				"--provenance=false",
 			).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					var err error
-					if t.Pipe.DockerImage.BuildArgs, err = InlineTemplates[any](t.Pipe.DockerImage.BuildArgs, nil); err != nil {
+					if P.DockerImage.BuildArgs, err = InlineTemplates[any](P.DockerImage.BuildArgs, nil); err != nil {
 						return err
 					}
 
-					for _, v := range t.Pipe.DockerImage.BuildArgs {
+					for _, v := range P.DockerImage.BuildArgs {
 						c.AppendArgs("--build-arg", v)
 					}
 
-					if t.Pipe.DockerImage.Pull {
+					if P.DockerImage.Pull {
 						c.AppendArgs("--pull")
 					}
 
 					c.AppendArgs("--push")
 
-					if t.Pipe.Docker.BuildxPlatforms != "" {
-						c.AppendArgs("--platform", t.Pipe.Docker.BuildxPlatforms)
+					if P.Docker.BuildxPlatforms != "" {
+						c.AppendArgs("--platform", P.Docker.BuildxPlatforms)
 					}
 
-					for _, tag := range t.Pipe.Ctx.Tags {
+					for _, tag := range C.Tags {
 						c.AppendArgs("-t", tag)
 					}
 
 					c.AppendArgs(
 						"--file",
-						t.Pipe.DockerFile.Name,
+						P.DockerFile.Name,
 						".",
 					)
 
-					c.SetDir(t.Pipe.DockerFile.Context)
+					c.SetDir(P.DockerFile.Context)
 					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
 					return nil
@@ -149,7 +152,7 @@ func DockerBuildX(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

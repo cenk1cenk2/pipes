@@ -4,9 +4,9 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func DockerVersion(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerVersion(tl *TaskList) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
 				DOCKER_EXE,
 				"--version",
@@ -16,17 +16,17 @@ func DockerVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }
 
-func DockerBuildXVersion(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildXVersion(tl *TaskList) *Task {
 	return tl.CreateTask("version", "buildx").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !t.Pipe.Docker.UseBuildx
+		ShouldDisable(func(t *Task) bool {
+			return !P.Docker.UseBuildx
 		}).
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.Log.Infoln("Docker Buildx is enabled.")
 
 			t.CreateCommand(
@@ -39,7 +39,7 @@ func DockerBuildXVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

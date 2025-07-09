@@ -17,48 +17,48 @@ var Flags = []cli.Flag{
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.files",
+		Name:     "docker-manifest.files",
 		Usage:    "Read published tags from a file. format(glob)",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_FILES"),
 		),
 		Value:       []string{"**/.published-docker-images*"},
-		Destination: &TL.Pipe.DockerManifest.Files,
+		Destination: &P.DockerManifest.Files,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.target",
+		Name:     "docker-manifest.target",
 		Usage:    "Target image names for patching the manifest. format(Template[string]())",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_TARGET"),
 		),
-		Destination: &TL.Pipe.DockerManifest.Target,
+		Destination: &P.DockerManifest.Target,
 	},
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.images",
+		Name:     "docker-manifest.images",
 		Usage:    "Image names for patching the manifest with the given target.",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_IMAGES"),
 		),
-		Destination: &TL.Pipe.DockerManifest.Images,
+		Destination: &P.DockerManifest.Images,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.matrix",
+		Name:     "docker-manifest.matrix",
 		Usage:    "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
 		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_MATRIX"),
 		),
 		Action: func(_ context.Context, command *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &TL.Pipe.DockerManifest.Matrix); err != nil {
+			if err := json.Unmarshal([]byte(v), &P.DockerManifest.Matrix); err != nil {
 				return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
 
 			}
