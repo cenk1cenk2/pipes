@@ -3,8 +3,8 @@ package build
 import (
 	"time"
 
-	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 )
 
 func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -13,7 +13,7 @@ func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
 			return setup.TL.Pipe.Docker.UseBuildx
 		}).
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
+			return JobSequence(
 				DockerBuild(tl).Job(),
 				DockerPush(tl).Job(),
 			)

@@ -54,11 +54,11 @@ func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobSequence(
+			return JobSequence(
 				Setup(tl).Job(),
 				DockerTagsParent(tl).Job(),
 
-				tl.JobParallel(
+				JobParallel(
 					DockerBuildParent(tl).Job(),
 					DockerBuildXParent(tl).Job(),
 				),

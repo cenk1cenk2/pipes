@@ -9,7 +9,7 @@ import (
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("init").
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
+			return JobSequence(
 				job,
 				ParseReferences(tl).Job(),
 			)

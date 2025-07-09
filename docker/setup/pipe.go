@@ -26,7 +26,7 @@ func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobParallel(
+			return JobParallel(
 				DockerVersion(tl).Job(),
 				DockerBuildXVersion(tl).Job(),
 			)

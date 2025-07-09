@@ -39,9 +39,9 @@ func New(p *Plumber) *TaskList[Pipe] {
 			return nil
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobSequence(
-				tl.JobParallel(
-					tl.JobSequence(
+			return JobSequence(
+				JobParallel(
+					JobSequence(
 						DiscoverPublishedImageFiles(tl).Job(),
 						FetchPublishedImagesFromFiles(tl).Job(),
 					),

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math/big"
 
-	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 )
 
 func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
@@ -15,7 +15,7 @@ func DockerBuildXParent(tl *TaskList[Pipe]) *Task[Pipe] {
 			return !setup.TL.Pipe.Docker.UseBuildx
 		}).
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
+			return JobSequence(
 				DockerBuildXCreate(tl).Job(),
 				DockerBuildxSetupQemu(tl).Job(),
 				DockerBuildX(tl).Job(),

@@ -4,14 +4,14 @@ import (
 	"io"
 	"strings"
 
-	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/docker/setup"
 )
 
 func DockerLoginParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("login", "parent").
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobParallel(
+			return JobParallel(
 				DockerLogin(tl).Job(),
 				DockerLoginVerify(tl).Job(),
 			)

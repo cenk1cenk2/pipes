@@ -8,18 +8,18 @@ import (
 	"regexp"
 	"strings"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
-	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {
 	return tl.CreateTask("tags").
 		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
-				tl.JobParallel(
+			return JobSequence(
+				JobParallel(
 					DockerTagsUser(tl).Job(),
 					DockerTagsFile(tl).Job(),
 				),
