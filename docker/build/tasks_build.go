@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {

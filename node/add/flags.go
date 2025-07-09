@@ -3,10 +3,10 @@ package pipe
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 //revive:disable:line-length-limit
@@ -53,7 +53,7 @@ var Flags = []cli.Flag{
 }
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.NodeAdd.Packages = tl.CliContext.StringSlice("packages.node")
+	tl.Pipe.NodeAdd.Packages = tl.Cli.StringSlice("packages.node")
 
 	return nil
 }

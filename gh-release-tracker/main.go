@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/gh-release-tracker/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 					tl := &pipe.TL
 
 					return tl.RunJobs(
-						pipe.New(p).SetCliContext(c).Job(),
+						pipe.New(p).SetCli(c).Job(),
 					)
 				},
 			}

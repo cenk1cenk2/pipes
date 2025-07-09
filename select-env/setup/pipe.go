@@ -2,7 +2,7 @@ package setup
 
 import (
 	"gitlab.kilic.dev/devops/pipes/common/flags"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (

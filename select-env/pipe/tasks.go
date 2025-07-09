@@ -3,7 +3,7 @@ package pipe
 import (
 	"github.com/joho/godotenv"
 	"gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func WriteEnvironmentFile(tl *TaskList[Pipe]) *Task[Pipe] {

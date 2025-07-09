@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	"gitlab.kilic.dev/devops/pipes/docker/login"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func AddDockerTag(t *Task[Pipe], tag string) error {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/terraform/apply"
 	"gitlab.kilic.dev/devops/pipes/terraform/install"
@@ -11,7 +11,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/publish"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func main() {
@@ -32,10 +32,10 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
-									install.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									login.New(p).SetCli(c).Job(),
+									state.New(p).SetCli(c).Job(),
+									install.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -50,8 +50,8 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									lint.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									lint.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -66,10 +66,10 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
-									plan.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									login.New(p).SetCli(c).Job(),
+									state.New(p).SetCli(c).Job(),
+									plan.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -84,10 +84,10 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
-									apply.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									login.New(p).SetCli(c).Job(),
+									state.New(p).SetCli(c).Job(),
+									apply.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -102,7 +102,7 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									publish.New(p).SetCliContext(c).Job(),
+									publish.New(p).SetCli(c).Job(),
 								),
 							)
 						},

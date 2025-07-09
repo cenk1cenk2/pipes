@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func TerraformPlan(tl *TaskList[Pipe]) *Task[Pipe] {

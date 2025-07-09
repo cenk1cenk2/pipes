@@ -5,7 +5,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {

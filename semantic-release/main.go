@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	node "gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func main() {
@@ -33,10 +33,10 @@ func main() {
 
 					return tl.RunJobs(
 						tl.JobSequence(
-							environment.New(p).SetCliContext(c).Job(),
-							node.New(p).SetCliContext(c).Job(),
-							login.New(p).SetCliContext(c).Job(),
-							pipe.New(p).SetCliContext(c).Job(),
+							environment.New(p).SetCli(c).Job(),
+							node.New(p).SetCli(c).Job(),
+							login.New(p).SetCli(c).Job(),
+							pipe.New(p).SetCli(c).Job(),
 						),
 					)
 				},

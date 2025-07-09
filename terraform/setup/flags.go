@@ -1,8 +1,8 @@
 package setup
 
 import (
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -132,7 +132,7 @@ var Flags = []cli.Flag{
 
 //revive:disable:unused-parameter
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.Project.Workspaces = tl.CliContext.StringSlice("terraform-project.workspaces")
+	tl.Pipe.Project.Workspaces = tl.Cli.StringSlice("terraform-project.workspaces")
 
 	tl.Pipe.Ctx.EnvVars = make(map[string]string)
 

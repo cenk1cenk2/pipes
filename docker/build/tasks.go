@@ -1,9 +1,9 @@
 package build
 
 import (
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func Setup(tl *TaskList[Pipe]) *Task[Pipe] {

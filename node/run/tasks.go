@@ -3,7 +3,7 @@ package run
 import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {

@@ -2,7 +2,7 @@ package lint
 
 import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func TerraformLint(tl *TaskList[Pipe]) *Task[Pipe] {

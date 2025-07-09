@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -89,7 +89,7 @@ func ProcessFlags(tl *TaskList[Pipe]) error {
 		)
 	}
 
-	if v := tl.CliContext.String("readme.matrix"); v != "" {
+	if v := tl.Cli.String("readme.matrix"); v != "" {
 		if err := json.Unmarshal([]byte(v), &tl.Pipe.Readme.Matrix); err != nil {
 			return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
 		}

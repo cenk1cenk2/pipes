@@ -1,8 +1,8 @@
 package plan
 
 import (
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	"github.com/urfave/cli/v3"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 //revive:disable:line-length-limit

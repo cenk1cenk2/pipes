@@ -3,7 +3,7 @@ package build
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 

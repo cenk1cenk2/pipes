@@ -1,8 +1,8 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -45,7 +45,7 @@ var Flags = []cli.Flag{
 }
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.Markdown.Patterns = tl.CliContext.StringSlice("markdown-toc.pattern")
+	tl.Pipe.Markdown.Patterns = tl.Cli.StringSlice("markdown-toc.pattern")
 
 	return nil
 }

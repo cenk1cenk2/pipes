@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/node/build"
 	"gitlab.kilic.dev/devops/pipes/node/install"
@@ -9,7 +9,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/run"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func main() {
@@ -39,8 +39,8 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									login.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -55,9 +55,9 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									install.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									login.New(p).SetCli(c).Job(),
+									install.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -71,9 +71,9 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									environment.New(p).SetCliContext(c).Job(),
-									build.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									environment.New(p).SetCli(c).Job(),
+									build.New(p).SetCli(c).Job(),
 								),
 							)
 						},
@@ -87,9 +87,9 @@ func main() {
 
 							return tl.RunJobs(
 								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									environment.New(p).SetCliContext(c).Job(),
-									run.New(p).SetCliContext(c).Job(),
+									setup.New(p).SetCli(c).Job(),
+									environment.New(p).SetCli(c).Job(),
+									run.New(p).SetCli(c).Job(),
 								),
 							)
 						},

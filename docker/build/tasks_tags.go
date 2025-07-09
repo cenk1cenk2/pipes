@@ -12,7 +12,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func DockerTagsParent(tl *TaskList[Pipe]) *Task[Pipe] {

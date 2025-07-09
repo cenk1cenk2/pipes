@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/urfave/cli/v2"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 //revive:disable:line-length-limit
@@ -44,7 +44,7 @@ var Flags = []cli.Flag{
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
 	if tl.Pipe.NodeCommand.Script == "" {
-		args := tl.CliContext.Args().Slice()
+		args := tl.Cli.Args().Slice()
 
 		if len(args) < 1 {
 			return fmt.Errorf("Arguments are needed to run a specific script.")

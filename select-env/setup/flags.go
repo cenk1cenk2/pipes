@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 //revive:disable:line-length-limit
@@ -63,7 +63,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 })
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	if v := tl.CliContext.String("environment.conditions"); v != "" {
+	if v := tl.Cli.String("environment.conditions"); v != "" {
 		if err := json.Unmarshal([]byte(v), &tl.Pipe.Environment.Conditions); err != nil {
 			return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
 		}

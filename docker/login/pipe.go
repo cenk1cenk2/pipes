@@ -1,7 +1,7 @@
 package login
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
@@ -23,9 +23,6 @@ var TL = TaskList[Pipe]{
 func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
-		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(
 				DockerLogin(tl).Job(),

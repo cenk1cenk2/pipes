@@ -1,7 +1,10 @@
 package manifest
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	"fmt"
+
+	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/docker/login"
 )
 
 type (
@@ -27,7 +30,13 @@ func New(p *Plumber) *TaskList[Pipe] {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
+			if login.TL.Pipe.DockerRegistry.Registry != "" {
+				tl.Pipe.DockerManifest.Target = fmt.Sprintf("%s/%s", login.TL.Pipe.DockerRegistry.Registry, tl.Pipe.DockerManifest.Target)
+			}
+
+			tl.Pipe.ManifestedImages = make(map[string][]string)
+
+			return nil
 		}).
 		Set(func(tl *TaskList[Pipe]) Job {
 			return tl.JobSequence(

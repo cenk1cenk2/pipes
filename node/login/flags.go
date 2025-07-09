@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -48,13 +48,13 @@ var Flags = []cli.Flag{
 }
 
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	if v := tl.CliContext.String("npm.login"); v != "" {
+	if v := tl.Cli.String("npm.login"); v != "" {
 		if err := json.Unmarshal([]byte(v), &tl.Pipe.Npm.Login); err != nil {
 			return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 		}
 	}
 
-	tl.Pipe.Npm.NpmRcFile = tl.CliContext.StringSlice("npm.npmrc_file")
+	tl.Pipe.Npm.NpmRcFile = tl.Cli.StringSlice("npm.npmrc_file")
 
 	return nil
 }

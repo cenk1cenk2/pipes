@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/urfave/cli/v2"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 	"golang.org/x/exp/slices"
 )
 
@@ -101,7 +101,7 @@ var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
 
 //revive:disable:unused-parameter
 func ProcessFlags(tl *TaskList[Pipe]) error {
-	registry := tl.CliContext.String("terraform-module.registry")
+	registry := tl.Cli.String("terraform-module.registry")
 	if !slices.Contains([]string{TF_REGISTRY_GITLAB}, registry) {
 		return fmt.Errorf("Registry type is not supported: %s", registry)
 	}
