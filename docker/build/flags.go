@@ -73,7 +73,7 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Category: setup.CATEGORY_DOCKER_IMAGE,
 		Name:     "docker-file.context",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("DOCKER_FILE_CONTEXT"),
+			cli.EnvVar("DOCKERFILE_CONTEXT"),
 		),
 		Usage:       "Dockerfile context argument for build operation.",
 		Required:    false,

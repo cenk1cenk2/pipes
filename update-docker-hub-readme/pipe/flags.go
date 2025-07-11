@@ -18,7 +18,7 @@ const (
 var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_HUB,
-		Name:     "docker_hub.username",
+		Name:     "docker-hub.username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_USERNAME"),
 		),
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_HUB,
-		Name:     "docker_hub.password",
+		Name:     "docker-hub.password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_PASSWORD"),
 		),
@@ -40,7 +40,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_DOCKER_HUB,
-		Name:     "docker_hub.address",
+		Name:     "docker-hub.address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_ADDRESS"),
 		),
@@ -76,7 +76,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_README,
-		Name:     "readme.short_description",
+		Name:     "readme.short-description",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("README_SHORT_DESCRIPTION"),
 		),
