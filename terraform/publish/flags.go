@@ -37,7 +37,7 @@ var Flags = CombineFlags(flags.NewTagsFileFlags(
 		Required:    true,
 		Value:       "",
 		Destination: &P.Module.Name,
-		Action: func(ctx context.Context, c *cli.Command, s string) error {
+		Action: func(_ context.Context, _ *cli.Command, s string) error {
 			regexp.MustCompile(`[_ ]`).ReplaceAllString(s, "-")
 
 			P.Module.Name = s

@@ -31,7 +31,7 @@ var Flags = []cli.Flag{
 		),
 		Required:    false,
 		Destination: &P.NodeCommand.Script,
-		Action: func(ctx context.Context, c *cli.Command, v string) error {
+		Action: func(_ context.Context, c *cli.Command, v string) error {
 			if v == "" {
 				args := c.Args().Slice()
 

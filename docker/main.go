@@ -25,7 +25,7 @@ func main() {
 						Name:        "login",
 						Description: "Login to the given Docker registries.",
 						Flags:       CombineFlags(setup.Flags, login.Flags),
-						Action: func(ctx context.Context, c *cli.Command) error {
+						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
 								JobSequence(
 									setup.New(p).Job(),
@@ -39,7 +39,7 @@ func main() {
 						Name:        "build",
 						Description: "Build Docker images.",
 						Flags:       CombineFlags(setup.Flags, login.Flags, build.Flags),
-						Action: func(ctx context.Context, c *cli.Command) error {
+						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
 								JobSequence(
 									setup.New(p).Job(),
@@ -54,7 +54,7 @@ func main() {
 						Name:        "manifest",
 						Description: "Update manifests of the Docker images.",
 						Flags:       CombineFlags(setup.Flags, login.Flags, manifest.Flags),
-						Action: func(ctx context.Context, c *cli.Command) error {
+						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
 								JobSequence(
 									setup.New(p).Job(),
