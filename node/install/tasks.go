@@ -5,21 +5,21 @@ import (
 	"os"
 	"strings"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
+func InstallNodeDependencies(tl *TaskList) *Task {
 	return tl.CreateTask("install").
-		Set(func(t *Task[Pipe]) error {
-			packageManager := setup.TL.Pipe.Ctx.PackageManager
+		Set(func(t *Task) error {
+			packageManager := setup.C.PackageManager
 
 			t.CreateCommand(
 				packageManager.Exe,
 			).
-				Set(func(c *Command[Pipe]) error {
-					if TL.Pipe.NodeInstall.UseLockFile {
+				Set(func(c *Command) error {
+					if P.NodeInstall.UseLockFile {
 						c.AppendArgs(packageManager.Commands.InstallWithLock...)
 
 						t.Log.Infoln("Using lockfile for installation.")
@@ -29,9 +29,9 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 						t.Log.Infoln("Installing dependencies without a lockfile.")
 					}
 
-					c.AppendArgs(strings.Split(t.Pipe.NodeInstall.Args, " ")...)
+					c.AppendArgs(strings.Split(P.NodeInstall.Args, " ")...)
 
-					if t.Pipe.NodeInstall.Cache {
+					if P.NodeInstall.Cache {
 						cacheDir := fmt.Sprintf(".%s", packageManager.Exe)
 						t.Log.Infof("Setting up cache: %s", cacheDir)
 
@@ -39,10 +39,10 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs(cacheDir)
 					}
 
-					c.SetDir(TL.Pipe.NodeInstall.Cwd)
+					c.SetDir(P.NodeInstall.Cwd)
 
 					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(environment.TL.Pipe.Ctx.EnvVars)
+						AppendEnvironment(environment.C.EnvVars)
 
 					return nil
 				}).
@@ -50,7 +50,7 @@ func InstallNodeDependencies(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

@@ -8,9 +8,9 @@ Automation tools for various pipelines.
 
 <!-- toc -->
 
-- [Pipes](#pipes)
+- [Description](#description)
+- [Pipes](#pipes-1)
   - [cenk1cenk2/pipe-docker](#cenk1cenk2pipe-docker)
-  - [cenk1cenk2/pipe-gh-release-tracker](#cenk1cenk2pipe-gh-release-tracker)
   - [cenk1cenk2/pipe-gl-artifacts](#cenk1cenk2pipe-gl-artifacts)
   - [cenk1cenk2/pipe-markdown-toc](#cenk1cenk2pipe-markdown-toc)
   - [cenk1cenk2/pipe-node](#cenk1cenk2pipe-node)
@@ -30,10 +30,6 @@ Automation tools for various pipelines.
 ### cenk1cenk2/pipe-docker
 
 [Read more...](./docker/README.md)
-
-### cenk1cenk2/pipe-gh-release-tracker
-
-[Read more...](./gh-release-tracker/README.md)
 
 ### cenk1cenk2/pipe-gl-artifacts
 

@@ -1,7 +1,9 @@
 package pipe
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	"fmt"
+
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
@@ -19,25 +21,40 @@ type (
 	}
 
 	Pipe struct {
-		Ctx
-
 		DockerHub
 		Readme
 	}
+
+	Ctx struct {
+		Token       string
+		Readme      map[string]ParsedReadme
+		ReadmeFiles map[string][]byte
+	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+var C = &Ctx{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			if P.Readme.Repository == "" && len(P.Readme.Matrix) == 0 {
+				return fmt.Errorf("You have to either provide a target via Repository or multiple targets through the Matrix.")
+			}
+
+			C.Readme = make(map[string]ParsedReadme)
+
+			return nil
 		}).
-		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobSequence(
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
 				LoginToDockerHubRegistry(tl).Job(),
 				DiscoverJobs(tl).Job(),
 				UpdateDockerReadme(tl).Job(),

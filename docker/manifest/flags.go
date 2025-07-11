@@ -1,13 +1,12 @@
 package manifest
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
-	"gitlab.kilic.dev/devops/pipes/docker/login"
+	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 //revive:disable:line-length-limit
@@ -18,57 +17,52 @@ var Flags = []cli.Flag{
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.files",
-		Usage:    "Read published tags from a file. format(glob)",
-		Required: false,
-		EnvVars:  []string{"DOCKER_MANIFEST_FILES"},
-		Value:    cli.NewStringSlice("**/.published-docker-images*"),
+		Name:     "docker-manifest.files",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_MANIFEST_FILES"),
+		),
+		Usage:       "Read published tags from a file. format(glob)",
+		Required:    false,
+		Value:       []string{"**/.published-docker-images*"},
+		Destination: &P.DockerManifest.Files,
 	},
 
 	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_MANIFEST,
-		Name:        "docker_manifest.target",
+		Category: setup.CATEGORY_DOCKER_MANIFEST,
+		Name:     "docker-manifest.target",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_MANIFEST_TARGET"),
+		),
 		Usage:       "Target image names for patching the manifest. format(Template[string]())",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_MANIFEST_TARGET"},
-		Destination: &TL.Pipe.DockerManifest.Target,
+		Destination: &P.DockerManifest.Target,
 	},
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.images",
-		Usage:    "Image names for patching the manifest with the given target.",
-		Required: false,
-		EnvVars:  []string{"DOCKER_MANIFEST_IMAGES"},
+		Name:     "docker-manifest.images",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_MANIFEST_IMAGES"),
+		),
+		Usage:       "Image names for patching the manifest with the given target.",
+		Required:    false,
+		Destination: &P.DockerManifest.Images,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
-		Name:     "docker_manifest.matrix",
+		Name:     "docker-manifest.matrix",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_MANIFEST_MATRIX"),
+		),
 		Usage:    "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
 		Required: false,
-		EnvVars:  []string{"DOCKER_MANIFEST_MATRIX"},
+		Action: func(_ context.Context, c *cli.Command, v string) error {
+			if err := json.Unmarshal([]byte(v), &P.DockerManifest.Matrix); err != nil {
+				return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
+
+			}
+			return nil
+		},
 	},
-}
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.DockerManifest.Files = tl.CliContext.StringSlice("docker_manifest.files")
-	tl.Pipe.DockerManifest.Images = tl.CliContext.StringSlice("docker_manifest.images")
-
-	// extend image names with registry
-
-	if login.TL.Pipe.DockerRegistry.Registry != "" {
-		tl.Pipe.DockerManifest.Target = fmt.Sprintf("%s/%s", login.TL.Pipe.DockerRegistry.Registry, tl.Pipe.DockerManifest.Target)
-	}
-
-	if v := tl.CliContext.String("docker_manifest.matrix"); v != "" {
-		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerManifest.Matrix); err != nil {
-			return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
-		}
-	}
-
-	tl.Pipe.ManifestedImages = make(map[string][]string)
-
-	return nil
 }

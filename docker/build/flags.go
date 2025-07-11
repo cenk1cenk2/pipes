@@ -1,31 +1,32 @@
 package build
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 //revive:disable:line-length-limit
 
-var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
+var Flags = CombineFlags(flags.NewGitFlags(
 	flags.GitFlagsSetup{
-		GitBranchDestination: &TL.Pipe.Git.Branch,
-		GitTagDestination:    &TL.Pipe.Git.Tag,
+		GitBranchDestination: &P.Git.Branch,
+		GitTagDestination:    &P.Git.Tag,
 	},
 ), flags.NewTagsFileFlags(
 	flags.TagsFileFlagsSetup{
-		TagsFileDestination: &TL.Pipe.DockerImage.TagsFile,
+		TagsFileDestination: &P.DockerImage.TagsFile,
 		TagsFileRequired:    false,
 	},
 ), flags.NewTagsFileStrictFlags(
 	flags.TagsFileStrictFlagsSetup{
-		TagsFileStrictDestination: &TL.Pipe.DockerImage.TagsFileStrict,
+		TagsFileStrictDestination: &P.DockerImage.TagsFileStrict,
 		TagsFileStrictRequired:    false,
 	},
 ), []cli.Flag{
@@ -33,160 +34,184 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	// CATEGORY_DOCKER
 
 	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER,
-		Name:        "docker.buildx_platforms",
+		Category: setup.CATEGORY_DOCKER,
+		Name:     "docker.buildx-platforms",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_BUILDX_PLATFORMS"),
+		),
 		Usage:       "Platform arguments for Docker BuildX.",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_BUILDX_PLATFORMS"},
 		Value:       "linux/amd64",
-		Destination: &TL.Pipe.Docker.BuildxPlatforms,
+		Destination: &P.Docker.BuildxPlatforms,
 	},
 
 	// setup.CATEGORY_DOCKER_IMAGE
 
 	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.name",
+		Category: setup.CATEGORY_DOCKER_IMAGE,
+		Name:     "docker-image.name",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_NAME"),
+		),
 		Usage:       "Image name for the will be built Docker image.",
 		Required:    true,
-		EnvVars:     []string{"DOCKER_IMAGE_NAME"},
-		Destination: &TL.Pipe.DockerImage.Name,
+		Destination: &P.DockerImage.Name,
 	},
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
-		Name:     "docker_image.tags",
-		Usage:    "Image tag for the will be built Docker image.",
-		Required: true,
-		EnvVars:  []string{"DOCKER_IMAGE_TAGS"},
-	},
-
-	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_file.context",
-		Usage:       "Dockerfile context argument for build operation.",
-		Required:    false,
-		EnvVars:     []string{"DOCKERFILE_CONTEXT"},
-		Value:       ".",
-		Destination: &TL.Pipe.DockerFile.Context,
-	},
-
-	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_file.name",
-		Usage:       "Dockerfile path for the build operation",
-		Required:    false,
-		EnvVars:     []string{"DOCKERFILE_NAME"},
-		Value:       "Dockerfile",
-		Destination: &TL.Pipe.DockerFile.Name,
+		Name:     "docker-image.tags",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_TAGS"),
+		),
+		Usage:       "Image tag for the will be built Docker image.",
+		Required:    true,
+		Destination: &P.DockerImage.Tags,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
-		Name:     "docker_image.tag_as_latest",
+		Name:     "docker-file.context",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_FILE_CONTEXT"),
+		),
+		Usage:       "Dockerfile context argument for build operation.",
+		Required:    false,
+		Value:       ".",
+		Destination: &P.DockerFile.Context,
+	},
+
+	&cli.StringFlag{
+		Category: setup.CATEGORY_DOCKER_IMAGE,
+		Name:     "docker-file.name",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKERFILE_NAME"),
+		),
+		Usage:       "Dockerfile path for the build operation",
+		Required:    false,
+		Value:       "Dockerfile",
+		Destination: &P.DockerFile.Name,
+	},
+
+	&cli.StringFlag{
+		Category: setup.CATEGORY_DOCKER_IMAGE,
+		Name:     "docker-image.tag-as-latest",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_TAGS_AS_LATEST"),
+		),
 		Usage: `Regex pattern to tag the image as latest.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json(RegExp[])`,
 		Required: false,
-		EnvVars:  []string{"DOCKER_IMAGE_TAG_AS_LATEST"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
+		Action: func(_ context.Context, c *cli.Command, v string) error {
+			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagAsLatest); err != nil {
+				return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
-		Name:     "docker_image.sanitize_tags",
+		Name:     "docker-image.sanitize-tags",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_SANITIZE_TAGS"),
+		),
 		Usage: `Sanitizes the given regex pattern out of tag name.
       Template is interpolated with the given matches in the regular expression.
       json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
 		Required: false,
-		EnvVars:  []string{"DOCKER_IMAGE_SANITIZE_TAGS"},
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
+		Action: func(_ context.Context, c *cli.Command, v string) error {
+			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsSanitize); err != nil {
+				return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
-		Name:     "docker_image.tags_template",
+		Name:     "docker-image.tags-template",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_TAGS_TEMPLATE"),
+		),
 		Usage: `Modifies every tag that matches a certain condition.
       Template is interpolated with the given matches in the regular expression.
       json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
 		Required: false,
-		EnvVars:  []string{"DOCKER_IMAGE_TAGS_TEMPLATE"},
 		Value:    "[]",
+		Action: func(_ context.Context, c *cli.Command, v string) error {
+			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsTemplate); err != nil {
+				return fmt.Errorf("Can not unmarshal Docker image templating tag conditions: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.BoolFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.inspect",
+		Category: setup.CATEGORY_DOCKER_IMAGE,
+		Name:     "docker-image.inspect",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_INSPECT"),
+		),
 		Usage:       "Inspect after pushing the image.",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_IMAGE_INSPECT"},
 		Value:       true,
-		Destination: &TL.Pipe.DockerImage.Inspect,
+		Destination: &P.DockerImage.Inspect,
 	},
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_IMAGE,
-		Name:     "docker_image.build_args",
+		Name:     "docker-image.build-args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_BUILD_ARGS"),
+		),
 		Usage: `Pass in extra build arguments for image.
       You can use it as a template with environment variables as the context.
       format(map[string]Template[string]())`,
-		Required: false,
-		EnvVars:  []string{"DOCKER_IMAGE_BUILD_ARGS"},
+		Required:    false,
+		Destination: &P.DockerImage.BuildArgs,
 	},
 
 	&cli.BoolFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_image.pull",
+		Category: setup.CATEGORY_DOCKER_IMAGE,
+		Name:     "docker-image.pull",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_PULL"),
+		),
 		Usage:       "Pull before building the image.",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_IMAGE_PULL"},
 		Value:       true,
-		Destination: &TL.Pipe.DockerImage.Pull,
+		Destination: &P.DockerImage.Pull,
 	},
 
 	// CATEGORY_DOCKER_MANIFEST
 
 	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_MANIFEST,
-		Name:        "docker_manifest.target",
+		Category: setup.CATEGORY_DOCKER_MANIFEST,
+		Name:     "docker_manifest.target",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_MANIFEST_TARGET"),
+		),
 		Usage:       "Target image names for patching the manifest. format(Template[string]([]string))",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_MANIFEST_TARGET"},
-		Destination: &TL.Pipe.DockerManifest.Target,
+		Destination: &P.DockerManifest.Target,
 	},
 
 	&cli.StringFlag{
-		Category:    setup.CATEGORY_DOCKER_IMAGE,
-		Name:        "docker_manifest.output-file",
+		Category: setup.CATEGORY_DOCKER_IMAGE,
+		Name:     "docker-manifest.output-file",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_MANIFEST_OUTPUT_FILE"),
+		),
 		Usage:       "Write all the images that are published in to a file for later use. format(Template[string]([]string))",
 		Required:    false,
-		EnvVars:     []string{"DOCKER_MANIFEST_OUTPUT_FILE"},
 		Value:       `.published-docker-images_{{ $ | join "," | sha256sum }}`,
-		Destination: &TL.Pipe.DockerManifest.OutputFile,
+		Destination: &P.DockerManifest.OutputFile,
 	},
 })
-
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	if v := tl.CliContext.String("docker_image.tag_as_latest"); v != "" {
-		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerImage.TagAsLatest); err != nil {
-			return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
-		}
-	}
-
-	if v := tl.CliContext.String("docker_image.sanitize_tags"); v != "" {
-		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerImage.TagsSanitize); err != nil {
-			return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
-		}
-	}
-
-	if v := tl.CliContext.String("docker_image.tags_template"); v != "" {
-		if err := json.Unmarshal([]byte(v), &tl.Pipe.DockerImage.TagsTemplate); err != nil {
-			return fmt.Errorf("Can not unmarshal Docker image templating tag conditions: %w", err)
-		}
-	}
-
-	tl.Pipe.DockerImage.Tags = tl.CliContext.StringSlice("docker_image.tags")
-	tl.Pipe.DockerImage.BuildArgs = tl.CliContext.StringSlice("docker_image.build_args")
-
-	return nil
-}

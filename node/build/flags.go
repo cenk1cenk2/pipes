@@ -3,7 +3,7 @@ package build
 import (
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
@@ -17,32 +17,38 @@ var Flags = []cli.Flag{
 	// CATEGORY_BUILD
 
 	&cli.StringFlag{
-		Category:    CATEGORY_NODE_BUILD,
-		Name:        "node.build_script",
+		Category: CATEGORY_NODE_BUILD,
+		Name:     "node.build_script",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_BUILD_SCRIPT"),
+		),
 		Usage:       fmt.Sprintf("package.json script for building operation. %s", environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE),
 		Required:    false,
-		EnvVars:     []string{"NODE_BUILD_SCRIPT"},
 		Value:       "build",
-		Destination: &TL.Pipe.NodeBuild.Script,
+		Destination: &P.NodeBuild.Script,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_NODE_BUILD,
-		Name:        "node.build_script_args",
+		Category: CATEGORY_NODE_BUILD,
+		Name:     "node.build_script_args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_BUILD_SCRIPT_ARGS"),
+		),
 		Usage:       fmt.Sprintf("package.json script arguments for building operation. %s", environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE),
 		Required:    false,
-		EnvVars:     []string{"NODE_BUILD_SCRIPT_ARGS"},
 		Value:       "",
-		Destination: &TL.Pipe.NodeBuild.ScriptArgs,
+		Destination: &P.NodeBuild.ScriptArgs,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_NODE_BUILD,
-		Name:        "node.build_cwd",
+		Category: CATEGORY_NODE_BUILD,
+		Name:     "node.build_cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_BUILD_CWD"),
+		),
 		Usage:       "Working directory for build operation.",
 		Required:    false,
-		EnvVars:     []string{"NODE_BUILD_CWD"},
 		Value:       ".",
-		Destination: &TL.Pipe.NodeBuild.Cwd,
+		Destination: &P.NodeBuild.Cwd,
 	},
 }

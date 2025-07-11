@@ -1,7 +1,7 @@
 package login
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
@@ -14,19 +14,23 @@ type (
 	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			return nil
 		}).
-		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobSequence(
-				GenerateTerraformRegistryCredentilsEnvVars(tl).Job(),
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
+				GenerateTerraformRegistryCredentialsEnvVars(tl).Job(),
 			)
 		})
 }

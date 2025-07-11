@@ -1,8 +1,11 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"context"
 
+	"github.com/urfave/cli/v3"
+
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/terraform/apply"
 	"gitlab.kilic.dev/devops/pipes/terraform/install"
 	"gitlab.kilic.dev/devops/pipes/terraform/lint"
@@ -11,31 +14,28 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/publish"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
 func main() {
 	NewPlumber(
-		func(p *Plumber) *cli.App {
-			return &cli.App{
+		func(p *Plumber) *cli.Command {
+			return &cli.Command{
 				Name:        CLI_NAME,
 				Version:     VERSION,
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
-				Commands: cli.Commands{
+				Commands: []*cli.Command{
 					{
 						Name:        "install",
 						Description: "Install terraform project.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags, state.Flags, install.Flags),
-						Action: func(c *cli.Context) error {
-							tl := &install.TL
-
-							return tl.RunJobs(
-								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
-									install.New(p).SetCliContext(c).Job(),
+						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, install.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								JobSequence(
+									setup.New(p).Job(),
+									login.New(p).Job(),
+									state.New(p).Job(),
+									install.New(p).Job(),
 								),
 							)
 						},
@@ -44,14 +44,12 @@ func main() {
 					{
 						Name:        "lint",
 						Description: "Lint terraform project with terraform.",
-						Flags:       p.AppendFlags(setup.Flags, lint.Flags),
-						Action: func(c *cli.Context) error {
-							tl := &lint.TL
-
-							return tl.RunJobs(
-								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									lint.New(p).SetCliContext(c).Job(),
+						Flags:       CombineFlags(setup.Flags, lint.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								JobSequence(
+									setup.New(p).Job(),
+									lint.New(p).Job(),
 								),
 							)
 						},
@@ -60,16 +58,14 @@ func main() {
 					{
 						Name:        "plan",
 						Description: "Plan terraform project.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags, state.Flags, plan.Flags),
-						Action: func(c *cli.Context) error {
-							tl := &plan.TL
-
-							return tl.RunJobs(
-								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
-									plan.New(p).SetCliContext(c).Job(),
+						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, plan.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								JobSequence(
+									setup.New(p).Job(),
+									login.New(p).Job(),
+									state.New(p).Job(),
+									plan.New(p).Job(),
 								),
 							)
 						},
@@ -78,16 +74,14 @@ func main() {
 					{
 						Name:        "apply",
 						Description: "Apply terraform project.",
-						Flags:       p.AppendFlags(setup.Flags, login.Flags, state.Flags, apply.Flags),
-						Action: func(c *cli.Context) error {
-							tl := &apply.TL
-
-							return tl.RunJobs(
-								tl.JobSequence(
-									setup.New(p).SetCliContext(c).Job(),
-									login.New(p).SetCliContext(c).Job(),
-									state.New(p).SetCliContext(c).Job(),
-									apply.New(p).SetCliContext(c).Job(),
+						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, apply.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								JobSequence(
+									setup.New(p).Job(),
+									login.New(p).Job(),
+									state.New(p).Job(),
+									apply.New(p).Job(),
 								),
 							)
 						},
@@ -96,13 +90,11 @@ func main() {
 					{
 						Name:        "publish",
 						Description: "Publish terraform project.",
-						Flags:       p.AppendFlags(publish.Flags),
-						Action: func(c *cli.Context) error {
-							tl := &publish.TL
-
-							return tl.RunJobs(
-								tl.JobSequence(
-									publish.New(p).SetCliContext(c).Job(),
+						Flags:       CombineFlags(publish.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								JobSequence(
+									publish.New(p).Job(),
 								),
 							)
 						},
@@ -111,8 +103,7 @@ func main() {
 			}
 		}).
 		SetDocumentationOptions(DocumentationOptions{
-			ExcludeFlags:       true,
-			ExcludeHelpCommand: true,
+			ExcludeFlags: true,
 		}).
 		Run()
 }

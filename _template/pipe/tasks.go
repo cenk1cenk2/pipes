@@ -1,16 +1,16 @@
 package pipe
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func DefaultTask(tl *TaskList[Pipe]) *Task[Pipe] {
+func DefaultTask(tl *TaskList) *Task {
 	return tl.CreateTask("default").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
 				"echo",
 			).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					c.AppendArgs("hello")
 
 					return nil
@@ -19,7 +19,7 @@ func DefaultTask(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

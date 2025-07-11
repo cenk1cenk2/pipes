@@ -1,8 +1,7 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -16,41 +15,26 @@ var Flags = []cli.Flag{
 	// CATEGORY_SEMANTIC_RELEASE
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_SEMANTIC_RELEASE,
-		Name:        "semantic_release.dry_run",
+		Category: CATEGORY_SEMANTIC_RELEASE,
+		Name:     "semantic_release.dry_run",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("SEMANTIC_RELEASE_DRY_RUN"),
+		),
 		Usage:       "Run semantic-release in dry mode without making changes.",
 		Required:    false,
-		EnvVars:     []string{"SEMANTIC_RELEASE_DRY_RUN"},
 		Value:       false,
-		Destination: &TL.Pipe.SemanticRelease.IsDryRun,
+		Destination: &P.SemanticRelease.IsDryRun,
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_SEMANTIC_RELEASE,
-		Name:        "semantic_release.workspace",
+		Category: CATEGORY_SEMANTIC_RELEASE,
+		Name:     "semantic_release.workspace",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("SEMANTIC_RELEASE_WORKSPACE"),
+		),
 		Usage:       "Use @qiwi/multi-semantic-release package to do a workspace release.",
 		Required:    false,
-		EnvVars:     []string{"SEMANTIC_RELEASE_WORKSPACE"},
 		Value:       false,
-		Destination: &TL.Pipe.SemanticRelease.Workspace,
+		Destination: &P.SemanticRelease.Workspace,
 	},
-}
-
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Plumber.SetDeprecationNotices([]DeprecationNotice{
-		{
-			Flag:        []string{"packages.apk"},
-			Environment: []string{"ADD_APKS"},
-			Level:       LOG_LEVEL_ERROR,
-			Message:     "Installing os packages directly through this pipe is deprecated whereas argument has been found: %s",
-		},
-		{
-			Flag:        []string{"packages.node", "packages.node.global"},
-			Environment: []string{"PACKAGES_NODE", "PACKAGES_NODE_GLOBAL"},
-			Level:       LOG_LEVEL_ERROR,
-			Message:     "Installing node packages directly through this pipe is deprecated whereas argument has been found: %s",
-		},
-	})
-
-	return nil
 }

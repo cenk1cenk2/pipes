@@ -1,7 +1,7 @@
 package install
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -15,42 +15,50 @@ var Flags = []cli.Flag{
 	// CATEGORY_NODE_INSTALL
 
 	&cli.StringFlag{
-		Category:    CATEGORY_NODE_INSTALL,
-		Name:        "node.install_cwd",
+		Category: CATEGORY_NODE_INSTALL,
+		Name:     "node.install_cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_INSTALL_CWD"),
+		),
 		Usage:       "Install CWD for the package manager.",
 		Required:    false,
-		EnvVars:     []string{"NODE_INSTALL_CWD"},
 		Value:       ".",
-		Destination: &TL.Pipe.NodeInstall.Cwd,
+		Destination: &P.NodeInstall.Cwd,
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_NODE_INSTALL,
-		Name:        "node.use_lock_file",
+		Category: CATEGORY_NODE_INSTALL,
+		Name:     "node.use_lock_file",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_INSTALL_USE_LOCK_FILE"),
+		),
 		Usage:       "Use the lockfile while installing the packages.",
 		Required:    false,
-		EnvVars:     []string{"NODE_INSTALL_USE_LOCK_FILE"},
 		Value:       true,
-		Destination: &TL.Pipe.NodeInstall.UseLockFile,
+		Destination: &P.NodeInstall.UseLockFile,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_NODE_INSTALL,
-		Name:        "node.install_args",
+		Category: CATEGORY_NODE_INSTALL,
+		Name:     "node.install_args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_INSTALL_ARGS"),
+		),
 		Usage:       "Arguments to append to install command.",
 		Required:    false,
-		EnvVars:     []string{"NODE_INSTALL_ARGS"},
 		Value:       "",
-		Destination: &TL.Pipe.NodeInstall.Args,
+		Destination: &P.NodeInstall.Args,
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_NODE_INSTALL,
-		Name:        "node.install_cache_enable",
+		Category: CATEGORY_NODE_INSTALL,
+		Name:     "node.install_cache_enable",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_INSTALL_CACHE_ENABLE"),
+		),
 		Usage:       "Enable caching for the package manager.",
 		Required:    false,
-		EnvVars:     []string{"NODE_INSTALL_CACHE_ENABLE"},
 		Value:       true,
-		Destination: &TL.Pipe.NodeInstall.Cache,
+		Destination: &P.NodeInstall.Cache,
 	},
 }

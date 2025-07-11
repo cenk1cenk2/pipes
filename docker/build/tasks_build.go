@@ -3,30 +3,33 @@ package build
 import (
 	"time"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func DockerBuildParent(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuildParent(tl *TaskList) *Task {
 	return tl.CreateTask("build", "parent").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return setup.TL.Pipe.Docker.UseBuildx
+		ShouldDisable(func(t *Task) bool {
+			return setup.P.Docker.UseBuildx
 		}).
-		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
+		SetJobWrapper(func(job Job, t *Task) Job {
+			return JobSequence(
 				DockerBuild(tl).Job(),
 				DockerPush(tl).Job(),
 			)
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
 		})
 }
 
-func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerBuild(tl *TaskList) *Task {
 	return tl.CreateTask("build").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.Log.Infof(
 				"Building Docker image: %s in %s",
-				t.Pipe.DockerFile.Name,
-				t.Pipe.DockerFile.Context,
+				P.DockerFile.Name,
+				P.DockerFile.Context,
 			)
 
 			// build image
@@ -34,8 +37,8 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 				setup.DOCKER_EXE,
 				"build",
 			).
-				Set(func(c *Command[Pipe]) error {
-					if setup.TL.Pipe.Docker.UseBuildKit {
+				Set(func(c *Command) error {
+					if setup.P.Docker.UseBuildKit {
 						t.Log.Infoln("Using Docker BuildKit for the build operation.")
 
 						c.AppendEnvironment(
@@ -54,33 +57,33 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 					}
 
 					var err error
-					if t.Pipe.DockerImage.BuildArgs, err = InlineTemplates[any](t.Pipe.DockerImage.BuildArgs, nil); err != nil {
+					if P.DockerImage.BuildArgs, err = InlineTemplates[any](P.DockerImage.BuildArgs, nil); err != nil {
 						return err
 					}
 
-					for _, v := range t.Pipe.DockerImage.BuildArgs {
+					for _, v := range P.DockerImage.BuildArgs {
 						c.AppendArgs("--build-arg", v)
 					}
 
-					if t.Pipe.DockerImage.Pull {
+					if P.DockerImage.Pull {
 						c.AppendArgs("--pull")
 					}
 
-					if setup.TL.Pipe.Docker.UseBuildKit {
+					if setup.P.Docker.UseBuildKit {
 						c.AppendArgs("--push")
 					}
 
-					for _, tag := range t.Pipe.Ctx.Tags {
+					for _, tag := range P.Tags {
 						c.AppendArgs("-t", tag)
 					}
 
 					c.AppendArgs(
 						"--file",
-						t.Pipe.DockerFile.Name,
+						P.DockerFile.Name,
 						".",
 					)
 
-					c.SetDir(t.Pipe.DockerFile.Context)
+					c.SetDir(P.DockerFile.Context)
 					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
 
 					return nil
@@ -89,24 +92,24 @@ func DockerBuild(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }
 
-func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerPush(tl *TaskList) *Task {
 	return tl.CreateTask("push").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return setup.TL.Pipe.Docker.UseBuildKit
+		ShouldDisable(func(t *Task) bool {
+			return setup.P.Docker.UseBuildKit
 		}).
-		Set(func(t *Task[Pipe]) error {
-			for _, tag := range t.Pipe.Ctx.Tags {
+		Set(func(t *Task) error {
+			for _, tag := range C.Tags {
 				t.CreateCommand(
 					setup.DOCKER_EXE,
 					"push",
 					tag,
 				).
-					Set(func(c *Command[Pipe]) error {
+					Set(func(c *Command) error {
 						c.Log.Infof(
 							"Pushing Docker image: %s",
 							tag,
@@ -123,7 +126,7 @@ func DockerPush(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

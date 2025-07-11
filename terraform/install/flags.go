@@ -1,42 +1,42 @@
 package install
 
 import (
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Name:        "terraform-install.reconfigure",
+		Name: "terraform-install.reconfigure",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_INSTALL_RECONFIGURE"),
+		),
 		Usage:       "Reconfigure flag for terraform init.",
 		Required:    false,
-		EnvVars:     []string{"TF_INSTALL_RECONFIGURE"},
 		Value:       false,
-		Destination: &TL.Pipe.Install.Reconfigure,
+		Destination: &P.Install.Reconfigure,
 	},
 
 	&cli.BoolFlag{
-		Name:        "terraform-install.use-lockfile",
+		Name: "terraform-install.use-lockfile",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_INSTALL_USE_LOCKFILE"),
+		),
 		Usage:       "Use lockfile for terraform init.",
 		Required:    false,
-		EnvVars:     []string{"TF_INSTALL_USE_LOCKFILE"},
 		Value:       false,
-		Destination: &TL.Pipe.Install.UseLockfile,
+		Destination: &P.Install.UseLockfile,
 	},
 
 	&cli.StringFlag{
-		Name:        "terraform-install.args",
+		Name: "terraform-install.args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_INSTALL_ARGS"),
+		),
 		Usage:       "Additional arguments for terraform init.",
 		Required:    false,
-		EnvVars:     []string{"TF_INSTALL_ARGS"},
 		Value:       "",
-		Destination: &TL.Pipe.Install.Args,
+		Destination: &P.Install.Args,
 	},
-}
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	return nil
 }

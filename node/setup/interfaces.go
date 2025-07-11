@@ -5,7 +5,7 @@ type (
 		Install         []string
 		InstallWithLock []string
 		Run             []string
-		RunDelimitter   []string
+		RunDelimiter    []string
 		Add             []string
 		Global          []string
 		Cache           []string

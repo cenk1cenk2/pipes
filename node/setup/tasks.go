@@ -1,33 +1,33 @@
 package setup
 
 import (
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func SetupPackageManager(tl *TaskList[Pipe]) *Task[Pipe] {
+func SetupPackageManager(tl *TaskList) *Task {
 	return tl.CreateTask("init").
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.PackageManager = PackageManager{
-				Exe:      t.Pipe.Node.PackageManager,
-				Commands: PackageManagers[t.Pipe.Node.PackageManager],
+		Set(func(t *Task) error {
+			C.PackageManager = PackageManager{
+				Exe:      P.Node.PackageManager,
+				Commands: PackageManagers[P.Node.PackageManager],
 			}
 
-			t.Log.Infof("Using package manager: %s", t.Pipe.Node.PackageManager)
+			t.Log.Infof("Using package manager: %s", P.Node.PackageManager)
 
 			return nil
 		})
 }
 
-func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
+func NodeVersion(tl *TaskList) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
 				"node",
 				"--version",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command[Pipe]) error {
+				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetCombinedStream()
 
 					if len(stream) == 0 {
@@ -43,16 +43,16 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 				AddSelfToTheTask()
 
 			t.CreateCommand(
-				t.Pipe.Ctx.PackageManager.Exe,
+				C.PackageManager.Exe,
 			).
-				Set(func(c *Command[Pipe]) error {
-					c.AppendArgs(t.Pipe.Ctx.PackageManager.Commands.Version...)
+				Set(func(c *Command) error {
+					c.AppendArgs(C.PackageManager.Commands.Version...)
 
 					return nil
 				}).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command[Pipe]) error {
+				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetCombinedStream()
 
 					if len(stream) == 0 {
@@ -61,7 +61,7 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 						return nil
 					}
 
-					t.Log.Infof("%s version: v%s", t.Pipe.Ctx.PackageManager.Exe, stream[0])
+					t.Log.Infof("%s version: v%s", C.PackageManager.Exe, stream[0])
 
 					return nil
 				}).
@@ -69,7 +69,7 @@ func NodeVersion(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

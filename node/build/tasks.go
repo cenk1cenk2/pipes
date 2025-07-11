@@ -3,27 +3,27 @@ package build
 import (
 	"os"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
+func BuildNodeApplication(tl *TaskList) *Task {
 	return tl.CreateTask("build").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
-				setup.TL.Pipe.Ctx.PackageManager.Exe,
+				setup.C.PackageManager.Exe,
 			).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					ctx := environment.EnvironmentTemplate{
-						Environment: environment.TL.Pipe.Ctx.Environment,
-						EnvVars:     environment.TL.Pipe.Ctx.EnvVars,
+						Environment: environment.C.Environment,
+						EnvVars:     environment.C.EnvVars,
 					}
 
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...)
+					c.AppendArgs(setup.C.PackageManager.Commands.Run...)
 
-					if t.Pipe.NodeBuild.Script != "" {
-						tmpl, err := InlineTemplate(t.Pipe.NodeBuild.Script, ctx)
+					if P.NodeBuild.Script != "" {
+						tmpl, err := InlineTemplate(P.NodeBuild.Script, ctx)
 
 						if err != nil {
 							return err
@@ -32,10 +32,10 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs(tmpl)
 					}
 
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.RunDelimitter...)
+					c.AppendArgs(setup.C.PackageManager.Commands.RunDelimiter...)
 
-					if t.Pipe.NodeBuild.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(t.Pipe.NodeBuild.ScriptArgs, ctx)
+					if P.NodeBuild.ScriptArgs != "" {
+						tmpl, err := InlineTemplate(P.NodeBuild.ScriptArgs, ctx)
 
 						if err != nil {
 							return err
@@ -44,10 +44,10 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs(tmpl)
 					}
 
-					c.SetDir(t.Pipe.NodeBuild.Cwd)
+					c.SetDir(P.NodeBuild.Cwd)
 
 					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(environment.TL.Pipe.Ctx.EnvVars)
+						AppendEnvironment(environment.C.EnvVars)
 
 					return nil
 				}).
@@ -55,7 +55,7 @@ func BuildNodeApplication(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

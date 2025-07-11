@@ -1,7 +1,7 @@
 package flags
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 type TagsFileFlagsSetup struct {
@@ -14,11 +14,13 @@ func NewTagsFileFlags(setup TagsFileFlagsSetup) []cli.Flag {
 	return []cli.Flag{
 		// CATEGORY_TAGS_FILE
 		&cli.StringFlag{
-			Category:    CATEGORY_TAGS_FILE,
-			Name:        "tags-file",
+			Category: CATEGORY_TAGS_FILE,
+			Name:     "tags-file",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TAGS_FILE"),
+			),
 			Usage:       "Read tags from a file.",
 			Required:    setup.TagsFileRequired,
-			EnvVars:     []string{"TAGS_FILE"},
 			Value:       setup.TagsFileValue,
 			Destination: setup.TagsFileDestination,
 		},
@@ -35,11 +37,13 @@ func NewTagsFileStrictFlags(setup TagsFileStrictFlagsSetup) []cli.Flag {
 	return []cli.Flag{
 		// CATEGORY_TAGS_FILE
 		&cli.BoolFlag{
-			Category:    CATEGORY_TAGS_FILE,
-			Name:        "tags-file.strict",
+			Category: CATEGORY_TAGS_FILE,
+			Name:     "tags-file.strict",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TAGS_FILE_STRICT"),
+			),
 			Usage:       "Fail on missing tags file.",
 			Required:    setup.TagsFileStrictRequired,
-			EnvVars:     []string{"TAGS_FILE_STRICT"},
 			Value:       setup.TagsFileStrictValue,
 			Destination: setup.TagsFileStrictDestination,
 		},

@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"regexp"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/docker/login"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func AddDockerTag(t *Task[Pipe], tag string) error {
+func AddDockerTag(t *Task, tag string) error {
 	p, err := ProcessDockerTag(t, tag)
 
 	if err != nil {
@@ -18,15 +18,15 @@ func AddDockerTag(t *Task[Pipe], tag string) error {
 	return AppendDockerTag(t, p)
 }
 
-func AppendDockerTag(t *Task[Pipe], tag string) error {
+func AppendDockerTag(t *Task, tag string) error {
 	t.Lock.Lock()
-	t.Pipe.Ctx.Tags = append(t.Pipe.Ctx.Tags, tag)
+	C.Tags = append(C.Tags, tag)
 	t.Lock.Unlock()
 
 	return nil
 }
 
-func ProcessDockerTag(t *Task[Pipe], tag string) (string, error) {
+func ProcessDockerTag(t *Task, tag string) (string, error) {
 	var err error
 	if tag, err = ApplyTagTemplate(t, tag); err != nil {
 		return "", err
@@ -40,17 +40,17 @@ func ProcessDockerTag(t *Task[Pipe], tag string) (string, error) {
 		return tag, fmt.Errorf("Can not add empty tag to list.")
 	}
 
-	if login.TL.Pipe.DockerRegistry.Registry != "" {
-		tag = fmt.Sprintf("%s/%s:%s", login.TL.Pipe.DockerRegistry.Registry, t.Pipe.DockerImage.Name, tag)
+	if login.P.DockerRegistry.Registry != "" {
+		tag = fmt.Sprintf("%s/%s:%s", login.P.DockerRegistry.Registry, P.DockerImage.Name, tag)
 	} else {
-		tag = fmt.Sprintf("%s:%s", t.Pipe.DockerImage.Name, tag)
+		tag = fmt.Sprintf("%s:%s", P.DockerImage.Name, tag)
 	}
 
 	return tag, nil
 }
 
-func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
-	for _, s := range t.Pipe.DockerImage.TagsSanitize {
+func SanitizeDockerTag(t *Task, tag string) (string, error) {
+	for _, s := range P.DockerImage.TagsSanitize {
 		re, err := regexp.Compile(s.Match)
 
 		if err != nil {
@@ -73,8 +73,8 @@ func SanitizeDockerTag(t *Task[Pipe], tag string) (string, error) {
 	return tag, nil
 }
 
-func ApplyTagTemplate(t *Task[Pipe], tag string) (string, error) {
-	for _, s := range t.Pipe.DockerImage.TagsTemplate {
+func ApplyTagTemplate(t *Task, tag string) (string, error) {
+	for _, s := range P.DockerImage.TagsTemplate {
 		re, err := regexp.Compile(s.Match)
 
 		if err != nil {

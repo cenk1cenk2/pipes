@@ -5,26 +5,26 @@ import (
 	"os"
 	"strings"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/nochso/gomd/eol"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
+func GenerateNpmRc(tl *TaskList) *Task {
 	return tl.CreateTask("npmrc").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Npm.Login == nil && t.Pipe.Npm.NpmRc == ""
+		ShouldDisable(func(t *Task) bool {
+			return P.Npm.Login == nil && P.Npm.NpmRc == ""
 		}).
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.Log.Debugf(
-				".npmrc file: %s", strings.Join(t.Pipe.Npm.NpmRcFile, ", "),
+				".npmrc file: %s", strings.Join(P.Npm.NpmRcFile, ", "),
 			)
 
 			npmrc := []string{}
 
-			if t.Pipe.Npm.Login != nil {
+			if P.Npm.Login != nil {
 				t.Log.Infoln("Logging in to given registries with credentials.")
 
-				for _, v := range t.Pipe.Npm.Login {
+				for _, v := range P.Npm.Login {
 					t.Log.Infof(
 						"Generating login credentials for the registry: %s",
 						v.Registry,
@@ -37,16 +37,16 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 			}
 
-			if t.Pipe.Npm.NpmRc != "" {
+			if P.Npm.NpmRc != "" {
 				t.Log.Infoln("Appending directly to the given npmrc file.")
 
-				npmrc = append(npmrc, strings.Split(t.Pipe.Npm.NpmRc, eol.OSDefault().String())...)
+				npmrc = append(npmrc, strings.Split(P.Npm.NpmRc, eol.OSDefault().String())...)
 			}
 
-			for _, file := range t.Pipe.Npm.NpmRcFile {
+			for _, file := range P.Npm.NpmRcFile {
 				t.CreateSubtask(file).
 					Set(
-						func(st *Task[Pipe]) error {
+						func(st *Task) error {
 							st.Log.Infof("Generating npmrc file: %s", file)
 
 							f, err := os.OpenFile(file,
@@ -69,24 +69,24 @@ func GenerateNpmRc(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }
 
-func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
+func VerifyNpmLogin(tl *TaskList) *Task {
 	return tl.CreateTask("login").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Npm.Login == nil
+		ShouldDisable(func(t *Task) bool {
+			return P.Npm.Login == nil
 		}).
-		Set(func(t *Task[Pipe]) error {
-			for _, v := range t.Pipe.Npm.Login {
+		Set(func(t *Task) error {
+			for _, v := range P.Npm.Login {
 				t.CreateCommand(
 					"npm",
 					"whoami",
 				).
 					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-					Set(func(c *Command[Pipe]) error {
+					Set(func(c *Command) error {
 						c.Log.Infof(
 							"Checking login credentials for Npm registry: %s", v.Registry,
 						)
@@ -101,7 +101,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 						c.AppendArgs(
 							"--configfile",
-							t.Pipe.Npm.NpmRcFile[0],
+							P.Npm.NpmRcFile[0],
 							"--registry",
 							url,
 						)
@@ -113,7 +113,7 @@ func VerifyNpmLogin(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

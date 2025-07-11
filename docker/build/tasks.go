@@ -1,39 +1,39 @@
 package build
 
 import (
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
+func Setup(tl *TaskList) *Task {
 	return tl.CreateTask("init").
-		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
+		SetJobWrapper(func(job Job, t *Task) Job {
+			return JobSequence(
 				job,
 				ParseReferences(tl).Job(),
 			)
 		})
 }
 
-func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
+func ParseReferences(tl *TaskList) *Task {
 	return tl.CreateTask("init", "references").
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.References = parser.ParseGitReferences(t.Pipe.Git.Tag, t.Pipe.Git.Branch)
+		Set(func(t *Task) error {
+			C.References = parser.ParseGitReferences(P.Git.Tag, P.Git.Branch)
 
-			t.Log.Debugf("References for environment selection: %v", t.Pipe.Ctx.References)
+			t.Log.Debugf("References for environment selection: %v", C.References)
 
 			return nil
 		})
 }
 
-func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
+func DockerInspect(tl *TaskList) *Task {
 	return tl.CreateTask("inspect").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return !t.Pipe.DockerImage.Inspect
+		ShouldDisable(func(t *Task) bool {
+			return !P.DockerImage.Inspect
 		}).
-		Set(func(t *Task[Pipe]) error {
-			for _, tag := range t.Pipe.Ctx.Tags {
+		Set(func(t *Task) error {
+			for _, tag := range C.Tags {
 				t.CreateCommand(
 					setup.DOCKER_EXE,
 					"manifest",
@@ -41,7 +41,7 @@ func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
 					tag,
 				).
 					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-					Set(func(c *Command[Pipe]) error {
+					Set(func(c *Command) error {
 						c.Log.Infof(
 							"Inspecting Docker image: %s",
 							tag,
@@ -54,7 +54,7 @@ func DockerInspect(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

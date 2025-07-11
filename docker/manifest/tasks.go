@@ -7,17 +7,17 @@ import (
 	"strings"
 
 	glob "github.com/bmatcuk/doublestar/v4"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {
+func DiscoverPublishedImageFiles(tl *TaskList) *Task {
 	return tl.CreateTask("discover", "file").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.DockerManifest.Files) == 0
+		ShouldDisable(func(t *Task) bool {
+			return len(P.DockerManifest.Files) == 0
 		}).
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			cwd, err := os.Getwd()
 
 			if err != nil {
@@ -28,7 +28,7 @@ func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			matches := []string{}
 
-			for _, v := range t.Pipe.DockerManifest.Files {
+			for _, v := range P.DockerManifest.Files {
 				match, err := glob.Glob(fs, v)
 
 				if err != nil {
@@ -41,7 +41,7 @@ func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 			if len(matches) == 0 {
 				t.Log.Warnf(
 					"Can not match any files with the given pattern: %s",
-					strings.Join(t.Pipe.DockerManifest.Files, ", "),
+					strings.Join(P.DockerManifest.Files, ", "),
 				)
 
 				return nil
@@ -51,21 +51,21 @@ func DiscoverPublishedImageFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			t.Log.Debugf("Paths matched for given pattern: %s", strings.Join(matches, ", "))
 
-			t.Pipe.Ctx.Matches = matches
+			C.Matches = matches
 
 			return nil
 		})
 }
 
-func FetchPublishedImagesFromFiles(tl *TaskList[Pipe]) *Task[Pipe] {
+func FetchPublishedImagesFromFiles(tl *TaskList) *Task {
 	return tl.CreateTask("fetch", "file").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.Ctx.Matches) == 0
+		ShouldDisable(func(t *Task) bool {
+			return len(C.Matches) == 0
 		}).
-		Set(func(t *Task[Pipe]) error {
-			for _, f := range t.Pipe.Ctx.Matches {
+		Set(func(t *Task) error {
+			for _, f := range C.Matches {
 				t.CreateSubtask(f).
-					Set(func(t *Task[Pipe]) error {
+					Set(func(t *Task) error {
 						content, err := os.ReadFile(f)
 						if err != nil {
 							return err
@@ -83,7 +83,7 @@ func FetchPublishedImagesFromFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 						t.Log.Debugf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f)
 
 						t.Lock.Lock()
-						t.Pipe.Ctx.ManifestedImages[parsed.Target] = append(t.Pipe.Ctx.ManifestedImages[parsed.Target], parsed.Images...)
+						C.ManifestedImages[parsed.Target] = append(C.ManifestedImages[parsed.Target], parsed.Images...)
 						t.Lock.Unlock()
 
 						return nil
@@ -92,33 +92,33 @@ func FetchPublishedImagesFromFiles(tl *TaskList[Pipe]) *Task[Pipe] {
 			}
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }
 
-func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
+func FetchUserPublishedImages(tl *TaskList) *Task {
 	return tl.CreateTask("fetch", "user").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return len(t.Pipe.DockerManifest.Images) == 0
+		ShouldDisable(func(t *Task) bool {
+			return len(P.DockerManifest.Images) == 0
 		}).
-		Set(func(t *Task[Pipe]) error {
-			if t.Pipe.DockerManifest.Target != "" && len(t.Pipe.DockerManifest.Images) > 0 {
+		Set(func(t *Task) error {
+			if P.DockerManifest.Target != "" && len(P.DockerManifest.Images) > 0 {
 				t.Lock.Lock()
 				var err error
-				if t.Pipe.DockerManifest.Target, err = InlineTemplate[any](t.Pipe.DockerManifest.Target, nil); err != nil {
+				if P.DockerManifest.Target, err = InlineTemplate[any](P.DockerManifest.Target, nil); err != nil {
 					return err
 				}
 
-				t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target] = append(t.Pipe.Ctx.ManifestedImages[t.Pipe.DockerManifest.Target], t.Pipe.DockerManifest.Images...)
+				C.ManifestedImages[P.DockerManifest.Target] = append(C.ManifestedImages[P.DockerManifest.Target], P.DockerManifest.Images...)
 				t.Lock.Unlock()
 
-				t.Log.Debugf("Fetched direct image: %s -> %v", t.Pipe.DockerManifest.Target, t.Pipe.DockerManifest.Images)
+				t.Log.Debugf("Fetched direct image: %s -> %v", P.DockerManifest.Target, P.DockerManifest.Images)
 			}
 
-			for _, manifest := range t.Pipe.DockerManifest.Matrix {
+			for _, manifest := range P.DockerManifest.Matrix {
 				t.Lock.Lock()
-				t.Pipe.Ctx.ManifestedImages[manifest.Target] = append(t.Pipe.Ctx.ManifestedImages[manifest.Target], manifest.Images...)
+				C.ManifestedImages[manifest.Target] = append(C.ManifestedImages[manifest.Target], manifest.Images...)
 				t.Lock.Unlock()
 
 				t.Log.Debugf("Fetched manifest from matrix: %s -> %v", manifest.Target, manifest.Images)
@@ -128,12 +128,12 @@ func FetchUserPublishedImages(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
+func UpdateManifests(tl *TaskList) *Task {
 	return tl.CreateTask("manifest").
-		Set(func(t *Task[Pipe]) error {
-			for target, images := range t.Pipe.Ctx.ManifestedImages {
+		Set(func(t *Task) error {
+			for target, images := range C.ManifestedImages {
 				t.CreateSubtask(target).
-					Set(func(t *Task[Pipe]) error {
+					Set(func(t *Task) error {
 						t.
 							CreateCommand(
 								setup.DOCKER_EXE,
@@ -141,7 +141,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 								"create",
 								target,
 							).
-							Set(func(c *Command[Pipe]) error {
+							Set(func(c *Command) error {
 								for _, image := range images {
 									c.AppendArgs(fmt.Sprintf("-a %s", image))
 								}
@@ -162,7 +162,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 
 						return nil
 					}).
-					ShouldRunAfter(func(t *Task[Pipe]) error {
+					ShouldRunAfter(func(t *Task) error {
 						return t.RunCommandJobAsJobSequence()
 					}).
 					AddSelfToTheParentAsParallel()
@@ -170,7 +170,7 @@ func UpdateManifests(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }

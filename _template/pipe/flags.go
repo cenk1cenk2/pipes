@@ -1,24 +1,20 @@
 package pipe
 
 import (
-	"github.com/urfave/cli/v2"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
+	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name:        "default.flag",
-		Usage:       "Some default flag.",
+		Name:  "default.flag",
+		Usage: "Some default flag.",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PIPE_DEFAULT_FLAG"),
+		),
 		Required:    false,
-		EnvVars:     []string{"DEFAULT_FLAG"},
 		Value:       "",
-		Destination: &TL.Pipe.Default.Flag,
+		Destination: &P.Default.Flag,
 	},
-}
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	return nil
 }

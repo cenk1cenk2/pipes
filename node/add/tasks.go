@@ -1,31 +1,31 @@
 package pipe
 
 import (
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
 )
 
-func AddNodeModules(tl *TaskList[Pipe]) *Task[Pipe] {
+func AddNodeModules(tl *TaskList) *Task {
 	return tl.CreateTask("packages", "node").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
-				setup.TL.Pipe.Ctx.PackageManager.Exe,
+				setup.C.PackageManager.Exe,
 			).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					ctx := environment.EnvironmentTemplate{
-						Environment: environment.TL.Pipe.Ctx.Environment,
-						EnvVars:     environment.TL.Pipe.Ctx.EnvVars,
+						Environment: environment.C.Environment,
+						EnvVars:     environment.C.EnvVars,
 					}
 
-					if t.Pipe.NodeAdd.Global {
-						c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Global...)
+					if P.NodeAdd.Global {
+						c.AppendArgs(setup.C.PackageManager.Commands.Global...)
 					}
 
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Add...)
+					c.AppendArgs(setup.C.PackageManager.Commands.Add...)
 
-					if t.Pipe.NodeAdd.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(t.Pipe.NodeAdd.ScriptArgs, ctx)
+					if P.NodeAdd.ScriptArgs != "" {
+						tmpl, err := InlineTemplate(P.NodeAdd.ScriptArgs, ctx)
 
 						if err != nil {
 							return err
@@ -34,9 +34,9 @@ func AddNodeModules(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs(tmpl)
 					}
 
-					c.AppendArgs(t.Pipe.NodeAdd.Packages...)
+					c.AppendArgs(P.NodeAdd.Packages...)
 
-					c.SetDir(t.Pipe.NodeAdd.Cwd)
+					c.SetDir(P.NodeAdd.Cwd)
 
 					return nil
 				}).
@@ -44,7 +44,7 @@ func AddNodeModules(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

@@ -1,13 +1,12 @@
 package publish
 
 import (
-	"fmt"
+	"context"
 	"regexp"
 
-	"github.com/urfave/cli/v2"
+	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
-	. "gitlab.kilic.dev/libraries/plumber/v5"
-	"golang.org/x/exp/slices"
 )
 
 //revive:disable:line-length-limit
@@ -18,9 +17,9 @@ const (
 	CATEGORY_REGISTRY_GITLAB = "Registry - Gitlab"
 )
 
-var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
+var Flags = CombineFlags(flags.NewTagsFileFlags(
 	flags.TagsFileFlagsSetup{
-		TagsFileDestination: &TL.Pipe.Module.TagsFile,
+		TagsFileDestination: &P.Module.TagsFile,
 		TagsFileRequired:    false,
 		TagsFileValue:       ".tags",
 	},
@@ -28,87 +27,96 @@ var Flags = TL.Plumber.AppendFlags(flags.NewTagsFileFlags(
 	// CATEGORY_MODULE
 
 	&cli.StringFlag{
-		Category:    CATEGORY_MODULE,
-		Name:        "terraform-module.name",
+		Category: CATEGORY_MODULE,
+		Name:     "terraform-module.name",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_MODULE_NAME"),
+			cli.EnvVar("CI_PROJECT_NAME"),
+		),
 		Usage:       "Name for the module that will be published.",
 		Required:    true,
-		EnvVars:     []string{"TF_MODULE_NAME", "CI_PROJECT_NAME"},
 		Value:       "",
-		Destination: &TL.Pipe.Module.Name,
+		Destination: &P.Module.Name,
+		Action: func(ctx context.Context, c *cli.Command, s string) error {
+			regexp.MustCompile(`[_ ]`).ReplaceAllString(s, "-")
+
+			P.Module.Name = s
+
+			return nil
+		},
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_MODULE,
-		Name:        "terraform-module.cwd",
+		Category: CATEGORY_MODULE,
+		Name:     "terraform-module.cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_MODULE_CWD"),
+			cli.EnvVar("TF_ROOT"),
+		),
 		Usage:       "Directory for the module that will be published.",
 		Required:    false,
-		EnvVars:     []string{"TF_MODULE_CWD", "TF_ROOT"},
 		Value:       ".",
-		Destination: &TL.Pipe.Module.Cwd,
+		Destination: &P.Module.Cwd,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_MODULE,
-		Name:        "terraform-module.system",
+		Category: CATEGORY_MODULE,
+		Name:     "terraform-module.system",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_MODULE_SYSTEM"),
+		),
 		Usage:       "Module system for the module that will be published.",
 		Required:    false,
-		EnvVars:     []string{"TF_MODULE_SYSTEM"},
 		Value:       "local",
-		Destination: &TL.Pipe.Module.System,
+		Destination: &P.Module.System,
 	},
 
 	// CATEGORY_REGISTRY
 
 	&cli.StringFlag{
-		Category:    CATEGORY_REGISTRY,
-		Name:        "terraform-module.registry",
+		Category: CATEGORY_REGISTRY,
+		Name:     "terraform-module.registry",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_MODULE_REGISTRY"),
+		),
 		Usage:       "Registry of the module that will be published.",
 		Required:    false,
-		EnvVars:     []string{"TF_MODULE_REGISTRY"},
 		Value:       TF_REGISTRY_GITLAB,
-		Destination: &TL.Pipe.Registry.Name,
+		Destination: &P.Registry.Name,
 	},
 
 	// CATEGORY_REGISTRY_GITLAB
 
 	&cli.StringFlag{
-		Category:    CATEGORY_REGISTRY_GITLAB,
-		Name:        "terraform-module.registry.gitlab.api-url",
+		Category: CATEGORY_REGISTRY_GITLAB,
+		Name:     "terraform-module.registry.gitlab.api-url",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("CI_API_V4_URL"),
+		),
 		Usage:       "Gitlab API URL for publish call.",
 		Required:    false,
-		EnvVars:     []string{"CI_API_V4_URL"},
-		Destination: &TL.Pipe.Registry.Gitlab.ApiUrl,
+		Destination: &P.Registry.Gitlab.ApiUrl,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_REGISTRY_GITLAB,
-		Name:        "terraform-module.registry.gitlab.project-id",
+		Category: CATEGORY_REGISTRY_GITLAB,
+		Name:     "terraform-module.registry.gitlab.project-id",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("CI_PROJECT_ID"),
+		),
 		Usage:       "Gitlab project id for publish call.",
 		Required:    false,
-		EnvVars:     []string{"CI_PROJECT_ID"},
-		Destination: &TL.Pipe.Registry.Gitlab.ProjectId,
+		Destination: &P.Registry.Gitlab.ProjectId,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_REGISTRY_GITLAB,
-		Name:        "terraform-module.registry.gitlab.token",
-		Usage:       "Gitlab API token for publish call.",
+		Category: CATEGORY_REGISTRY_GITLAB,
+		Name:     "terraform-module.registry.gitlab.token",
+		Usage:    "Gitlab API token for publish call.",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("CI_JOB_TOKEN"),
+		),
 		Required:    false,
-		EnvVars:     []string{"CI_JOB_TOKEN"},
-		Destination: &TL.Pipe.Registry.Gitlab.Token,
+		Destination: &P.Registry.Gitlab.Token,
 	},
 })
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	registry := tl.CliContext.String("terraform-module.registry")
-	if !slices.Contains([]string{TF_REGISTRY_GITLAB}, registry) {
-		return fmt.Errorf("Registry type is not supported: %s", registry)
-	}
-
-	cleanse := regexp.MustCompile(`[_ ]`)
-
-	tl.Pipe.Module.Name = cleanse.ReplaceAllString(tl.Pipe.Module.Name, "-")
-
-	return nil
-}
