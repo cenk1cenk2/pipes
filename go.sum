@@ -1,5 +1,7 @@
 github.com/bmatcuk/doublestar/v4 v4.8.1 h1:54Bopc5c2cAvhLRAzqOGCYHYyhcDHsFF4wWIR5wKP38=
 github.com/bmatcuk/doublestar/v4 v4.8.1/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
+github.com/cenk1cenk2/plumber/v6 v6.0.0 h1:RcSTbPDykhefR1oNAIP31C1E6gndvE4rIOCFzVmzZZ4=
+github.com/cenk1cenk2/plumber/v6 v6.0.0/go.mod h1:PCNmW81q3h09TCBKnpnDbffbQm7b8KX2SyFo3L5Xupk=
 github.com/creasty/defaults v1.8.0 h1:z27FJxCAa0JKt3utc0sCImAEb+spPucmKoOdLHvHYKk=
 github.com/creasty/defaults v1.8.0/go.mod h1:iGzKe6pbEHnpMPtfDXZEr0NVxWnPTjb1bbDy08fPzYM=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

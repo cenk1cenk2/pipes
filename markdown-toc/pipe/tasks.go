@@ -77,7 +77,9 @@ func RunMarkdownToc(tl *TaskList) *Task {
 
 						var b bytes.Buffer
 
-						p.Print(&b)
+						if err := p.Print(&b); err != nil {
+							return fmt.Errorf("failed to generate table of contents: %w", err)
+						}
 
 						s := b.String()
 
