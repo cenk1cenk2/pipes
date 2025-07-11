@@ -1,7 +1,6 @@
 package setup
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 )
 
@@ -16,125 +15,151 @@ const (
 var Flags = []cli.Flag{
 	// CATEGORY_CONFIG
 	&cli.StringFlag{
-		Category:    CATEGORY_CONFIG,
-		Name:        "terraform-config.log-level",
+		Category: CATEGORY_CONFIG,
+		Name:     "terraform-config.log-level",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_LOG_LEVEL"),
+			cli.EnvVar("TF_LOG"),
+		),
 		Usage:       `Terraform log level. enum("trace", "debug", "info", "warn", "error")`,
 		Required:    false,
-		EnvVars:     []string{"TF_LOG_LEVEL", "TF_LOG"},
 		Value:       "",
-		Destination: &TL.Pipe.Config.LogLevel,
+		Destination: &P.Config.LogLevel,
 	},
 
 	// CATEGORY_PROJECT
 
 	&cli.StringFlag{
-		Category:    CATEGORY_PROJECT,
-		Name:        "terraform-project.cwd",
+		Category: CATEGORY_PROJECT,
+		Name:     "terraform-project.cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_ROOT"),
+		),
 		Usage:       "Terraform project working directory",
 		Required:    false,
-		EnvVars:     []string{"TF_ROOT"},
 		Value:       ".",
-		Destination: &TL.Pipe.Project.Cwd,
+		Destination: &P.Project.Cwd,
 	},
 
 	&cli.StringSliceFlag{
 		Category: CATEGORY_PROJECT,
 		Name:     "terraform-project.workspaces",
-		Usage:    "Workspaces that this command will be executed on.",
-		Required: false,
-		EnvVars:  []string{"TF_WORKSPACES"},
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_WORKSPACES"),
+		),
+		Usage:       "Workspaces that this command will be executed on.",
+		Required:    false,
+		Destination: &P.Project.Workspaces,
 	},
 
 	// CATEGORY_CI_VARIABLES
 
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.job-id",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.job-id",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_JOB_ID"),
+			cli.EnvVar("CI_JOB_ID"),
+		),
 		Usage:       "Injected CI job-id variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_JOB_ID", "CI_JOB_ID"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.JobId,
+		Destination: &P.CiVariables.JobId,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.commit-sha",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.commit-sha",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_COMMIT_SHA"),
+			cli.EnvVar("CI_COMMIT_SHA"),
+		),
 		Usage:       "Injected CI commit-sha variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_COMMIT_SHA", "CI_COMMIT_SHA"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.CommitSha,
+		Destination: &P.CiVariables.CommitSha,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.job-stage",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.job-stage",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_JOB_STAGE"),
+			cli.EnvVar("CI_JOB_STAGE"),
+		),
 		Usage:       "Injected CI job-stage variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_JOB_STAGE", "CI_JOB_STAGE"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.JobStage,
+		Destination: &P.CiVariables.JobStage,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.project-id",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.project-id",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_PROJECT_ID"),
+			cli.EnvVar("CI_PROJECT_ID"),
+		),
 		Usage:       "Injected CI project-id variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_PROJECT_ID", "CI_PROJECT_ID"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.ProjectId,
+		Destination: &P.CiVariables.ProjectId,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.project-name",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.project-name",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_PROJECT_NAME"),
+			cli.EnvVar("CI_PROJECT_NAME"),
+		),
 		Usage:       "Injected CI project-name variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_PROJECT_NAME", "CI_PROJECT_NAME"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.ProjectName,
+		Destination: &P.CiVariables.ProjectName,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.project-namespace",
-		Usage:       "Injected CI project-namespace variable to the deployment.",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.project-namespace",
+		Usage:    "Injected CI project-namespace variable to the deployment.",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_PROJECT_NAMESPACE"),
+			cli.EnvVar("CI_PROJECT_NAMESPACE"),
+		),
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_PROJECT_NAMESPACE", "CI_PROJECT_NAMESPACE"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.ProjectNamespace,
+		Destination: &P.CiVariables.ProjectNamespace,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.project-path",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.project-path",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_PROJECT_PATH"),
+			cli.EnvVar("CI_PROJECT_PATH"),
+		),
 		Usage:       "Injected CI project-path variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_PROJECT_PATH", "CI_PROJECT_PATH"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.ProjectPath,
+		Destination: &P.CiVariables.ProjectPath,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.project-url",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.project-url",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_PROJECT_URL"),
+			cli.EnvVar("CI_PROJECT_URL"),
+		),
 		Usage:       "Injected CI project-url variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_PROJECT_URL", "CI_PROJECT_URL"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.ProjectUrl,
+		Destination: &P.CiVariables.ProjectUrl,
 	},
 	&cli.StringFlag{
-		Category:    CATEGORY_CI_VARIABLES,
-		Name:        "terraform-var.api-url",
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.api-url",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_API_V4_URL"),
+			cli.EnvVar("CI_API_V4_URL"),
+		),
 		Usage:       "Injected CI api-url variable to the deployment.",
 		Required:    false,
-		EnvVars:     []string{"TF_VAR_CI_API_V4_URL", "CI_API_V4_URL"},
 		Value:       "",
-		Destination: &TL.Pipe.CiVariables.ApiUrl,
+		Destination: &P.CiVariables.ApiUrl,
 	},
-}
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.Project.Workspaces = tl.Cli.StringSlice("terraform-project.workspaces")
-
-	tl.Pipe.Ctx.EnvVars = make(map[string]string)
-
-	return nil
 }

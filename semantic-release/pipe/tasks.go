@@ -4,25 +4,25 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
+func RunSemanticRelease(tl *TaskList) *Task {
 	return tl.CreateTask("release").
-		Set(func(t *Task[Pipe]) error {
-			if t.Pipe.Workspace {
-				t.Pipe.Ctx.Exe = MULTI_SEMANTIC_RELEASE_EXE
+		Set(func(t *Task) error {
+			if P.Workspace {
+				C.Exe = MULTI_SEMANTIC_RELEASE_EXE
 			} else {
-				t.Pipe.Ctx.Exe = SEMANTIC_RELEASE_EXE
+				C.Exe = SEMANTIC_RELEASE_EXE
 			}
 
 			t.CreateCommand(
-				t.Pipe.Ctx.Exe,
+				C.Exe,
 			).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					// this should be added for original multi-semantic-release and not the @qiwi/multi-semantic-release
-					// if t.Pipe.SemanticRelease.Workspace {
+					// if P.SemanticRelease.Workspace {
 					// 	c.AppendArgs("--ignore-private-packages")
 					// }
 
-					if t.Pipe.SemanticRelease.IsDryRun {
+					if P.SemanticRelease.IsDryRun {
 						c.AppendArgs("--dry-run")
 					}
 
@@ -36,7 +36,7 @@ func RunSemanticRelease(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

@@ -8,16 +8,16 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/docker/docker/api/types/registry"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/docker/docker/api/types/registry"
 )
 
-func LoginToDockerHubRegistry(tl *TaskList[Pipe]) *Task[Pipe] {
+func LoginToDockerHubRegistry(tl *TaskList) *Task {
 	return tl.CreateTask("login").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			login, err := json.Marshal(registry.AuthConfig{
-				Username: t.Pipe.DockerHub.Username,
-				Password: t.Pipe.DockerHub.Password,
+				Username: P.DockerHub.Username,
+				Password: P.DockerHub.Password,
 			})
 
 			if err != nil {
@@ -49,25 +49,25 @@ func LoginToDockerHubRegistry(tl *TaskList[Pipe]) *Task[Pipe] {
 				return err
 			}
 
-			t.Pipe.Ctx.Token = b.Token
+			C.Token = b.Token
 
 			return nil
 		})
 }
 
-func DiscoverJobs(tl *TaskList[Pipe]) *Task[Pipe] {
+func DiscoverJobs(tl *TaskList) *Task {
 	return tl.CreateTask("discover").
-		Set(func(t *Task[Pipe]) error {
-			if t.Pipe.Readme.Repository != "" {
-				t.Pipe.Ctx.Readme[t.Pipe.Readme.Repository] = ParsedReadme{
-					File:        t.Pipe.Readme.File,
-					Description: t.Pipe.Readme.Description,
+		Set(func(t *Task) error {
+			if P.Readme.Repository != "" {
+				C.Readme[P.Readme.Repository] = ParsedReadme{
+					File:        P.Readme.File,
+					Description: P.Readme.Description,
 				}
 			}
 
-			if len(t.Pipe.Readme.Matrix) > 0 {
-				for _, readme := range t.Pipe.Readme.Matrix {
-					t.Pipe.Ctx.Readme[readme.Repository] = ParsedReadme{
+			if len(P.Readme.Matrix) > 0 {
+				for _, readme := range P.Readme.Matrix {
+					C.Readme[readme.Repository] = ParsedReadme{
 						File:        readme.File,
 						Description: readme.Description,
 					}
@@ -79,15 +79,15 @@ func DiscoverJobs(tl *TaskList[Pipe]) *Task[Pipe] {
 }
 
 //ignore:funlen
-func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
+func UpdateDockerReadme(tl *TaskList) *Task {
 	return tl.CreateTask("update").
-		Set(func(t *Task[Pipe]) error {
-			for repository, readme := range t.Pipe.Ctx.Readme {
+		Set(func(t *Task) error {
+			for repository, readme := range C.Readme {
 				t.CreateSubtask(repository).
-					Set(func(t *Task[Pipe]) error {
+					Set(func(t *Task) error {
 						t.Log.Debugf(
 							"Running against repository: %s/%s",
-							t.Pipe.DockerHub.Address,
+							P.DockerHub.Address,
 							repository,
 						)
 
@@ -116,7 +116,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 						}
 
 						req, err := http.NewRequest(http.MethodPatch,
-							fmt.Sprintf("%s/%s/", t.Pipe.DockerHub.Address, repository),
+							fmt.Sprintf("%s/%s/", P.DockerHub.Address, repository),
 							bytes.NewReader(body),
 						)
 
@@ -164,20 +164,20 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 							t.Log.Infof(
 								"Successfully pushed readme file to: %s > %s/%s",
 								readme.File,
-								t.Pipe.DockerHub.Address,
+								P.DockerHub.Address,
 								repository,
 							)
 						case http.StatusNotFound:
 							return fmt.Errorf(
 								"Repository does not exists: %s/%s",
-								t.Pipe.DockerHub.Address,
+								P.DockerHub.Address,
 								repository,
 							)
 						default:
 							if !b.CanEdit {
 								return fmt.Errorf(
 									"Given user credentials do not have permission to edit repository: %s/%s",
-									t.Pipe.DockerHub.Address,
+									P.DockerHub.Address,
 									repository,
 								)
 							}
@@ -195,7 +195,7 @@ func UpdateDockerReadme(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }

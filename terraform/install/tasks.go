@@ -1,47 +1,47 @@
 package install
 
 import (
-	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformInstall(tl *TaskList[Pipe]) *Task[Pipe] {
+func TerraformInstall(tl *TaskList) *Task {
 	return tl.CreateTask("install").
-		Set(func(t *Task[Pipe]) error {
-			for _, ws := range setup.TL.Pipe.Project.Workspaces {
+		Set(func(t *Task) error {
+			for _, ws := range setup.P.Project.Workspaces {
 				t.CreateSubtask(ws).
-					Set(func(t *Task[Pipe]) error {
+					Set(func(t *Task) error {
 						t.CreateCommand(
 							"terraform",
 							"init",
 							"-input=false",
 						).
-							Set(func(c *Command[Pipe]) error {
-								if t.Pipe.Install.Reconfigure {
+							Set(func(c *Command) error {
+								if P.Install.Reconfigure {
 									t.Log.Infoln("Will reconfigure state.")
 
 									c.AppendArgs("-reconfigure")
 								}
 
-								if t.Pipe.Install.UseLockfile {
+								if P.Install.UseLockfile {
 									t.Log.Infoln("Using lockfile.")
 
 									c.AppendArgs("-lockfile=readonly")
 								}
 
-								if t.Pipe.Install.Args != "" {
-									c.AppendArgs(t.Pipe.Install.Args)
+								if P.Install.Args != "" {
+									c.AppendArgs(P.Install.Args)
 								}
 
 								return nil
 							}).
 							SetDir(ws).
-							AppendEnvironment(setup.TL.Pipe.Ctx.EnvVars).
+							AppendEnvironment(setup.C.EnvVars).
 							AddSelfToTheTask()
 
 						return nil
 					}).
-					ShouldRunAfter(func(t *Task[Pipe]) error {
+					ShouldRunAfter(func(t *Task) error {
 						return t.RunCommandJobAsJobSequence()
 					}).
 					AddSelfToTheParentAsParallel()
@@ -49,7 +49,7 @@ func TerraformInstall(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }

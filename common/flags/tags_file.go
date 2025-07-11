@@ -16,11 +16,11 @@ func NewTagsFileFlags(setup TagsFileFlagsSetup) []cli.Flag {
 		&cli.StringFlag{
 			Category: CATEGORY_TAGS_FILE,
 			Name:     "tags-file",
-			Usage:    "Read tags from a file.",
-			Required: setup.TagsFileRequired,
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TAGS_FILE"),
 			),
+			Usage:       "Read tags from a file.",
+			Required:    setup.TagsFileRequired,
 			Value:       setup.TagsFileValue,
 			Destination: setup.TagsFileDestination,
 		},
@@ -39,11 +39,11 @@ func NewTagsFileStrictFlags(setup TagsFileStrictFlagsSetup) []cli.Flag {
 		&cli.BoolFlag{
 			Category: CATEGORY_TAGS_FILE,
 			Name:     "tags-file.strict",
-			Usage:    "Fail on missing tags file.",
-			Required: setup.TagsFileStrictRequired,
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TAGS_FILE_STRICT"),
 			),
+			Usage:       "Fail on missing tags file.",
+			Required:    setup.TagsFileStrictRequired,
 			Value:       setup.TagsFileStrictValue,
 			Destination: setup.TagsFileStrictDestination,
 		},

@@ -3,36 +3,36 @@ package plan
 import (
 	"fmt"
 
-	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformPlan(tl *TaskList[Pipe]) *Task[Pipe] {
+func TerraformPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"plan",
 				"-input=false",
 			).
-				Set(func(c *Command[Pipe]) error {
-					if t.Pipe.Plan.Output != "" {
-						c.AppendArgs(fmt.Sprintf("-out=%s", t.Pipe.Plan.Output))
+				Set(func(c *Command) error {
+					if P.Plan.Output != "" {
+						c.AppendArgs(fmt.Sprintf("-out=%s", P.Plan.Output))
 					}
 
-					if t.Pipe.Plan.Args != "" {
-						c.AppendArgs(t.Pipe.Plan.Args)
+					if P.Plan.Args != "" {
+						c.AppendArgs(P.Plan.Args)
 					}
 
 					return nil
 				}).
-				SetDir(setup.TL.Pipe.Project.Cwd).
-				AppendEnvironment(setup.TL.Pipe.Ctx.EnvVars).
+				SetDir(setup.P.Project.Cwd).
+				AppendEnvironment(setup.C.EnvVars).
 				AddSelfToTheTask()
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

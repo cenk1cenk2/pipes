@@ -7,18 +7,19 @@ vars: {}
 
 env:
   CGO_ENABLED: 0
+  GO_VERSION: 1.24
 
 output: prefixed
 
 includes:
+  go:
+    taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-library.yml?ref_type=heads
+    flatten: true
   template:
     dir: ./_template
     taskfile: ./Taskfile.pipe.yml
   docker:
     dir: ./docker
-    taskfile: ./Taskfile.pipe.yml
-  gh-release-tracker:
-    dir: ./gh-release-tracker
     taskfile: ./Taskfile.pipe.yml
   markdown-toc:
     dir: ./markdown-toc
@@ -40,47 +41,11 @@ includes:
     taskfile: ./Taskfile.pipe.yml
 
 tasks:
-  install:
-    desc: Installs the required dependencies on pull.
-    cmds:
-      - go mod vendor
-    sources:
-      - go.{sum,mod}
-    generates:
-      - "vendor/**"
-
-  format:
-    desc: Formats the current code base.
-    cmds:
-      - golangci-lint run --fix
-
-  lint:
-    desc: Lints the codebase with predefined rules.
-    cmds:
-      - golangci-lint run --timeout 10m
-    sources:
-      - "**/*.go"
-
-  update:
-    desc: Updates all the dependencies to their latest minor version.
-    cmds:
-      - go get -u all
-      - task: tidy
-
-  tidy:
-    desc: Tidies the go.mod file.
-    cmds:
-      - go mod tidy -compat={{ .GO_VERSION }}
-      - task: install
-    sources:
-      - "go.{mod,sum}"
-
   packages:
     internal: true
     deps:
       - task: "template:{{ .command }}"
       - task: "docker:{{ .command }}"
-      - task: "gh-release-tracker:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"
       - task: "select-env:{{ .command }}"

@@ -13,6 +13,11 @@ vars:
 env:
   CGO_ENABLED: 0
 
+# includes:
+#   go:
+#     taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-application.yml?ref_type=heads
+#     flatten: true
+
 tasks:
   clean:
     desc: Cleans the output binary folder and build cache.
@@ -23,7 +28,27 @@ tasks:
   test:
     desc: Tests the given application.
     cmds:
-      - go test -v -p 1 ./...
+      - go test -v ./...
+
+  build.platform:
+    internal: true
+    vars:
+      binary_output: "{{ .BINARY_DIR }}/{{ .BINARY_NAME }}{{ if .BINARY_APPEND_OS }}-{{ .os }}{{ end }}{{ if .BINARY_APPEND_ARCH }}-{{ .arch }}{{ end }}"
+    cmds:
+      - GOOS={{ .os }} GOARCH={{ .arch }} go build -mod=vendor {{- if .GO_LD_FLAGS }} -ldflags="{{ .GO_LD_FLAGS }}"{{- end }} -o {{ .binary_output }}
+    sources:
+      - "**/*.go"
+      - "go.{mod,sum}"
+    generates:
+      - "{{ .binary_output }}"
+
+  start:
+    desc: Starts the given application.
+    interactive: true
+    env:
+      LOG_LEVEL: debug
+    cmds:
+      - go run . {{ .CLI_ARGS }}
 
   build:
     desc: Builds the application.
@@ -36,21 +61,6 @@ tasks:
         vars:
           os: linux
           arch: arm64
-
-  build.platform:
-    internal: true
-    vars:
-      binary_output: '{{ .BINARY_DIR }}/{{ .BINARY_NAME }}{{ if eq .BINARY_APPEND_OS true }}-{{ .os }}{{ end }}{{ if eq .BINARY_APPEND_ARCH true }}-{{ .arch }}{{ end }}'
-    cmds:
-      - GOOS={{ .os }} GOARCH={{ .arch }} go build -mod=vendor {{- if .GO_LD_FLAGS }} -ldflags="{{ .GO_LD_FLAGS }}"{{- end }} -o {{ .binary_output }}
-
-  start:
-    desc: Starts the given application.
-    interactive: true
-    env:
-      LOG_LEVEL: debug
-    cmds:
-      - go run . {{ .CLI_ARGS }}
 
   docs:
     desc: Generates the documentation for the application.

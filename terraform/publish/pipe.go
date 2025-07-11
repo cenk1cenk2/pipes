@@ -13,7 +13,7 @@ type (
 	}
 
 	Registry struct {
-		Name   string
+		Name   string `validate:"oneof=gitlab"`
 		Gitlab struct {
 			ApiUrl    string
 			ProjectId string
@@ -22,25 +22,33 @@ type (
 	}
 
 	Pipe struct {
-		Ctx
-
 		Module
 		Registry
 	}
+
+	Ctx struct {
+		Tags     []string
+		Packages []PublishablePackage
+	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+var C = &Ctx{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			return nil
 		}).
-		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobSequence(
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
 				TerraformTagsFile(tl).Job(),
 				TerraformPackage(tl).Job(),
 				TerraformPublish(tl).Job(),

@@ -15,12 +15,12 @@ func NewGitFlags(setup GitFlagsSetup) []cli.Flag {
 		&cli.StringFlag{
 			Category: CATEGORY_GIT,
 			Name:     "git.branch",
-			Usage:    "Source control branch.",
-			Required: false,
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_COMMIT_REF_NAME"),
 				cli.EnvVar("BITBUCKET_BRANCH"),
 			),
+			Usage:       "Source control branch.",
+			Required:    false,
 			Value:       "",
 			Destination: setup.GitBranchDestination,
 		},
@@ -28,12 +28,12 @@ func NewGitFlags(setup GitFlagsSetup) []cli.Flag {
 		&cli.StringFlag{
 			Category: CATEGORY_GIT,
 			Name:     "git.tag",
-			Usage:    "Source control tag.",
-			Required: false,
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_COMMIT_TAG"),
 				cli.EnvVar("BITBUCKET_TAG"),
 			),
+			Usage:       "Source control tag.",
+			Required:    false,
 			Value:       "",
 			Destination: setup.GitTagDestination,
 		},

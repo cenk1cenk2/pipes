@@ -7,19 +7,19 @@ import (
 	"strings"
 
 	glob "github.com/bmatcuk/doublestar/v4"
-	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 )
 
-func Version(tl *TaskList[Pipe]) *Task[Pipe] {
+func Version(tl *TaskList) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"version",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				ShouldRunAfter(func(c *Command[Pipe]) error {
+				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetCombinedStream()
 
 					joined := strings.Join(stream, "\n")
@@ -37,25 +37,25 @@ func Version(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }
 
-func DiscoverWorkspaces(tl *TaskList[Pipe]) *Task[Pipe] {
+func DiscoverWorkspaces(tl *TaskList) *Task {
 	return tl.CreateTask("workspaces").
-		Set(func(t *Task[Pipe]) error {
-			if len(t.Pipe.Project.Workspaces) > 0 {
-				fs := os.DirFS(t.Pipe.Project.Cwd)
+		Set(func(t *Task) error {
+			if len(P.Project.Workspaces) > 0 {
+				fs := os.DirFS(P.Project.Cwd)
 
 				t.Log.Debugf(
 					"Trying to match patterns: %s",
-					strings.Join(t.Pipe.Project.Workspaces, ", "),
+					strings.Join(P.Project.Workspaces, ", "),
 				)
 
 				matches := []string{}
 
-				for _, v := range t.Pipe.Project.Workspaces {
+				for _, v := range P.Project.Workspaces {
 					match, err := glob.Glob(fs, v)
 
 					if err != nil {
@@ -68,7 +68,7 @@ func DiscoverWorkspaces(tl *TaskList[Pipe]) *Task[Pipe] {
 				if len(matches) == 0 {
 					return fmt.Errorf(
 						"Can not match any files with the given pattern: %s",
-						strings.Join(t.Pipe.Project.Workspaces, ", "),
+						strings.Join(P.Project.Workspaces, ", "),
 					)
 				}
 
@@ -76,9 +76,9 @@ func DiscoverWorkspaces(tl *TaskList[Pipe]) *Task[Pipe] {
 
 				t.Log.Infof("Paths matched for given pattern as workspace: %s", strings.Join(matches, ", "))
 
-				t.Pipe.Project.Workspaces = matches
+				P.Project.Workspaces = matches
 			} else {
-				t.Pipe.Project.Workspaces = []string{t.Pipe.Project.Cwd}
+				P.Project.Workspaces = []string{P.Project.Cwd}
 
 				t.Log.Debugln("Using project root as workspace since there is no defined.")
 			}
@@ -87,23 +87,23 @@ func DiscoverWorkspaces(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func GenerateTerraformEnvVars(tl *TaskList[Pipe]) *Task[Pipe] {
+func GenerateTerraformEnvVars(tl *TaskList) *Task {
 	return tl.CreateTask("environment").
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_JOB_ID"] = t.Pipe.CiVariables.JobId
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_COMMIT_SHA"] = t.Pipe.CiVariables.CommitSha
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_JOB_STAGE"] = t.Pipe.CiVariables.JobStage
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_PROJECT_ID"] = t.Pipe.CiVariables.ProjectId
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_PROJECT_NAME"] = t.Pipe.CiVariables.ProjectName
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_PROJECT_NAMESPACE"] = t.Pipe.CiVariables.ProjectNamespace
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_PROJECT_PATH"] = t.Pipe.CiVariables.ProjectPath
-			t.Pipe.Ctx.EnvVars["TF_VAR_CI_PROJECT_URL"] = t.Pipe.CiVariables.ProjectUrl
+		Set(func(t *Task) error {
+			C.EnvVars["TF_VAR_CI_JOB_ID"] = P.CiVariables.JobId
+			C.EnvVars["TF_VAR_CI_COMMIT_SHA"] = P.CiVariables.CommitSha
+			C.EnvVars["TF_VAR_CI_JOB_STAGE"] = P.CiVariables.JobStage
+			C.EnvVars["TF_VAR_CI_PROJECT_ID"] = P.CiVariables.ProjectId
+			C.EnvVars["TF_VAR_CI_PROJECT_NAME"] = P.CiVariables.ProjectName
+			C.EnvVars["TF_VAR_CI_PROJECT_NAMESPACE"] = P.CiVariables.ProjectNamespace
+			C.EnvVars["TF_VAR_CI_PROJECT_PATH"] = P.CiVariables.ProjectPath
+			C.EnvVars["TF_VAR_CI_PROJECT_URL"] = P.CiVariables.ProjectUrl
 
-			t.Pipe.Ctx.EnvVars["TF_IN_AUTOMATION"] = "true"
+			C.EnvVars["TF_IN_AUTOMATION"] = "true"
 
-			t.Pipe.Ctx.EnvVars["TF_LOG"] = t.Pipe.Config.LogLevel
+			C.EnvVars["TF_LOG"] = P.Config.LogLevel
 
-			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", t.Pipe.Ctx.EnvVars)
+			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", C.EnvVars)
 
 			return nil
 		})

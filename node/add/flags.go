@@ -3,7 +3,6 @@ package pipe
 import (
 	"fmt"
 
-	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
@@ -15,45 +14,48 @@ var Flags = []cli.Flag{
 	&cli.StringSliceFlag{
 		Category: flags.CATEGORY_PACKAGES,
 		Name:     "packages.node",
-		Usage:    "Install node packages before performing operations.",
-		Required: true,
-		EnvVars:  []string{"PACKAGES_NODE"},
-		Value:    &cli.StringSlice{},
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PACKAGES_NODE"),
+		),
+		Usage:       "Install node packages before performing operations.",
+		Required:    true,
+		Value:       []string{},
+		Destination: &P.NodeAdd.Packages,
 	},
 
 	&cli.BoolFlag{
-		Category:    flags.CATEGORY_PACKAGES,
-		Name:        "packages.node.global",
+		Category: flags.CATEGORY_PACKAGES,
+		Name:     "packages.node.global",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PACKAGES_NODE_GLOBAL"),
+		),
 		Usage:       "Install node packages globally.",
 		Required:    false,
-		EnvVars:     []string{"PACKAGES_NODE_GLOBAL"},
 		Value:       true,
-		Destination: &TL.Pipe.NodeAdd.Global,
+		Destination: &P.NodeAdd.Global,
 	},
 
 	&cli.StringFlag{
-		Category:    flags.CATEGORY_PACKAGES,
-		Name:        "packages.node.script_args",
+		Category: flags.CATEGORY_PACKAGES,
+		Name:     "packages.node.script_args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PACKAGES_NODE_SCRIPT_ARGS"),
+		),
 		Usage:       fmt.Sprintf("package.json script arguments for building operation. %s", environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE),
 		Required:    false,
-		EnvVars:     []string{"PACKAGES_NODE_SCRIPT_ARGS"},
 		Value:       "",
-		Destination: &TL.Pipe.NodeAdd.ScriptArgs,
+		Destination: &P.NodeAdd.ScriptArgs,
 	},
 
 	&cli.StringFlag{
-		Category:    flags.CATEGORY_PACKAGES,
-		Name:        "packages.node.cwd",
+		Category: flags.CATEGORY_PACKAGES,
+		Name:     "packages.node.cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PACKAGES_NODE_CWD"),
+		),
 		Usage:       "Working directory for build operation.",
 		Required:    false,
-		EnvVars:     []string{"PACKAGES_NODE_CWD"},
 		Value:       ".",
-		Destination: &TL.Pipe.NodeAdd.Cwd,
+		Destination: &P.NodeAdd.Cwd,
 	},
-}
-
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	tl.Pipe.NodeAdd.Packages = tl.Cli.StringSlice("packages.node")
-
-	return nil
 }

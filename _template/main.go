@@ -1,35 +1,34 @@
 package main
 
 import (
+	"context"
+
 	"github.com/urfave/cli/v3"
 
-	pipe "gitlab.kilic.dev/devops/pipes/_template/pipe"
 	. "github.com/cenk1cenk2/plumber/v6"
+	pipe "gitlab.kilic.dev/devops/pipes/_template/pipe"
 )
 
 func main() {
 	NewPlumber(
-		func(p *Plumber) *cli.App {
-			return &cli.App{
+		func(p *Plumber) *cli.Command {
+			return &cli.Command{
 				Name:        CLI_NAME,
 				Version:     VERSION,
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
-				Flags:       p.AppendFlags(pipe.Flags),
-				Action: func(c *cli.Context) error {
-					tl := &pipe.TL
-
-					return tl.RunJobs(
-						tl.JobSequence(
-							pipe.New(p).SetCli(c).Job(),
+				Flags:       CombineFlags(pipe.Flags),
+				Action: func(_ context.Context, c *cli.Command) error {
+					return p.RunJobs(
+						JobSequence(
+							pipe.New(p).Job(),
 						),
 					)
 				},
 			}
 		}).
 		SetDocumentationOptions(DocumentationOptions{
-			ExcludeFlags:       true,
-			ExcludeHelpCommand: true,
+			ExcludeFlags: true,
 		}).
 		Run()
 }

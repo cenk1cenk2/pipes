@@ -1,27 +1,27 @@
 package run
 
 import (
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
-	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
-	return tl.CreateTask("run", tl.Pipe.Ctx.Script).
-		Set(func(t *Task[Pipe]) error {
+func RunNodeScript(tl *TaskList) *Task {
+	return tl.CreateTask("run", C.Script).
+		Set(func(t *Task) error {
 			t.CreateCommand(
-				setup.TL.Pipe.Ctx.PackageManager.Exe,
+				setup.C.PackageManager.Exe,
 			).
-				Set(func(c *Command[Pipe]) error {
+				Set(func(c *Command) error {
 					ctx := environment.EnvironmentTemplate{
-						Environment: environment.TL.Pipe.Ctx.Environment,
-						EnvVars:     environment.TL.Pipe.Ctx.EnvVars,
+						Environment: environment.C.Environment,
+						EnvVars:     environment.C.EnvVars,
 					}
 
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.Run...)
+					c.AppendArgs(setup.C.PackageManager.Commands.Run...)
 
-					if t.Pipe.Ctx.Script != "" {
-						tmpl, err := InlineTemplate(t.Pipe.Ctx.Script, ctx)
+					if C.Script != "" {
+						tmpl, err := InlineTemplate(C.Script, ctx)
 
 						if err != nil {
 							return err
@@ -30,10 +30,10 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs(tmpl)
 					}
 
-					c.AppendArgs(setup.TL.Pipe.Ctx.PackageManager.Commands.RunDelimitter...)
+					c.AppendArgs(setup.C.PackageManager.Commands.RunDelimiter...)
 
-					if t.Pipe.Ctx.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(t.Pipe.Ctx.ScriptArgs, ctx)
+					if C.ScriptArgs != "" {
+						tmpl, err := InlineTemplate(C.ScriptArgs, ctx)
 
 						if err != nil {
 							return err
@@ -42,7 +42,7 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 						c.AppendArgs(tmpl)
 					}
 
-					c.SetDir(t.Pipe.NodeCommand.Cwd)
+					c.SetDir(P.NodeCommand.Cwd)
 
 					return nil
 				}).
@@ -50,7 +50,7 @@ func RunNodeScript(tl *TaskList[Pipe]) *Task[Pipe] {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task[Pipe]) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

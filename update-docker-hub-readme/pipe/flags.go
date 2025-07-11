@@ -1,10 +1,10 @@
 package pipe
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
-	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 )
 
@@ -17,89 +17,98 @@ const (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_HUB,
-		Name:        "docker_hub.username",
+		Category: CATEGORY_DOCKER_HUB,
+		Name:     "docker_hub.username",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_USERNAME"),
+		),
 		Usage:       "DockerHub username for updating the readme.",
-		EnvVars:     []string{"DOCKER_USERNAME"},
 		Required:    true,
-		Destination: &TL.Pipe.DockerHub.Username,
+		Destination: &P.DockerHub.Username,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_HUB,
-		Name:        "docker_hub.password",
+		Category: CATEGORY_DOCKER_HUB,
+		Name:     "docker_hub.password",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_PASSWORD"),
+		),
 		Usage:       "DockerHub password for updating the readme.",
-		EnvVars:     []string{"DOCKER_PASSWORD"},
 		Required:    true,
-		Destination: &TL.Pipe.DockerHub.Password,
+		Destination: &P.DockerHub.Password,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_DOCKER_HUB,
-		Name:        "docker_hub.address",
+		Category: CATEGORY_DOCKER_HUB,
+		Name:     "docker_hub.address",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_HUB_ADDRESS"),
+		),
 		Usage:       "HTTP address for the DockerHub compatible service.",
-		EnvVars:     []string{"DOCKER_HUB_ADDRESS"},
 		Value:       "https://hub.docker.com/v2/repositories",
-		Destination: &TL.Pipe.DockerHub.Address,
+		Destination: &P.DockerHub.Address,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_README,
-		Name:        "readme.repository",
+		Category: CATEGORY_README,
+		Name:     "readme.repository",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("DOCKER_IMAGE_NAME"),
+			cli.EnvVar("README_REPOSITORY"),
+		),
 		Usage:       "Repository for applying the readme on.",
-		EnvVars:     []string{"DOCKER_IMAGE_NAME", "README_REPOSITORY"},
 		Required:    false,
 		Value:       "",
-		Destination: &TL.Pipe.Readme.Repository,
+		Destination: &P.Readme.Repository,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_README,
-		Name:        "readme.file",
+		Category: CATEGORY_README,
+		Name:     "readme.file",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("README_FILE"),
+		),
 		Usage:       "Readme file for the given repository.",
-		EnvVars:     []string{"README_FILE"},
 		Value:       "README.md",
-		Destination: &TL.Pipe.Readme.File,
-		Required:    false,
-	},
-
-	&cli.StringFlag{
-		Category:    CATEGORY_README,
-		Name:        "readme.short_description",
-		Usage:       "Short description to display on DockerHub.",
-		EnvVars:     []string{"README_DESCRIPTION"},
-		Destination: &TL.Pipe.Readme.Description,
+		Destination: &P.Readme.File,
 		Required:    false,
 	},
 
 	&cli.StringFlag{
 		Category: CATEGORY_README,
-		Name:     "readme.matrix",
-		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
-		EnvVars:  []string{"README_MATRIX"},
-		Required: false,
+		Name:     "readme.short_description",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("README_SHORT_DESCRIPTION"),
+		),
+		Usage:       "Short description to display on DockerHub.",
+		Destination: &P.Readme.Description,
+		Required:    false,
+		Action: func(_ context.Context, _ *cli.Command, v string) error {
+			if len(P.Readme.Description) > 100 {
+				return fmt.Errorf(
+					"Readme short description can only be 100 characters long while you have: %d",
+					len(P.Readme.Description),
+				)
+			}
+
+			return nil
+		},
 	},
-}
 
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	if len(tl.Pipe.Readme.Description) > 100 {
-		return fmt.Errorf(
-			"Readme short description can only be 100 characters long while you have: %d",
-			len(tl.Pipe.Readme.Description),
-		)
-	}
+	&cli.StringFlag{
+		Category: CATEGORY_README,
+		Name:     "readme.matrix",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("README_MATRIX"),
+		),
+		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
+		Required: false,
+		Action: func(_ context.Context, _ *cli.Command, v string) error {
+			if err := json.Unmarshal([]byte(v), &P.Readme.Matrix); err != nil {
+				return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
+			}
 
-	if v := tl.Cli.String("readme.matrix"); v != "" {
-		if err := json.Unmarshal([]byte(v), &tl.Pipe.Readme.Matrix); err != nil {
-			return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
-		}
-	}
-
-	if tl.Pipe.Readme.Repository == "" && len(tl.Pipe.Readme.Matrix) == 0 {
-		return fmt.Errorf("You have to either provide a target via Repository or multiple targets through the Matrix.")
-	}
-
-	tl.Pipe.Ctx.Readme = make(map[string]ParsedReadme)
-
-	return nil
+			return nil
+		},
+	},
 }

@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -11,21 +12,23 @@ import (
 
 //revive:disable:line-length-limit
 
-var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
+var Flags = CombineFlags(flags.NewGitFlags(
 	flags.GitFlagsSetup{
-		GitBranchDestination: &TL.Pipe.Git.Branch,
-		GitTagDestination:    &TL.Pipe.Git.Tag,
+		GitBranchDestination: &P.Git.Branch,
+		GitTagDestination:    &P.Git.Tag,
 	},
 ), []cli.Flag{
 	&cli.BoolFlag{
-		Category:    flags.CATEGORY_ENVIRONMENT,
-		Name:        "environment.enable",
+		Category: flags.CATEGORY_ENVIRONMENT,
+		Name:     "environment.enable",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("ENVIRONMENT_ENABLE"),
+		),
 		Usage:       "Enable environment injection.",
 		Required:    false,
 		Hidden:      true,
-		EnvVars:     []string{"ENVIRONMENT_ENABLE"},
 		Value:       true,
-		Destination: &TL.Pipe.Environment.Enable,
+		Destination: &P.Environment.Enable,
 	},
 
 	// CATEGORY_ENVIRONMENT
@@ -33,41 +36,44 @@ var Flags = TL.Plumber.AppendFlags(flags.NewGitFlags(
 	&cli.StringFlag{
 		Category: flags.CATEGORY_ENVIRONMENT,
 		Name:     "environment.conditions",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("ENVIRONMENT_CONDITIONS"),
+		),
 		Usage: `Regex pattern to select an environment.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json([]struct{ match: RegExp, environment: string })`,
 		Required: false,
-		EnvVars:  []string{"ENVIRONMENT_CONDITIONS"},
 		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
+		Action: func(_ context.Context, _ *cli.Command, v string) error {
+			if err := json.Unmarshal([]byte(v), &P.Environment.Conditions); err != nil {
+				return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.BoolFlag{
-		Category:    flags.CATEGORY_ENVIRONMENT,
-		Name:        "environment.fail-on-no-reference",
+		Category: flags.CATEGORY_ENVIRONMENT,
+		Name:     "environment.fail-on-no-reference",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("ENVIRONMENT_FAIL_ON_NO_REFERENCE"),
+		),
 		Usage:       "Fail on missing environment references.",
 		Required:    false,
-		EnvVars:     []string{"ENVIRONMENT_FAIL_ON_NO_REFERENCE"},
 		Value:       true,
-		Destination: &TL.Pipe.Environment.FailOnNoReference,
+		Destination: &P.Environment.FailOnNoReference,
 	},
 
 	&cli.BoolFlag{
-		Category:    flags.CATEGORY_ENVIRONMENT,
-		Name:        "environment.strict",
+		Category: flags.CATEGORY_ENVIRONMENT,
+		Name:     "environment.strict",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("ENVIRONMENT_STRICT"),
+		),
 		Usage:       "Fail on no environment selected.",
 		Required:    false,
-		EnvVars:     []string{"ENVIRONMENT_STRICT"},
 		Value:       true,
-		Destination: &TL.Pipe.Environment.Strict,
+		Destination: &P.Environment.Strict,
 	},
 })
-
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	if v := tl.Cli.String("environment.conditions"); v != "" {
-		if err := json.Unmarshal([]byte(v), &tl.Pipe.Environment.Conditions); err != nil {
-			return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
-		}
-	}
-
-	return nil
-}

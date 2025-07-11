@@ -2,47 +2,49 @@ package lint
 
 import (
 	"github.com/urfave/cli/v3"
-	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Name:        "terraform-lint.fmt-check.enable",
+		Name: "terraform-lint.fmt-check.enable",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_LINT_FMT_CHECK_ENABLE"),
+		),
 		Usage:       "Enable terraform fmt.",
 		Required:    false,
-		EnvVars:     []string{"TF_LINT_FMT_CHECK_ENABLE"},
 		Value:       true,
-		Destination: &TL.Pipe.Lint.FormatCheckEnable,
+		Destination: &P.Lint.FormatCheckEnable,
 	},
 	&cli.StringFlag{
-		Name:        "terraform-lint.fmt-check.args",
+		Name: "terraform-lint.fmt-check.args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_LINT_FMT_CHECK_ARGS"),
+		),
 		Usage:       "Additional arguments for terraform fmt.",
 		Required:    false,
-		EnvVars:     []string{"TF_LINT_FMT_CHECK_ARGS"},
 		Value:       "",
-		Destination: &TL.Pipe.Lint.FormatCheckArgs,
+		Destination: &P.Lint.FormatCheckArgs,
 	},
 	&cli.BoolFlag{
-		Name:        "terraform-lint.validate.enable",
+		Name: "terraform-lint.validate.enable",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_LINT_VALIDATE_ENABLE"),
+		),
 		Usage:       "Enable terraform validate.",
 		Required:    false,
-		EnvVars:     []string{"TF_LINT_VALIDATE_ENABLE"},
 		Value:       true,
-		Destination: &TL.Pipe.Lint.ValidateEnable,
+		Destination: &P.Lint.ValidateEnable,
 	},
 	&cli.StringFlag{
-		Name:        "terraform-lint.validate.args",
+		Name: "terraform-lint.validate.args",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_LINT_VALIDATE_ARGS"),
+		),
 		Usage:       "Additional arguments for terraform validate.",
 		Required:    false,
-		EnvVars:     []string{"TF_LINT_VALIDATE_ARGS"},
 		Value:       "",
-		Destination: &TL.Pipe.Lint.ValidateArgs,
+		Destination: &P.Lint.ValidateArgs,
 	},
-}
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList[Pipe]) error {
-	return nil
 }

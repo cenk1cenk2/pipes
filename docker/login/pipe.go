@@ -24,7 +24,7 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validator.Struct(P); err != nil {
+			if err := p.Validate(P); err != nil {
 				return err
 			}
 

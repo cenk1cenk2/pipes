@@ -27,26 +27,35 @@ type (
 	}
 
 	Pipe struct {
-		Ctx
-
 		Project
 		Config
 		CiVariables
 	}
+
+	Ctx struct {
+		EnvVars map[string]string
+	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+var C = &Ctx{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			C.EnvVars = make(map[string]string)
+
+			return nil
 		}).
-		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobParallel(
+		Set(func(tl *TaskList) Job {
+			return JobParallel(
 				Version(tl).Job(),
 				DiscoverWorkspaces(tl).Job(),
 				GenerateTerraformEnvVars(tl).Job(),

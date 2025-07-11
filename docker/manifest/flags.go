@@ -18,11 +18,11 @@ var Flags = []cli.Flag{
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
 		Name:     "docker-manifest.files",
-		Usage:    "Read published tags from a file. format(glob)",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_FILES"),
 		),
+		Usage:       "Read published tags from a file. format(glob)",
+		Required:    false,
 		Value:       []string{"**/.published-docker-images*"},
 		Destination: &P.DockerManifest.Files,
 	},
@@ -30,34 +30,34 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
 		Name:     "docker-manifest.target",
-		Usage:    "Target image names for patching the manifest. format(Template[string]())",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_TARGET"),
 		),
+		Usage:       "Target image names for patching the manifest. format(Template[string]())",
+		Required:    false,
 		Destination: &P.DockerManifest.Target,
 	},
 
 	&cli.StringSliceFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
 		Name:     "docker-manifest.images",
-		Usage:    "Image names for patching the manifest with the given target.",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_IMAGES"),
 		),
+		Usage:       "Image names for patching the manifest with the given target.",
+		Required:    false,
 		Destination: &P.DockerManifest.Images,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_MANIFEST,
 		Name:     "docker-manifest.matrix",
-		Usage:    "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_MATRIX"),
 		),
-		Action: func(_ context.Context, command *cli.Command, v string) error {
+		Usage:    "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
+		Required: false,
+		Action: func(_ context.Context, c *cli.Command, v string) error {
 			if err := json.Unmarshal([]byte(v), &P.DockerManifest.Matrix); err != nil {
 				return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
 

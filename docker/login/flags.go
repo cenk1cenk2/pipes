@@ -14,33 +14,33 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_REGISTRY,
 		Name:     "docker-registry.registry",
-		Usage:    "Docker registry url to login to.",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_REGISTRY"),
 		),
+		Usage:       "Docker registry url to login to.",
+		Required:    false,
 		Destination: &P.DockerRegistry.Registry,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_REGISTRY,
 		Name:     "docker-registry.username",
-		Usage:    "Docker registry username for the given registry.",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_REGISTRY_USERNAME"),
 		),
+		Usage:       "Docker registry username for the given registry.",
+		Required:    false,
 		Destination: &P.DockerRegistry.Username,
 	},
 
 	&cli.StringFlag{
 		Category: setup.CATEGORY_DOCKER_REGISTRY,
 		Name:     "docker-registry.password",
-		Usage:    "Docker registry password for the given registry.",
-		Required: false,
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_REGISTRY_PASSWORD"),
 		),
+		Usage:       "Docker registry password for the given registry.",
+		Required:    false,
 		Destination: &P.DockerRegistry.Password,
 	},
 }

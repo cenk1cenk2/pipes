@@ -1,8 +1,8 @@
 package setup
 
 import (
-	"gitlab.kilic.dev/devops/pipes/common/flags"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 type (
@@ -16,28 +16,37 @@ type (
 	Git flags.GitFlags
 
 	Pipe struct {
-		Ctx
-
 		Environment
 		Git
 	}
+
+	Ctx struct {
+		References  []string
+		Environment string
+		EnvVars     map[string]string
+	}
 )
 
-var TL = TaskList[Pipe]{
-	Pipe: Pipe{},
-}
+var TL = TaskList{}
 
-func New(p *Plumber) *TaskList[Pipe] {
+var P = &Pipe{}
+var C = &Ctx{}
+
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldDisable(func(tl *TaskList[Pipe]) bool {
-			return !tl.Pipe.Environment.Enable
+		ShouldDisable(func(tl *TaskList) bool {
+			return !P.Environment.Enable
 		}).
-		ShouldRunBefore(func(tl *TaskList[Pipe]) error {
-			return ProcessFlags(tl)
+		ShouldRunBefore(func(tl *TaskList) error {
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			return nil
 		}).
-		Set(func(tl *TaskList[Pipe]) Job {
-			return tl.JobSequence(
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
 				Setup(tl).Job(),
 
 				SelectEnvironment(tl).Job(),

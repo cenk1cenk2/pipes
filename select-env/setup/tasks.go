@@ -6,43 +6,43 @@ import (
 	"regexp"
 	"strings"
 
-	"gitlab.kilic.dev/devops/pipes/common/parser"
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/common/parser"
 )
 
-func Setup(tl *TaskList[Pipe]) *Task[Pipe] {
+func Setup(tl *TaskList) *Task {
 	return tl.CreateTask("init").
-		SetJobWrapper(func(job Job, t *Task[Pipe]) Job {
-			return tl.JobSequence(
+		SetJobWrapper(func(job Job, t *Task) Job {
+			return JobSequence(
 				job,
 				ParseReferences(tl).Job(),
 			)
 		})
 }
 
-func ParseReferences(tl *TaskList[Pipe]) *Task[Pipe] {
+func ParseReferences(tl *TaskList) *Task {
 	return tl.CreateTask("init", "references").
-		Set(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.References = parser.ParseGitReferences(t.Pipe.Git.Tag, t.Pipe.Git.Branch)
+		Set(func(t *Task) error {
+			C.References = parser.ParseGitReferences(P.Git.Tag, P.Git.Branch)
 
-			if t.Pipe.Environment.FailOnNoReference && len(t.Pipe.Ctx.References) == 0 {
+			if P.Environment.FailOnNoReference && len(C.References) == 0 {
 				return fmt.Errorf("References for the given environment has not been found.")
 			}
 
-			t.Log.Debugf("References for environment selection: %v", t.Pipe.Ctx.References)
+			t.Log.Debugf("References for environment selection: %v", C.References)
 
 			return nil
 		})
 }
 
-func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
+func SelectEnvironment(tl *TaskList) *Task {
 	return tl.CreateTask("environment", "select").
-		Set(func(t *Task[Pipe]) error {
-			t.Log.Debugf("Conditions for environment variable selection: %+v", t.Pipe.Environment.Conditions)
+		Set(func(t *Task) error {
+			t.Log.Debugf("Conditions for environment variable selection: %+v", P.Environment.Conditions)
 
 		out:
-			for _, c := range t.Pipe.Environment.Conditions {
-				for _, reference := range t.Pipe.Ctx.References {
+			for _, c := range P.Environment.Conditions {
+				for _, reference := range C.References {
 					re, err := regexp.Compile(c.Match)
 
 					if err != nil {
@@ -50,7 +50,7 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 					}
 
 					if re.MatchString(reference) {
-						t.Pipe.Ctx.Environment = c.Environment
+						C.Environment = c.Environment
 
 						t.Log.Infof("Environment selected: %s", c.Environment)
 
@@ -59,9 +59,9 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 				}
 			}
 
-			if t.Pipe.Environment.Strict && t.Pipe.Ctx.Environment == "" {
+			if P.Environment.Strict && C.Environment == "" {
 				return fmt.Errorf("Environment is not selected. Can not process further on strict mode.")
-			} else if t.Pipe.Ctx.Environment == "" {
+			} else if C.Environment == "" {
 				t.Log.Infof("No environment has been selected.")
 			}
 
@@ -69,20 +69,20 @@ func SelectEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 		})
 }
 
-func FetchEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
+func FetchEnvironment(tl *TaskList) *Task {
 	return tl.CreateTask("environment", "fetch").
-		ShouldDisable(func(t *Task[Pipe]) bool {
-			return t.Pipe.Ctx.Environment == ""
+		ShouldDisable(func(t *Task) bool {
+			return C.Environment == ""
 		}).
-		ShouldRunBefore(func(t *Task[Pipe]) error {
-			t.Pipe.Ctx.EnvVars = map[string]string{}
+		ShouldRunBefore(func(t *Task) error {
+			C.EnvVars = map[string]string{}
 
 			return nil
 		}).
-		Set(func(t *Task[Pipe]) error {
+		Set(func(t *Task) error {
 			vars := os.Environ()
 
-			prefix := strings.ToUpper(t.Pipe.Ctx.Environment)
+			prefix := strings.ToUpper(C.Environment)
 
 			prefix = prefix + "_"
 
@@ -92,16 +92,14 @@ func FetchEnvironment(tl *TaskList[Pipe]) *Task[Pipe] {
 				key := pair[0]
 				value := pair[1]
 
-				if strings.HasPrefix(key, prefix) {
-					trimmed := strings.TrimPrefix(key, prefix)
+				trimmed, _ := strings.CutPrefix(key, prefix)
 
-					t.Pipe.Ctx.EnvVars[trimmed] = value
-				}
+				C.EnvVars[trimmed] = value
 			}
 
-			t.Pipe.Ctx.EnvVars["ENVIRONMENT"] = t.Pipe.Ctx.Environment
+			C.EnvVars["ENVIRONMENT"] = C.Environment
 
-			t.Log.Infof("Environment variables that matches the current environment: %s -> %+v", t.Pipe.Ctx.Environment, t.Pipe.Ctx.EnvVars)
+			t.Log.Infof("Environment variables that matches the current environment: %s -> %+v", C.Environment, C.EnvVars)
 
 			return nil
 		})

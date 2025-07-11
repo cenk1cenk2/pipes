@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
+
 	"github.com/urfave/cli/v3"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/login"
 	node "gitlab.kilic.dev/devops/pipes/node/setup"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/pipe"
-	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 func main() {
@@ -21,30 +23,27 @@ func main() {
 	})
 
 	NewPlumber(
-		func(p *Plumber) *cli.App {
-			return &cli.App{
+		func(p *Plumber) *cli.Command {
+			return &cli.Command{
 				Name:        CLI_NAME,
 				Version:     VERSION,
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
-				Flags:       p.AppendFlags(environment.Flags, node.Flags, login.Flags, pipe.Flags),
-				Action: func(c *cli.Context) error {
-					tl := &pipe.TL
-
-					return tl.RunJobs(
-						tl.JobSequence(
-							environment.New(p).SetCli(c).Job(),
-							node.New(p).SetCli(c).Job(),
-							login.New(p).SetCli(c).Job(),
-							pipe.New(p).SetCli(c).Job(),
+				Flags:       CombineFlags(environment.Flags, node.Flags, login.Flags, pipe.Flags),
+				Action: func(_ context.Context, _ *cli.Command) error {
+					return p.RunJobs(
+						JobSequence(
+							environment.New(p).Job(),
+							node.New(p).Job(),
+							login.New(p).Job(),
+							pipe.New(p).Job(),
 						),
 					)
 				},
 			}
 		}).
 		SetDocumentationOptions(DocumentationOptions{
-			ExcludeFlags:       true,
-			ExcludeHelpCommand: true,
+			ExcludeFlags: true,
 		}).
 		Run()
 }
