@@ -73,7 +73,7 @@ func DockerBuild(tl *TaskList) *Task {
 						c.AppendArgs("--push")
 					}
 
-					for _, tag := range P.Tags {
+					for _, tag := range C.Tags {
 						c.AppendArgs("-t", tag)
 					}
 

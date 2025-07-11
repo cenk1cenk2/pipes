@@ -4,4 +4,4 @@ const CLI_NAME = "pipe-terraform"
 
 const DESCRIPTION = "Running terraform inside the pipelines."
 
-const VERSION = "latest"
+var VERSION = "latest"

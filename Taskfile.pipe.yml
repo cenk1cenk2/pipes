@@ -4,7 +4,7 @@
 version: "3"
 
 vars:
-  GO_LD_FLAGS: -w -s
+  GO_LD_FLAGS: -w -s -X main.VERSION=BUILD.$(date +%Y%m%dT%H%M%S)
   BINARY_DIR: dist
   BINARY_NAME: pipe
   BINARY_APPEND_OS: true

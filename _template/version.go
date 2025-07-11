@@ -4,4 +4,4 @@ const CLI_NAME = "pipe-template"
 
 const DESCRIPTION = "template-cli"
 
-const VERSION = "latest"
+var VERSION = "latest"
