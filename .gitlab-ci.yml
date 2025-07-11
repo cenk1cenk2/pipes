@@ -2,8 +2,6 @@
 variables:
   LOG_LEVEL: trace
   GO_VERSION: 1.24-alpine
-  TASK_X_REMOTE_TASKFILES: 1
-  GO_COMMAND_RUNNER: task --yes
 
 stages:
   - first-build
@@ -114,10 +112,20 @@ build:
   extends: .go-build
   stage: build
   variables:
-    GO_BUILD_COMMAND: build
+    GO_BUILD_COMMAND: $PIPE:build
   artifacts:
     paths:
       - "./*/dist/"
+  parallel:
+    matrix:
+      - PIPE: template
+      - PIPE: docker
+      - PIPE: node
+      - PIPE: markdown-toc
+      - PIPE: select-env
+      - PIPE: semantic-release
+      - PIPE: terraform
+      - PIPE: update-docker-hub-readme
 
 # to stop depending on itself
 
@@ -125,7 +133,7 @@ docker-build-first_docker:
   extends: .docker-build-vanilla
   stage: pre-publish
   dependencies:
-    - build
+    - "build: [docker]"
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
@@ -183,7 +191,7 @@ docker-build_docker:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [docker]"
   only:
     changes:
       - "common/**/*"
@@ -243,7 +251,7 @@ docker-build_node:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [node]"
   only:
     changes:
       - "common/**/*"
@@ -270,7 +278,7 @@ docker-build_markdown-toc:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [markdown-toc]"
   only:
     changes:
       - "common/**/*"
@@ -290,7 +298,7 @@ docker-build_select-env:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
     DOCKER_MANIFEST_TARGET: latest
   dependencies:
-    - build
+    - "build: [select-env]"
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
@@ -322,7 +330,7 @@ docker-build_semantic-release:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [semantic-release]"
   only:
     changes:
       - "common/**/*"
@@ -350,7 +358,7 @@ docker-build_terraform:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [terraform]"
   only:
     changes:
       - "common/**/*"
@@ -376,7 +384,7 @@ docker-build_update-docker-hub-readme:
           - amd64
           - arm64
   dependencies:
-    - build
+    - "build: [update-docker-hub-readme]"
   only:
     changes:
       - "common/**/*"
