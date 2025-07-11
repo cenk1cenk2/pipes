@@ -123,7 +123,7 @@ docker-build-first_docker:
   extends: .docker-build-vanilla
   stage: pre-publish
   dependencies:
-    - "build: [docker]"
+    - build
   variables:
     DOCKERFILE_CONTEXT: ./docker
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
@@ -181,7 +181,7 @@ docker-build_docker:
           - amd64
           - arm64
   dependencies:
-    - "build: [docker]"
+    - build
   only:
     changes:
       - "common/**/*"
@@ -241,7 +241,7 @@ docker-build_node:
           - amd64
           - arm64
   dependencies:
-    - "build: [node]"
+    - build
   only:
     changes:
       - "common/**/*"
@@ -268,7 +268,7 @@ docker-build_markdown-toc:
           - amd64
           - arm64
   dependencies:
-    - "build: [markdown-toc]"
+    - build
   only:
     changes:
       - "common/**/*"
@@ -288,7 +288,7 @@ docker-build_select-env:
     DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
     DOCKER_MANIFEST_TARGET: latest
   dependencies:
-    - "build: [select-env]"
+    - build
   parallel:
     matrix:
       - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
@@ -320,7 +320,7 @@ docker-build_semantic-release:
           - amd64
           - arm64
   dependencies:
-    - "build: [semantic-release]"
+    - build
   only:
     changes:
       - "common/**/*"
@@ -348,7 +348,7 @@ docker-build_terraform:
           - amd64
           - arm64
   dependencies:
-    - "build: [terraform]"
+    - build
   only:
     changes:
       - "common/**/*"
@@ -374,7 +374,7 @@ docker-build_update-docker-hub-readme:
           - amd64
           - arm64
   dependencies:
-    - "build: [update-docker-hub-readme]"
+    - build
   only:
     changes:
       - "common/**/*"
