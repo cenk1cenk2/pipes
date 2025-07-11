@@ -1,9 +1,7 @@
 package run
 
 import (
-	"context"
 	"fmt"
-	"strings"
 
 	"github.com/urfave/cli/v3"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
@@ -31,23 +29,6 @@ var Flags = []cli.Flag{
 		),
 		Required:    false,
 		Destination: &P.NodeCommand.Script,
-		Action: func(_ context.Context, c *cli.Command, v string) error {
-			if v == "" {
-				args := c.Args().Slice()
-
-				if len(args) < 1 {
-					return fmt.Errorf("Arguments are needed to run a specific script.")
-				}
-
-				C.Script = args[0]
-				C.ScriptArgs = strings.Join(args[1:], " ")
-			} else {
-				C.Script = strings.Split(v, " ")[0]
-				C.ScriptArgs = strings.Join(strings.Split(v, " ")[1:], " ")
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringFlag{

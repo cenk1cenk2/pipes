@@ -1,6 +1,9 @@
 package run
 
 import (
+	"fmt"
+	"strings"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
@@ -31,6 +34,20 @@ func New(p *Plumber) *TaskList {
 		ShouldRunBefore(func(tl *TaskList) error {
 			if err := p.Validate(P); err != nil {
 				return err
+			}
+
+			if P.NodeCommand.Script == "" {
+				args := p.Cli.Args().Slice()
+
+				if len(args) < 1 {
+					return fmt.Errorf("Arguments are needed to run a specific script.")
+				}
+
+				C.Script = args[0]
+				C.ScriptArgs = strings.Join(args[1:], " ")
+			} else {
+				C.Script = strings.Split(P.NodeCommand.Script, " ")[0]
+				C.ScriptArgs = strings.Join(strings.Split(P.NodeCommand.Script, " ")[1:], " ")
 			}
 
 			return nil
