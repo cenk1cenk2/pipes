@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"encoding/json"
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -41,8 +42,21 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
+			if v := p.Cli.String("readme.matrix"); v != "" {
+				if err := json.Unmarshal([]byte(v), &P.Readme.Matrix); err != nil {
+					return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
+				}
+			}
+
 			if err := p.Validate(P); err != nil {
 				return err
+			}
+
+			if len(P.Readme.Description) > 100 {
+				return fmt.Errorf(
+					"Readme short description can only be 100 characters long while you have: %d",
+					len(P.Readme.Description),
+				)
 			}
 
 			if P.Readme.Repository == "" && len(P.Readme.Matrix) == 0 {

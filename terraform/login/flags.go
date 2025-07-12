@@ -1,10 +1,6 @@
 package login
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-
 	"github.com/urfave/cli/v3"
 )
 
@@ -18,12 +14,5 @@ var Flags = []cli.Flag{
 		),
 		Usage:    "Terraform registry credentials. json([]struct { registry: string, token: string })",
 		Required: false,
-		Action: func(_ context.Context, _ *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.Registry.Credentials); err != nil {
-				return fmt.Errorf("Can not unmarshal registry credentials: %w", err)
-			}
-
-			return nil
-		},
 	},
 }

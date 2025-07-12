@@ -1,6 +1,9 @@
 package build
 
 import (
+	"encoding/json"
+	"fmt"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
@@ -59,6 +62,24 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
+			if v := p.Cli.String("docker-image.tag-as-latest"); v != "" {
+				if err := json.Unmarshal([]byte(v), &P.DockerImage.TagAsLatest); err != nil {
+					return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
+				}
+			}
+
+			if v := p.Cli.String("docker-image.sanitize-tags"); v != "" {
+				if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsSanitize); err != nil {
+					return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
+				}
+			}
+
+			if v := p.Cli.String("docker-image.tags-template"); v != "" {
+				if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsTemplate); err != nil {
+					return fmt.Errorf("Can not unmarshal Docker image templating tag conditions: %w", err)
+				}
+			}
+
 			if err := p.Validate(P); err != nil {
 				return err
 			}

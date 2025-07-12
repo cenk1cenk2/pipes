@@ -1,10 +1,6 @@
 package setup
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
@@ -44,13 +40,6 @@ var Flags = CombineFlags(flags.NewGitFlags(
       json([]struct{ match: RegExp, environment: string })`,
 		Required: false,
 		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
-		Action: func(_ context.Context, _ *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.Environment.Conditions); err != nil {
-				return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.BoolFlag{

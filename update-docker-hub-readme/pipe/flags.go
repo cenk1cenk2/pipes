@@ -1,10 +1,6 @@
 package pipe
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-
 	"github.com/urfave/cli/v3"
 )
 
@@ -83,16 +79,6 @@ var Flags = []cli.Flag{
 		Usage:       "Short description to display on DockerHub.",
 		Destination: &P.Readme.Description,
 		Required:    false,
-		Action: func(_ context.Context, _ *cli.Command, v string) error {
-			if len(P.Readme.Description) > 100 {
-				return fmt.Errorf(
-					"Readme short description can only be 100 characters long while you have: %d",
-					len(P.Readme.Description),
-				)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringFlag{
@@ -103,12 +89,6 @@ var Flags = []cli.Flag{
 		),
 		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
 		Required: false,
-		Action: func(_ context.Context, _ *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.Readme.Matrix); err != nil {
-				return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
-			}
-
-			return nil
-		},
+		Local:    true,
 	},
 }

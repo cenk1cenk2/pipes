@@ -1,6 +1,7 @@
 package manifest
 
 import (
+	"encoding/json"
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -34,6 +35,12 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
+			if v := p.Cli.String("docker-manifest.matrix"); v != "" {
+				if err := json.Unmarshal([]byte(v), &P.DockerManifest.Matrix); err != nil {
+					return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
+				}
+			}
+
 			if err := p.Validate(P); err != nil {
 				return err
 			}

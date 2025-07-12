@@ -1,9 +1,6 @@
 package publish
 
 import (
-	"context"
-	"regexp"
-
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
@@ -37,13 +34,6 @@ var Flags = CombineFlags(flags.NewTagsFileFlags(
 		Required:    true,
 		Value:       "",
 		Destination: &P.Module.Name,
-		Action: func(_ context.Context, _ *cli.Command, s string) error {
-			regexp.MustCompile(`[_ ]`).ReplaceAllString(s, "-")
-
-			P.Module.Name = s
-
-			return nil
-		},
 	},
 
 	&cli.StringFlag{

@@ -1,6 +1,9 @@
 package setup
 
 import (
+	"encoding/json"
+	"fmt"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
@@ -39,6 +42,12 @@ func New(p *Plumber) *TaskList {
 			return !P.Environment.Enable
 		}).
 		ShouldRunBefore(func(tl *TaskList) error {
+			if v := p.Cli.String("environment.conditions"); v != "" {
+				if err := json.Unmarshal([]byte(v), &P.Environment.Conditions); err != nil {
+					return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
+				}
+			}
+
 			if err := p.Validate(P); err != nil {
 				return err
 			}

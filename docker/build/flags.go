@@ -1,10 +1,6 @@
 package build
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
@@ -104,13 +100,6 @@ var Flags = CombineFlags(flags.NewGitFlags(
       json(RegExp[])`,
 		Required: false,
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
-		Action: func(_ context.Context, c *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagAsLatest); err != nil {
-				return fmt.Errorf("Can not unmarshal Docker image tags for latest: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringFlag{
@@ -124,13 +113,6 @@ var Flags = CombineFlags(flags.NewGitFlags(
       json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
 		Required: false,
 		Value:    flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
-		Action: func(_ context.Context, c *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsSanitize); err != nil {
-				return fmt.Errorf("Can not unmarshal Docker image sanitizing tag conditions: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringFlag{
@@ -144,13 +126,6 @@ var Flags = CombineFlags(flags.NewGitFlags(
       json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
 		Required: false,
 		Value:    "[]",
-		Action: func(_ context.Context, c *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsTemplate); err != nil {
-				return fmt.Errorf("Can not unmarshal Docker image templating tag conditions: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.BoolFlag{

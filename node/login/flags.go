@@ -1,10 +1,6 @@
 package login
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-
 	"github.com/urfave/cli/v3"
 )
 
@@ -27,13 +23,6 @@ var Flags = []cli.Flag{
 		Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
 		Required: false,
 		Value:    "",
-		Action: func(_ context.Context, _ *cli.Command, v string) error {
-			if err := json.Unmarshal([]byte(v), &P.Npm.Login); err != nil {
-				return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
-			}
-
-			return nil
-		},
 	},
 
 	&cli.StringSliceFlag{
