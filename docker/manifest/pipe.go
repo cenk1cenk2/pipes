@@ -30,23 +30,26 @@ var TL = TaskList{}
 
 var P = &Pipe{}
 var C = &Ctx{}
+var raw = &struct {
+	DockerManifestMatrix string
+}{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if v := p.Cli.String("docker-manifest.matrix"); v != "" {
+			if v := raw.DockerManifestMatrix; v != "" {
 				if err := json.Unmarshal([]byte(v), &P.DockerManifest.Matrix); err != nil {
 					return fmt.Errorf("Can not unmarshal Docker manifest matrix: %w", err)
 				}
 			}
 
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
 			if login.P.DockerRegistry.Registry != "" {
 				P.DockerManifest.Target = fmt.Sprintf("%s/%s", login.P.DockerRegistry.Registry, P.DockerManifest.Target)
+			}
+
+			if err := p.Validate(P); err != nil {
+				return err
 			}
 
 			C.ManifestedImages = make(map[string][]string)

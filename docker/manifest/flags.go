@@ -51,7 +51,8 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_MATRIX"),
 		),
-		Usage:    "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
-		Required: false,
+		Usage:       "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
+		Required:    false,
+		Destination: &raw.DockerManifestMatrix,
 	},
 }

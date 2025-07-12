@@ -45,7 +45,6 @@ func New(p *Plumber) *TaskList {
 		ShouldRunBefore(func(tl *TaskList) error {
 			if P.Module.Name != "" {
 				P.Module.Name = regexp.MustCompile(`[_ ]`).ReplaceAllString(P.Module.Name, "-")
-
 			}
 
 			if err := p.Validate(P); err != nil {

@@ -22,12 +22,15 @@ type (
 var TL = TaskList{}
 
 var P = &Pipe{}
+var raw = &struct {
+	NpmLogin string
+}{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if v := p.Cli.String("npm.login"); v != "" {
+			if v := raw.NpmLogin; v != "" {
 				if err := json.Unmarshal([]byte(v), &P.Npm.Login); err != nil {
 					return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 				}

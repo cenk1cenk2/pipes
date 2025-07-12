@@ -87,8 +87,8 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("README_MATRIX"),
 		),
-		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
-		Required: false,
-		Local:    true,
+		Usage:       "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
+		Required:    false,
+		Destination: &raw.ReadmeMatrix,
 	},
 }

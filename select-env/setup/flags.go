@@ -38,8 +38,9 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Usage: `Regex pattern to select an environment.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json([]struct{ match: RegExp, environment: string })`,
-		Required: false,
-		Value:    flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
+		Required:    false,
+		Value:       flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
+		Destination: &raw.EnvironmentConditions,
 	},
 
 	&cli.BoolFlag{

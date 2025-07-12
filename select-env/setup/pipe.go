@@ -34,6 +34,9 @@ var TL = TaskList{}
 
 var P = &Pipe{}
 var C = &Ctx{}
+var raw = &struct {
+	EnvironmentConditions string
+}{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
@@ -42,7 +45,7 @@ func New(p *Plumber) *TaskList {
 			return !P.Environment.Enable
 		}).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if v := p.Cli.String("environment.conditions"); v != "" {
+			if v := raw.EnvironmentConditions; v != "" {
 				if err := json.Unmarshal([]byte(v), &P.Environment.Conditions); err != nil {
 					return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
 				}

@@ -20,9 +20,10 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NPM_LOGIN"),
 		),
-		Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
-		Required: false,
-		Value:    "",
+		Usage:       "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
+		Required:    false,
+		Value:       "",
+		Destination: &raw.NpmLogin,
 	},
 
 	&cli.StringSliceFlag{

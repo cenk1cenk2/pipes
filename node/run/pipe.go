@@ -32,10 +32,6 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
 			if P.NodeCommand.Script == "" {
 				args := p.Cli.Args().Slice()
 
@@ -48,6 +44,10 @@ func New(p *Plumber) *TaskList {
 			} else {
 				C.Script = strings.Split(P.NodeCommand.Script, " ")[0]
 				C.ScriptArgs = strings.Join(strings.Split(P.NodeCommand.Script, " ")[1:], " ")
+			}
+
+			if err := p.Validate(P); err != nil {
+				return err
 			}
 
 			return nil

@@ -37,12 +37,15 @@ var TL = TaskList{}
 
 var P = &Pipe{}
 var C = &Ctx{}
+var raw = struct {
+	ReadmeMatrix string
+}{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if v := p.Cli.String("readme.matrix"); v != "" {
+			if v := raw.ReadmeMatrix; v != "" {
 				if err := json.Unmarshal([]byte(v), &P.Readme.Matrix); err != nil {
 					return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
 				}

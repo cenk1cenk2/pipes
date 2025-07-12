@@ -20,12 +20,15 @@ type (
 var TL = TaskList{}
 
 var P = &Pipe{}
+var raw = &struct {
+	RegistryCredentials string
+}{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if v := p.Cli.String("terraform.registry.credentials"); v != "" {
+			if v := raw.RegistryCredentials; v != "" {
 				if err := json.Unmarshal([]byte(v), &P.Registry.Credentials); err != nil {
 					return fmt.Errorf("Can not unmarshal registry credentials: %w", err)
 				}
