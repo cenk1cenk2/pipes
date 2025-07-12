@@ -6,6 +6,10 @@ template-cli
 
 ## Flags
 
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$PIPE_DEFAULT_FLAG` | Some default flag. | `string` | `false` |  |
+
 **CLI**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
