@@ -1,7 +1,7 @@
 ---
 variables:
   LOG_LEVEL: trace
-  GO_VERSION: 1.24-alpine
+  GO_VERSION: 1.25-alpine
   TASK_X_REMOTE_TASKFILES: 1
   GO_COMMAND_RUNNER: task --yes
 
@@ -91,7 +91,7 @@ docker-manifest-first_go:
   parallel:
     matrix:
       - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-        DOCKER_IMAGE_TAGS: 1.24-alpine
+        DOCKER_IMAGE_TAGS: 1.25-alpine
         DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:${DOCKER_IMAGE_TAGS}-amd64 -a cenk1cenk2/pipe-go:${DOCKER_IMAGE_TAGS}-arm64"
   only:
     changes:
@@ -218,7 +218,7 @@ docker-build_go:
         DOCKER_MANIFEST_TARGET: '{{ env "GO_VERSION" }}'
         DOCKERFILE_NAME: Dockerfile-alpine
         GO_VERSION:
-          - 1.24-alpine
+          - 1.25-alpine
         GITLAB_CI_ARCH:
           - amd64
           - arm64

@@ -1,0 +1,31 @@
+---
+spec:
+  inputs:
+    terraform_version:
+      type: string
+      default: latest
+    terraform_cwd:
+      type: string
+      default: latest
+    tags:
+      type: array
+      default:
+        - docker
+    rules:
+      type: array
+      default:
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+        - if: $CI_OPEN_MERGE_REQUESTS
+          when: never
+        - if: $CI_COMMIT_BRANCH
+        - if: $CI_COMMIT_TAG
+
+variables:
+  TF_ROOT: $[[inputs.terraform_cwd]]
+
+.tf-lint:
+  image: cenk1cenk2/pipe-terraform:$[[inputs.terraform_version]]
+  script:
+    - pipe lint
+  rules: $[[inputs.rules]]
+  tags: $[[inputs.tags]]

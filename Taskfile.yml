@@ -7,7 +7,7 @@ vars: {}
 
 env:
   CGO_ENABLED: 0
-  GO_VERSION: 1.24
+  GO_VERSION: 1.25
 
 output: prefixed
 
