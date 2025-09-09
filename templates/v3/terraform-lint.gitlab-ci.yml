@@ -1,10 +1,7 @@
 ---
 spec:
   inputs:
-    terraform_version:
-      type: string
-      default: latest
-    terraform_cwd:
+    pipe_version:
       type: string
       default: latest
     tags:
@@ -21,7 +18,7 @@ spec:
         - if: $CI_COMMIT_TAG
 
 .tf-lint:
-  image: cenk1cenk2/pipe-terraform:$[[inputs.terraform_version]]
+  image: cenk1cenk2/pipe-terraform:$[[inputs.pipe_version]]
   script:
     - pipe lint
   rules: $[[inputs.rules]]
