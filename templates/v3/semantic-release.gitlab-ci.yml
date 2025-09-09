@@ -19,7 +19,7 @@ spec:
           variables:
             SEMANTIC_RELEASE_DRY_RUN: "true"
 
-semantic-release:
+.semantic-release:
   image: cenk1cenk2/pipe-semantic-release:$[[inputs.pipe_version]]
   variables:
     GIT_AUTHOR_NAME: semantic-release [bot]
