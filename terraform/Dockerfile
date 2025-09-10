@@ -8,6 +8,8 @@ ARG BUILDARCH
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
+RUN apk add --no-cache --no-progress jq
+
 RUN pipe --help
 
 ENTRYPOINT [ ]
