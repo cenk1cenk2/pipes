@@ -24,11 +24,14 @@ func TerraformPlan(tl *TaskList) *Task {
 						c.AppendArgs(P.Plan.Args)
 					}
 
+					if P.Plan.Retry {
+						c.SetRetries(&CommandRetry{
+							Tries: P.Plan.RetryTries,
+							Delay: P.Plan.RetryDelay,
+						})
+					}
+
 					return nil
-				}).
-				SetRetries(&CommandRetry{
-					Tries: 30,
-					Delay: 10,
 				}).
 				SetDir(setup.P.Project.Cwd).
 				AppendEnvironment(setup.C.EnvVars).

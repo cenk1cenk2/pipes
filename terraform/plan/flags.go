@@ -1,6 +1,8 @@
 package plan
 
 import (
+	"time"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 )
@@ -30,6 +32,38 @@ var Flags = []cli.Flag{
 		Required:    false,
 		Value:       "",
 		Destination: &P.Plan.Args,
+	},
+
+	&cli.BoolFlag{
+		Name: "terraform-plan.retry",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_PLAN_RETRY"),
+		),
+		Usage:       "Enable retries for terraform plan command.",
+		Required:    false,
+		Value:       true,
+		Destination: &P.Plan.Retry,
+	},
+
+	&cli.Uint32Flag{
+		Name: "terraform-plan.retry-tries",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_PLAN_RETRY_TRIES"),
+		),
+		Usage:       "Number of retries for terraform plan command.",
+		Required:    false,
+		Destination: &P.Plan.RetryTries,
+	},
+
+	&cli.DurationFlag{
+		Name: "terraform-plan.retry-delay",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_PLAN_RETRY_DELAY"),
+		),
+		Usage:       "Delay between retries for terraform plan command.",
+		Required:    false,
+		Value:       60 * time.Second,
+		Destination: &P.Plan.RetryDelay,
 	},
 }
 

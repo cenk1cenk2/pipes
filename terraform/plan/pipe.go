@@ -1,13 +1,18 @@
 package plan
 
 import (
+	"time"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
 	Plan struct {
-		Args   string
-		Output string
+		Args       string
+		Output     string
+		Retry      bool
+		RetryDelay time.Duration
+		RetryTries uint32
 	}
 
 	Pipe struct {
