@@ -26,6 +26,10 @@ func TerraformPlan(tl *TaskList) *Task {
 
 					return nil
 				}).
+				SetRetries(&CommandRetry{
+					Tries: 30,
+					Delay: 10,
+				}).
 				SetDir(setup.P.Project.Cwd).
 				AppendEnvironment(setup.C.EnvVars).
 				AddSelfToTheTask()
