@@ -20,6 +20,10 @@ linters:
           - errcheck
         source: \s*defer\s+
 formatters:
+  enable:
+    - gofmt
+    - goimports
+    - golines
   settings:
     golines:
       max-len: 180
