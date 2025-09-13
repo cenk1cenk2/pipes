@@ -23,6 +23,9 @@ func RunSemanticRelease(tl *TaskList) *Task {
 					// }
 
 					if P.SemanticRelease.IsDryRun {
+						c.AppendEnvironment(map[string]string{
+							"CI": "",
+						})
 						c.AppendArgs("--dry-run", "--no-ci", "--branches", P.CI.CommitReference)
 					}
 
