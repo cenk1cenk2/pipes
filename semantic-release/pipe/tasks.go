@@ -23,7 +23,12 @@ func RunSemanticRelease(tl *TaskList) *Task {
 					// }
 
 					if P.SemanticRelease.IsDryRun {
-						c.Command.Env = []string{"CI=", "GITLAB_CI=", "CI_MERGE_REQUEST_ID="}
+						c.AppendEnvironment(map[string]string{
+							// detected by the following rules, have to disable them to trick
+							// https://github.com/semantic-release/env-ci/tree/master/services
+							"CI":        "false",
+							"GITLAB_CI": "false",
+						})
 						c.AppendArgs("--dry-run", "--no-ci", "--branches", P.CI.CommitReference)
 					}
 
