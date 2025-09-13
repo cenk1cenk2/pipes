@@ -8,6 +8,7 @@ import (
 
 const (
 	CATEGORY_SEMANTIC_RELEASE = "Semantic Release"
+	CATEGORY_CI_VARIABLES     = "CI Variables"
 )
 
 var Flags = []cli.Flag{
@@ -36,5 +37,19 @@ var Flags = []cli.Flag{
 		Required:    false,
 		Value:       false,
 		Destination: &P.SemanticRelease.Workspace,
+	},
+
+	// CATEGORY_CI_VARIABLES
+
+	&cli.StringFlag{
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "ci.commit-branch",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("CI_COMMIT_BRANCH"),
+		),
+		Usage:       "Current commit branch.",
+		Required:    false,
+		Value:       "",
+		Destination: &P.CI.CurrentCommitBranch,
 	},
 }

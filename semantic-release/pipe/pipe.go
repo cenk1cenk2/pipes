@@ -5,6 +5,10 @@ import (
 )
 
 type (
+	CI struct {
+		CurrentCommitBranch string
+	}
+
 	SemanticRelease struct {
 		IsDryRun  bool
 		Workspace bool
@@ -12,6 +16,7 @@ type (
 
 	Pipe struct {
 		SemanticRelease
+		CI
 	}
 
 	Ctx struct {
