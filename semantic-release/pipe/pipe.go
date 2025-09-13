@@ -6,7 +6,7 @@ import (
 
 type (
 	CI struct {
-		CurrentCommitBranch string
+		CommitReference string
 	}
 
 	SemanticRelease struct {

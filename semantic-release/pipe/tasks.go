@@ -23,7 +23,7 @@ func RunSemanticRelease(tl *TaskList) *Task {
 					// }
 
 					if P.SemanticRelease.IsDryRun {
-						c.AppendArgs("--dry-run", "--no-ci", "--branches", P.CI.CurrentCommitBranch)
+						c.AppendArgs("--dry-run", "--no-ci", "--branches", P.CI.CommitReference)
 					}
 
 					if t.Plumber.Environment.Debug {

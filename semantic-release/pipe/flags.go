@@ -43,13 +43,13 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_CI_VARIABLES,
-		Name:     "ci.commit-branch",
+		Name:     "ci.commit-ref-name",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("CI_COMMIT_BRANCH"),
+			cli.EnvVar("CI_COMMIT_REF_NAME"),
 		),
-		Usage:       "Current commit branch.",
+		Usage:       "Current commit reference that can be branch or tag name of the project..",
 		Required:    false,
 		Value:       "",
-		Destination: &P.CI.CurrentCommitBranch,
+		Destination: &P.CI.CommitReference,
 	},
 }
