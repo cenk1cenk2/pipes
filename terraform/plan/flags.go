@@ -34,17 +34,6 @@ var Flags = []cli.Flag{
 		Destination: &P.Plan.Args,
 	},
 
-	&cli.BoolFlag{
-		Name: "terraform-plan.retry",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("TF_PLAN_RETRY"),
-		),
-		Usage:       "Enable retries for terraform plan command.",
-		Required:    false,
-		Value:       true,
-		Destination: &P.Plan.Retry,
-	},
-
 	&cli.Uint32Flag{
 		Name: "terraform-plan.retry-tries",
 		Sources: cli.NewValueSourceChain(
@@ -52,6 +41,7 @@ var Flags = []cli.Flag{
 		),
 		Usage:       "Number of retries for terraform plan command.",
 		Required:    false,
+		Value:       5,
 		Destination: &P.Plan.RetryTries,
 	},
 

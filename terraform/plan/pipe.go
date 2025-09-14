@@ -10,7 +10,6 @@ type (
 	Plan struct {
 		Args       string
 		Output     string
-		Retry      bool
 		RetryDelay time.Duration
 		RetryTries uint32
 	}
