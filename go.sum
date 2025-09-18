@@ -119,8 +119,8 @@ github.com/catenacyber/perfsprint v0.9.1 h1:5LlTp4RwTooQjJCvGEFV6XksZvWE7wCOUvjD
 github.com/catenacyber/perfsprint v0.9.1/go.mod h1:q//VWC2fWbcdSLEY1R3l8n0zQCDPdE4IjZwyY1HMunM=
 github.com/ccojocar/zxcvbn-go v1.0.4 h1:FWnCIRMXPj43ukfX000kvBZvV6raSxakYr1nzyNrUcc=
 github.com/ccojocar/zxcvbn-go v1.0.4/go.mod h1:3GxGX+rHmueTUMvm5ium7irpyjmm7ikxYFOSJB21Das=
-github.com/cenk1cenk2/plumber/v6 v6.2.1 h1:oL0egLvtwBxJ08GBElxON/WTGZMTGvm3YmTJL374Rvs=
-github.com/cenk1cenk2/plumber/v6 v6.2.1/go.mod h1:cFkHf163xJT68C7Xx2/DoBxA4RFhn7oylsSfI9GFLvo=
+github.com/cenk1cenk2/plumber/v6 v6.2.2 h1:d83Rg9j1XqtVTTVObfW6r4RVeimAOn1ENOndbSbX1xw=
+github.com/cenk1cenk2/plumber/v6 v6.2.2/go.mod h1:cFkHf163xJT68C7Xx2/DoBxA4RFhn7oylsSfI9GFLvo=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
