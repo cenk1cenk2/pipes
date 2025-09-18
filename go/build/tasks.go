@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
 func GoBuild(tl *TaskList) *Task {
@@ -33,6 +34,12 @@ func GoBuild(tl *TaskList) *Task {
 						).
 							SetDir(P.Cwd).
 							Set(func(c *Command) error {
+								if setup.P.Cache != "" {
+									c.AppendEnvironment(map[string]string{
+										"GOPATH": setup.P.Cache,
+									})
+								}
+
 								if !P.EnableCGO {
 									c.AppendEnvironment(map[string]string{
 										"CGO_ENABLED": "0",
