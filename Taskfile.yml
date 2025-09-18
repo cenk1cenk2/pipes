@@ -18,6 +18,9 @@ includes:
   template:
     dir: ./_template
     taskfile: ./Taskfile.pipe.yml
+  buildah:
+    dir: ./buildah
+    taskfile: ./Taskfile.pipe.yml
   docker:
     dir: ./docker
     taskfile: ./Taskfile.pipe.yml
@@ -45,6 +48,7 @@ tasks:
     internal: true
     deps:
       - task: "template:{{ .command }}"
+      - task: "buildah:{{ .command }}"
       - task: "docker:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"

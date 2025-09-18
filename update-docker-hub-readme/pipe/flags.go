@@ -94,6 +94,10 @@ var Flags = []cli.Flag{
 		Required:         false,
 		ValidateDefaults: true,
 		Validator: func(v string) error {
+			if v == "" {
+				return nil
+			}
+
 			if err := json.Unmarshal([]byte(v), &P.Readme.Matrix); err != nil {
 				return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
 			}
