@@ -20,8 +20,8 @@ func main() {
 				Flags:       CombineFlags(pipe.Flags),
 				Action: func(_ context.Context, c *cli.Command) error {
 					return p.RunJobs(
-						JobSequence(
-							pipe.New(p).Job(),
+						CombineTaskLists(
+							pipe.New(p),
 						),
 					)
 				},

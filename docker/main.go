@@ -27,9 +27,9 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
 								),
 							)
 						},
@@ -41,10 +41,10 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags, build.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
-									build.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
+									build.New(p),
 								),
 							)
 						},
@@ -56,10 +56,10 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags, manifest.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
-									manifest.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
+									manifest.New(p),
 								),
 							)
 						},

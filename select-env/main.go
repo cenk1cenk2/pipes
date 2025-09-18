@@ -21,9 +21,9 @@ func main() {
 				Flags:       CombineFlags(setup.Flags, pipe.Flags),
 				Action: func(_ context.Context, c *cli.Command) error {
 					return p.RunJobs(
-						JobSequence(
-							setup.New(p).Job(),
-							pipe.New(p).Job(),
+						CombineTaskLists(
+							setup.New(p),
+							pipe.New(p),
 						),
 					)
 				},

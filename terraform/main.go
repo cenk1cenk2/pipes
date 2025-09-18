@@ -31,11 +31,11 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, install.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
-									state.New(p).Job(),
-									install.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
+									state.New(p),
+									install.New(p),
 								),
 							)
 						},
@@ -47,9 +47,9 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, lint.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									lint.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									lint.New(p),
 								),
 							)
 						},
@@ -61,11 +61,11 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, plan.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
-									state.New(p).Job(),
-									plan.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
+									state.New(p),
+									plan.New(p),
 								),
 							)
 						},
@@ -77,11 +77,11 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, apply.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
-									state.New(p).Job(),
-									apply.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
+									state.New(p),
+									apply.New(p),
 								),
 							)
 						},
@@ -93,8 +93,8 @@ func main() {
 						Flags:       CombineFlags(publish.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									publish.New(p).Job(),
+								CombineTaskLists(
+									publish.New(p),
 								),
 							)
 						},

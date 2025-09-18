@@ -32,11 +32,11 @@ func main() {
 				Flags:       CombineFlags(environment.Flags, node.Flags, login.Flags, pipe.Flags),
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(
-						JobSequence(
-							environment.New(p).Job(),
-							node.New(p).Job(),
-							login.New(p).Job(),
-							pipe.New(p).Job(),
+						CombineTaskLists(
+							environment.New(p),
+							node.New(p),
+							login.New(p),
+							pipe.New(p),
 						),
 					)
 				},

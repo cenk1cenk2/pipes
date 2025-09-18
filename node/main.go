@@ -38,9 +38,9 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
 								),
 							)
 						},
@@ -52,10 +52,10 @@ func main() {
 						Flags:       CombineFlags(setup.Flags, login.Flags, install.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									login.New(p).Job(),
-									install.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									login.New(p),
+									install.New(p),
 								),
 							)
 						},
@@ -66,10 +66,10 @@ func main() {
 						Flags: CombineFlags(setup.Flags, environment.Flags, build.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									environment.New(p).Job(),
-									build.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									environment.New(p),
+									build.New(p),
 								),
 							)
 						},
@@ -80,10 +80,10 @@ func main() {
 						Flags: CombineFlags(setup.Flags, environment.Flags, run.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
-								JobSequence(
-									setup.New(p).Job(),
-									environment.New(p).Job(),
-									run.New(p).Job(),
+								CombineTaskLists(
+									setup.New(p),
+									environment.New(p),
+									run.New(p),
 								),
 							)
 						},
