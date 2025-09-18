@@ -1,6 +1,9 @@
 package build
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
@@ -98,9 +101,20 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Usage: `Regex pattern to tag the image as latest.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json(RegExp[])`,
-		Required:    false,
-		Value:       flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
-		Destination: &raw.DockerImageTagAsLatest,
+		Required:         false,
+		Value:            flags.FLAG_DEFAULT_DOCKER_IMAGE_TAG_AS_LATEST,
+		ValidateDefaults: true,
+		Validator: func(v string) error {
+			if v == "" {
+				return nil
+			}
+
+			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagAsLatest); err != nil {
+				return fmt.Errorf("Cannot unmarshal Docker image tags for latest: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.StringFlag{
@@ -112,9 +126,20 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Usage: `Sanitizes the given regex pattern out of tag name.
       Template is interpolated with the given matches in the regular expression.
       json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
-		Required:    false,
-		Value:       flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
-		Destination: &raw.DockerImageTagsSanitize,
+		Required:         false,
+		Value:            flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
+		ValidateDefaults: true,
+		Validator: func(v string) error {
+			if v == "" {
+				return nil
+			}
+
+			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsSanitize); err != nil {
+				return fmt.Errorf("Cannot unmarshal Docker image sanitizing tag conditions: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.StringFlag{
@@ -126,9 +151,20 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Usage: `Modifies every tag that matches a certain condition.
       Template is interpolated with the given matches in the regular expression.
       json([]struct { match: RegExp, template: Template[string](RegExpMatch) })`,
-		Required:    false,
-		Value:       "[]",
-		Destination: &raw.DockerImageTagsTemplate,
+		Required:         false,
+		Value:            "[]",
+		ValidateDefaults: true,
+		Validator: func(v string) error {
+			if v == "" {
+				return nil
+			}
+
+			if err := json.Unmarshal([]byte(v), &P.DockerImage.TagsTemplate); err != nil {
+				return fmt.Errorf("Cannot unmarshal Docker image templating tag conditions: %w", err)
+			}
+
+			return nil
+		},
 	},
 
 	&cli.BoolFlag{

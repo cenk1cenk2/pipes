@@ -1,6 +1,9 @@
 package manifest
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
 )
@@ -51,8 +54,19 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_MANIFEST_MATRIX"),
 		),
-		Usage:       "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
-		Required:    false,
-		Destination: &raw.DockerManifestMatrix,
+		Usage:            "Matrix of all the images that should be manifested. json([]struct { target: string, images: []string })",
+		Required:         false,
+		ValidateDefaults: true,
+		Validator: func(v string) error {
+			if v == "" {
+				return nil
+			}
+
+			if err := json.Unmarshal([]byte(v), &P.DockerManifest.Matrix); err != nil {
+				return fmt.Errorf("Cannot unmarshal Docker manifest matrix: %w", err)
+			}
+
+			return nil
+		},
 	},
 }

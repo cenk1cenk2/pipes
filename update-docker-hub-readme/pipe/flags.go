@@ -1,6 +1,9 @@
 package pipe
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/urfave/cli/v3"
 )
 
@@ -87,8 +90,15 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("README_MATRIX"),
 		),
-		Usage:       "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
-		Required:    false,
-		Destination: &raw.ReadmeMatrix,
+		Usage:            "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
+		Required:         false,
+		ValidateDefaults: true,
+		Validator: func(v string) error {
+			if err := json.Unmarshal([]byte(v), &P.Readme.Matrix); err != nil {
+				return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
+			}
+
+			return nil
+		},
 	},
 }
