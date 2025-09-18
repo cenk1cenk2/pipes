@@ -38,8 +38,8 @@ type (
 	}
 
 	ContainerImageMatch struct {
-		Match    string `yaml:"match"    validate:"required"`
-		Template string `yaml:"template" validate:"required"`
+		Match    string `json:"match"    yaml:"match"    validate:"required"`
+		Template string `json:"template" yaml:"template" validate:"required"`
 	}
 
 	Pipe struct {

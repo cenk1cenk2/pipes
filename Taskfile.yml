@@ -12,7 +12,7 @@ env:
 output: prefixed
 
 includes:
-  go:
+  go-library:
     taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-library.yml?ref_type=heads
     flatten: true
   template:
@@ -23,6 +23,9 @@ includes:
     taskfile: ./Taskfile.pipe.yml
   docker:
     dir: ./docker
+    taskfile: ./Taskfile.pipe.yml
+  go:
+    dir: ./go
     taskfile: ./Taskfile.pipe.yml
   markdown-toc:
     dir: ./markdown-toc
@@ -50,6 +53,7 @@ tasks:
       - task: "template:{{ .command }}"
       - task: "buildah:{{ .command }}"
       - task: "docker:{{ .command }}"
+      - task: "go:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"
       - task: "select-env:{{ .command }}"

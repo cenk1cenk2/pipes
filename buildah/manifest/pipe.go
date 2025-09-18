@@ -16,8 +16,8 @@ type (
 	}
 
 	ContainerManifestMatrix struct {
-		Target string   `yaml:"target,omitempty"`
-		Images []string `yaml:"images"`
+		Target string   `json:"target,omitempty" yaml:"target,omitempty"`
+		Images []string `json:"images"           yaml:"images"`
 	}
 
 	Pipe struct {
