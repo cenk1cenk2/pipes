@@ -39,7 +39,7 @@ go:
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
               CONTAINER_IMAGE_BUILD_ARGS: |-
-                GO_VERSION: "{{ env "GO_VERSION" }}"
+                GO_VERSION: '{{ env "GO_VERSION" }}'
               CONTAINER_IMAGE_TAGS: |-
                 {{ env "GO_VERSION" }}
               GO_VERSION:
@@ -65,7 +65,7 @@ buildah:
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
               CONTAINER_IMAGE_BUILD_ARGS: |-
-                BUILDAH_VERSION: "{{ env "BUILDAH_VERSION" }}"
+                BUILDAH_VERSION: '{{ env "BUILDAH_VERSION" }}'
               CONTAINER_IMAGE_TAGS: |-
                 {{ env "BUILDAH_VERSION" }}
               BUILDAH_VERSION:

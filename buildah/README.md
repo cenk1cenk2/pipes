@@ -25,7 +25,7 @@ Login to the given container registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code></code> |
+| `$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code>docker.io</code> |
 | `$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` | `false` | <code></code> |
 | `$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` | `false` | <code></code> |
 
@@ -48,7 +48,6 @@ Build container images.
 | `$CONTAINER_IMAGE_PULL` | Pull before building the image. | `bool` | `false` | <code>true</code> |
 | `$CONTAINER_IMAGE_PUSH` | Push the image after building. | `bool` | `false` | <code>true</code> |
 | `$CONTAINER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image.<br />    You can use it as a template with environment variables as the context. | `string`<br/>`format(yaml(map[string]Template()))` | `false` | <code></code> |
-| `$CONTAINER_IMAGE_INSPECT` | Inspect after pushing the image. | `bool` | `false` | <code>true</code> |
 | `$CONTAINER_IMAGE_LATEST_TAG` | Latest tag for the container image where it is marked as latest. | `string` | `false` | <code>latest</code> |
 | `$CONTAINER_IMAGE_CACHE` | Specify the cache for the container image. | `string` | `false` | <code></code> |
 | `$CONTAINER_IMAGE_FORMAT` | Specify the format for Container Image. | `string` | `false` | <code>oci</code> |
@@ -65,7 +64,7 @@ Build container images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code></code> |
+| `$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code>docker.io</code> |
 | `$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` | `false` | <code></code> |
 | `$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` | `false` | <code></code> |
 
@@ -73,8 +72,8 @@ Build container images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CONTAINERFILE_CONTEXT` | Containerfile context argument for build operation. | `string` | `false` | <code>.</code> |
-| `$CONTAINERFILE_NAME` | Containerfile path for the build operation | `string` | `false` | <code>Dockerfile</code> |
+| `$CONTAINER_FILE_CONTEXT` | Containerfile context argument for build operation. | `string` | `false` | <code>.</code> |
+| `$CONTAINER_FILE_NAME` | Containerfile path for the build operation | `string` | `false` | <code>Dockerfile</code> |
 
 **GIT**
 
@@ -109,6 +108,6 @@ Update manifests of the container images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code></code> |
+| `$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code>docker.io</code> |
 | `$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` | `false` | <code></code> |
 | `$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` | `false` | <code></code> |
