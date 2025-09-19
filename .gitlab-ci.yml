@@ -63,7 +63,7 @@ include:
     file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
 
 bootstrap:
-  stage: bootstrap
+  stage: pre
   trigger:
     strategy: depend
     include:
