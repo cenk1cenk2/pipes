@@ -32,7 +32,6 @@ container:
       parallel:
         matrix:
           - GO_CWD: "${GO_CWD}"
-  stage: container
   image: quay.io/buildah/stable:latest
   variables:
     CONTAINER_IMAGE_TAGS: bootstrap
