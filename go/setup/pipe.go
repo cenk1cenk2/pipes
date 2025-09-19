@@ -6,6 +6,7 @@ import (
 
 type (
 	Pipe struct {
+		Cwd   string `validate:"omitempty,dir"`
 		Cache string `validate:"omitempty,dirpath"`
 	}
 

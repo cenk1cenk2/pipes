@@ -6,14 +6,15 @@ import (
 
 type (
 	Pipe struct {
-		Cwd            string `validate:"dirpath"`
 		Args           string
 		Output         string `validate:"dirpath"`
 		BinaryName     string
 		BinaryTemplate string
-		LdFlags        string
+		LdFlags        []string
 		EnableCGO      bool
 		BuildTargets   []GoBuildTarget
+		BuildVariables map[string]string
+		BuildTags      []string
 	}
 
 	GoBuildTarget struct {

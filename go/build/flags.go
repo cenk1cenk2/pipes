@@ -16,18 +16,6 @@ const (
 var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_BUILD,
-		Name:     "go.build.cwd",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("GO_BUILD_CWD"),
-		),
-		Usage:       "Build CWD for the package manager.",
-		Required:    false,
-		Value:       ".",
-		Destination: &P.Cwd,
-	},
-
-	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
 		Name:     "go.build.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_ARGS"),
@@ -74,7 +62,7 @@ var Flags = []cli.Flag{
 		Destination: &P.BinaryTemplate,
 	},
 
-	&cli.StringFlag{
+	&cli.StringSliceFlag{
 		Category: CATEGORY_BUILD,
 		Name:     "go.build.ld-flags",
 		Sources: cli.NewValueSourceChain(
@@ -82,7 +70,7 @@ var Flags = []cli.Flag{
 		),
 		Usage:       "Arguments for the linker during the build process.",
 		Required:    false,
-		Value:       "",
+		Value:       []string{},
 		Destination: &P.LdFlags,
 	},
 
@@ -116,6 +104,41 @@ var Flags = []cli.Flag{
 
 			if err := yaml.Unmarshal([]byte(v), &P.BuildTargets); err != nil {
 				return fmt.Errorf("Cannot unmarshal build targets: %w", err)
+			}
+
+			return nil
+		},
+	},
+
+	&cli.StringSliceFlag{
+		Category: CATEGORY_BUILD,
+		Name:     "go.build.tags",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_BUILD_TAGS"),
+		),
+		Usage:       "Build tags for the build process.",
+		Required:    false,
+		Value:       []string{},
+		Destination: &P.BuildTags,
+	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_BUILD,
+		Name:     "go.build.variables",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_BUILD_VARIABLES"),
+		),
+		Usage:            "Build variables for the build process. format(yaml(map[string]string))",
+		Required:         false,
+		Value:            `{}`,
+		ValidateDefaults: true,
+		Validator: func(v string) error {
+			if v == "" {
+				return nil
+			}
+
+			if err := yaml.Unmarshal([]byte(v), &P.BuildVariables); err != nil {
+				return fmt.Errorf("Cannot unmarshal build variables: %w", err)
 			}
 
 			return nil

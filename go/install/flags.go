@@ -11,18 +11,6 @@ const (
 )
 
 var Flags = []cli.Flag{
-	&cli.StringFlag{
-		Category: CATEGORY_INSTALL,
-		Name:     "go.install.cwd",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("GO_INSTALL_CWD"),
-		),
-		Usage:       "Install CWD for the package manager.",
-		Required:    false,
-		Value:       ".",
-		Destination: &P.Cwd,
-	},
-
 	&cli.BoolFlag{
 		Category: CATEGORY_INSTALL,
 		Name:     "go.install.verify",

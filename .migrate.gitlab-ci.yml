@@ -1,1 +1,17 @@
 ---
+stages:
+  - bootstrap
+
+bootstrap:
+  stage: bootstrap
+  trigger:
+    strategy: depend
+    include:
+      - local: .bootstrap.gitlab-ci.yml
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - go/**
+        - buildah/**
+        - .bootstrap.gitlab-ci.yml
+    - if: $CI_COMMIT_TAG

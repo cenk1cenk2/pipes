@@ -6,6 +6,7 @@ variables:
   GO_COMMAND_RUNNER: task --yes
 
 stages:
+  - pre
   - first-build
   - first-manifest
   - install
@@ -60,6 +61,13 @@ include:
     file: /templates/v2/update-docker-hub-readme.gitlab-ci.yml
   - project: devops/pipes
     file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
+
+bootstrap:
+  stage: bootstrap
+  trigger:
+    strategy: depend
+    include:
+      - local: .bootstrap.gitlab-ci.yml
 
 docker-build-first_go:
   extends: .docker-build-vanilla

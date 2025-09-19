@@ -31,8 +31,9 @@ func GoBuild(tl *TaskList) *Task {
 							"go",
 							"build",
 							"-mod=vendor",
+							"-v",
 						).
-							SetDir(P.Cwd).
+							SetDir(setup.P.Cwd).
 							Set(func(c *Command) error {
 								if setup.P.Cache != "" {
 									c.AppendEnvironment(map[string]string{
@@ -46,8 +47,16 @@ func GoBuild(tl *TaskList) *Task {
 									})
 								}
 
-								if P.LdFlags != "" {
-									c.AppendArgs(fmt.Sprintf("-ldflags=%s", P.LdFlags))
+								for k, v := range P.BuildVariables {
+									P.LdFlags = append(P.LdFlags, fmt.Sprintf("-X %s=%s", k, v))
+								}
+
+								for _, v := range P.LdFlags {
+									c.AppendArgs("-ldflags", v)
+								}
+
+								if len(P.BuildTags) > 0 {
+									c.AppendArgs("-tags", strings.Join(P.BuildTags, ","))
 								}
 
 								c.AppendArgs(strings.Split(P.Args, " ")...)

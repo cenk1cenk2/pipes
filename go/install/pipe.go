@@ -6,7 +6,6 @@ import (
 
 type (
 	Pipe struct {
-		Cwd    string `validate:"dirpath"`
 		Verify bool
 		Args   string
 	}

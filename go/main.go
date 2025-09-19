@@ -6,8 +6,8 @@ import (
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/go/build"
 	"gitlab.kilic.dev/devops/pipes/go/install"
-	"gitlab.kilic.dev/devops/pipes/go/lint"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
+	"gitlab.kilic.dev/devops/pipes/go/tool"
 
 	. "github.com/cenk1cenk2/plumber/v6"
 )
@@ -36,20 +36,6 @@ func main() {
 					},
 
 					{
-						Name:        "lint",
-						Description: "Lint the repository.",
-						Flags:       CombineFlags(setup.Flags, lint.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									lint.New(p),
-								),
-							)
-						},
-					},
-
-					{
 						Name:        "build",
 						Description: "Build an application.",
 						Flags:       CombineFlags(setup.Flags, build.Flags),
@@ -58,6 +44,20 @@ func main() {
 								CombineTaskLists(
 									setup.New(p),
 									build.New(p),
+								),
+							)
+						},
+					},
+
+					{
+						Name:        "tool",
+						Description: "Run a specified go tool.",
+						Flags:       CombineFlags(setup.Flags, tool.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								CombineTaskLists(
+									setup.New(p),
+									tool.New(p),
 								),
 							)
 						},

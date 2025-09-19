@@ -14,7 +14,7 @@ import (
 
 const (
 	CATEGORY_CONTAINER_IMAGE    = "Container Image"
-	CATEGORY_CONTAINERFILE      = "Containerfile"
+	CATEGORY_CONTAINER_FILE      = "Containerfile"
 	CATEGORY_CONTAINER_MANIFEST = "Container Manifest"
 )
 
@@ -270,13 +270,13 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Destination: &P.ContainerImage.StorageDriver,
 	},
 
-	// CATEGORY_CONTAINERFILE
+	// CATEGORY_CONTAINER_FILE
 
 	&cli.StringFlag{
-		Category: CATEGORY_CONTAINERFILE,
+		Category: CATEGORY_CONTAINER_FILE,
 		Name:     "containerfile.context",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("CONTAINERFILE_CONTEXT"),
+			cli.EnvVar("CONTAINER_FILE_CONTEXT"),
 		),
 		Usage:       "Containerfile context argument for build operation.",
 		Required:    false,
@@ -285,10 +285,10 @@ var Flags = CombineFlags(flags.NewGitFlags(
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_CONTAINERFILE,
+		Category: CATEGORY_CONTAINER_FILE,
 		Name:     "containerfile.name",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("CONTAINERFILE_NAME"),
+			cli.EnvVar("CONTAINER_FILE_NAME"),
 		),
 		Usage:       "Containerfile path for the build operation",
 		Required:    false,
