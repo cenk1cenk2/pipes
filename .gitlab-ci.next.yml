@@ -1,6 +1,7 @@
 ---
 stages:
   - bootstrap
+  - pipes
 
 dummy:
   stage: bootstrap
@@ -20,8 +21,34 @@ bootstrap:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
+          - .gitlab-ci.next.yml
+          - .gitlab-ci.bootstrap.yml
           - go/
           - buildah/
-          - .gitlab-ci.bootstrap.yml
+    - if: $CI_COMMIT_TAG
+
+go:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./go
+          container-image-name: cenk1cenk2/pipe-go2
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_BUILD_ARGS: |-
+                GO_VERSION: "{{ env "GO_VERSION" }}"
+              CONTAINER_IMAGE_TAGS: |-
+                {{ env "GO_VERSION" }}
+              GO_VERSION:
+                - 1.25-alpine
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
           - .gitlab-ci.next.yml
+          - .gitlab-ci.pipe.yml
+          - go/
     - if: $CI_COMMIT_TAG
