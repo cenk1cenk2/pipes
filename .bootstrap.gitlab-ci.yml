@@ -32,6 +32,8 @@ container:
   image: quay.io/buildah/stable:latest
   variables:
     CONTAINER_IMAGE_TAGS: bootstrap
+  script:
+    - ./buildah/dist/pipe-linux-amd64 build
   parallel:
     matrix:
       - CONTAINER_FILE_CONTEXT: ./go
