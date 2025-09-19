@@ -7,6 +7,8 @@ dummy:
   image: alpine:latest
   script:
     - echo "imdat"
+  tags:
+    - docker
 
 bootstrap:
   stage: bootstrap

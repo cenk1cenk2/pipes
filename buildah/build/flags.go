@@ -253,7 +253,7 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		),
 		Usage:       "Specify the format for Container Image.",
 		Required:    false,
-		Value:       "oci",
+		Value:       "docker",
 		Destination: &P.ContainerImage.Format,
 	},
 
