@@ -26,6 +26,9 @@ init:
   artifacts:
     paths:
       - ${GO_CWD}/dist/
+  tags:
+    - amd64
+    - docker
 
 container:
   stage: container
@@ -44,3 +47,6 @@ container:
         CONTAINER_IMAGE_NAME: docker.io/cenk1cenk2/pipe-buildah
         CONTAINER_IMAGE_BUILD_ARGS: |-
           BUILDAH_VERSION: latest
+  tags:
+    - amd64
+    - docker
