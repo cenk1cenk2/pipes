@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile-upstream:master-labs
-FROM quay.io/buildah/stable:latest
+ARG BUILDAH_VERSION
+
+FROM quay.io/buildah/stable:${BUILDAH_VERSION}
 
 ARG BUILDOS
 ARG BUILDARCH
