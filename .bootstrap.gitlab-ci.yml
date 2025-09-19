@@ -1,5 +1,10 @@
+---
+stages:
+  - init
+  - container
+
 init:
-  needs: []
+  stage: init
   image: golang:1.25-alpine
   variables:
     GO_BUILD_BINARY_NAME: pipe
@@ -27,9 +32,7 @@ init:
     - docker
 
 container:
-  needs:
-    - job: init
-      artifacts: true
+  stage: container
   image: quay.io/buildah/stable:latest
   variables:
     CONTAINER_IMAGE_TAGS: bootstrap

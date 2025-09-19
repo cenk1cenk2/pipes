@@ -14,7 +14,7 @@ import (
 
 const (
 	CATEGORY_CONTAINER_IMAGE    = "Container Image"
-	CATEGORY_CONTAINER_FILE      = "Containerfile"
+	CATEGORY_CONTAINER_FILE     = "Containerfile"
 	CATEGORY_CONTAINER_MANIFEST = "Container Manifest"
 )
 
