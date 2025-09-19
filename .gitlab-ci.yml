@@ -62,7 +62,7 @@ include:
   - project: devops/pipes
     file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
 
-bootstrap:
+next:
   stage: pre
   trigger:
     strategy: mirror
