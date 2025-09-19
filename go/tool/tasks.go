@@ -31,6 +31,8 @@ func CreateGoToolTask(tl *TaskList, options CreateGoToolTaskOptions) *Task {
 				SetDir(options.Cwd).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command) error {
+					t.Log.Infof("Tool: %s in %s", options.Tool, setup.P.Cwd)
+
 					c.AppendArgs(options.Tool)
 
 					c.AppendArgs(strings.Split(options.Args, " ")...)

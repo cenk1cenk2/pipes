@@ -22,6 +22,7 @@ var Flags = []cli.Flag{
 		),
 		Usage:       "Container registry url to login to.",
 		Required:    false,
+		Value:       "docker.io",
 		Destination: &P.ContainerRegistry.Uri,
 	},
 

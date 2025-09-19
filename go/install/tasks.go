@@ -18,7 +18,7 @@ func GoModVendor(tl *TaskList) *Task {
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				SetDir(setup.P.Cwd).
 				Set(func(c *Command) error {
-					c.Log.Info("Vendoring Go modules.")
+					t.Log.Infof("Vendoring: in %s", setup.P.Cwd)
 
 					if P.Args != "" {
 						c.AppendArgs(strings.Split(P.Args, " ")...)
@@ -55,7 +55,7 @@ func GoModVerify(tl *TaskList) *Task {
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				SetDir(setup.P.Cwd).
 				Set(func(c *Command) error {
-					c.Log.Info("Verifying Go modules.")
+					t.Log.Infof("Verifying modules: in %s", setup.P.Cwd)
 
 					return nil
 				}).
