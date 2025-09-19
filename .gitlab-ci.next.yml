@@ -7,11 +7,11 @@ bootstrap:
   trigger:
     strategy: depend
     include:
-      - local: .bootstrap.gitlab-ci.yml
+      - local: .gitlab-ci.bootstrap.yml
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
         - go/**
         - buildah/**
-        - .bootstrap.gitlab-ci.yml
+        - .gitlab-ci.bootstrap.yml
     - if: $CI_COMMIT_TAG

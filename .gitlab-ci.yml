@@ -65,9 +65,9 @@ include:
 bootstrap:
   stage: pre
   trigger:
-    strategy: depend
+    strategy: mirror
     include:
-      - local: .bootstrap.gitlab-ci.yml
+      - local: .gitlab-ci.next.yml
 
 docker-build-first_go:
   extends: .docker-build-vanilla
