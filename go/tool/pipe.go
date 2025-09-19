@@ -9,8 +9,9 @@ import (
 
 type (
 	Pipe struct {
-		Tool string `validate:"required"`
-		Args string
+		Tool    string `validate:"required"`
+		Args    string
+		Command []string
 	}
 
 	Ctx struct {
@@ -26,18 +27,12 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			args := p.Cli.Args().Tail()
-			if len(args) > 0 {
+			if len(P.Command) > 0 {
 				if P.Tool == "" {
-
-					if len(args) < 1 {
-						return fmt.Errorf("Arguments are needed to run a specific script.")
-					}
-
-					P.Tool = args[0]
-					P.Args = fmt.Sprintf("%s %s", P.Args, strings.Join(args[1:], " "))
+					P.Tool = P.Command[0]
+					P.Args = fmt.Sprintf("%s %s", P.Args, strings.Join(P.Command[1:], " "))
 				} else {
-					P.Args = fmt.Sprintf("%s %s", P.Args, strings.Join(args, " "))
+					P.Args = fmt.Sprintf("%s %s", P.Args, strings.Join(P.Command, " "))
 				}
 			}
 

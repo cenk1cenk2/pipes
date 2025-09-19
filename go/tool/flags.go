@@ -35,3 +35,13 @@ var Flags = []cli.Flag{
 		Destination: &P.Args,
 	},
 }
+
+var Arguments = []cli.Argument{
+	&cli.StringArgs{
+		Name:        "arg",
+		Min:         0,
+		Max:         -1,
+		UsageText:   "Tool to run.",
+		Destination: &P.Command,
+	},
+}
