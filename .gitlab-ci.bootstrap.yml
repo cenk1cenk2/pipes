@@ -9,7 +9,7 @@ init:
   variables:
     GO_BUILD_BINARY_NAME: pipe
     GO_BUILD_LINKER: -w -s
-    GO_BUILD_VARIABLES:
+    GO_BUILD_VARIABLES: |-
       main.VERSION: bootstrap.{{ now | date "2006-01-02T15:04:05Z0700" }}
   parallel:
     matrix:
