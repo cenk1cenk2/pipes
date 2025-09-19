@@ -19,7 +19,6 @@ type (
 		TagsTemplate   []ContainerImageMatch
 		Pull           bool
 		Push           bool
-		Inspect        bool
 		BuildArgs      map[string]string
 		LatestTag      string
 		Cache          string `validate:"omitempty,dirpath"`
@@ -76,7 +75,6 @@ func New(p *Plumber) *TaskList {
 				ContainerImageTagsParent(tl).Job(),
 				ContainerBuild(tl).Job(),
 				ContainerPush(tl).Job(),
-				ContainerInspect(tl).Job(),
 			)
 		})
 }

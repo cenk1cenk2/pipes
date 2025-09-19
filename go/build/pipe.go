@@ -10,7 +10,7 @@ type (
 		Output         string `validate:"dirpath"`
 		BinaryName     string
 		BinaryTemplate string
-		LdFlags        []string
+		LinkerFlags    string
 		EnableCGO      bool
 		BuildTargets   []GoBuildTarget
 		BuildVariables map[string]string

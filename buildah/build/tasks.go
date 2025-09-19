@@ -32,6 +32,7 @@ func ContainerBuild(tl *TaskList) *Task {
 				"buildah",
 				"build",
 			).
+				SetDir(P.ContainerFile.Context).
 				Set(func(c *Command) error {
 					c.AppendEnvironment(map[string]string{
 						"STORAGE_DRIVER": P.ContainerImage.StorageDriver,
@@ -72,9 +73,6 @@ func ContainerBuild(tl *TaskList) *Task {
 						".",
 					)
 
-					c.SetDir(P.ContainerFile.Context)
-					t.Log.Debugf("CWD set as: %s", c.Command.Dir)
-
 					return nil
 				}).
 				AddSelfToTheTask()
@@ -106,50 +104,13 @@ func ContainerPush(tl *TaskList) *Task {
 									tag,
 								)
 
+								c.AppendEnvironment(map[string]string{
+									"STORAGE_DRIVER": P.ContainerImage.StorageDriver,
+								})
+
 								return nil
 							}).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							AddSelfToTheTask()
-
-						return nil
-					}).
-					ShouldRunAfter(func(t *Task) error {
-						return t.RunCommandJobAsJobParallel()
-					}).
-					AddSelfToTheParentAsParallel()
-			}
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
-		})
-}
-
-func ContainerInspect(tl *TaskList) *Task {
-	return tl.CreateTask("inspect").
-		ShouldDisable(func(t *Task) bool {
-			return !P.ContainerImage.Inspect
-		}).
-		Set(func(t *Task) error {
-			for _, tag := range C.Tags {
-				t.CreateSubtask(tag).
-					Set(func(t *Task) error {
-						t.CreateCommand(
-							"buildah",
-							"manifest",
-							"inspect",
-							tag,
-						).
-							SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							Set(func(c *Command) error {
-								c.Log.Infof(
-									"Inspecting container image: %s",
-									tag,
-								)
-
-								return nil
-							}).
 							AddSelfToTheTask()
 
 						return nil

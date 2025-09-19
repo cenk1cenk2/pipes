@@ -209,18 +209,6 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		},
 	},
 
-	&cli.BoolFlag{
-		Category: CATEGORY_CONTAINER_IMAGE,
-		Name:     "container-image.inspect",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("CONTAINER_IMAGE_INSPECT"),
-		),
-		Usage:       "Inspect after pushing the image.",
-		Required:    false,
-		Value:       true,
-		Destination: &P.ContainerImage.Inspect,
-	},
-
 	&cli.StringFlag{
 		Category: CATEGORY_CONTAINER_IMAGE,
 		Name:     "container-image.latest-tag",
@@ -253,7 +241,7 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		),
 		Usage:       "Specify the format for Container Image.",
 		Required:    false,
-		Value:       "docker",
+		Value:       "oci",
 		Destination: &P.ContainerImage.Format,
 	},
 

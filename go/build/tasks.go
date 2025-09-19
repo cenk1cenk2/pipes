@@ -50,12 +50,16 @@ func GoBuild(tl *TaskList) *Task {
 								}
 
 								for k, v := range P.BuildVariables {
-									P.LdFlags = append(P.LdFlags, fmt.Sprintf("-X %s=%s", k, v))
+									P.LinkerFlags = fmt.Sprintf("%s -X %s=%s", P.LinkerFlags, k, v)
+								}
+								P.LinkerFlags = strings.TrimSpace(P.LinkerFlags)
+
+								linker, err := InlineTemplate[any](P.LinkerFlags, nil)
+								if err != nil {
+									return fmt.Errorf("Cannot template linker flags: %s", P.LinkerFlags)
 								}
 
-								for _, v := range P.LdFlags {
-									c.AppendArgs("-ldflags", v)
-								}
+								c.AppendArgs(fmt.Sprintf("-ldflags=%s", linker))
 
 								if len(P.BuildTags) > 0 {
 									c.AppendArgs("-tags", strings.Join(P.BuildTags, ","))
