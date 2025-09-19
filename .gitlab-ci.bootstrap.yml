@@ -43,13 +43,17 @@ container:
   parallel:
     matrix:
       - CONTAINER_FILE_CONTEXT: ./go
-        CONTAINER_IMAGE_NAME: docker.io/cenk1cenk2/pipe-go2
+        CONTAINER_IMAGE_NAME: cenk1cenk2/pipe-go2
         CONTAINER_IMAGE_BUILD_ARGS: |-
           GO_VERSION: 1.25-alpine
+          BUILDOS: linux
+          BUILDARCH: amd64
       - CONTAINER_FILE_CONTEXT: ./buildah
-        CONTAINER_IMAGE_NAME: docker.io/cenk1cenk2/pipe-buildah
+        CONTAINER_IMAGE_NAME: cenk1cenk2/pipe-buildah
         CONTAINER_IMAGE_BUILD_ARGS: |-
           BUILDAH_VERSION: latest
+          BUILDOS: linux
+          BUILDARCH: amd64
   tags:
     - amd64
     - docker

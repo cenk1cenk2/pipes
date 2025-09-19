@@ -14,6 +14,7 @@ func GoModVendor(tl *TaskList) *Task {
 				"go",
 				"mod",
 				"vendor",
+				"-v",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				SetDir(setup.P.Cwd).
