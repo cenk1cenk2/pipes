@@ -2,6 +2,12 @@
 stages:
   - bootstrap
 
+dummy:
+  stage: bootstrap
+  image: alpine:latest
+  script:
+    - echo "imdat"
+
 bootstrap:
   stage: bootstrap
   trigger:

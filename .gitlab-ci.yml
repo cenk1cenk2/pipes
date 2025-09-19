@@ -65,7 +65,7 @@ include:
 next:
   stage: pre
   trigger:
-    strategy: mirror
+    strategy: depend
     include:
       - local: .gitlab-ci.next.yml
 
