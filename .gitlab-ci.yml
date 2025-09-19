@@ -1,427 +1,242 @@
 ---
-variables:
-  LOG_LEVEL: trace
-  GO_VERSION: 1.25-alpine
-  TASK_X_REMOTE_TASKFILES: 1
-  GO_COMMAND_RUNNER: task --yes
-
 stages:
-  - pre
-  - first-build
-  - first-manifest
-  - install
-  - build
-  - pre-publish
-  - pre-manifest
-  - publish
+  - bootstrap
+  - pipes
   - post
 
-.docker-build-vanilla:
-  variables:
-    DOCKER_BUILDKIT: "1"
-    GITLAB_CI_ARCH: amd64
-    DOCKERFILE_NAME: Dockerfile
-    DOCKERFILE_CONTEXT: .
-    DOCKER_IMAGE_BUILD_ARGS: ""
-  before_script:
-    - cd $DOCKERFILE_CONTEXT
-  script:
-    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-    - docker build --pull -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS $DOCKER_IMAGE_BUILD_ARGS -f ${DOCKERFILE_NAME} .
-    - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
-  only:
-    refs:
-      - main
-      - tags
-  tags:
-    - $GITLAB_CI_ARCH
-
-.docker-manifest-vanilla:
-  variables:
-    DOCKER_BUILDKIT: "1"
-  script:
-    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-    - docker manifest create ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAGS} ${DOCKER_IMAGE_AMEND_TAGS}
-    - docker manifest push --purge $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAGS
-  only:
-    refs:
-      - main
-      - tags
-  tags:
-    - docker
-
 include:
-  - project: devops/pipes
-    file: /templates/v2/workflow-on-mr.gitlab-ci.yml
-  - project: devops/pipes
-    file: /templates/v2/go.gitlab-ci.yml
-  - project: devops/pipes
-    file: /templates/v2/docker-build-dockerhub.gitlab-ci.yml
-  - project: devops/pipes
-    file: /templates/v2/update-docker-hub-readme.gitlab-ci.yml
-  - project: devops/pipes
-    file: /templates/v2/docker-manifest-dockerhub.gitlab-ci.yml
+  # TODO: remove me after migrating to the new pipelines
+  - local: templates/v2/update-docker-hub-readme.gitlab-ci.yml
 
-next:
-  stage: pre
+bootstrap:
+  stage: bootstrap
   trigger:
     strategy: depend
     include:
-      - local: .gitlab-ci.next.yml
+      - local: .gitlab-ci.bootstrap.yml
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.bootstrap.yml
+          - go/
+          - buildah/
+    - if: $CI_COMMIT_TAG
 
-docker-build-first_go:
-  extends: .docker-build-vanilla
-  stage: first-build
-  variables:
-    DOCKERFILE_CONTEXT: ./go
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: ${GO_VERSION}-${GITLAB_CI_ARCH}
-        DOCKER_IMAGE_BUILD_ARGS: --build-arg=GO_VERSION=${GO_VERSION}
-        DOCKERFILE_NAME: Dockerfile-alpine
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  only:
-    changes:
-      - go.mod
-      - "go/**/*"
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
+pipe-buildah:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./buildah
+          container-image-name: cenk1cenk2/pipe-buildah
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - buildah/
+    - if: $CI_COMMIT_TAG
 
-docker-manifest-first_go:
-  extends: .docker-manifest-vanilla
-  stage: first-manifest
-  dependencies: []
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-        DOCKER_IMAGE_TAGS: 1.25-alpine
-        DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-go:${DOCKER_IMAGE_TAGS}-amd64 -a cenk1cenk2/pipe-go:${DOCKER_IMAGE_TAGS}-arm64"
-  only:
-    changes:
-      - go.mod
-      - "go/**/*"
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
+pipe-docker:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./docker
+          container-image-name: cenk1cenk2/pipe-docker
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - docker/
+    - if: $CI_COMMIT_TAG
 
-install:
-  extends: .go-install
-  stage: install
+pipe-go:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./go
+          # TODO: update me to the point to go image after migration
+          container-image-name: cenk1cenk2/pipe-go2
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_BUILD_ARGS: |-
+                GO_VERSION: '{{ env "GO_VERSION" }}'
+              CONTAINER_IMAGE_TAGS: |-
+                {{ env "GO_VERSION" }}
+              GO_VERSION:
+                - 1.25-alpine
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - go/
+    - if: $CI_COMMIT_TAG
 
-lint:
-  extends: .go-lint
-  stage: build
+pipe-markdown-toc:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./markdown-toc
+          container-image-name: cenk1cenk2/pipe-markdown-toc
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - markdown-toc/
+    - if: $CI_COMMIT_TAG
 
-build:
-  extends: .go-build
-  stage: build
-  variables:
-    GO_BUILD_COMMAND: $PIPE:build
-  artifacts:
-    paths:
-      - "./*/dist/"
-  parallel:
-    matrix:
-      - PIPE: template
-      - PIPE: docker
-      - PIPE: node
-      - PIPE: markdown-toc
-      - PIPE: select-env
-      - PIPE: semantic-release
-      - PIPE: terraform
-      - PIPE: update-docker-hub-readme
+pipe-node:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./node
+          container-image-name: cenk1cenk2/pipe-node
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_BUILD_ARGS: |-
+                NODE_VERSION: '{{ env "NODE_VERSION" }}'
+              CONTAINER_IMAGE_TAGS: |-
+                {{ env "NODE_VERSION" }}
+              NODE_VERSION:
+                - 20
+                - 20-alpine
+                - 22
+                - 22-alpine
+                - 24
+                - 24-alpine
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - node/
+    - if: $CI_COMMIT_TAG
 
-# to stop depending on itself
+pipe-select-env:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./select-env
+          container-image-name: cenk1cenk2/pipe-select-env
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - select-env/
+    - if: $CI_COMMIT_TAG
 
-docker-build-first_docker:
-  extends: .docker-build-vanilla
-  stage: pre-publish
-  dependencies:
-    - "build: [docker]"
-  variables:
-    DOCKERFILE_CONTEXT: ./docker
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-${GITLAB_CI_ARCH}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "docker/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
+pipe-semantic-release:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./semantic-release
+          container-image-name: cenk1cenk2/semantic-release
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_BUILD_ARGS: |-
+                NODE_VERSION: 22-alpine
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - semantic-release/
+    - if: $CI_COMMIT_TAG
 
-docker-manifest-first_docker:
-  extends: .docker-manifest-vanilla
-  stage: pre-manifest
-  dependencies: []
-  variables:
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-    DOCKER_IMAGE_TAGS: latest
-    DOCKER_IMAGE_AMEND_TAGS: "-a cenk1cenk2/pipe-docker:latest-amd64 -a cenk1cenk2/pipe-docker:latest-arm64"
-  only:
-    changes:
-      - "common/**/*"
-      - "docker/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
+pipe-terraform:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./terraform
+          container-image-name: cenk1cenk2/pipe-terraform
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - terraform/
+    - if: $CI_COMMIT_TAG
 
-# private images
-
-# public images
-
-docker-build_docker:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./docker
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-docker
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies:
-    - "build: [docker]"
-  only:
-    changes:
-      - "common/**/*"
-      - "docker/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_go:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./go
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-go
-    DOCKER_IMAGE_BUILD_ARGS: GO_VERSION={{ env "GO_VERSION" }}
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: '{{ env "GO_VERSION" }}-{{ env "GITLAB_CI_ARCH" }}'
-        DOCKER_MANIFEST_TARGET: '{{ env "GO_VERSION" }}'
-        DOCKERFILE_NAME: Dockerfile-alpine
-        GO_VERSION:
-          - 1.25-alpine
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies: []
-  only:
-    changes:
-      - "go/**/*"
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_node:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./node
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-node
-    DOCKER_MANIFEST_TARGET: '{{ env "NODE_VERSION" }}'
-    DOCKER_IMAGE_BUILD_ARGS: NODE_VERSION={{ env "NODE_VERSION" }}
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: '{{ env "NODE_VERSION" }}-{{ env "GITLAB_CI_ARCH" }}'
-        NODE_VERSION:
-          - 20
-          - 20-alpine
-          - 22
-          - 22-alpine
-          - 24
-          - 24-alpine
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies:
-    - "build: [node]"
-  only:
-    changes:
-      - "common/**/*"
-      - "select-env/**/*"
-      - "node/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_markdown-toc:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./markdown-toc
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-markdown-toc
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies:
-    - "build: [markdown-toc]"
-  only:
-    changes:
-      - "common/**/*"
-      - "markdown-toc/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_select-env:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./select-env
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-select-env
-    DOCKER_MANIFEST_TARGET: latest
-  dependencies:
-    - "build: [select-env]"
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  only:
-    changes:
-      - "common/**/*"
-      - "select-env/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_semantic-release:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./semantic-release
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies:
-    - "build: [semantic-release]"
-  only:
-    changes:
-      - "common/**/*"
-      - "select-env/**/*"
-      - "node/**/*"
-      - "semantic-release/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_terraform:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./terraform
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-terraform
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies:
-    - "build: [terraform]"
-  only:
-    changes:
-      - "common/**/*"
-      - "terraform/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-build_update-docker-hub-readme:
-  extends: .docker-build-dockerhub
-  stage: publish
-  variables:
-    DOCKERFILE_CONTEXT: ./update-docker-hub-readme
-    DOCKER_IMAGE_NAME: cenk1cenk2/pipe-update-docker-hub-readme
-    DOCKER_MANIFEST_TARGET: latest
-  parallel:
-    matrix:
-      - DOCKER_IMAGE_TAGS: latest-{{ env "GITLAB_CI_ARCH" }}
-        GITLAB_CI_ARCH:
-          - amd64
-          - arm64
-  dependencies:
-    - "build: [update-docker-hub-readme]"
-  only:
-    changes:
-      - "common/**/*"
-      - "update-docker-hub-readme/**/*"
-      - go.mod
-      - go.sum
-      - .gitlab-ci.yml
-    refs:
-      - main
-      - tags
-
-docker-manifest:
-  extends: .docker-manifest-dockerhub
-  stage: post
-  dependencies:
-    - docker-build_docker
-    - docker-build_go
-    - docker-build_node
-    - docker-build_markdown-toc
-    - docker-build_select-env
-    - docker-build_semantic-release
-    - docker-build_terraform
-    - docker-build_update-docker-hub-readme
-  only:
-    refs:
-      - main
-      - tags
+pipe-update-docker-hub-readme:
+  stage: pipes
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./update-docker-hub-readme
+          container-image-name: cenk1cenk2/pipe-update-docker-hub-readme
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - .gitlab-ci.pipe.yml
+          - update-docker-hub-readme/
+    - if: $CI_COMMIT_TAG
 
 update-docker-hub-readme:
   extends: .update-docker-hub-readme
@@ -430,6 +245,11 @@ update-docker-hub-readme:
   variables:
     README_MATRIX: |
       [
+        {
+          "repository": "cenk1cenk2/pipe-buildah",
+          "file": "./buildah/README.md",
+          "description": "Builds and publishes a container image with given conditions."
+        },
         {
           "repository": "cenk1cenk2/pipe-docker",
           "file": "./docker/README.md",
@@ -441,9 +261,9 @@ update-docker-hub-readme:
           "description": "Node.JS operations for pipelines."
         },
         {
-          "repository": "cenk1cenk2/pipe-go",
+          "repository": "cenk1cenk2/pipe-go2",
           "file": "./go/README.md",
-          "description": "GoLang operations for pipelines."
+          "description": "Golang operations for pipelines."
         },
         {
           "repository": "cenk1cenk2/pipe-markdown-toc",

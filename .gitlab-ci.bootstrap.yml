@@ -13,9 +13,8 @@ init:
       main.VERSION: bootstrap.{{ now | date "2006-01-02T15:04:05Z0700" }}
   parallel:
     matrix:
-      - GO_CWD:
-          - go
-          - buildah
+      - GO_CWD: go
+      - GO_CWD: buildah
   script:
     - go mod vendor
     - go mod verify
@@ -28,7 +27,7 @@ init:
     - ./go/dist/pipe-bootstrap tool -- golangci-lint run --timeout 3m
     - ./go/dist/pipe-bootstrap build
   cache:
-    - key: bootstrap-$CI_JOB_NAME_SLUG
+    - key: bootstrap-init
       paths:
         - vendor/
         - $GO_CWD/dist/
@@ -54,14 +53,10 @@ container:
         CONTAINER_IMAGE_NAME: cenk1cenk2/pipe-go2
         CONTAINER_IMAGE_BUILD_ARGS: |-
           GO_VERSION: 1.25-alpine
-          BUILDOS: linux
-          BUILDARCH: amd64
       - CONTAINER_FILE_CONTEXT: ./buildah
         CONTAINER_IMAGE_NAME: cenk1cenk2/pipe-buildah
         CONTAINER_IMAGE_BUILD_ARGS: |-
           BUILDAH_VERSION: latest
-          BUILDOS: linux
-          BUILDARCH: amd64
   tags:
     - amd64
     - docker

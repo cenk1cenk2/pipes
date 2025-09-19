@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile-upstream:master-labs
-FROM node:22.19.0-alpine
+ARG NODE_VERSION
+
+FROM node:${NODE_VERSION}
 
 ARG BUILDOS
 ARG BUILDARCH

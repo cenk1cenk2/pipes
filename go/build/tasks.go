@@ -25,7 +25,16 @@ func GoBuild(tl *TaskList) *Task {
 					target.Os = runtime.GOARCH
 				}
 
-				t.CreateSubtask(fmt.Sprintf("%s/%s", target.Os, target.Arch)).
+				output, err := InlineTemplate(P.BinaryTemplate, map[string]string{
+					"os":   target.Os,
+					"arch": target.Arch,
+					"name": P.BinaryName,
+				})
+				if err != nil {
+					return fmt.Errorf("Cannot template binary name from template: %s -> %w", P.BinaryTemplate, err)
+				}
+
+				t.CreateSubtask(fmt.Sprintf("%s@%s/%s", output, target.Os, target.Arch)).
 					Set(func(t *Task) error {
 						t.CreateCommand(
 							"go",
@@ -66,15 +75,6 @@ func GoBuild(tl *TaskList) *Task {
 								}
 
 								c.AppendArgs(strings.Split(P.Args, " ")...)
-
-								output, err := InlineTemplate(P.BinaryTemplate, map[string]string{
-									"os":   target.Os,
-									"arch": target.Arch,
-									"name": P.BinaryName,
-								})
-								if err != nil {
-									return fmt.Errorf("Cannot template binary name from template: %s -> %w", P.BinaryTemplate, err)
-								}
 
 								c.AppendArgs(
 									"-o",
