@@ -1,6 +1,7 @@
 ---
 stages:
   - bootstrap
+  - install
   - pipes
   - post
 
@@ -21,6 +22,22 @@ bootstrap:
           - go/
           - buildah/
     - if: $CI_COMMIT_TAG
+
+install:
+  stage: install
+  image: cenk1cenk2/pipe-go:bootstrap
+  script:
+    - pipe install
+  artifacts:
+    paths:
+      - vendor/
+  cache:
+    - key: $CI_JOB_NAME_SLUG
+      paths:
+        - vendor/
+  tags:
+    - amd64
+    - docker
 
 pipe-template:
   stage: pipes
