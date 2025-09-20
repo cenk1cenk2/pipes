@@ -247,7 +247,7 @@ pipe-semantic-release:
       - local: .gitlab-ci.pipe.yml
         inputs:
           cwd: ./semantic-release
-          container-image-name: cenk1cenk2/semantic-release
+          container-image-name: cenk1cenk2/pipe-semantic-release
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
               CONTAINER_IMAGE_BUILD_ARGS: |-
