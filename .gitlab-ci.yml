@@ -8,11 +8,6 @@ include:
   # TODO: remove me after migrating to the new pipelines
   - local: templates/v2/update-docker-hub-readme.gitlab-ci.yml
 
-.changes:
-  - .gitlab-ci.yml
-  - go.mod
-  - go.sum
-
 bootstrap:
   stage: bootstrap
   trigger:
@@ -23,7 +18,9 @@ bootstrap:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.bootstrap.yml
           - go/
           - buildah/
@@ -48,7 +45,9 @@ pipe-template:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - _template/
     - if: $CI_COMMIT_TAG
@@ -70,7 +69,9 @@ pipe-buildah:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - buildah/
     - if: $CI_COMMIT_TAG
@@ -92,7 +93,9 @@ pipe-docker:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - docker/
     - if: $CI_COMMIT_TAG
@@ -119,7 +122,9 @@ pipe-go:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - go/
     - if: $CI_COMMIT_TAG
@@ -141,7 +146,9 @@ pipe-markdown-toc:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - markdown-toc/
     - if: $CI_COMMIT_TAG
@@ -172,7 +179,9 @@ pipe-node:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - node/
     - if: $CI_COMMIT_TAG
@@ -194,7 +203,9 @@ pipe-select-env:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - select-env/
     - if: $CI_COMMIT_TAG
@@ -218,7 +229,9 @@ pipe-semantic-release:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - semantic-release/
     - if: $CI_COMMIT_TAG
@@ -240,7 +253,9 @@ pipe-terraform:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - terraform/
     - if: $CI_COMMIT_TAG
@@ -262,7 +277,9 @@ pipe-update-docker-hub-readme:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - !reference .changes
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
           - .gitlab-ci.pipe.yml
           - update-docker-hub-readme/
     - if: $CI_COMMIT_TAG
