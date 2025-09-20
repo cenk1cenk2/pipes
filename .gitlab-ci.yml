@@ -4,10 +4,6 @@ stages:
   - pipes
   - post
 
-include:
-  # TODO: remove me after migrating to the new pipelines
-  - local: templates/v2/update-docker-hub-readme.gitlab-ci.yml
-
 bootstrap:
   stage: bootstrap
   trigger:
@@ -285,10 +281,12 @@ pipe-update-docker-hub-readme:
     - if: $CI_COMMIT_TAG
 
 update-docker-hub-readme:
-  extends: .update-docker-hub-readme
   stage: post
+  image: cenk1cenk2/pipe-update-docker-hub-readme:latest
   dependencies: []
   variables:
+    DOCKER_USERNAME: $DOCKERHUB_USERNAME
+    DOCKER_PASSWORD: $DOCKERHUB_API_PASSWORD
     README_MATRIX: |
       [
         {
@@ -337,7 +335,11 @@ update-docker-hub-readme:
           "description": "Updates the README on DockerHub for given repository."
         }
       ]
+  script:
+    - pipe
   rules:
-    - changes:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
         paths:
           - "**/README.md"
+    - if: $CI_COMMIT_TAG
