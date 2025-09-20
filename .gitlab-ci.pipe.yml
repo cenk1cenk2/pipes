@@ -82,7 +82,7 @@ container:
     matrix: $[[inputs.container-matrix]]
   script:
     - pipe build
-  rules: $[[inputs.rules]]
+  rules: $[[inputs.container-rules]]
   tags:
     - amd64
     - docker
