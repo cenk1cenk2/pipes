@@ -46,6 +46,7 @@ pipe-template:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./_template
           container-image-name: cenk1cenk2/pipe-template
           container-matrix:
@@ -72,6 +73,7 @@ pipe-buildah:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./buildah
           container-image-name: cenk1cenk2/pipe-buildah
           container-matrix:
@@ -96,6 +98,7 @@ pipe-docker:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./docker
           container-image-name: cenk1cenk2/pipe-docker
           container-matrix:
@@ -120,6 +123,7 @@ pipe-go:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./go
           # TODO: update me to the point to go image after migration
           container-image-name: cenk1cenk2/pipe-go
@@ -149,6 +153,7 @@ pipe-markdown-toc:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./markdown-toc
           container-image-name: cenk1cenk2/pipe-markdown-toc
           container-matrix:
@@ -173,6 +178,7 @@ pipe-node:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./node
           container-image-name: cenk1cenk2/pipe-node
           container-matrix:
@@ -206,6 +212,7 @@ pipe-select-env:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./select-env
           container-image-name: cenk1cenk2/pipe-select-env
           container-matrix:
@@ -230,6 +237,7 @@ pipe-semantic-release:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./semantic-release
           container-image-name: cenk1cenk2/semantic-release
           container-matrix:
@@ -256,6 +264,7 @@ pipe-terraform:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./terraform
           container-image-name: cenk1cenk2/pipe-terraform
           container-matrix:
@@ -280,6 +289,7 @@ pipe-update-docker-hub-readme:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          parent-pipeline-id: $CI_PIPELINE_ID
           cwd: ./update-docker-hub-readme
           container-image-name: cenk1cenk2/pipe-update-docker-hub-readme
           container-matrix:
