@@ -10,6 +10,11 @@ spec:
     container-matrix:
       type: array
       description: A matrix of containers for building images.
+    container-rules:
+      type: array
+      description: Rules for container publishing.
+      default:
+        - when: always
 ---
 stages:
   - install
@@ -77,6 +82,7 @@ container:
     matrix: $[[inputs.container-matrix]]
   script:
     - pipe build
+  rules: $[[inputs.rules]]
   tags:
     - amd64
     - docker
