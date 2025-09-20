@@ -95,6 +95,8 @@ pipe-buildah:
 
 pipe-docker:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -119,6 +121,8 @@ pipe-docker:
 
 pipe-go:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -148,6 +152,8 @@ pipe-go:
 
 pipe-markdown-toc:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -172,6 +178,8 @@ pipe-markdown-toc:
 
 pipe-node:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -205,6 +213,8 @@ pipe-node:
 
 pipe-select-env:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -229,6 +239,8 @@ pipe-select-env:
 
 pipe-semantic-release:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -255,6 +267,8 @@ pipe-semantic-release:
 
 pipe-terraform:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
@@ -279,6 +293,8 @@ pipe-terraform:
 
 pipe-update-docker-hub-readme:
   stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
     include:
