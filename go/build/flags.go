@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v3"
-	"gopkg.in/yaml.v2"
+	"go.yaml.in/yaml/v4"
 )
 
 //revive:disable:line-length-limit

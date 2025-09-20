@@ -8,6 +8,11 @@ include:
   # TODO: remove me after migrating to the new pipelines
   - local: templates/v2/update-docker-hub-readme.gitlab-ci.yml
 
+.changes:
+  - .gitlab-ci.yml
+  - go.mod
+  - go.sum
+
 bootstrap:
   stage: bootstrap
   trigger:
@@ -18,7 +23,7 @@ bootstrap:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.bootstrap.yml
           - go/
           - buildah/
@@ -43,7 +48,7 @@ pipe-template:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - _template/
     - if: $CI_COMMIT_TAG
@@ -65,7 +70,7 @@ pipe-buildah:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - buildah/
     - if: $CI_COMMIT_TAG
@@ -87,7 +92,7 @@ pipe-docker:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - docker/
     - if: $CI_COMMIT_TAG
@@ -101,7 +106,7 @@ pipe-go:
         inputs:
           cwd: ./go
           # TODO: update me to the point to go image after migration
-          container-image-name: cenk1cenk2/pipe-go2
+          container-image-name: cenk1cenk2/pipe-go
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
               CONTAINER_IMAGE_BUILD_ARGS: |-
@@ -114,7 +119,7 @@ pipe-go:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - go/
     - if: $CI_COMMIT_TAG
@@ -136,7 +141,7 @@ pipe-markdown-toc:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - markdown-toc/
     - if: $CI_COMMIT_TAG
@@ -167,7 +172,7 @@ pipe-node:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - node/
     - if: $CI_COMMIT_TAG
@@ -189,7 +194,7 @@ pipe-select-env:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - select-env/
     - if: $CI_COMMIT_TAG
@@ -213,7 +218,7 @@ pipe-semantic-release:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - semantic-release/
     - if: $CI_COMMIT_TAG
@@ -235,7 +240,7 @@ pipe-terraform:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - terraform/
     - if: $CI_COMMIT_TAG
@@ -257,7 +262,7 @@ pipe-update-docker-hub-readme:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
+          - !reference [.changes]
           - .gitlab-ci.pipe.yml
           - update-docker-hub-readme/
     - if: $CI_COMMIT_TAG
@@ -315,3 +320,7 @@ update-docker-hub-readme:
           "description": "Updates the README on DockerHub for given repository."
         }
       ]
+  rules:
+    - changes:
+        paths:
+          - "**/README.md"
