@@ -5,9 +5,6 @@ ARG PULUMI_VERSION=latest
 FROM pulumi/pulumi-nodejs:${PULUMI_VERSION} AS pulumi
 FROM node:${NODE_VERSION}
 
-ARG BUILDOS
-ARG BUILDARCH
-
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
 
