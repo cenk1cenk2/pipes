@@ -47,7 +47,7 @@ build:
     GO_BUILD_BINARY_NAME: pipe
     GO_BUILD_LINKER: -w -s
     GO_BUILD_VARIABLES: |-
-      main.VERSION: ${CI_COMMIT_TAG:-BUILD.${CI_COMMIT_SHORT_SHA}}.{{ now | date "2006-01-02T15:04:05Z0700" }}
+      main.VERSION: BUILD.{{ now | date "2006-01-02T15:04:05Z0700" }}
     GO_BUILD_TARGETS: |-
       - os: linux
         arch: amd64

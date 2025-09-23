@@ -1,3 +1,44 @@
+# ---
+# # https://taskfile.dev
+#
+# version: "3"
+#
+# env:
+#   CGO_ENABLED: 0
+#
+# includes:
+#   go:
+#     taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-application.yml?ref_type=heads
+#     flatten: true
+#     dir: "{{ .dir }}"
+#
+# tasks:
+#   build:
+#     desc: Builds the application.
+#     cmds:
+#       - task: build.platform
+#         vars:
+#           GO_LD_FLAGS: -w -s -X main.VERSION=BUILD.$(date +%Y%m%dT%H%M%S)
+#           BINARY_DIR: dist
+#           BINARY_NAME: pipe
+#           BINARY_APPEND_OS: true
+#           BINARY_APPEND_ARCH: true
+#           os: linux
+#           arch: amd64
+#
+#   docs:
+#     desc: Generates the documentation for the application.
+#     interactive: true
+#     env:
+#       LOG_LEVEL: trace
+#     cmds:
+#       - go run . MARKDOWN_DOC
+#
+#   help:
+#     desc: Generates help for the application.
+#     cmds:
+#       - go run . --help
+# TODO: PROBLEMS WITH NESTED INCLUDES
 ---
 # https://taskfile.dev
 
@@ -12,11 +53,6 @@ vars:
 
 env:
   CGO_ENABLED: 0
-
-# includes:
-#   go:
-#     taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-application.yml?ref_type=heads
-#     flatten: true
 
 tasks:
   clean:
@@ -57,10 +93,6 @@ tasks:
         vars:
           os: linux
           arch: amd64
-      - task: build.platform
-        vars:
-          os: linux
-          arch: arm64
 
   docs:
     desc: Generates the documentation for the application.

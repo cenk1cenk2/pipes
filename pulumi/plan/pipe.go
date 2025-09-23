@@ -1,4 +1,4 @@
-package pipe
+package plan
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -6,7 +6,6 @@ import (
 
 type (
 	Pipe struct {
-		Flag string
 	}
 
 	Ctx struct {
@@ -30,7 +29,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				DefaultTask(tl).Job(),
+				PulumiPlan(tl).Job(),
 			)
 		})
 }

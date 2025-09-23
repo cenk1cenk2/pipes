@@ -1,4 +1,4 @@
-package pipe
+package setup
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -6,7 +6,7 @@ import (
 
 type (
 	Pipe struct {
-		Flag string
+		Cwd string `validate:"dirpath"`
 	}
 
 	Ctx struct {
@@ -30,7 +30,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				DefaultTask(tl).Job(),
+				Setup(tl).Job(),
 			)
 		})
 }

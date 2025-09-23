@@ -34,26 +34,11 @@ Install terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
-**Injected Variables**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_VAR_CI_JOB_ID`<br />`$CI_JOB_ID` | Injected CI job-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_COMMIT_SHA`<br />`$CI_COMMIT_SHA` | Injected CI commit-sha variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_JOB_STAGE`<br />`$CI_JOB_STAGE` | Injected CI job-stage variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAME`<br />`$CI_PROJECT_NAME` | Injected CI project-name variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAMESPACE`<br />`$CI_PROJECT_NAMESPACE` | Injected CI project-namespace variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_PATH`<br />`$CI_PROJECT_PATH` | Injected CI project-path variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_URL`<br />`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>.</code> |
-| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `string[]` | `false` | <code>[]</code> |
 
 **State**
 
@@ -90,26 +75,11 @@ Lint terraform project with terraform.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
-**Injected Variables**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_VAR_CI_JOB_ID`<br />`$CI_JOB_ID` | Injected CI job-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_COMMIT_SHA`<br />`$CI_COMMIT_SHA` | Injected CI commit-sha variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_JOB_STAGE`<br />`$CI_JOB_STAGE` | Injected CI job-stage variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAME`<br />`$CI_PROJECT_NAME` | Injected CI project-name variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAMESPACE`<br />`$CI_PROJECT_NAMESPACE` | Injected CI project-namespace variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_PATH`<br />`$CI_PROJECT_PATH` | Injected CI project-path variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_URL`<br />`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>.</code> |
-| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `string[]` | `false` | <code>[]</code> |
 
 ### `pipe-terraform plan`
 
@@ -131,26 +101,11 @@ Plan terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
-**Injected Variables**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_VAR_CI_JOB_ID`<br />`$CI_JOB_ID` | Injected CI job-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_COMMIT_SHA`<br />`$CI_COMMIT_SHA` | Injected CI commit-sha variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_JOB_STAGE`<br />`$CI_JOB_STAGE` | Injected CI job-stage variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAME`<br />`$CI_PROJECT_NAME` | Injected CI project-name variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAMESPACE`<br />`$CI_PROJECT_NAMESPACE` | Injected CI project-namespace variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_PATH`<br />`$CI_PROJECT_PATH` | Injected CI project-path variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_URL`<br />`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>.</code> |
-| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `string[]` | `false` | <code>[]</code> |
 
 **State**
 
@@ -186,26 +141,11 @@ Apply terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
-**Injected Variables**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_VAR_CI_JOB_ID`<br />`$CI_JOB_ID` | Injected CI job-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_COMMIT_SHA`<br />`$CI_COMMIT_SHA` | Injected CI commit-sha variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_JOB_STAGE`<br />`$CI_JOB_STAGE` | Injected CI job-stage variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAME`<br />`$CI_PROJECT_NAME` | Injected CI project-name variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_NAMESPACE`<br />`$CI_PROJECT_NAMESPACE` | Injected CI project-namespace variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_PATH`<br />`$CI_PROJECT_PATH` | Injected CI project-path variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_PROJECT_URL`<br />`$CI_PROJECT_URL` | Injected CI project-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>.</code> |
-| `$TF_WORKSPACES` | Workspaces that this command will be executed on. | `string[]` | `false` | <code>[]</code> |
 
 **State**
 

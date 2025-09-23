@@ -6,8 +6,7 @@ import (
 
 type (
 	Project struct {
-		Cwd        string   `validate:"omitempty,dir"`
-		Workspaces []string `validate:"omitempty"`
+		Cwd string `validate:"omitempty,dir"`
 	}
 
 	CiVariables struct {
@@ -57,7 +56,6 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobParallel(
 				Version(tl).Job(),
-				DiscoverWorkspaces(tl).Job(),
 				GenerateTerraformEnvVars(tl).Job(),
 			)
 		})

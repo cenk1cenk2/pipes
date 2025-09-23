@@ -33,6 +33,9 @@ includes:
   node:
     dir: ./node
     taskfile: ./Taskfile.pipe.yml
+  pulumi:
+    dir: ./pulumi
+    taskfile: ./Taskfile.pipe.yml
   select-env:
     dir: ./select-env
     taskfile: ./Taskfile.pipe.yml
@@ -56,6 +59,7 @@ tasks:
       - task: "go:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"
+      - task: "pulumi:{{ .command }}"
       - task: "select-env:{{ .command }}"
       - task: "semantic-release:{{ .command }}"
       - task: "terraform:{{ .command }}"

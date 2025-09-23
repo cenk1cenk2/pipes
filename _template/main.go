@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	pipe "gitlab.kilic.dev/devops/pipes/_template/pipe"
+	"gitlab.kilic.dev/devops/pipes/_template/pipe"
 )
 
 func main() {

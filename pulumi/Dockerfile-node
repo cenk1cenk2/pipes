@@ -1,0 +1,22 @@
+# syntax=docker/dockerfile-upstream:master-labs
+ARG NODE_VERSION=22-alpine
+ARG PULUMI_VERSION=latest
+
+FROM pulumi/pulumi-nodejs:${PULUMI_VERSION} AS pulumi
+FROM node:${NODE_VERSION}
+
+ARG BUILDOS
+ARG BUILDARCH
+
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PATH}:${PNPM_HOME}"
+
+COPY --from=pulumi /pulumi/bin/ /usr/bin/
+
+RUN \
+  unset NPM_CONFIG_USER && \
+  corepack enable && corepack prepare pnpm@latest --activate
+
+COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
+
+RUN pipe --help
