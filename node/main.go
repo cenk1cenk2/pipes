@@ -76,8 +76,9 @@ func main() {
 					},
 
 					{
-						Name:  "run",
-						Flags: CombineFlags(setup.Flags, environment.Flags, run.Flags),
+						Name:      "run",
+						Flags:     CombineFlags(setup.Flags, environment.Flags, run.Flags),
+						Arguments: CombineArguments(run.Arguments),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
 								CombineTaskLists(

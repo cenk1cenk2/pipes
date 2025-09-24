@@ -52,7 +52,7 @@ func main() {
 					{
 						Name:        "tool",
 						Description: "Run a specified go tool.",
-						Arguments:   tool.Arguments,
+						Arguments:   CombineArguments(tool.Arguments),
 						Flags:       CombineFlags(setup.Flags, tool.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
