@@ -44,6 +44,7 @@ install:
           - go.sum
           - "**/*.go"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -83,6 +84,7 @@ pipe-template:
           - .gitlab-ci.pipe.yml
           - _template/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -118,6 +120,7 @@ pipe-buildah:
           - .gitlab-ci.pipe.yml
           - buildah/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -153,6 +156,7 @@ pipe-docker:
           - .gitlab-ci.pipe.yml
           - docker/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -192,6 +196,7 @@ pipe-go:
           - .gitlab-ci.pipe.yml
           - go/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -227,6 +232,7 @@ pipe-markdown-toc:
           - .gitlab-ci.pipe.yml
           - markdown-toc/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -272,6 +278,7 @@ pipe-node:
           - node/**/*
           - select-env/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -314,6 +321,7 @@ pipe-pulumi:
           - .gitlab-ci.pipe.yml
           - pulumi/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -349,6 +357,7 @@ pipe-select-env:
           - .gitlab-ci.pipe.yml
           - select-env/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -388,6 +397,7 @@ pipe-semantic-release:
           - select-env/**/*
           - node/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -425,6 +435,7 @@ pipe-terraform:
           - .gitlab-ci.pipe.yml
           - terraform/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
@@ -460,6 +471,7 @@ pipe-update-docker-hub-readme:
           - .gitlab-ci.pipe.yml
           - update-docker-hub-readme/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
       changes:
         paths:
           - .gitlab-ci.yml
