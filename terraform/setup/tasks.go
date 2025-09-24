@@ -45,6 +45,9 @@ func GenerateTerraformEnvVars(tl *TaskList) *Task {
 
 			C.EnvVars["TF_LOG"] = P.Config.LogLevel
 
+			C.EnvVars["TF_VAR_CI_API_V4_URL"] = P.CiVariables.ApiUrl
+			C.EnvVars["TF_VAR_CI_PROJECT_ID"] = P.CiVariables.ProjectId
+
 			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", C.EnvVars)
 
 			return nil

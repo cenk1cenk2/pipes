@@ -10,15 +10,8 @@ type (
 	}
 
 	CiVariables struct {
-		JobId            string
-		CommitSha        string
-		JobStage         string
-		ProjectId        string
-		ProjectName      string
-		ProjectNamespace string
-		ProjectPath      string
-		ProjectUrl       string
-		ApiUrl           string
+		ProjectId string
+		ApiUrl    string
 	}
 
 	Config struct {

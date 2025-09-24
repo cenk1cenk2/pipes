@@ -40,4 +40,32 @@ var Flags = []cli.Flag{
 		Value:       ".",
 		Destination: &P.Project.Cwd,
 	},
+
+	// CATEGORY_CI_VARIABLES
+
+	&cli.StringFlag{
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.api-url",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_API_V4_URL"),
+			cli.EnvVar("CI_API_V4_URL"),
+		),
+		Usage:       "Injected CI api-url variable to the deployment.",
+		Required:    false,
+		Value:       "",
+		Destination: &P.CiVariables.ApiUrl,
+	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_CI_VARIABLES,
+		Name:     "terraform-var.project-id",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TF_VAR_CI_PROJECT_ID"),
+			cli.EnvVar("CI_PROJECT_ID"),
+		),
+		Usage:       "Injected CI project-id variable to the deployment.",
+		Required:    false,
+		Value:       "",
+		Destination: &P.CiVariables.ProjectId,
+	},
 }
