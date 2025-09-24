@@ -1,4 +1,4 @@
-package plan
+package preview
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"

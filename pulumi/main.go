@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/pulumi/plan"
+	"gitlab.kilic.dev/devops/pipes/pulumi/preview"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 	"gitlab.kilic.dev/devops/pipes/pulumi/up"
@@ -20,18 +20,17 @@ func main() {
 				Version:     VERSION,
 				Usage:       DESCRIPTION,
 				Description: DESCRIPTION,
-				Flags:       CombineFlags(plan.Flags),
 				Commands: []*cli.Command{
 					{
 						Name:        "plan",
 						Description: "Plan the Pulimi changes.",
-						Flags:       CombineFlags(setup.Flags, stack.Flags, plan.Flags),
+						Flags:       CombineFlags(setup.Flags, stack.Flags, preview.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
 								CombineTaskLists(
 									setup.New(p),
 									stack.New(p),
-									plan.New(p),
+									preview.New(p),
 								),
 							)
 						},

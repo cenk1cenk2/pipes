@@ -1,4 +1,4 @@
-package plan
+package preview
 
 import (
 	"github.com/urfave/cli/v3"
