@@ -19,8 +19,8 @@ bootstrap:
           - go.mod
           - go.sum
           - .gitlab-ci.bootstrap.yml
-          - go/
-          - buildah/
+          - go/**
+          - buildah/**
     - if: $CI_COMMIT_TAG
 
 install:
@@ -64,7 +64,7 @@ pipe-template:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - _template/
+          - _template/**
     - if: $CI_COMMIT_TAG
 
 pipe-buildah:
@@ -90,7 +90,7 @@ pipe-buildah:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - buildah/
+          - buildah/**
     - if: $CI_COMMIT_TAG
 
 pipe-docker:
@@ -116,7 +116,7 @@ pipe-docker:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - docker/
+          - docker/**
     - if: $CI_COMMIT_TAG
 
 pipe-go:
@@ -147,7 +147,7 @@ pipe-go:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - go/
+          - go/**
     - if: $CI_COMMIT_TAG
 
 pipe-markdown-toc:
@@ -173,7 +173,7 @@ pipe-markdown-toc:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - markdown-toc/
+          - markdown-toc/**
     - if: $CI_COMMIT_TAG
 
 pipe-node:
@@ -208,8 +208,8 @@ pipe-node:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - node/
-          - select-env/
+          - node/**
+          - select-env/**
     - if: $CI_COMMIT_TAG
 
 pipe-pulumi:
@@ -241,7 +241,7 @@ pipe-pulumi:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - pulumi/
+          - pulumi/**
     - if: $CI_COMMIT_TAG
 
 pipe-select-env:
@@ -267,7 +267,7 @@ pipe-select-env:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - select-env/
+          - select-env/**
     - if: $CI_COMMIT_TAG
 
 pipe-semantic-release:
@@ -295,9 +295,9 @@ pipe-semantic-release:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - semantic-release/
-          - node/
-          - select-env/
+          - semantic-release/**
+          - node/**
+          - select-env/**
     - if: $CI_COMMIT_TAG
 
 pipe-terraform:
@@ -323,7 +323,7 @@ pipe-terraform:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - terraform/
+          - terraform/**
     - if: $CI_COMMIT_TAG
 
 pipe-update-docker-hub-readme:
@@ -349,7 +349,7 @@ pipe-update-docker-hub-readme:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - update-docker-hub-readme/
+          - update-docker-hub-readme/**
     - if: $CI_COMMIT_TAG
 
 update-docker-hub-readme:
