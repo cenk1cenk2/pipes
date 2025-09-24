@@ -19,8 +19,18 @@ bootstrap:
           - go.mod
           - go.sum
           - .gitlab-ci.bootstrap.yml
-          - go/**
-          - buildah/**
+          - go/**/*
+          - buildah/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.bootstrap.yml
+          - go/**/*
+          - buildah/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 install:
@@ -64,7 +74,16 @@ pipe-template:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - _template/**
+          - _template/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - _template/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-buildah:
@@ -90,7 +109,16 @@ pipe-buildah:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - buildah/**
+          - buildah/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - buildah/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-docker:
@@ -116,7 +144,16 @@ pipe-docker:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - docker/**
+          - docker/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - docker/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-go:
@@ -129,7 +166,6 @@ pipe-go:
       - local: .gitlab-ci.pipe.yml
         inputs:
           cwd: ./go
-          # TODO: update me to the point to go image after migration
           container-image-name: cenk1cenk2/pipe-go
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
@@ -147,7 +183,16 @@ pipe-go:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - go/**
+          - go/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - go/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-markdown-toc:
@@ -173,7 +218,16 @@ pipe-markdown-toc:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - markdown-toc/**
+          - markdown-toc/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - markdown-toc/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-node:
@@ -208,8 +262,18 @@ pipe-node:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - node/**
-          - select-env/**
+          - node/**/*
+          - select-env/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - node/**/*
+          - select-env/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-pulumi:
@@ -241,7 +305,16 @@ pipe-pulumi:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - pulumi/**
+          - pulumi/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - pulumi/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-select-env:
@@ -267,7 +340,16 @@ pipe-select-env:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - select-env/**
+          - select-env/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - select-env/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-semantic-release:
@@ -295,9 +377,20 @@ pipe-semantic-release:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
+          - semantic-release/**/*
+          - select-env/**/*
+          - node/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
           - semantic-release/**
-          - node/**
-          - select-env/**
+          - select-env/**/*
+          - node/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-terraform:
@@ -323,7 +416,16 @@ pipe-terraform:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - terraform/**
+          - terraform/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - terraform/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 pipe-update-docker-hub-readme:
@@ -349,7 +451,16 @@ pipe-update-docker-hub-readme:
           - go.mod
           - go.sum
           - .gitlab-ci.pipe.yml
-          - update-docker-hub-readme/**
+          - update-docker-hub-readme/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - update-docker-hub-readme/**/*
+        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 update-docker-hub-readme:
