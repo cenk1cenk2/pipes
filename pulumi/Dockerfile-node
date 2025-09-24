@@ -8,6 +8,9 @@ FROM node:${NODE_VERSION}
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PATH}:${PNPM_HOME}"
 
+ARG BUILDOS
+ARG BUILDARCH
+
 COPY --from=pulumi /pulumi/bin/ /usr/bin/
 
 RUN \
