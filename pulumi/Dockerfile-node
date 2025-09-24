@@ -2,7 +2,7 @@
 ARG NODE_VERSION=22-alpine
 ARG PULUMI_VERSION=latest
 
-FROM pulumi/pulumi-nodejs:${PULUMI_VERSION} AS pulumi
+FROM docker.io/pulumi/pulumi-nodejs:${PULUMI_VERSION} AS pulumi
 FROM node:${NODE_VERSION}
 
 ENV PNPM_HOME="/root/.local/share/pnpm"
