@@ -34,6 +34,13 @@ Install terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
+**Injected Variables**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
+
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -75,6 +82,13 @@ Lint terraform project with terraform.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
+**Injected Variables**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
+
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -100,6 +114,13 @@ Plan terraform project.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
+
+**Injected Variables**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
 
 **Project**
 
@@ -140,6 +161,13 @@ Apply terraform project.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
+
+**Injected Variables**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
 
 **Project**
 

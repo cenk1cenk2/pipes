@@ -14,6 +14,8 @@ func PulumiUp(tl *TaskList) *Task {
 				"--diff",
 				"--yes",
 				"-f",
+				"--plan",
+				P.Plan,
 			).
 				SetDir(setup.P.Cwd).
 				AddSelfToTheTask()

@@ -6,6 +6,7 @@ import (
 
 type (
 	Pipe struct {
+		Plan string
 	}
 
 	Ctx struct {

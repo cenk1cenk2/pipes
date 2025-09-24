@@ -13,6 +13,8 @@ func PulumiPlan(tl *TaskList) *Task {
 				"preview",
 				"--non-interactive",
 				"--diff",
+				"--save-plan",
+				P.Plan,
 			).
 				SetDir(setup.P.Cwd).
 				AddSelfToTheTask()
