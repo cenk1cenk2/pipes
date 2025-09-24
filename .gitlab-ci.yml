@@ -21,16 +21,6 @@ bootstrap:
           - .gitlab-ci.bootstrap.yml
           - go/**/*
           - buildah/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.bootstrap.yml
-          - go/**/*
-          - buildah/**/*
-        compare_to: $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_TAG
 
 install:
