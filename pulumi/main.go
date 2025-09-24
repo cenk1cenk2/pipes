@@ -22,8 +22,8 @@ func main() {
 				Description: DESCRIPTION,
 				Commands: []*cli.Command{
 					{
-						Name:        "plan",
-						Description: "Plan the Pulimi changes.",
+						Name:        "preview",
+						Description: "Preview the Pulumi changes.",
 						Flags:       CombineFlags(setup.Flags, stack.Flags, preview.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
@@ -38,7 +38,7 @@ func main() {
 
 					{
 						Name:        "up",
-						Description: "Apply the Pulimi changes.",
+						Description: "Apply the Pulumi changes.",
 						Flags:       CombineFlags(setup.Flags, stack.Flags, up.Flags),
 						Action: func(_ context.Context, _ *cli.Command) error {
 							return p.RunJobs(
