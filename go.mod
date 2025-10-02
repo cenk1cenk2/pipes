@@ -5,7 +5,7 @@ go 1.25.1
 require (
 	github.com/bmatcuk/doublestar/v4 v4.9.1
 	github.com/cenk1cenk2/plumber/v6 v6.3.1
-	github.com/docker/docker v28.4.0+incompatible
+	github.com/docker/docker v28.5.0+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
