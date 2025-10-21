@@ -10,7 +10,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/sirupsen/logrus v1.9.3
-	github.com/urfave/cli/v3 v3.4.1
+	github.com/urfave/cli/v3 v3.5.0
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.2.3
 	go.yaml.in/yaml/v4 v4.0.0-rc.2
 )
