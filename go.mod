@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.9.1
-	github.com/cenk1cenk2/plumber/v6 v6.3.4
+	github.com/cenk1cenk2/plumber/v6 v6.3.5
 	github.com/docker/docker v28.5.1+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/joho/godotenv v1.5.1
@@ -13,6 +13,7 @@ require (
 	github.com/urfave/cli/v3 v3.5.0
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.2.3
 	go.yaml.in/yaml/v4 v4.0.0-rc.2
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -220,7 +221,7 @@ require (
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/exp v0.0.0-20251017212417-90e834f514db // indirect
+	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250911091902-df9299821621 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
@@ -229,7 +230,6 @@ require (
 	golang.org/x/tools v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.2.0 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
