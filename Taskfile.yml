@@ -27,6 +27,9 @@ includes:
   go:
     dir: ./go
     taskfile: ./Taskfile.pipe.yml
+  helm:
+    dir: ./helm
+    taskfile: ./Taskfile.pipe.yml
   markdown-toc:
     dir: ./markdown-toc
     taskfile: ./Taskfile.pipe.yml
@@ -57,6 +60,7 @@ tasks:
       - task: "buildah:{{ .command }}"
       - task: "docker:{{ .command }}"
       - task: "go:{{ .command }}"
+      - task: "helm:{{ .command }}"
       - task: "markdown-toc:{{ .command }}"
       - task: "node:{{ .command }}"
       - task: "pulumi:{{ .command }}"

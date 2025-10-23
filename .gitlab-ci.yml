@@ -207,6 +207,42 @@ pipe-go:
         compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
     - if: $CI_COMMIT_TAG
 
+pipe-helm:
+  stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./helm
+          container-image-name: cenk1cenk2/pipe-helm
+          container-matrix:
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_TAGS: |-
+                latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - helm/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - go.mod
+          - go.sum
+          - .gitlab-ci.pipe.yml
+          - helm/**/*
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - if: $CI_COMMIT_TAG
+
 pipe-markdown-toc:
   stage: pipes
   variables:

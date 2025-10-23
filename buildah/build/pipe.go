@@ -6,8 +6,6 @@ import (
 )
 
 type (
-	Git flags.GitFlags
-
 	ContainerImage struct {
 		Platforms      []string
 		Name           string
@@ -42,7 +40,7 @@ type (
 	}
 
 	Pipe struct {
-		Git
+		Git flags.GitFlags
 		ContainerImage
 		ContainerFile
 		ContainerManifest
