@@ -33,17 +33,6 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		TagsFileStrictRequired:    false,
 	},
 ), []cli.Flag{
-	&cli.StringFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.name",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_NAME"),
-		),
-		Usage:       "Versions for the helm chart to be published.",
-		Required:    true,
-		Destination: &P.HelmChart.Name,
-	},
-
 	&cli.StringSliceFlag{
 		Category: CATEGORY_HELM_CHART,
 		Name:     "helm-chart.versions",
@@ -121,5 +110,17 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		Required:    false,
 		Value:       ".",
 		Destination: &P.HelmChart.Destination,
+	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_HELM_CHART,
+		Name:     "helm-chart.app-version",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_CHART_APP_VERSION"),
+		),
+		Usage:       "Application version for the packaged helm chart.",
+		Required:    false,
+		Value:       "",
+		Destination: &P.HelmChart.AppVersion,
 	},
 })

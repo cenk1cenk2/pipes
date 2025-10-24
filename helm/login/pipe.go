@@ -6,7 +6,7 @@ import (
 
 type (
 	HelmRegistry struct {
-		Uri      string `validate:"omitempty,fqdn"`
+		Uri      string
 		Username string
 		Password string
 	}

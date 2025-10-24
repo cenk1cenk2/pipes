@@ -7,13 +7,13 @@ import (
 
 type (
 	HelmChart struct {
-		Name              string
 		Versions          []string
 		VersionFile       string
 		VersionFileStrict bool
 		VersionsSanitize  []HelmChartMatch
 		VersionsTemplate  []HelmChartMatch
 		Destination       string `validate:"dirpath"`
+		AppVersion        string
 	}
 
 	HelmChartMatch struct {
