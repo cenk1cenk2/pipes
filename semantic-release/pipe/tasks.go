@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"fmt"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -39,9 +40,14 @@ func RunSemanticRelease(tl *TaskList) *Task {
 					}
 
 					if len(P.SemanticRelease.IsolateWorkspaces) > 0 {
+						ignores := []string{}
+						for _, w := range P.SemanticRelease.IsolateWorkspaces {
+							ignores = append(ignores, fmt.Sprintf("!%s/**", strings.TrimSpace(w)))
+						}
+
 						c.AppendArgs(
 							"--ignore-packages",
-							strings.Join(P.SemanticRelease.IsolateWorkspaces, ","),
+							strings.Join(ignores, ","),
 						)
 					}
 
