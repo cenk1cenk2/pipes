@@ -55,3 +55,4 @@ Releases applications through the semantic-release library.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$SEMANTIC_RELEASE_DRY_RUN` | Run semantic-release in dry mode without making changes. | `bool` | `false` | <code>false</code> |
 | `$SEMANTIC_RELEASE_WORKSPACE` | Use @qiwi/multi-semantic-release package to do a workspace release. | `bool` | `false` | <code>false</code> |
+| `$SEMANTIC_RELEASE_ISOLATE_WORKPLACES` | Isolate specific workspaces for release when using workspace mode. | `string[]` | `false` | <code></code> |

@@ -16,7 +16,7 @@ var Flags = []cli.Flag{
 		Category: CATEGORY_HELM,
 		Name:     "helm.cwd",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CWD"),
+			cli.EnvVar("HELM_ROOT"),
 		),
 		Usage:       "Working directory for Helm commands.",
 		Required:    false,

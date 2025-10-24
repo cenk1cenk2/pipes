@@ -25,7 +25,7 @@ Install Helm chart dependencies.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$HELM_CWD` | Working directory for Helm commands. | `string` | `false` | <code>"."</code> |
+| `$HELM_ROOT` | Working directory for Helm commands. | `string` | `false` | <code>"."</code> |
 
 **Helm Registry**
 
@@ -49,7 +49,7 @@ Lint Helm chart templates.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$HELM_CWD` | Working directory for Helm commands. | `string` | `false` | <code>"."</code> |
+| `$HELM_ROOT` | Working directory for Helm commands. | `string` | `false` | <code>"."</code> |
 
 ### `pipe-helm publish`
 
@@ -68,7 +68,7 @@ Publish Helm chart templates.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$HELM_CWD` | Working directory for Helm commands. | `string` | `false` | <code>"."</code> |
+| `$HELM_ROOT` | Working directory for Helm commands. | `string` | `false` | <code>"."</code> |
 
 **Helm Chart**
 
