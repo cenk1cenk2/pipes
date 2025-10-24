@@ -17,4 +17,15 @@ var Flags = []cli.Flag{
 		Value:       "",
 		Destination: &P.Kubernetes.Version,
 	},
+
+	&cli.BoolFlag{
+		Name:  "helm-lint.should-template",
+		Usage: "If set to true, the lint command will also template the chart.",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_LINT_SHOULD_TEMPLATE"),
+		),
+		Required:    false,
+		Value:       true,
+		Destination: &P.ShouldTemplate,
+	},
 }

@@ -10,6 +10,7 @@ type (
 	}
 
 	Pipe struct {
+		ShouldTemplate bool
 		Kubernetes
 	}
 )
@@ -29,8 +30,9 @@ func New(p *Plumber) *TaskList {
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
-			return JobSequence(
+			return JobParallel(
 				HelmLint(tl).Job(),
+				HelmTemplate(tl).Job(),
 			)
 		})
 }
