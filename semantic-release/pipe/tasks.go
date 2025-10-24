@@ -1,6 +1,8 @@
 package pipe
 
 import (
+	"strings"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
@@ -34,6 +36,13 @@ func RunSemanticRelease(tl *TaskList) *Task {
 
 					if t.Plumber.Environment.Debug {
 						c.AppendArgs("--debug")
+					}
+
+					if len(P.SemanticRelease.IsolateWorkspaces) > 0 {
+						c.AppendArgs(
+							"--ignore-packages",
+							strings.Join(P.SemanticRelease.IsolateWorkspaces, ","),
+						)
 					}
 
 					return nil

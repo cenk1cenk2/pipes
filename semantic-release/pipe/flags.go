@@ -17,7 +17,7 @@ var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
 		Category: CATEGORY_SEMANTIC_RELEASE,
-		Name:     "semantic_release.dry_run",
+		Name:     "semantic-release.dry_run",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_DRY_RUN"),
 		),
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
 		Category: CATEGORY_SEMANTIC_RELEASE,
-		Name:     "semantic_release.workspace",
+		Name:     "semantic-release.workspace",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_WORKSPACE"),
 		),
@@ -37,6 +37,18 @@ var Flags = []cli.Flag{
 		Required:    false,
 		Value:       false,
 		Destination: &P.SemanticRelease.Workspace,
+	},
+
+	&cli.StringSliceFlag{
+		Category: CATEGORY_SEMANTIC_RELEASE,
+		Name:     "semantic-release.isolate-workplace",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("SEMANTIC_RELEASE_ISOLATE_WORKPLACE"),
+		),
+		Usage:       "Isolate specific workspaces for release when using workspace mode.",
+		Required:    false,
+		Value:       []string{},
+		Destination: &P.SemanticRelease.IsolateWorkspaces,
 	},
 
 	// CATEGORY_CI_VARIABLES
