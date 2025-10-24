@@ -6,7 +6,7 @@ import (
 
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/flags"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	. "github.com/cenk1cenk2/plumber/v6"
 )
