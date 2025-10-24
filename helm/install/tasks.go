@@ -11,7 +11,7 @@ func DefaultTask(tl *TaskList) *Task {
 			t.CreateCommand(
 				"helm",
 				"dependency",
-				"build",
+				"update",
 			).
 				SetDir(setup.P.Cwd).
 				AddSelfToTheTask()
