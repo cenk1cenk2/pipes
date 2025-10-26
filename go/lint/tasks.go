@@ -1,19 +1,20 @@
-package install
+package lint
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmInstall(tl *TaskList) *Task {
-	return tl.CreateTask("install").
+func GoLint(tl *TaskList) *Task {
+	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
 			t.CreateCommand(
-				"helm",
-				"dependency",
-				"update",
+				"golangci-lint",
+				"run",
+				"-v",
+				"--timeout",
+				P.Timeout.String(),
 			).
-				SetDir(setup.P.Cwd).
+				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 				AddSelfToTheTask()
 
 			return nil

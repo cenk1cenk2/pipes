@@ -25,7 +25,7 @@ init:
         go build -mod=vendor -o dist/pipe-bootstrap
       )
     - ./go/dist/pipe-bootstrap --version
-    - golangci-lint run --timeout 5m
+    - ./go/dist/pipe-bootstrap lint
     - ./go/dist/pipe-bootstrap build
   cache:
     - key: bootstrap-init

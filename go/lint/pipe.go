@@ -1,17 +1,25 @@
-package install
+package lint
 
 import (
+	"time"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
 	Pipe struct {
+		Args    string
+		Timeout time.Duration
+	}
+
+	Ctx struct {
 	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
+var C = &Ctx{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
@@ -25,7 +33,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmInstall(tl).Job(),
+				GoLint(tl).Job(),
 			)
 		})
 }

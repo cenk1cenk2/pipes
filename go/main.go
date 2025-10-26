@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/go/build"
 	"gitlab.kilic.dev/devops/pipes/go/install"
+	"gitlab.kilic.dev/devops/pipes/go/lint"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 	"gitlab.kilic.dev/devops/pipes/go/tool"
 
@@ -44,6 +45,20 @@ func main() {
 								CombineTaskLists(
 									setup.New(p),
 									build.New(p),
+								),
+							)
+						},
+					},
+
+					{
+						Name:        "lint",
+						Description: "Run golangci-lint on the project.",
+						Flags:       CombineFlags(setup.Flags, lint.Flags),
+						Action: func(_ context.Context, _ *cli.Command) error {
+							return p.RunJobs(
+								CombineTaskLists(
+									setup.New(p),
+									lint.New(p),
 								),
 							)
 						},
