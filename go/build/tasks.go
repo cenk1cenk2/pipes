@@ -46,11 +46,7 @@ func GoBuild(tl *TaskList) *Task {
 							Set(func(c *Command) error {
 								t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, setup.P.Cwd, target.Os, target.Arch)
 
-								if setup.P.Cache != "" {
-									c.AppendEnvironment(map[string]string{
-										"GOPATH": setup.P.Cache,
-									})
-								}
+								c.AppendEnvironment(setup.C.EnvVars)
 
 								if !P.EnableCGO {
 									c.AppendEnvironment(map[string]string{

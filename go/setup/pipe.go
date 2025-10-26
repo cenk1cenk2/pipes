@@ -11,13 +11,16 @@ type (
 	}
 
 	Ctx struct {
+		EnvVars map[string]string
 	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
-var C = &Ctx{}
+var C = &Ctx{
+	EnvVars: map[string]string{},
+}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).

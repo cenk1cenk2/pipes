@@ -31,7 +31,7 @@ var Flags = []cli.Flag{
 		),
 		Usage:       "Enable go cache.",
 		Required:    false,
-		Value:       "",
+		Value:       ".go",
 		Destination: &P.Cache,
 	},
 }

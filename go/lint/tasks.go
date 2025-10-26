@@ -16,11 +16,7 @@ func GoLint(tl *TaskList) *Task {
 				P.Timeout.String(),
 			).
 				Set(func(c *Command) error {
-					if setup.P.Cache != "" {
-						c.AppendEnvironment(map[string]string{
-							"GOPATH": setup.P.Cache,
-						})
-					}
+					c.AppendEnvironment(setup.C.EnvVars)
 
 					return nil
 				}).

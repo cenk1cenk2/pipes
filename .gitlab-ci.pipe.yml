@@ -39,6 +39,10 @@ build:
     GO_BUILD_TARGETS: |-
       - os: linux
         arch: amd64
+  cache:
+    - key: $CI_JOB_NAME_SLUG
+      paths:
+        - .go/
   artifacts:
     paths:
       - $GO_CWD/dist/

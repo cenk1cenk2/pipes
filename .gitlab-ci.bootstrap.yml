@@ -3,6 +3,9 @@ stages:
   - init
   - container
 
+variables:
+  GOPATH: $CI_PROJECT_DIR/.go
+
 init:
   stage: init
   image: golang:1.25-alpine
@@ -32,6 +35,7 @@ init:
       paths:
         - vendor/
         - $GO_CWD/dist/
+        - .go/
   artifacts:
     paths:
       - $GO_CWD/dist/

@@ -24,11 +24,7 @@ func GoModVendor(tl *TaskList) *Task {
 						c.AppendArgs(strings.Split(P.Args, " ")...)
 					}
 
-					if setup.P.Cache != "" {
-						c.AppendEnvironment(map[string]string{
-							"GOPATH": setup.P.Cache,
-						})
-					}
+					c.AppendEnvironment(setup.C.EnvVars)
 
 					return nil
 				}).

@@ -36,4 +36,16 @@ var Flags = []cli.Flag{
 		Value:       time.Duration(5 * time.Minute),
 		Destination: &P.Timeout,
 	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_LINT,
+		Name:     "go.lint.cache",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_LINT_CACHE"),
+		),
+		Usage:       "Path to cache lint results.",
+		Required:    false,
+		Value:       "./.golangci-lint",
+		Destination: &P.Cache,
+	},
 }
