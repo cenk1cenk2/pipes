@@ -34,6 +34,9 @@ func HelmChartVersionsParent(tl *TaskList) *Task {
 
 func HelmChartVersionsFromUser(tl *TaskList) *Task {
 	return tl.CreateTask("versions", "user").
+		ShouldDisable(func(t *Task) bool {
+			return len(P.HelmChart.Versions) == 0
+		}).
 		Set(func(t *Task) error {
 			// add all the specified version
 			for _, v := range slices.Compact(P.HelmChart.Versions) {

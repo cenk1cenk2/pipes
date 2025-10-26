@@ -40,7 +40,7 @@ var Flags = CombineFlags(flags.NewGitFlags(
 			cli.EnvVar("HELM_CHART_VERSIONS"),
 		),
 		Usage:       "Versions for the helm chart to be published.",
-		Required:    true,
+		Required:    false,
 		Destination: &P.HelmChart.Versions,
 	},
 
