@@ -34,8 +34,8 @@ func GoEnv(tl *TaskList) *Task {
 				}
 
 				C.EnvVars["GOPATH"] = cache
-				C.EnvVars["GOCACHE"] = filepath.Join(cache, "cache")
-				C.EnvVars["GOLANGCI_LINT_CACHE"] = filepath.Join(C.EnvVars["GOCACHE"], "golangci-lint")
+				C.EnvVars["GOCACHE"] = filepath.Join(cache, "go-build")
+				C.EnvVars["GOLANGCI_LINT_CACHE"] = filepath.Join(cache, "golangci-lint")
 			}
 
 			t.CreateCommand("go", "env").
