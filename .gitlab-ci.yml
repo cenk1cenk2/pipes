@@ -24,6 +24,9 @@ bootstrap:
           - buildah/**/*
     - if: $CI_COMMIT_TAG
 
+variables:
+  GOPATH: $CI_PROJECT_DIR/.go
+
 install:
   stage: install
   image: cenk1cenk2/pipe-go:bootstrap

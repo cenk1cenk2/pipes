@@ -108,7 +108,7 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		),
 		Usage:       "Destination directory for the packaged helm chart.",
 		Required:    false,
-		Value:       ".",
+		Value:       "./dist",
 		Destination: &P.HelmChart.Destination,
 	},
 
