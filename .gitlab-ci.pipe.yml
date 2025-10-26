@@ -23,7 +23,6 @@ stages:
 
 variables:
   GO_CWD: $[[inputs.cwd]]
-  GOPATH: $CI_PROJECT_DIR/.go
 
 build:
   stage: build
