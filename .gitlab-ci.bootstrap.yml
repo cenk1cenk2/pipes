@@ -16,6 +16,7 @@ init:
       - GO_CWD: go
       - GO_CWD: buildah
   script:
+    - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | BINDIR=/usr/bin sh -s
     - go mod vendor
     - go mod verify
     - |-

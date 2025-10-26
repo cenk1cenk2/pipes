@@ -12,7 +12,7 @@ RUN apk add --no-cache --no-progress git
 RUN \
   apk add --no-cache --no-progress git make && \
   wget -O- -nv https://taskfile.dev/install.sh | sh /dev/stdin -d -b /usr/bin && \
-  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | BINDIR=/usr/bin sh -s
+  wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | BINDIR=/usr/bin sh -s
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 

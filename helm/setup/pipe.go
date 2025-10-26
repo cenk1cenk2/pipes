@@ -33,6 +33,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				HelmVersion(tl).Job(),
+				HelmLoadChart(tl).Job(),
 			)
 		})
 }
