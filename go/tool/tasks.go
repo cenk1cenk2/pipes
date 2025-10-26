@@ -33,14 +33,13 @@ func CreateGoToolTask(tl *TaskList, options CreateGoToolTaskOptions) *Task {
 				Set(func(c *Command) error {
 					t.Log.Infof("Tool: %s in %s", options.Tool, setup.P.Cwd)
 
-					c.AppendEnvironment(setup.C.EnvVars)
-
 					c.AppendArgs(options.Tool)
 
 					c.AppendArgs(strings.Split(options.Args, " ")...)
 
 					return nil
 				}).
+				AppendEnvironment(setup.C.EnvVars).
 				AddSelfToTheTask()
 
 			return nil

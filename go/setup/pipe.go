@@ -33,8 +33,9 @@ func New(p *Plumber) *TaskList {
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
-			return JobSequence(
+			return JobParallel(
 				GoVersion(tl).Job(),
+				GoEnv(tl).Job(),
 			)
 		})
 }

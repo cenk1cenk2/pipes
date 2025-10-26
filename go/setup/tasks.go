@@ -38,6 +38,11 @@ func GoEnv(tl *TaskList) *Task {
 				C.EnvVars["GOLANGCI_LINT_CACHE"] = filepath.Join(C.EnvVars["GOCACHE"], "golangci-lint")
 			}
 
+			t.CreateCommand("go", "env").
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				AppendEnvironment(C.EnvVars).
+				AddSelfToTheTask()
+
 			return nil
 		})
 }

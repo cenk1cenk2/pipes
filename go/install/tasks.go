@@ -24,10 +24,9 @@ func GoModVendor(tl *TaskList) *Task {
 						c.AppendArgs(strings.Split(P.Args, " ")...)
 					}
 
-					c.AppendEnvironment(setup.C.EnvVars)
-
 					return nil
 				}).
+				AppendEnvironment(setup.C.EnvVars).
 				AddSelfToTheTask()
 
 			return nil

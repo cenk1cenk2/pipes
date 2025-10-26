@@ -46,8 +46,6 @@ func GoBuild(tl *TaskList) *Task {
 							Set(func(c *Command) error {
 								t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, setup.P.Cwd, target.Os, target.Arch)
 
-								c.AppendEnvironment(setup.C.EnvVars)
-
 								if !P.EnableCGO {
 									c.AppendEnvironment(map[string]string{
 										"CGO_ENABLED": "0",
@@ -82,6 +80,7 @@ func GoBuild(tl *TaskList) *Task {
 
 								return nil
 							}).
+							AppendEnvironment(setup.C.EnvVars).
 							AddSelfToTheTask()
 
 						return nil

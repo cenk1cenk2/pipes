@@ -15,11 +15,7 @@ func GoLint(tl *TaskList) *Task {
 				"--timeout",
 				P.Timeout.String(),
 			).
-				Set(func(c *Command) error {
-					c.AppendEnvironment(setup.C.EnvVars)
-
-					return nil
-				}).
+				AppendEnvironment(setup.C.EnvVars).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 				AddSelfToTheTask()
 
