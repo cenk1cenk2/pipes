@@ -42,6 +42,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
+				IsolateWorkspaces(tl).Job(),
 				RunSemanticRelease(tl).Job(),
 			)
 		})
