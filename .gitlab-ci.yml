@@ -68,7 +68,23 @@ lint:
   script:
     - golangci-lint run --timeout 5m ./...
   rules:
-    - when: always
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      # changes:
+      #   paths:
+      #     - .gitlab-ci.yml
+      #     - go.mod
+      #     - go.sum
+      #     - "**/*.go"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      # changes:
+      #   paths:
+      #     - .gitlab-ci.yml
+      #     - go.mod
+      #     - go.sum
+      #     - "**/*.go"
+      #   compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - if: $CI_COMMIT_TAG
   tags:
     - amd64
     - docker
