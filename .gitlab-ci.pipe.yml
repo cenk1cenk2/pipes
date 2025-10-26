@@ -54,7 +54,6 @@ container:
   stage: container
   image: cenk1cenk2/pipe-buildah:bootstrap
   needs:
-    - job: lint
     - job: build
   variables:
     CONTAINER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
