@@ -2,6 +2,7 @@ package lint
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
 func GoLint(tl *TaskList) *Task {
@@ -14,6 +15,15 @@ func GoLint(tl *TaskList) *Task {
 				"--timeout",
 				P.Timeout.String(),
 			).
+				Set(func(c *Command) error {
+					if setup.P.Cache != "" {
+						c.AppendEnvironment(map[string]string{
+							"GOPATH": setup.P.Cache,
+						})
+					}
+
+					return nil
+				}).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 				AddSelfToTheTask()
 
