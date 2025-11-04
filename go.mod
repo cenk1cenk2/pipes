@@ -14,7 +14,7 @@ require (
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.2.3
 	go.yaml.in/yaml/v4 v4.0.0-rc.2
 	gopkg.in/yaml.v2 v2.4.0
-	helm.sh/helm/v4 v4.0.0-beta.2
+	helm.sh/helm/v4 v4.0.0-rc.1
 )
 
 require (
