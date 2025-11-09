@@ -4,8 +4,8 @@ github.com/Masterminds/semver/v3 v3.4.0 h1:Zog+i5UMtVoCU8oKka5P7i9q9HgrJeGzI9SA1
 github.com/Masterminds/semver/v3 v3.4.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/bmatcuk/doublestar/v4 v4.9.1 h1:X8jg9rRZmJd4yRy7ZeNDRnM+T3ZfHv15JiBJ/avrEXE=
 github.com/bmatcuk/doublestar/v4 v4.9.1/go.mod h1:xBQ8jztBU6kakFMg+8WGxn0c6z1fTSPVIjEY1Wr7jzc=
-github.com/cenk1cenk2/plumber/v6 v6.3.5 h1:bufYLJaVkQNh1uI1wlZmBI2NTUA+h1Tl+hN0y0uzy/4=
-github.com/cenk1cenk2/plumber/v6 v6.3.5/go.mod h1:GkCcM+8bpPWdlpOyDt+x6HydQn/7MkjdxWMdDkuTa9Y=
+github.com/cenk1cenk2/plumber/v6 v6.3.6 h1:ZN+KpiZco6Gw5ldoLKkm24vnePRboZR8Wk4PZaroEUE=
+github.com/cenk1cenk2/plumber/v6 v6.3.6/go.mod h1:c5v0Jd5C06kxueA9QQthN7GoOQq86YhONm30PNEZ8gc=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creasty/defaults v1.8.0 h1:z27FJxCAa0JKt3utc0sCImAEb+spPucmKoOdLHvHYKk=
 github.com/creasty/defaults v1.8.0/go.mod h1:iGzKe6pbEHnpMPtfDXZEr0NVxWnPTjb1bbDy08fPzYM=
