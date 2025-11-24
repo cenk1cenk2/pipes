@@ -13,7 +13,7 @@ require (
 	github.com/urfave/cli/v3 v3.6.1
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.2.3
 	go.yaml.in/yaml/v4 v4.0.0-rc.3
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v4 v4.0.0
 )
 
