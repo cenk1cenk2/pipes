@@ -11,6 +11,7 @@ func HelmLint(tl *TaskList) *Task {
 			t.CreateCommand(
 				"helm",
 				"lint",
+				".",
 			).
 				Set(func(c *Command) error {
 					if P.Kubernetes.Version != "" {
