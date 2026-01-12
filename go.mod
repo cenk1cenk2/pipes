@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.9.2
-	github.com/cenk1cenk2/plumber/v6 v6.3.13
+	github.com/cenk1cenk2/plumber/v6 v6.3.14
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/joho/godotenv v1.5.1
@@ -40,9 +40,9 @@ require (
 	gitlab.kilic.dev/libraries/go-broadcaster v1.1.3 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/crypto v0.46.0 // indirect
-	golang.org/x/exp v0.0.0-20251219203646-944ab1f22d93 // indirect
+	golang.org/x/exp v0.0.0-20260112195511-716be5621a96 // indirect
 	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gotest.tools/v3 v3.2.0 // indirect
