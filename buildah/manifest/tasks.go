@@ -159,7 +159,7 @@ func UpdateManifests(tl *TaskList) *Task {
 								"buildah",
 								"manifest",
 								"push",
-								"-p",
+								"--rm",
 								target,
 							).
 							AddSelfToTheTask()
