@@ -53,6 +53,7 @@ var Flags = []cli.Flag{
 		Name:     "readme.repository",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_IMAGE_NAME"),
+			cli.EnvVar("CONTAINER_IMAGE_NAME"),
 			cli.EnvVar("README_REPOSITORY"),
 		),
 		Usage:       "Repository for applying the readme on.",
