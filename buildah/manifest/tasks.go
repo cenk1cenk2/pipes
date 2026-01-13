@@ -1,7 +1,6 @@
 package manifest
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +8,7 @@ import (
 	glob "github.com/bmatcuk/doublestar/v4"
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
+	"go.yaml.in/yaml/v4"
 )
 
 func DiscoverPublishedImageFiles(tl *TaskList) *Task {
@@ -71,7 +71,7 @@ func FetchPublishedImagesFromFiles(tl *TaskList) *Task {
 						}
 
 						parsed := &ContainerManifestMatrix{}
-						if err := json.Unmarshal(content, parsed); err != nil {
+						if err := yaml.Unmarshal(content, parsed); err != nil {
 							return fmt.Errorf("Can not unmarshal container manifest matrix: %w", err)
 						}
 
