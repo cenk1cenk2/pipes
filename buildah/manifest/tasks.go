@@ -156,7 +156,7 @@ func UpdateManifests(tl *TaskList) *Task {
 
 						t.
 							CreateCommand(
-								"buldah",
+								"buildah",
 								"manifest",
 								"push",
 								"-p",
