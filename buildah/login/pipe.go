@@ -6,7 +6,7 @@ import (
 
 type (
 	ContainerRegistry struct {
-		Uri      string `validate:"omitempty,fqdn"`
+		Uri      string
 		Username string
 		Password string
 	}
