@@ -7,6 +7,7 @@ import (
 
 type (
 	HelmChart struct {
+		Target            string
 		Versions          []string
 		VersionFile       string
 		VersionFileStrict bool

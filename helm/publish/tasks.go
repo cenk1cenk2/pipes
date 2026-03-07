@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/helm/login"
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
@@ -74,7 +73,7 @@ func HelmPublish(tl *TaskList) *Task {
 		}).
 		Set(func(t *Task) error {
 			for _, version := range C.Versions {
-				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, login.P.HelmRegistry.Uri)
+				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, P.HelmChart.Target)
 
 				t.CreateSubtask(fmt.Sprintf("%s@%s", setup.C.Chart.Name(), version)).
 					Set(func(t *Task) error {
@@ -82,7 +81,7 @@ func HelmPublish(tl *TaskList) *Task {
 							"helm",
 							"push",
 							filepath.Join(P.HelmChart.Destination, fmt.Sprintf("%s-%s.tgz", setup.C.Chart.Name(), version)),
-							login.P.HelmRegistry.Uri,
+							P.HelmChart.Target,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 							SetDir(setup.P.Cwd).

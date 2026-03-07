@@ -33,6 +33,17 @@ var Flags = CombineFlags(flags.NewGitFlags(
 		TagsFileStrictRequired:    false,
 	},
 ), []cli.Flag{
+	&cli.StringFlag{
+		Category: CATEGORY_HELM_CHART,
+		Name:     "helm-chart.target",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_CHART_TARGET"),
+		),
+		Usage:       "Helm chart repository target to publish to.",
+		Required:    true,
+		Destination: &P.HelmChart.Target,
+	},
+
 	&cli.StringSliceFlag{
 		Category: CATEGORY_HELM_CHART,
 		Name:     "helm-chart.versions",
