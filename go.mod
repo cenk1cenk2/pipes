@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.10.0
-	github.com/cenk1cenk2/plumber/v6 v6.3.23
+	github.com/cenk1cenk2/plumber/v6 v6.3.24
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/ekalinin/github-markdown-toc.go v1.4.0
 	github.com/joho/godotenv v1.5.1
@@ -14,7 +14,7 @@ require (
 	gitlab.kilic.dev/libraries/go-utils/v2 v2.2.4
 	go.yaml.in/yaml/v4 v4.0.0-rc.4
 	gopkg.in/yaml.v3 v3.0.1
-	helm.sh/helm/v4 v4.1.1
+	helm.sh/helm/v4 v4.1.3
 )
 
 require (
