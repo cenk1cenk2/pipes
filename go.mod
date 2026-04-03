@@ -6,7 +6,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/cenk1cenk2/plumber/v6 v6.3.24
 	github.com/docker/docker v28.5.2+incompatible
-	github.com/ekalinin/github-markdown-toc.go v1.4.0
+	github.com/ekalinin/github-markdown-toc.go/v2 v2.0.1
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/sirupsen/logrus v1.9.4
