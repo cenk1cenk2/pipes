@@ -222,7 +222,9 @@ pipe-go:
               CONTAINER_IMAGE_TAGS: |-
                 {{ env "GO_VERSION" }}
               GO_VERSION:
+                - 1.24-alpine
                 - 1.25-alpine
+                - 1.26-alpine
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:

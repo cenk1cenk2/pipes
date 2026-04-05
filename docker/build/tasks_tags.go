@@ -6,13 +6,13 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/docker/manifest"
 	"gitlab.kilic.dev/devops/pipes/docker/setup"
-	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 )
 
 func DockerTagsParent(tl *TaskList) *Task {
@@ -29,9 +29,9 @@ func DockerTagsParent(tl *TaskList) *Task {
 			)
 		}).
 		Set(func(t *Task) error {
-			C.Tags = utils.RemoveDuplicateStr(
-				utils.DeleteEmptyStringsFromSlice(C.Tags),
-			)
+			C.Tags = slices.Compact(slices.Sorted(slices.Values(
+				slices.DeleteFunc(C.Tags, func(v string) bool { return v == "" }),
+			)))
 
 			t.Log.Infof(
 				"Image tags: %s", strings.Join(C.Tags, ", "),
@@ -88,7 +88,7 @@ func DockerTagsUser(tl *TaskList) *Task {
 	return tl.CreateTask("tags", "user").
 		Set(func(t *Task) error {
 			// add all the specified tags
-			for _, v := range utils.RemoveDuplicateStr(utils.DeleteEmptyStringsFromSlice(P.DockerImage.Tags)) {
+			for _, v := range slices.Compact(slices.Sorted(slices.Values(slices.DeleteFunc(P.DockerImage.Tags, func(v string) bool { return v == "" })))) {
 				if err := AddDockerTag(t, v); err != nil {
 					return err
 				}

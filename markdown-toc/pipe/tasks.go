@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
-
-	"gitlab.kilic.dev/libraries/go-utils/v2/utils"
 
 	glob "github.com/bmatcuk/doublestar/v4"
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -49,7 +48,7 @@ func FindMarkdownFiles(tl *TaskList) *Task {
 				)
 			}
 
-			matches = utils.RemoveDuplicateStr(matches)
+			matches = slices.Compact(slices.Sorted(slices.Values(matches)))
 
 			t.Log.Debugf("Paths matched for given pattern: %s", strings.Join(matches, ", "))
 

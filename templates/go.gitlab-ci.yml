@@ -3,7 +3,7 @@ stages:
   - build
 
 variables:
-  GO_VERSION: 1.25-alpine
+  GO_VERSION: 1.26-alpine
 
 include:
   # - project: devops/pipes
