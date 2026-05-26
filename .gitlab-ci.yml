@@ -457,7 +457,7 @@ pipe-semantic-release:
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
               CONTAINER_IMAGE_BUILD_ARGS: |-
-                NODE_VERSION: 22-alpine
+                NODE_VERSION: 24-alpine
               CONTAINER_IMAGE_TAGS: |-
                 latest
   rules:
