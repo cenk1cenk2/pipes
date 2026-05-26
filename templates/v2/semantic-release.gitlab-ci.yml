@@ -10,6 +10,7 @@ variables:
     GIT_COMMITTER_NAME: semantic-release [bot]
     GIT_COMMITTER_EMAIL: gitlab@kilic.dev
     GL_TOKEN: ${SEMANTIC_RELEASE_GL_TOKEN}
+    GITLAB_TOKEN: ${SEMANTIC_RELEASE_GL_TOKEN}
   script:
     - pipe
   artifacts:
