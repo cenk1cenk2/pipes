@@ -168,42 +168,6 @@ pipe-buildah:
         compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
     - if: $CI_COMMIT_TAG
 
-pipe-docker:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./docker
-          container-image-name: cenk1cenk2/pipe-docker
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - docker/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - docker/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
 pipe-go:
   stage: pipes
   variables:
@@ -279,42 +243,6 @@ pipe-helm:
           - go.sum
           - .gitlab-ci.pipe.yml
           - helm/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-markdown-toc:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./markdown-toc
-          container-image-name: cenk1cenk2/pipe-markdown-toc
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - markdown-toc/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - markdown-toc/**/*
         compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
     - if: $CI_COMMIT_TAG
 
@@ -572,11 +500,6 @@ update-docker-hub-readme:
           "description": "Builds and publishes a container image with given conditions."
         },
         {
-          "repository": "cenk1cenk2/pipe-docker",
-          "file": "./docker/README.md",
-          "description": "Builds and publishes a Docker image with given conditions."
-        },
-        {
           "repository": "cenk1cenk2/pipe-node",
           "file": "./node/README.md",
           "description": "Node.JS operations for pipelines."
@@ -590,11 +513,6 @@ update-docker-hub-readme:
           "repository": "cenk1cenk2/pipe-go",
           "file": "./go/README.md",
           "description": "Golang operations for pipelines."
-        },
-        {
-          "repository": "cenk1cenk2/pipe-markdown-toc",
-          "file": "./markdown-toc/README.md",
-          "description": "Generates TOC for markdown files."
         },
         {
           "repository": "cenk1cenk2/pipe-select-env",
