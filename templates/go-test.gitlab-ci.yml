@@ -1,8 +1,0 @@
----
-include:
-  - project: devops/pipes
-    file: /templates/v2/go-test.gitlab-ci.yml
-
-test:
-  extends: .go-test
-  stage: build

@@ -1,8 +1,0 @@
----
-include:
-  - project: devops/pipes
-    file: /templates/v2/go-build.gitlab-ci.yml
-
-build:
-  extends: .go-build
-  stage: build
