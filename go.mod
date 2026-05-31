@@ -10,6 +10,7 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/sirupsen/logrus v1.9.4
 	github.com/urfave/cli/v3 v3.8.0
+	gitlab.com/gitlab-org/api/client-go v1.46.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.4
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v4 v4.1.3
@@ -42,7 +43,10 @@ require (
 	github.com/go-playground/validator/v10 v10.30.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
+	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
