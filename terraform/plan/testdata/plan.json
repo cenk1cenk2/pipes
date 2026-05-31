@@ -1,0 +1,65 @@
+{
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.logs",
+      "change": {
+        "actions": ["create"],
+        "after": { "bucket": "secret-bucket-name" },
+        "after_sensitive": { "bucket": true }
+      }
+    },
+    {
+      "address": "aws_instance.web",
+      "change": {
+        "actions": ["update"],
+        "before": { "user_data": "secret-old-user-data" },
+        "after": { "user_data": "secret-new-user-data" },
+        "before_sensitive": { "user_data": true },
+        "after_sensitive": { "user_data": true }
+      }
+    },
+    {
+      "address": "aws_db_instance.main",
+      "change": {
+        "actions": ["delete", "create"],
+        "before": { "password": "secret-old-password" },
+        "after": { "password": "secret-new-password" },
+        "sensitive_values": { "password": true }
+      }
+    },
+    {
+      "address": "data.aws_caller_identity.current",
+      "change": {
+        "actions": ["read"],
+        "after": { "account_id": "secret-account-id" }
+      }
+    },
+    {
+      "address": "null_resource.noop",
+      "change": {
+        "actions": ["no-op"],
+        "after": { "triggers": { "secret": "secret-noop-value" } }
+      }
+    }
+  ],
+  "output_changes": {
+    "bucket_name": {
+      "actions": ["create"],
+      "after": "secret-output-bucket"
+    },
+    "endpoint": {
+      "actions": ["update"],
+      "before": "secret-old-endpoint",
+      "after": "secret-new-endpoint"
+    },
+    "password": {
+      "actions": ["delete"],
+      "before": "secret-output-password"
+    },
+    "unchanged": {
+      "actions": ["no-op"],
+      "after": "secret-unchanged-output"
+    }
+  }
+}
