@@ -108,7 +108,7 @@ func UpsertMergeRequestReport(
 	config MergeRequestReportConfig,
 	body string,
 ) (*MergeRequestReportResult, error) {
-	marker := fmt.Sprintf("<!-- %s%s -->", "gitlab-pipes:mr-report:", config.Identifier)
+	marker := fmt.Sprintf("<!-- %s:%s -->", "gitlab-pipes:mr-report", config.Identifier)
 	if !strings.Contains(body, marker) {
 		body = fmt.Sprintf("%s\n\n%s", strings.TrimRight(body, "\n"), marker)
 	}
