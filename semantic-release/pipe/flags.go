@@ -39,18 +39,6 @@ var Flags = []cli.Flag{
 		Destination: &P.SemanticRelease.Workspace,
 	},
 
-	&cli.StringSliceFlag{
-		Category: CATEGORY_SEMANTIC_RELEASE,
-		Name:     "semantic-release.isolate-workplaces",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("SEMANTIC_RELEASE_ISOLATE_WORKPLACES"),
-		),
-		Usage:       "Isolate specific workspaces for release when using workspace mode.",
-		Required:    false,
-		Value:       []string{},
-		Destination: &P.SemanticRelease.IsolateWorkspaces,
-	},
-
 	// CATEGORY_CI_VARIABLES
 
 	&cli.StringFlag{
