@@ -1,4 +1,0 @@
----
-include:
-  - project: devops/pipes
-    file: /templates/node.gitlab-ci.yml
