@@ -36,7 +36,7 @@ func NewMergeRequestReportFlags(config *MergeRequestReportConfig) []cli.Flag {
 			),
 			Usage:       "Enable GitLab merge request report note on the given merge request.",
 			Required:    false,
-			Value:       true,
+			Value:       false,
 			Destination: &config.Enabled,
 		},
 

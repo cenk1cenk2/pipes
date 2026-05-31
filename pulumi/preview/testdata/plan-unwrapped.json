@@ -1,0 +1,56 @@
+{
+  "manifest": {
+    "time": "2026-05-31T12:00:00Z",
+    "magic": "03503ad839446037795e489261c69ed98257c899e8d4e52abb8134db63afcdd3",
+    "version": "3.187.0"
+  },
+  "config": {
+    "example:secret": "secret-config-value"
+  },
+  "resourcePlans": {
+    "urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs": {
+      "goal": {
+        "type": "aws:s3/bucket:Bucket",
+        "name": "logs",
+        "inputDiff": {
+          "adds": {
+            "acl": "private",
+            "token": "secret-input-value"
+          }
+        },
+        "outputDiff": {
+          "adds": {
+            "bucketName": "secret-output-value"
+          }
+        }
+      },
+      "steps": [
+        "create"
+      ],
+      "state": {
+        "bucketName": "secret-output-value"
+      },
+      "seed": "H+gYmoW6MtpQibswnx9E8p4c3gMoGk2wJKtl9RDVKb0="
+    },
+    "urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings": {
+      "goal": {
+        "type": "kubernetes:core/v1:ConfigMap",
+        "name": "settings",
+        "outputDiff": {
+          "updates": {
+            "metadata": {
+              "old": "secret-old-value",
+              "new": "secret-new-value"
+            }
+          }
+        }
+      },
+      "steps": [
+        "update"
+      ],
+      "state": {
+        "metadata": "secret-new-value"
+      }
+    }
+  }
+}

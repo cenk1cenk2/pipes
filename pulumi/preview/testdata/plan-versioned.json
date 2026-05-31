@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "plan": {
+    "manifest": {
+      "time": "2026-05-31T12:30:00Z",
+      "version": "3.187.0"
+    },
+    "resourcePlans": {
+      "urn:pulumi:stage::example::aws:lambda/function:Function::worker": {
+        "goal": {
+          "type": "aws:lambda/function:Function",
+          "name": "worker",
+          "outputDiff": {
+            "updates": {
+              "arn": "secret-arn-value"
+            }
+          }
+        },
+        "steps": [
+          "replace",
+          "create-replacement",
+          "delete-replaced"
+        ],
+        "state": {
+          "arn": "secret-arn-value"
+        }
+      }
+    }
+  }
+}
