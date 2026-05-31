@@ -7,7 +7,7 @@ ARG BUILDOS
 ARG BUILDARCH
 
 ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="${PATH}:${PNPM_HOME}"
+ENV PATH="${PATH}:${PNPM_HOME}/bin"
 
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
