@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v3"
-	clientgitlab "gitlab.com/gitlab-org/api/client-go"
+	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
 )
 
 const (
