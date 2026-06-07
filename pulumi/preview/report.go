@@ -2,9 +2,11 @@ package preview
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 	"text/template"
 	"time"
@@ -60,13 +62,28 @@ type (
 	}
 
 	actionAccumulator struct {
-		Action       string
-		Count        int
-		Resources    map[string]PulumiPlanResource
-		OutputNames  map[string]map[string]struct{}
-		OutputLookup map[string]PulumiPlanResource
+		Action      string
+		Count       int
+		Resources   map[string]PulumiPlanResource
+		OutputNames map[string]map[string]struct{}
 	}
 )
+
+var pulumiPlanActionRanks = map[string]int{
+	"same":                   10,
+	"read":                   20,
+	"create":                 30,
+	"import":                 40,
+	"update":                 50,
+	"replace":                60,
+	"create-replacement":     70,
+	"update-replacement":     80,
+	"read-replacement":       90,
+	"delete-replaced":        100,
+	"delete":                 110,
+	"discard":                120,
+	"remove-pending-replace": 130,
+}
 
 func (r PulumiPlanReport) HasMetadata() bool {
 	return r.Metadata.Stack != "" ||
@@ -104,8 +121,6 @@ func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*P
 			accumulator.Resources[summary.Urn] = summary
 
 			if len(outputNames) > 0 {
-				accumulator.OutputLookup[summary.Urn] = summary
-
 				for _, outputName := range outputNames {
 					if accumulator.OutputNames[summary.Urn] == nil {
 						accumulator.OutputNames[summary.Urn] = map[string]struct{}{}
@@ -236,9 +251,9 @@ func resourceOutputNames(resource apitype.ResourcePlanV1) []string {
 
 	diff := resource.Goal.OutputDiff
 	names := make([]string, 0, len(diff.Adds)+len(diff.Deletes)+len(diff.Updates))
-	names = append(names, mapKeys(diff.Adds)...)
+	names = append(names, slices.Collect(maps.Keys(diff.Adds))...)
 	names = append(names, diff.Deletes...)
-	names = append(names, mapKeys(diff.Updates)...)
+	names = append(names, slices.Collect(maps.Keys(diff.Updates))...)
 
 	return uniqueSortedStrings(names)
 }
@@ -250,10 +265,9 @@ func getActionAccumulator(accumulators map[string]*actionAccumulator, action str
 	}
 
 	accumulator = &actionAccumulator{
-		Action:       action,
-		Resources:    map[string]PulumiPlanResource{},
-		OutputNames:  map[string]map[string]struct{}{},
-		OutputLookup: map[string]PulumiPlanResource{},
+		Action:      action,
+		Resources:   map[string]PulumiPlanResource{},
+		OutputNames: map[string]map[string]struct{}{},
 	}
 	accumulators[action] = accumulator
 
@@ -268,33 +282,25 @@ func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []Pulumi
 			Action:    accumulator.Action,
 			Count:     accumulator.Count,
 			Resources: sortedResources(accumulator.Resources),
-			Outputs:   sortedOutputs(accumulator.OutputNames, accumulator.OutputLookup),
+			Outputs:   sortedOutputs(accumulator.OutputNames, accumulator.Resources),
 		}
 
 		actions = append(actions, action)
 	}
 
-	sort.Slice(actions, func(i, j int) bool {
-		left := actionSortRank(actions[i].Action)
-		right := actionSortRank(actions[j].Action)
-		if left == right {
-			return actions[i].Action < actions[j].Action
+	slices.SortFunc(actions, func(left, right PulumiPlanAction) int {
+		if rank := cmp.Compare(actionSortRank(left.Action), actionSortRank(right.Action)); rank != 0 {
+			return rank
 		}
 
-		return left < right
+		return cmp.Compare(left.Action, right.Action)
 	})
 
 	return actions
 }
 
 func sortedResources(resources map[string]PulumiPlanResource) []PulumiPlanResource {
-	keys := make([]string, 0, len(resources))
-	for key := range resources {
-		keys = append(keys, key)
-	}
-
-	sort.Strings(keys)
-
+	keys := slices.Sorted(maps.Keys(resources))
 	sorted := make([]PulumiPlanResource, 0, len(keys))
 	for _, key := range keys {
 		sorted = append(sorted, resources[key])
@@ -305,19 +311,13 @@ func sortedResources(resources map[string]PulumiPlanResource) []PulumiPlanResour
 
 func sortedOutputs(
 	outputNames map[string]map[string]struct{},
-	outputLookup map[string]PulumiPlanResource,
+	resources map[string]PulumiPlanResource,
 ) []PulumiPlanOutput {
-	keys := make([]string, 0, len(outputNames))
-	for key := range outputNames {
-		keys = append(keys, key)
-	}
-
-	sort.Strings(keys)
-
+	keys := slices.Sorted(maps.Keys(outputNames))
 	outputs := make([]PulumiPlanOutput, 0, len(keys))
 	for _, key := range keys {
 		outputs = append(outputs, PulumiPlanOutput{
-			Resource: outputLookup[key],
+			Resource: resources[key],
 			Names:    sortedStringSet(outputNames[key]),
 		})
 	}
@@ -326,23 +326,7 @@ func sortedOutputs(
 }
 
 func sortedStringSet(values map[string]struct{}) []string {
-	sorted := make([]string, 0, len(values))
-	for value := range values {
-		sorted = append(sorted, value)
-	}
-
-	sort.Strings(sorted)
-
-	return sorted
-}
-
-func mapKeys(values map[string]any) []string {
-	keys := make([]string, 0, len(values))
-	for key := range values {
-		keys = append(keys, key)
-	}
-
-	return keys
+	return slices.Sorted(maps.Keys(values))
 }
 
 func uniqueSortedStrings(values []string) []string {
@@ -367,23 +351,7 @@ func splitPulumiUrn(urn string) (string, string) {
 }
 
 func actionSortRank(action string) int {
-	ranks := map[string]int{
-		"same":                   10,
-		"read":                   20,
-		"create":                 30,
-		"import":                 40,
-		"update":                 50,
-		"replace":                60,
-		"create-replacement":     70,
-		"update-replacement":     80,
-		"read-replacement":       90,
-		"delete-replaced":        100,
-		"delete":                 110,
-		"discard":                120,
-		"remove-pending-replace": 130,
-	}
-
-	if rank, ok := ranks[action]; ok {
+	if rank, ok := pulumiPlanActionRanks[action]; ok {
 		return rank
 	}
 

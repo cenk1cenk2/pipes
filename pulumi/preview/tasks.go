@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/gitlab"
@@ -38,9 +39,14 @@ func MergeRequestReport(tl *TaskList) *Task {
 			return !P.MergeRequestReportConfig.Enabled || P.MergeRequestReportConfig.MergeRequestId == 0
 		}).
 		Set(func(t *Task) error {
-			data, err := os.ReadFile(P.Plan)
+			planPath := P.Plan
+			if !filepath.IsAbs(planPath) {
+				planPath = filepath.Join(setup.P.Cwd, planPath)
+			}
+
+			data, err := os.ReadFile(planPath)
 			if err != nil {
-				return fmt.Errorf("read Pulumi plan file %s: %w", P.Plan, err)
+				return fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
 			}
 
 			metadata := P.ReportMetadata
