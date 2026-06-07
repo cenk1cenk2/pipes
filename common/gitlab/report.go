@@ -18,7 +18,7 @@ type MergeRequestReportConfig struct {
 	Token          string `validate:"required_if=Enabled true"`
 	ApiUrl         string `validate:"required_if=Enabled true"`
 	ProjectId      string `validate:"required_if=Enabled true"`
-	MergeRequestId int64  `validate:"required_if=Enabled true,omitempty,gt=0"`
+	MergeRequestId int64  `validate:"omitempty,gt=0"`
 	Identifier     string `validate:"required_if=Enabled true,omitempty,printascii,excludes=-->"`
 }
 
