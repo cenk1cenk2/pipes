@@ -47,7 +47,17 @@ func TerraformPlan(tl *TaskList) *Task {
 func TerraformMergeRequestReport(tl *TaskList) *Task {
 	return tl.CreateTask("merge-request-report").
 		ShouldDisable(func(t *Task) bool {
-			return !P.MergeRequestReport.Enabled || P.MergeRequestReport.MergeRequestId == 0
+			if !P.MergeRequestReport.Enabled {
+				return true
+			}
+
+			if P.MergeRequestReport.MergeRequestId == 0 {
+				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
+
+				return true
+			}
+
+			return false
 		}).
 		Set(func(t *Task) error {
 			if P.Plan.Output == "" {
