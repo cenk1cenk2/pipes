@@ -2,9 +2,11 @@ package plan
 
 import (
 	"bytes"
+	"cmp"
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"slices"
 	"strings"
 	"text/template"
@@ -135,12 +137,9 @@ func mergeRequestReportGroups(items map[string][]string) []mergeRequestReportGro
 	groups := []mergeRequestReportGroup{}
 
 	for _, action := range mergeRequestReportActions(items) {
-		actionItems := slices.Clone(items[action])
-		slices.Sort(actionItems)
-
 		groups = append(groups, mergeRequestReportGroup{
 			Action: action,
-			Items:  actionItems,
+			Items:  slices.Sorted(slices.Values(items[action])),
 		})
 	}
 
@@ -148,34 +147,30 @@ func mergeRequestReportGroups(items map[string][]string) []mergeRequestReportGro
 }
 
 func mergeRequestReportActions(groups ...map[string][]string) []string {
-	seen := map[string]struct{}{}
-
-	for _, group := range groups {
-		for action, items := range group {
-			if len(items) == 0 {
-				continue
-			}
-
-			seen[action] = struct{}{}
-		}
-	}
-
 	actions := []string{}
-	for _, action := range mergeRequestReportActionOrder {
-		if _, ok := seen[action]; ok {
-			actions = append(actions, action)
-			delete(seen, action)
+	for _, group := range groups {
+		actions = slices.Concat(actions, slices.Collect(maps.Keys(group)))
+	}
+	slices.Sort(actions)
+	actions = slices.Compact(actions)
+
+	actionRank := func(action string) int {
+		if rank := slices.Index(mergeRequestReportActionOrder, action); rank >= 0 {
+			return rank
 		}
+
+		return len(mergeRequestReportActionOrder)
 	}
 
-	remaining := make([]string, 0, len(seen))
-	for action := range seen {
-		remaining = append(remaining, action)
-	}
+	slices.SortFunc(actions, func(left, right string) int {
+		if rank := cmp.Compare(actionRank(left), actionRank(right)); rank != 0 {
+			return rank
+		}
 
-	slices.Sort(remaining)
+		return cmp.Compare(left, right)
+	})
 
-	return append(actions, remaining...)
+	return actions
 }
 
 func renderMergeRequestReport(report *mergeRequestReport) (string, error) {
