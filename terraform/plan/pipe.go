@@ -4,6 +4,7 @@ import (
 	"time"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 )
 
 type (
@@ -16,6 +17,7 @@ type (
 
 	Pipe struct {
 		Plan
+		MergeRequestReport gitlab.MergeRequestReportConfig
 	}
 )
 
@@ -36,6 +38,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				TerraformPlan(tl).Job(),
+				TerraformMergeRequestReport(tl).Job(),
 			)
 		})
 }
