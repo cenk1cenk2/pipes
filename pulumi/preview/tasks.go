@@ -36,7 +36,17 @@ func PulumiPlan(tl *TaskList) *Task {
 func MergeRequestReport(tl *TaskList) *Task {
 	return tl.CreateTask("gitlab", "merge-request-report").
 		ShouldDisable(func(t *Task) bool {
-			return !P.MergeRequestReportConfig.Enabled || P.MergeRequestReportConfig.MergeRequestId == 0
+			if !P.MergeRequestReportConfig.Enabled {
+				return true
+			}
+
+			if P.MergeRequestReportConfig.MergeRequestId == 0 {
+				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
+
+				return true
+			}
+
+			return false
 		}).
 		Set(func(t *Task) error {
 			planPath := P.Plan
