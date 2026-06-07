@@ -65,24 +65,24 @@ type (
 		Action      string
 		Count       int
 		Resources   map[string]PulumiPlanResource
-		OutputNames map[string]map[string]struct{}
+		OutputNames map[string][]string
 	}
 )
 
-var pulumiPlanActionRanks = map[string]int{
-	"same":                   10,
-	"read":                   20,
-	"create":                 30,
-	"import":                 40,
-	"update":                 50,
-	"replace":                60,
-	"create-replacement":     70,
-	"update-replacement":     80,
-	"read-replacement":       90,
-	"delete-replaced":        100,
-	"delete":                 110,
-	"discard":                120,
-	"remove-pending-replace": 130,
+var pulumiPlanActionOrder = []string{
+	"same",
+	"read",
+	"create",
+	"import",
+	"update",
+	"replace",
+	"create-replacement",
+	"update-replacement",
+	"read-replacement",
+	"delete-replaced",
+	"delete",
+	"discard",
+	"remove-pending-replace",
 }
 
 func (r PulumiPlanReport) HasMetadata() bool {
@@ -116,18 +116,21 @@ func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*P
 		outputNames := resourceOutputNames(resource)
 
 		for _, action := range steps {
-			accumulator := getActionAccumulator(accumulators, action)
+			accumulator := accumulators[action]
+			if accumulator == nil {
+				accumulator = &actionAccumulator{
+					Action:      action,
+					Resources:   map[string]PulumiPlanResource{},
+					OutputNames: map[string][]string{},
+				}
+				accumulators[action] = accumulator
+			}
+
 			accumulator.Count++
 			accumulator.Resources[summary.Urn] = summary
 
 			if len(outputNames) > 0 {
-				for _, outputName := range outputNames {
-					if accumulator.OutputNames[summary.Urn] == nil {
-						accumulator.OutputNames[summary.Urn] = map[string]struct{}{}
-					}
-
-					accumulator.OutputNames[summary.Urn][outputName] = struct{}{}
-				}
+				accumulator.OutputNames[summary.Urn] = outputNames
 			}
 		}
 	}
@@ -200,7 +203,6 @@ func formatManifestTime(value time.Time) string {
 }
 
 func resourceActions(resource apitype.ResourcePlanV1) []string {
-	seen := map[string]struct{}{}
 	actions := make([]string, 0, len(resource.Steps))
 
 	for _, action := range resource.Steps {
@@ -209,11 +211,10 @@ func resourceActions(resource apitype.ResourcePlanV1) []string {
 			continue
 		}
 
-		if _, ok := seen[action]; ok {
+		if slices.Contains(actions, action) {
 			continue
 		}
 
-		seen[action] = struct{}{}
 		actions = append(actions, action)
 	}
 
@@ -250,46 +251,50 @@ func resourceOutputNames(resource apitype.ResourcePlanV1) []string {
 	}
 
 	diff := resource.Goal.OutputDiff
-	names := make([]string, 0, len(diff.Adds)+len(diff.Deletes)+len(diff.Updates))
-	names = append(names, slices.Collect(maps.Keys(diff.Adds))...)
-	names = append(names, diff.Deletes...)
-	names = append(names, slices.Collect(maps.Keys(diff.Updates))...)
-
-	return uniqueSortedStrings(names)
-}
-
-func getActionAccumulator(accumulators map[string]*actionAccumulator, action string) *actionAccumulator {
-	accumulator, ok := accumulators[action]
-	if ok {
-		return accumulator
-	}
-
-	accumulator = &actionAccumulator{
-		Action:      action,
-		Resources:   map[string]PulumiPlanResource{},
-		OutputNames: map[string]map[string]struct{}{},
-	}
-	accumulators[action] = accumulator
-
-	return accumulator
+	return sortedUniqueStrings(slices.Concat(
+		slices.Collect(maps.Keys(diff.Adds)),
+		diff.Deletes,
+		slices.Collect(maps.Keys(diff.Updates)),
+	))
 }
 
 func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []PulumiPlanAction {
 	actions := make([]PulumiPlanAction, 0, len(accumulators))
 
 	for _, accumulator := range accumulators {
+		resources := slices.Collect(maps.Values(accumulator.Resources))
+		slices.SortFunc(resources, func(left, right PulumiPlanResource) int {
+			return cmp.Compare(left.Urn, right.Urn)
+		})
+
+		outputs := make([]PulumiPlanOutput, 0, len(accumulator.OutputNames))
+		for _, urn := range slices.Sorted(maps.Keys(accumulator.OutputNames)) {
+			outputs = append(outputs, PulumiPlanOutput{
+				Resource: accumulator.Resources[urn],
+				Names:    sortedUniqueStrings(accumulator.OutputNames[urn]),
+			})
+		}
+
 		action := PulumiPlanAction{
 			Action:    accumulator.Action,
 			Count:     accumulator.Count,
-			Resources: sortedResources(accumulator.Resources),
-			Outputs:   sortedOutputs(accumulator.OutputNames, accumulator.Resources),
+			Resources: resources,
+			Outputs:   outputs,
 		}
 
 		actions = append(actions, action)
 	}
 
+	actionRank := func(action string) int {
+		if rank := slices.Index(pulumiPlanActionOrder, action); rank >= 0 {
+			return rank
+		}
+
+		return len(pulumiPlanActionOrder)
+	}
+
 	slices.SortFunc(actions, func(left, right PulumiPlanAction) int {
-		if rank := cmp.Compare(actionSortRank(left.Action), actionSortRank(right.Action)); rank != 0 {
+		if rank := cmp.Compare(actionRank(left.Action), actionRank(right.Action)); rank != 0 {
 			return rank
 		}
 
@@ -299,46 +304,17 @@ func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []Pulumi
 	return actions
 }
 
-func sortedResources(resources map[string]PulumiPlanResource) []PulumiPlanResource {
-	keys := slices.Sorted(maps.Keys(resources))
-	sorted := make([]PulumiPlanResource, 0, len(keys))
-	for _, key := range keys {
-		sorted = append(sorted, resources[key])
+func sortedUniqueStrings(values []string) []string {
+	values = slices.Clone(values)
+	for index, value := range values {
+		values[index] = strings.TrimSpace(value)
 	}
+	values = slices.DeleteFunc(values, func(value string) bool {
+		return value == ""
+	})
+	slices.Sort(values)
 
-	return sorted
-}
-
-func sortedOutputs(
-	outputNames map[string]map[string]struct{},
-	resources map[string]PulumiPlanResource,
-) []PulumiPlanOutput {
-	keys := slices.Sorted(maps.Keys(outputNames))
-	outputs := make([]PulumiPlanOutput, 0, len(keys))
-	for _, key := range keys {
-		outputs = append(outputs, PulumiPlanOutput{
-			Resource: resources[key],
-			Names:    sortedStringSet(outputNames[key]),
-		})
-	}
-
-	return outputs
-}
-
-func sortedStringSet(values map[string]struct{}) []string {
-	return slices.Sorted(maps.Keys(values))
-}
-
-func uniqueSortedStrings(values []string) []string {
-	seen := map[string]struct{}{}
-	for _, value := range values {
-		value = strings.TrimSpace(value)
-		if value != "" {
-			seen[value] = struct{}{}
-		}
-	}
-
-	return sortedStringSet(seen)
+	return slices.Compact(values)
 }
 
 func splitPulumiUrn(urn string) (string, string) {
@@ -348,12 +324,4 @@ func splitPulumiUrn(urn string) (string, string) {
 	}
 
 	return parts[len(parts)-2], parts[len(parts)-1]
-}
-
-func actionSortRank(action string) int {
-	if rank, ok := pulumiPlanActionRanks[action]; ok {
-		return rank
-	}
-
-	return 1000
 }
