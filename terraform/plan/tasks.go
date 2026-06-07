@@ -3,6 +3,8 @@ package plan
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -34,6 +36,67 @@ func TerraformPlan(tl *TaskList) *Task {
 				SetRetries(&CommandRetry{
 					Tries: P.Plan.RetryTries,
 					Delay: P.Plan.RetryDelay,
+				}).
+				AddSelfToTheTask()
+
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
+		})
+}
+
+func TerraformSummary(tl *TaskList) *Task {
+	return tl.CreateTask("summary").
+		ShouldDisable(func(t *Task) bool {
+			if P.Summary.Output == "" {
+				t.Log.Debugln("Skipping Terraform summary because no summary output file is configured.")
+
+				return true
+			}
+
+			if P.Plan.Output == "" {
+				t.Log.Debugln("Skipping Terraform summary because no plan output file is configured.")
+
+				return true
+			}
+
+			return false
+		}).
+		Set(func(t *Task) error {
+			t.CreateCommand(
+				"terraform",
+				"show",
+				"-json",
+				P.Plan.Output,
+			).
+				SetDir(setup.P.Project.Cwd).
+				AppendEnvironment(setup.C.EnvVars).
+				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
+				EnableStreamRecording().
+				ShouldRunAfter(func(c *Command) error {
+					summary, err := summarizeTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")))
+					if err != nil {
+						return err
+					}
+
+					body, err := renderSummary(summary)
+					if err != nil {
+						return err
+					}
+
+					output := P.Summary.Output
+					if !filepath.IsAbs(output) {
+						output = filepath.Join(setup.P.Project.Cwd, output)
+					}
+
+					if err := os.WriteFile(output, body, 0o644); err != nil {
+						return fmt.Errorf("write Terraform summary %s: %w", output, err)
+					}
+
+					t.Log.Infof("Wrote Terraform summary: %s", output)
+
+					return nil
 				}).
 				AddSelfToTheTask()
 

@@ -108,6 +108,7 @@ Plan terraform project.
 | `$TF_PLAN_ARGS` | Additional arguments for terraform plan. | `string` | `false` | <code></code> |
 | `$TF_PLAN_RETRY_TRIES` | Number of retries for terraform plan command. | `uint` | `false` | <code>5</code> |
 | `$TF_PLAN_RETRY_DELAY` | Delay between retries for terraform plan command. | `duration` | `false` | <code>1m0s</code> |
+| `$TERRAFORM_SUMMARY_OUTPUT` | Output file for terraform plan summary. Leave empty to skip summary generation. | `string` | `false` | <code>"terraform-summary.json"</code> |
 
 **Config**
 

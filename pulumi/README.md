@@ -25,6 +25,7 @@ Preview the Pulumi changes.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
 | `$PULUMI_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+| `$PULUMI_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
 
 **Gitlab Merge Request Report**
 

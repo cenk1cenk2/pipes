@@ -15,8 +15,13 @@ type (
 		RetryTries uint32
 	}
 
+	Summary struct {
+		Output string
+	}
+
 	Pipe struct {
 		Plan
+		Summary
 		MergeRequestReport gitlab.MergeRequestReportConfig
 	}
 )
@@ -42,6 +47,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				TerraformPlan(tl).Job(),
+				TerraformSummary(tl).Job(),
 				TerraformMergeRequestReport(tl).Job(),
 			)
 		})

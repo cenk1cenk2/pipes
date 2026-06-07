@@ -38,6 +38,23 @@ var _ = Describe("Terraform merge request report", func() {
 			Items:  []string{"password"},
 		}))
 
+		summary, err := summarizeTerraformShowPlan(readFixture("plan.json"))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(summary).To(Equal(terraformSummary{
+			Create: 2,
+			Update: 1,
+			Delete: 1,
+		}))
+
+		summaryBody, err := renderSummary(summary)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(summaryBody)).To(Equal(`{
+  "create": 2,
+  "update": 1,
+  "delete": 1
+}
+`))
+
 		body, err := renderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
 

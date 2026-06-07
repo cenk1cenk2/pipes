@@ -33,6 +33,53 @@ func PulumiPlan(tl *TaskList) *Task {
 		})
 }
 
+func PulumiSummary(tl *TaskList) *Task {
+	return tl.CreateTask("summary").
+		ShouldDisable(func(t *Task) bool {
+			if P.Summary.Output == "" {
+				t.Log.Debugln("Skipping Pulumi summary because no summary output file is configured.")
+
+				return true
+			}
+
+			return false
+		}).
+		Set(func(t *Task) error {
+			planPath := P.Plan
+			if !filepath.IsAbs(planPath) {
+				planPath = filepath.Join(setup.P.Cwd, planPath)
+			}
+
+			data, err := os.ReadFile(planPath)
+			if err != nil {
+				return fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
+			}
+
+			report, err := parsePulumiPlanReport(data, MergeRequestReportMetadata{})
+			if err != nil {
+				return err
+			}
+
+			body, err := renderSummary(summarizePulumiReport(report))
+			if err != nil {
+				return err
+			}
+
+			output := P.Summary.Output
+			if !filepath.IsAbs(output) {
+				output = filepath.Join(setup.P.Cwd, output)
+			}
+
+			if err := os.WriteFile(output, body, 0o644); err != nil {
+				return fmt.Errorf("write Pulumi summary %s: %w", output, err)
+			}
+
+			t.Log.Infof("Wrote Pulumi summary: %s", output)
+
+			return nil
+		})
+}
+
 func MergeRequestReport(tl *TaskList) *Task {
 	return tl.CreateTask("gitlab", "merge-request-report").
 		ShouldDisable(func(t *Task) bool {

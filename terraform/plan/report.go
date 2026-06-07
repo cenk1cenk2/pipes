@@ -40,6 +40,12 @@ type (
 		Action string
 		Items  []string
 	}
+
+	terraformSummary struct {
+		Create int `json:"create"`
+		Update int `json:"update"`
+		Delete int `json:"delete"`
+	}
 )
 
 var mergeRequestReportActionOrder = []string{
@@ -97,6 +103,47 @@ func parseTerraformShowPlan(output []byte) (*mergeRequestReport, error) {
 		ResourceGroups: mergeRequestReportGroups(resources),
 		OutputGroups:   mergeRequestReportGroups(outputs),
 	}, nil
+}
+
+func summarizeTerraformShowPlan(output []byte) (terraformSummary, error) {
+	var plan tfjson.Plan
+
+	decoder := json.NewDecoder(bytes.NewReader(output))
+	if err := decoder.Decode(&plan); err != nil {
+		return terraformSummary{}, fmt.Errorf("parse terraform show -json output: %w", err)
+	}
+	if err := plan.Validate(); err != nil {
+		return terraformSummary{}, fmt.Errorf("validate terraform show -json output: %w", err)
+	}
+
+	summary := terraformSummary{}
+	for _, change := range plan.ResourceChanges {
+		if change == nil || change.Change == nil {
+			continue
+		}
+
+		for _, action := range change.Change.Actions {
+			switch action {
+			case tfjson.ActionCreate:
+				summary.Create++
+			case tfjson.ActionUpdate:
+				summary.Update++
+			case tfjson.ActionDelete:
+				summary.Delete++
+			}
+		}
+	}
+
+	return summary, nil
+}
+
+func renderSummary(summary terraformSummary) ([]byte, error) {
+	body, err := json.MarshalIndent(summary, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("render terraform summary: %w", err)
+	}
+
+	return append(body, '\n'), nil
 }
 
 func terraformChangeAction(actions tfjson.Actions) string {

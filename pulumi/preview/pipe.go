@@ -6,8 +6,13 @@ import (
 )
 
 type (
+	Summary struct {
+		Output string
+	}
+
 	Pipe struct {
 		Plan string
+		Summary
 		gitlab.MergeRequestReportConfig
 		ReportMetadata MergeRequestReportMetadata
 	}
@@ -38,6 +43,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				PulumiPlan(tl).Job(),
+				PulumiSummary(tl).Job(),
 				MergeRequestReport(tl).Job(),
 			)
 		})
