@@ -115,6 +115,17 @@ Plan terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
+**Gitlab Merge Request Report**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GITLAB_MR_REPORT_ENABLED` | Enable GitLab merge request report note on the given merge request. | `bool` | `false` | <code>false</code> |
+| `$GL_PIPES_TOKEN` | GitLab API token for merge request report notes. | `string` | `false` | <code></code> |
+| `$CI_API_V4_URL` | GitLab API URL for merge request report notes. | `string` | `false` | <code></code> |
+| `$CI_PROJECT_ID` | GitLab project id for merge request report notes. | `string` | `false` | <code></code> |
+| `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `false` | <code>0</code> |
+| `$GITLAB_MR_REPORT_IDENTIFIER`<br />`$CI_JOB_NAME` | Hidden marker identifier for merge request report notes. | `string` | `false` | <code></code> |
+
 **Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
