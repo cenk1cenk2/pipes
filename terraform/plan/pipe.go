@@ -4,7 +4,6 @@ import (
 	"time"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 )
 
 type (
@@ -15,9 +14,14 @@ type (
 		RetryTries uint32
 	}
 
+	ReportConfig struct {
+		Enabled bool
+		Output  string `validate:"required_if=Enabled true"`
+	}
+
 	Pipe struct {
 		Plan
-		MergeRequestReport gitlab.MergeRequestReportConfig
+		Report ReportConfig
 	}
 )
 
@@ -29,10 +33,6 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if !P.MergeRequestReport.Enabled {
-				P.MergeRequestReport.MergeRequestId = 0
-			}
-
 			if err := p.Validate(P); err != nil {
 				return err
 			}
@@ -42,7 +42,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				TerraformPlan(tl).Job(),
-				TerraformMergeRequestReport(tl).Job(),
+				TerraformReport(tl).Job(),
 			)
 		})
 }

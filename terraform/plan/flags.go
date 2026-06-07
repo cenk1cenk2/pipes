@@ -5,10 +5,11 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 )
 
 //revive:disable:line-length-limit
+
+const reportCategory = "Report"
 
 var Flags = CombineFlags(
 	[]cli.Flag{
@@ -57,8 +58,31 @@ var Flags = CombineFlags(
 			Value:       60 * time.Second,
 			Destination: &P.Plan.RetryDelay,
 		},
+
+		&cli.BoolFlag{
+			Category: reportCategory,
+			Name:     "report.enabled",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_REPORT_ENABLED"),
+			),
+			Usage:       "Generate Terraform report artifacts.",
+			Required:    false,
+			Value:       true,
+			Destination: &P.Report.Enabled,
+		},
+
+		&cli.StringFlag{
+			Category: reportCategory,
+			Name:     "report.output",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_REPORT_OUTPUT"),
+			),
+			Usage:       "Output file for Terraform report artifact.",
+			Required:    false,
+			Value:       "terraform-report.html",
+			Destination: &P.Report.Output,
+		},
 	},
-	gitlab.NewMergeRequestReportFlags(&P.MergeRequestReport),
 )
 
 //revive:disable:unused-parameter

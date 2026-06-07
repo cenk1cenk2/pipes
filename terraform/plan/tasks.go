@@ -1,14 +1,16 @@
 package plan
 
 import (
-	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
+
+const terraformSummaryOutput = "terraform-summary-report.json"
 
 func TerraformPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
@@ -44,24 +46,14 @@ func TerraformPlan(tl *TaskList) *Task {
 		})
 }
 
-func TerraformMergeRequestReport(tl *TaskList) *Task {
-	return tl.CreateTask("merge-request-report").
+func TerraformReport(tl *TaskList) *Task {
+	return tl.CreateTask("report").
 		ShouldDisable(func(t *Task) bool {
-			if !P.MergeRequestReport.Enabled {
-				return true
-			}
-
-			if P.MergeRequestReport.MergeRequestId == 0 {
-				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
-
-				return true
-			}
-
-			return false
+			return !P.Report.Enabled
 		}).
 		Set(func(t *Task) error {
 			if P.Plan.Output == "" {
-				return fmt.Errorf("terraform plan output is required for GitLab merge request report")
+				return fmt.Errorf("terraform plan output is required for report")
 			}
 
 			t.CreateCommand(
@@ -75,38 +67,54 @@ func TerraformMergeRequestReport(tl *TaskList) *Task {
 				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command) error {
-					report, err := parseTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")))
+					plan, err := parseTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")))
 					if err != nil {
 						return err
 					}
 
-					for _, item := range []mergeRequestReportMetadata{
-						{Name: "Terraform working directory", Value: setup.P.Project.Cwd},
-						{Name: "Terraform plan file", Value: P.Plan.Output},
-						{Name: "GitLab project id", Value: P.MergeRequestReport.ProjectId},
-						{Name: "GitLab merge request", Value: fmt.Sprintf("!%d", P.MergeRequestReport.MergeRequestId)},
-						{Name: "Report identifier", Value: P.MergeRequestReport.Identifier},
+					report := buildTerraformReport(plan)
+					for _, item := range []reportMetadata{
+						{Name: "Working directory", Value: setup.P.Project.Cwd},
+						{Name: "Plan file", Value: P.Plan.Output},
 					} {
 						if item.Value != "" {
 							report.Metadata = append(report.Metadata, item)
 						}
 					}
 
-					body, err := renderMergeRequestReport(report)
+					body, err := renderReport(report)
 					if err != nil {
 						return err
 					}
 
-					result, err := gitlab.UpsertMergeRequestReport(
-						context.Background(),
-						P.MergeRequestReport,
-						body,
-					)
+					reportPath := P.Report.Output
+					if !filepath.IsAbs(reportPath) {
+						reportPath = filepath.Join(setup.P.Project.Cwd, reportPath)
+					}
+					if err := os.MkdirAll(filepath.Dir(reportPath), 0o755); err != nil {
+						return fmt.Errorf("create Terraform report directory: %w", err)
+					}
+					if err := os.WriteFile(reportPath, body, 0o644); err != nil {
+						return fmt.Errorf("write Terraform report %s: %w", reportPath, err)
+					}
+					t.Log.Infof("Wrote Terraform report artifact: %s", reportPath)
+
+					summaryReport, err := renderSummary(summarizeTerraformPlan(plan))
 					if err != nil {
 						return err
 					}
 
-					t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
+					summaryReportPath := terraformSummaryOutput
+					if !filepath.IsAbs(summaryReportPath) {
+						summaryReportPath = filepath.Join(setup.P.Project.Cwd, summaryReportPath)
+					}
+					if err := os.MkdirAll(filepath.Dir(summaryReportPath), 0o755); err != nil {
+						return fmt.Errorf("create Terraform summary report directory: %w", err)
+					}
+					if err := os.WriteFile(summaryReportPath, summaryReport, 0o644); err != nil {
+						return fmt.Errorf("write Terraform summary report %s: %w", summaryReportPath, err)
+					}
+					t.Log.Infof("Wrote Terraform summary report artifact: %s", summaryReportPath)
 
 					return nil
 				}).

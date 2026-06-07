@@ -1,0 +1,80 @@
+{{- define "resource" -}}
+{{- if and .Type .Name -}}<code>{{ .Type }}</code>/<code>{{ .Name }}</code>{{- else if .Urn -}}<code>{{ .Urn }}</code>{{- else -}}<code>unknown resource</code>{{- end -}}
+{{- end -}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pulumi report</title>
+  <style>
+    :root { color-scheme: light dark; --border: #d0d7de; --muted: #6e7781; --bg: #f6f8fa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 2rem; line-height: 1.45; }
+    h1, h2, h3 { line-height: 1.2; }
+    table { border-collapse: collapse; margin: 1rem 0; min-width: 24rem; }
+    th, td { border: 1px solid var(--border); padding: .4rem .6rem; text-align: left; }
+    th { background: var(--bg); }
+    td.number { text-align: right; }
+    code { background: var(--bg); border-radius: 4px; padding: .1rem .25rem; }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <h1>Pulumi report</h1>
+
+  {{- if .HasMetadata }}
+  <h2>Metadata</h2>
+  <table>
+    <tbody>
+    {{- if .Metadata.Stack }}
+      <tr><th>Stack</th><td><code>{{ .Metadata.Stack }}</code></td></tr>
+    {{- end }}
+    {{- if .PlanVersion }}
+      <tr><th>Plan schema version</th><td><code>{{ printf "%d" .PlanVersion }}</code></td></tr>
+    {{- end }}
+    {{- if .Manifest.Version }}
+      <tr><th>Pulumi version</th><td><code>{{ .Manifest.Version }}</code></td></tr>
+    {{- end }}
+    {{- if .Manifest.Time }}
+      <tr><th>Plan time</th><td><code>{{ .Manifest.Time }}</code></td></tr>
+    {{- end }}
+    </tbody>
+  </table>
+  {{- end }}
+
+  <h2>Summary</h2>
+  {{- if .Actions }}
+  <table>
+    <thead>
+      <tr><th>Action</th><th>Count</th></tr>
+    </thead>
+    <tbody>
+    {{- range .Actions }}
+      <tr><td><code>{{ .Action }}</code></td><td class="number">{{ .Count }}</td></tr>
+    {{- end }}
+    </tbody>
+  </table>
+  <p>Total planned resource actions: {{ .TotalActions }}.</p>
+  {{- else }}
+  <p>No resource changes were found in the saved Pulumi plan.</p>
+  {{- end }}
+
+  {{- range .Actions }}
+  <h2><code>{{ .Action }}</code></h2>
+  <h3>Resources <span class="muted">({{ len .Resources }})</span></h3>
+  <ul>
+    {{- range .Resources }}
+    <li>{{ template "resource" . }}{{ if .Urn }} <span class="muted">URN:</span> <code>{{ .Urn }}</code>{{ end }}</li>
+    {{- end }}
+  </ul>
+  {{- if .Outputs }}
+  <h3>Output names <span class="muted">({{ len .Outputs }})</span></h3>
+  <ul>
+    {{- range .Outputs }}
+    <li>{{ template "resource" .Resource }}: {{ range $index, $name := .Names }}{{ if $index }}, {{ end }}<code>{{ $name }}</code>{{ end }}</li>
+    {{- end }}
+  </ul>
+  {{- end }}
+  {{- end }}
+</body>
+</html>

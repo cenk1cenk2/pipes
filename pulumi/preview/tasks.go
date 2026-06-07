@@ -1,16 +1,16 @@
 package preview
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
+
+const pulumiSummaryOutput = "pulumi-summary-report.json"
 
 func PulumiPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
@@ -33,20 +33,10 @@ func PulumiPlan(tl *TaskList) *Task {
 		})
 }
 
-func MergeRequestReport(tl *TaskList) *Task {
-	return tl.CreateTask("gitlab", "merge-request-report").
+func ReportTask(tl *TaskList) *Task {
+	return tl.CreateTask("report").
 		ShouldDisable(func(t *Task) bool {
-			if !P.MergeRequestReportConfig.Enabled {
-				return true
-			}
-
-			if P.MergeRequestReportConfig.MergeRequestId == 0 {
-				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
-
-				return true
-			}
-
-			return false
+			return !P.Report.Enabled
 		}).
 		Set(func(t *Task) error {
 			planPath := P.Plan
@@ -59,29 +49,48 @@ func MergeRequestReport(tl *TaskList) *Task {
 				return fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
 			}
 
-			metadata := P.ReportMetadata
-			metadata.Stack = stack.P.Stack
-
-			report, err := parsePulumiPlanReport(data, metadata)
+			report, err := parsePulumiReport(data, reportMetadata{
+				Stack: stack.P.Stack,
+			})
 			if err != nil {
 				return err
 			}
 
-			body, err := renderMergeRequestReport(report)
+			body, err := renderReport(report)
 			if err != nil {
 				return err
 			}
 
-			result, err := gitlab.UpsertMergeRequestReport(
-				context.Background(),
-				P.MergeRequestReportConfig,
-				body,
-			)
+			reportPath := P.Report.Output
+			if !filepath.IsAbs(reportPath) {
+				reportPath = filepath.Join(setup.P.Cwd, reportPath)
+			}
+			if err := os.MkdirAll(filepath.Dir(reportPath), 0o755); err != nil {
+				return fmt.Errorf("create Pulumi report directory: %w", err)
+			}
+			if err := os.WriteFile(reportPath, body, 0o644); err != nil {
+				return fmt.Errorf("write Pulumi report %s: %w", reportPath, err)
+			}
+
+			t.Log.Infof("Wrote Pulumi report artifact: %s", reportPath)
+
+			summaryReport, err := renderSummary(summarizePulumiReport(report))
 			if err != nil {
 				return err
 			}
 
-			t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
+			summaryReportPath := pulumiSummaryOutput
+			if !filepath.IsAbs(summaryReportPath) {
+				summaryReportPath = filepath.Join(setup.P.Cwd, summaryReportPath)
+			}
+			if err := os.MkdirAll(filepath.Dir(summaryReportPath), 0o755); err != nil {
+				return fmt.Errorf("create Pulumi summary report directory: %w", err)
+			}
+			if err := os.WriteFile(summaryReportPath, summaryReport, 0o644); err != nil {
+				return fmt.Errorf("write Pulumi summary report %s: %w", summaryReportPath, err)
+			}
+
+			t.Log.Infof("Wrote Pulumi summary report artifact: %s", summaryReportPath)
 
 			return nil
 		})

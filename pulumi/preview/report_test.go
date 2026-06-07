@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Pulumi plan merge request report", func() {
+var _ = Describe("Pulumi report", func() {
 	readFixture := func(name string) []byte {
 		GinkgoHelper()
 
@@ -18,20 +18,14 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		return data
 	}
 
-	metadata := func() MergeRequestReportMetadata {
-		return MergeRequestReportMetadata{
-			Stack:          "dev",
-			JobName:        "pulumi-preview",
-			JobUrl:         "https://gitlab.example.test/project/-/jobs/1",
-			PipelineId:     "42",
-			PipelineUrl:    "https://gitlab.example.test/project/-/pipelines/42",
-			CommitSha:      "0123456789abcdef",
-			CommitShortSha: "01234567",
+	metadata := func() reportMetadata {
+		return reportMetadata{
+			Stack: "dev",
 		}
 	}
 
 	It("summarizes an unwrapped Pulumi plan without rendering values", func() {
-		report, err := parsePulumiPlanReport(readFixture("plan-unwrapped.json"), metadata())
+		report, err := parsePulumiReport(readFixture("plan-unwrapped.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(report.PlanVersion).To(Equal(0))
@@ -54,20 +48,22 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Names: []string{"bucketName"},
 		}))
 
-		body, err := renderMergeRequestReport(report)
+		body, err := renderReport(report)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(body).To(ContainSubstring("Pulumi preview report"))
-		Expect(body).To(ContainSubstring("`bucketName`"))
-		Expect(body).To(ContainSubstring("`metadata`"))
-		Expect(body).NotTo(ContainSubstring("secret-config-value"))
-		Expect(body).NotTo(ContainSubstring("secret-input-value"))
-		Expect(body).NotTo(ContainSubstring("secret-output-value"))
-		Expect(body).NotTo(ContainSubstring("secret-old-value"))
-		Expect(body).NotTo(ContainSubstring("secret-new-value"))
+
+		content := string(body)
+		Expect(content).To(ContainSubstring("Pulumi report"))
+		Expect(content).To(ContainSubstring("bucketName"))
+		Expect(content).To(ContainSubstring("metadata"))
+		Expect(content).NotTo(ContainSubstring("secret-config-value"))
+		Expect(content).NotTo(ContainSubstring("secret-input-value"))
+		Expect(content).NotTo(ContainSubstring("secret-output-value"))
+		Expect(content).NotTo(ContainSubstring("secret-old-value"))
+		Expect(content).NotTo(ContainSubstring("secret-new-value"))
 	})
 
 	It("summarizes a versioned Pulumi deployment plan wrapper", func() {
-		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), metadata())
+		report, err := parsePulumiReport(readFixture("plan-versioned.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(report.PlanVersion).To(Equal(1))
@@ -93,9 +89,30 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			}))
 		}
 
-		body, err := renderMergeRequestReport(report)
+		body, err := renderReport(report)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(body).To(ContainSubstring("Plan schema version"))
-		Expect(body).NotTo(ContainSubstring("secret-arn-value"))
+		Expect(string(body)).To(ContainSubstring("Plan schema version"))
+		Expect(string(body)).NotTo(ContainSubstring("secret-arn-value"))
+	})
+
+	It("renders Pulumi summary counts", func() {
+		report, err := parsePulumiReport(readFixture("plan-versioned.json"), metadata())
+		Expect(err).NotTo(HaveOccurred())
+
+		summary := summarizePulumiReport(report)
+		Expect(summary).To(Equal(pulumiSummary{
+			Create: 1,
+			Update: 0,
+			Delete: 1,
+		}))
+
+		body, err := renderSummary(summary)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(body)).To(Equal(`{
+  "create": 1,
+  "update": 0,
+  "delete": 1
+}
+`))
 	})
 })

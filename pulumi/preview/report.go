@@ -5,10 +5,10 @@ import (
 	"cmp"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"maps"
 	"slices"
 	"strings"
-	"text/template"
 	"time"
 
 	_ "embed"
@@ -16,22 +16,16 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 )
 
-//go:embed assets/mr-report.md.gotmpl
-var mrReportTemplate string
+//go:embed assets/report.html.gotmpl
+var reportTemplate string
 
 type (
-	MergeRequestReportMetadata struct {
-		Stack          string
-		JobName        string
-		JobUrl         string
-		PipelineId     string
-		PipelineUrl    string
-		CommitSha      string
-		CommitShortSha string
+	reportMetadata struct {
+		Stack string
 	}
 
-	PulumiPlanReport struct {
-		Metadata     MergeRequestReportMetadata
+	pulumiReport struct {
+		Metadata     reportMetadata
 		PlanVersion  int
 		Manifest     PulumiPlanManifest
 		Actions      []PulumiPlanAction
@@ -61,6 +55,12 @@ type (
 		Names    []string
 	}
 
+	pulumiSummary struct {
+		Create int `json:"create"`
+		Update int `json:"update"`
+		Delete int `json:"delete"`
+	}
+
 	actionAccumulator struct {
 		Action      string
 		Count       int
@@ -85,20 +85,14 @@ var pulumiPlanActionOrder = []string{
 	"remove-pending-replace",
 }
 
-func (r PulumiPlanReport) HasMetadata() bool {
+func (r pulumiReport) HasMetadata() bool {
 	return r.Metadata.Stack != "" ||
-		r.Metadata.JobName != "" ||
-		r.Metadata.JobUrl != "" ||
-		r.Metadata.PipelineId != "" ||
-		r.Metadata.PipelineUrl != "" ||
-		r.Metadata.CommitSha != "" ||
-		r.Metadata.CommitShortSha != "" ||
 		r.PlanVersion != 0 ||
 		r.Manifest.Version != "" ||
 		r.Manifest.Time != ""
 }
 
-func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*PulumiPlanReport, error) {
+func parsePulumiReport(data []byte, metadata reportMetadata) (*pulumiReport, error) {
 	plan, planVersion, err := parsePulumiPlan(data)
 	if err != nil {
 		return nil, err
@@ -135,7 +129,7 @@ func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*P
 		}
 	}
 
-	report := &PulumiPlanReport{
+	report := &pulumiReport{
 		Metadata:    metadata,
 		PlanVersion: planVersion,
 		Manifest: PulumiPlanManifest{
@@ -152,19 +146,53 @@ func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*P
 	return report, nil
 }
 
-func renderMergeRequestReport(report *PulumiPlanReport) (string, error) {
-	tmpl, err := template.New("mr-report.md.gotmpl").
-		Parse(mrReportTemplate)
+func renderReport(report *pulumiReport) ([]byte, error) {
+	tmpl, err := template.New("report.html.gotmpl").
+		Parse(reportTemplate)
 	if err != nil {
-		return "", fmt.Errorf("parse Pulumi merge request report template: %w", err)
+		return nil, fmt.Errorf("parse Pulumi report template: %w", err)
 	}
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, report); err != nil {
-		return "", fmt.Errorf("render Pulumi merge request report: %w", err)
+		return nil, fmt.Errorf("render Pulumi report: %w", err)
 	}
 
-	return strings.TrimRight(buf.String(), "\n") + "\n", nil
+	return buf.Bytes(), nil
+}
+
+func summarizePulumiReport(report *pulumiReport) pulumiSummary {
+	summary := pulumiSummary{}
+	hasReplacementDetails := slices.ContainsFunc(report.Actions, func(action PulumiPlanAction) bool {
+		return action.Action == "create-replacement" || action.Action == "delete-replaced"
+	})
+
+	for _, action := range report.Actions {
+		switch action.Action {
+		case "create", "create-replacement":
+			summary.Create += action.Count
+		case "update", "update-replacement":
+			summary.Update += action.Count
+		case "delete", "delete-replaced":
+			summary.Delete += action.Count
+		case "replace":
+			if !hasReplacementDetails {
+				summary.Create += action.Count
+				summary.Delete += action.Count
+			}
+		}
+	}
+
+	return summary
+}
+
+func renderSummary(summary pulumiSummary) ([]byte, error) {
+	data, err := json.MarshalIndent(summary, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("render Pulumi summary report: %w", err)
+	}
+
+	return append(data, '\n'), nil
 }
 
 func parsePulumiPlan(data []byte) (apitype.DeploymentPlanV1, int, error) {

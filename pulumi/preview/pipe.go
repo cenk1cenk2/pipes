@@ -2,14 +2,17 @@ package preview
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 )
 
 type (
+	ReportConfig struct {
+		Enabled bool
+		Output  string `validate:"required_if=Enabled true"`
+	}
+
 	Pipe struct {
-		Plan string
-		gitlab.MergeRequestReportConfig
-		ReportMetadata MergeRequestReportMetadata
+		Plan   string
+		Report ReportConfig
 	}
 
 	Ctx struct {
@@ -25,10 +28,6 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if !P.MergeRequestReportConfig.Enabled {
-				P.MergeRequestReportConfig.MergeRequestId = 0
-			}
-
 			if err := p.Validate(P); err != nil {
 				return err
 			}
@@ -38,7 +37,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				PulumiPlan(tl).Job(),
-				MergeRequestReport(tl).Job(),
+				ReportTask(tl).Job(),
 			)
 		})
 }

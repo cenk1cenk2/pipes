@@ -26,27 +26,12 @@ Preview the Pulumi changes.
 | `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
 | `$PULUMI_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
 
-**Gitlab Merge Request Report**
+**Report**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GITLAB_MR_REPORT_ENABLED` | Enable GitLab merge request report note on the given merge request. | `bool` | `false` | <code>false</code> |
-| `$GL_PIPES_TOKEN` | GitLab API token for merge request report notes. | `string` | `false` | <code></code> |
-| `$CI_API_V4_URL` | GitLab API URL for merge request report notes. | `string` | `false` | <code></code> |
-| `$CI_PROJECT_ID` | GitLab project id for merge request report notes. | `string` | `false` | <code></code> |
-| `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `false` | <code>0</code> |
-| `$GITLAB_MR_REPORT_IDENTIFIER`<br />`$CI_JOB_NAME` | Hidden marker identifier for merge request report notes. | `string` | `false` | <code></code> |
-
-**Gitlab Pipeline**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CI_JOB_NAME` | GitLab CI job name to include in merge request report metadata. | `string` | `false` | <code></code> |
-| `$CI_JOB_URL` | GitLab CI job URL to include in merge request report metadata. | `string` | `false` | <code></code> |
-| `$CI_PIPELINE_ID` | GitLab CI pipeline id to include in merge request report metadata. | `string` | `false` | <code></code> |
-| `$CI_PIPELINE_URL` | GitLab CI pipeline URL to include in merge request report metadata. | `string` | `false` | <code></code> |
-| `$CI_COMMIT_SHA` | Git commit sha to include in merge request report metadata. | `string` | `false` | <code></code> |
-| `$CI_COMMIT_SHORT_SHA` | Short git commit sha to include in merge request report metadata. | `string` | `false` | <code></code> |
+| `$PULUMI_REPORT_ENABLED` | Generate Pulumi report artifact. | `bool` | `false` | <code>true</code> |
+| `$PULUMI_REPORT_OUTPUT` | Output file for Pulumi report artifact. | `string` | `false` | <code>"pulumi-report.html"</code> |
 
 **pulumi**
 

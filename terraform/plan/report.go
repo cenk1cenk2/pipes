@@ -6,43 +6,49 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"maps"
 	"slices"
 	"strings"
-	"text/template"
 
 	tfjson "github.com/hashicorp/terraform-json"
 )
 
-//go:embed assets/mr-report.md.gotmpl
-var mergeRequestReportTemplate string
+//go:embed assets/report.html.gotmpl
+var reportTemplate string
 
 type (
-	mergeRequestReport struct {
-		Metadata       []mergeRequestReportMetadata
-		Summary        []mergeRequestReportSummary
-		ResourceGroups []mergeRequestReportGroup
-		OutputGroups   []mergeRequestReportGroup
+	terraformReport struct {
+		Metadata       []reportMetadata
+		Summary        []reportSummary
+		ResourceGroups []reportGroup
+		OutputGroups   []reportGroup
 	}
 
-	mergeRequestReportMetadata struct {
+	reportMetadata struct {
 		Name  string
 		Value string
 	}
 
-	mergeRequestReportSummary struct {
+	reportSummary struct {
 		Action        string
 		ResourceCount int
 		OutputCount   int
 	}
 
-	mergeRequestReportGroup struct {
+	reportGroup struct {
 		Action string
 		Items  []string
 	}
+
+	terraformSummary struct {
+		Create int `json:"create"`
+		Update int `json:"update"`
+		Delete int `json:"delete"`
+	}
 )
 
-var mergeRequestReportActionOrder = []string{
+var reportActionOrder = []string{
 	"create",
 	"update",
 	"delete",
@@ -53,7 +59,7 @@ var mergeRequestReportActionOrder = []string{
 	"unknown",
 }
 
-func parseTerraformShowPlan(output []byte) (*mergeRequestReport, error) {
+func parseTerraformShowPlan(output []byte) (*tfjson.Plan, error) {
 	var plan tfjson.Plan
 
 	decoder := json.NewDecoder(bytes.NewReader(output))
@@ -64,6 +70,10 @@ func parseTerraformShowPlan(output []byte) (*mergeRequestReport, error) {
 		return nil, fmt.Errorf("validate terraform show -json output: %w", err)
 	}
 
+	return &plan, nil
+}
+
+func buildTerraformReport(plan *tfjson.Plan) *terraformReport {
 	resources := map[string][]string{}
 	for _, change := range plan.ResourceChanges {
 		if change == nil || change.Change == nil {
@@ -92,11 +102,43 @@ func parseTerraformShowPlan(output []byte) (*mergeRequestReport, error) {
 		outputs[action] = append(outputs[action], name)
 	}
 
-	return &mergeRequestReport{
-		Summary:        mergeRequestReportSummaryItems(resources, outputs),
-		ResourceGroups: mergeRequestReportGroups(resources),
-		OutputGroups:   mergeRequestReportGroups(outputs),
-	}, nil
+	return &terraformReport{
+		Summary:        reportSummaryItems(resources, outputs),
+		ResourceGroups: reportGroups(resources),
+		OutputGroups:   reportGroups(outputs),
+	}
+}
+
+func summarizeTerraformPlan(plan *tfjson.Plan) terraformSummary {
+	report := terraformSummary{}
+
+	for _, change := range plan.ResourceChanges {
+		if change == nil || change.Change == nil {
+			continue
+		}
+
+		for _, action := range change.Change.Actions {
+			switch action {
+			case tfjson.ActionCreate:
+				report.Create++
+			case tfjson.ActionUpdate:
+				report.Update++
+			case tfjson.ActionDelete:
+				report.Delete++
+			}
+		}
+	}
+
+	return report
+}
+
+func renderSummary(report terraformSummary) ([]byte, error) {
+	data, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("render Terraform summary report: %w", err)
+	}
+
+	return append(data, '\n'), nil
 }
 
 func terraformChangeAction(actions tfjson.Actions) string {
@@ -116,14 +158,14 @@ func terraformChangeAction(actions tfjson.Actions) string {
 	return strings.Join(names, "+")
 }
 
-func mergeRequestReportSummaryItems(
+func reportSummaryItems(
 	resources map[string][]string,
 	outputs map[string][]string,
-) []mergeRequestReportSummary {
-	summary := []mergeRequestReportSummary{}
+) []reportSummary {
+	summary := []reportSummary{}
 
-	for _, action := range mergeRequestReportActions(resources, outputs) {
-		summary = append(summary, mergeRequestReportSummary{
+	for _, action := range reportActions(resources, outputs) {
+		summary = append(summary, reportSummary{
 			Action:        action,
 			ResourceCount: len(resources[action]),
 			OutputCount:   len(outputs[action]),
@@ -133,11 +175,11 @@ func mergeRequestReportSummaryItems(
 	return summary
 }
 
-func mergeRequestReportGroups(items map[string][]string) []mergeRequestReportGroup {
-	groups := []mergeRequestReportGroup{}
+func reportGroups(items map[string][]string) []reportGroup {
+	groups := []reportGroup{}
 
-	for _, action := range mergeRequestReportActions(items) {
-		groups = append(groups, mergeRequestReportGroup{
+	for _, action := range reportActions(items) {
+		groups = append(groups, reportGroup{
 			Action: action,
 			Items:  slices.Sorted(slices.Values(items[action])),
 		})
@@ -146,7 +188,7 @@ func mergeRequestReportGroups(items map[string][]string) []mergeRequestReportGro
 	return groups
 }
 
-func mergeRequestReportActions(groups ...map[string][]string) []string {
+func reportActions(groups ...map[string][]string) []string {
 	actions := []string{}
 	for _, group := range groups {
 		actions = slices.Concat(actions, slices.Collect(maps.Keys(group)))
@@ -155,11 +197,11 @@ func mergeRequestReportActions(groups ...map[string][]string) []string {
 	actions = slices.Compact(actions)
 
 	actionRank := func(action string) int {
-		if rank := slices.Index(mergeRequestReportActionOrder, action); rank >= 0 {
+		if rank := slices.Index(reportActionOrder, action); rank >= 0 {
 			return rank
 		}
 
-		return len(mergeRequestReportActionOrder)
+		return len(reportActionOrder)
 	}
 
 	slices.SortFunc(actions, func(left, right string) int {
@@ -173,17 +215,17 @@ func mergeRequestReportActions(groups ...map[string][]string) []string {
 	return actions
 }
 
-func renderMergeRequestReport(report *mergeRequestReport) (string, error) {
-	tmpl, err := template.New("mr-report.md.gotmpl").
-		Parse(mergeRequestReportTemplate)
+func renderReport(report *terraformReport) ([]byte, error) {
+	tmpl, err := template.New("report.html.gotmpl").
+		Parse(reportTemplate)
 	if err != nil {
-		return "", fmt.Errorf("parse GitLab merge request report template: %w", err)
+		return nil, fmt.Errorf("parse Terraform report template: %w", err)
 	}
 
 	var body bytes.Buffer
 	if err := tmpl.Execute(&body, report); err != nil {
-		return "", fmt.Errorf("render GitLab merge request report template: %w", err)
+		return nil, fmt.Errorf("render Terraform report template: %w", err)
 	}
 
-	return body.String(), nil
+	return body.Bytes(), nil
 }
