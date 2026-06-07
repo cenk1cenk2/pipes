@@ -6,6 +6,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.10.0
 	github.com/cenk1cenk2/plumber/v6 v6.3.27
 	github.com/docker/docker v28.5.2+incompatible
+	github.com/go-playground/validator/v10 v10.30.2
 	github.com/hashicorp/terraform-json v0.27.2
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
@@ -52,7 +53,6 @@ require (
 	github.com/go-openapi/swag/yamlutils v0.25.5 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.30.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/golang/glog v1.2.5 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
