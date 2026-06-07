@@ -21,6 +21,17 @@ var Flags = CombineFlags(
 			Value:       "plan.json",
 			Destination: &P.Plan,
 		},
+
+		&cli.StringFlag{
+			Name: "pulumi.preview.summary-output",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("PULUMI_SUMMARY_OUTPUT"),
+			),
+			Usage:       "Output file for Pulumi preview summary. Leave empty to skip summary generation.",
+			Required:    false,
+			Value:       "pulumi-summary.json",
+			Destination: &P.Summary.Output,
+		},
 	},
 	gitlab.NewMergeRequestReportFlags(&P.MergeRequestReportConfig),
 	[]cli.Flag{

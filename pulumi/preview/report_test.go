@@ -54,6 +54,22 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Names: []string{"bucketName"},
 		}))
 
+		summary := summarizePulumiReport(report)
+		Expect(summary).To(Equal(pulumiSummary{
+			Create: 1,
+			Update: 1,
+			Delete: 0,
+		}))
+
+		summaryBody, err := renderSummary(summary)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(summaryBody)).To(Equal(`{
+  "create": 1,
+  "update": 1,
+  "delete": 0
+}
+`))
+
 		body, err := renderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("Pulumi preview report"))
@@ -92,6 +108,13 @@ var _ = Describe("Pulumi plan merge request report", func() {
 				Names: []string{"arn"},
 			}))
 		}
+
+		summary := summarizePulumiReport(report)
+		Expect(summary).To(Equal(pulumiSummary{
+			Create: 1,
+			Update: 0,
+			Delete: 1,
+		}))
 
 		body, err := renderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())

@@ -61,6 +61,12 @@ type (
 		Names    []string
 	}
 
+	pulumiSummary struct {
+		Create int `json:"create"`
+		Update int `json:"update"`
+		Delete int `json:"delete"`
+	}
+
 	actionAccumulator struct {
 		Action      string
 		Count       int
@@ -165,6 +171,40 @@ func renderMergeRequestReport(report *PulumiPlanReport) (string, error) {
 	}
 
 	return strings.TrimRight(buf.String(), "\n") + "\n", nil
+}
+
+func summarizePulumiReport(report *PulumiPlanReport) pulumiSummary {
+	summary := pulumiSummary{}
+	hasReplacementDetails := slices.ContainsFunc(report.Actions, func(action PulumiPlanAction) bool {
+		return action.Action == "create-replacement" || action.Action == "delete-replaced"
+	})
+
+	for _, action := range report.Actions {
+		switch action.Action {
+		case "create", "create-replacement":
+			summary.Create += action.Count
+		case "update", "update-replacement":
+			summary.Update += action.Count
+		case "delete", "delete-replaced":
+			summary.Delete += action.Count
+		case "replace":
+			if !hasReplacementDetails {
+				summary.Create += action.Count
+				summary.Delete += action.Count
+			}
+		}
+	}
+
+	return summary
+}
+
+func renderSummary(summary pulumiSummary) ([]byte, error) {
+	body, err := json.MarshalIndent(summary, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("render Pulumi summary: %w", err)
+	}
+
+	return append(body, '\n'), nil
 }
 
 func parsePulumiPlan(data []byte) (apitype.DeploymentPlanV1, int, error) {

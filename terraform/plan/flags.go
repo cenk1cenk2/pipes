@@ -57,6 +57,17 @@ var Flags = CombineFlags(
 			Value:       60 * time.Second,
 			Destination: &P.Plan.RetryDelay,
 		},
+
+		&cli.StringFlag{
+			Name: "terraform-plan.summary-output",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_SUMMARY_OUTPUT"),
+			),
+			Usage:       "Output file for terraform plan summary. Leave empty to skip summary generation.",
+			Required:    false,
+			Value:       "terraform-summary.json",
+			Destination: &P.Summary.Output,
+		},
 	},
 	gitlab.NewMergeRequestReportFlags(&P.MergeRequestReport),
 )
