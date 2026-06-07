@@ -2,11 +2,14 @@ package preview
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 )
 
 type (
 	Pipe struct {
 		Plan string
+		gitlab.MergeRequestReportConfig
+		ReportMetadata MergeRequestReportMetadata
 	}
 
 	Ctx struct {
@@ -31,6 +34,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				PulumiPlan(tl).Job(),
+				MergeRequestReport(tl).Job(),
 			)
 		})
 }
