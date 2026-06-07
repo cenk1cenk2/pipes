@@ -535,6 +535,8 @@ update-docker-hub-readme:
           "description": "Updates the README on DockerHub for given repository."
         }
       ]
+  tags:
+    - docker
   script:
     - pipe
   rules:
