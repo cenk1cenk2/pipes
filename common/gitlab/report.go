@@ -15,11 +15,11 @@ const (
 
 type MergeRequestReportConfig struct {
 	Enabled        bool
-	Token          string `validate:"required_if=Enabled true"`
-	ApiUrl         string `validate:"required_if=Enabled true"`
-	ProjectId      string `validate:"required_if=Enabled true"`
+	Token          string `validate:"required_with=MergeRequestId"`
+	ApiUrl         string `validate:"required_with=MergeRequestId"`
+	ProjectId      string `validate:"required_with=MergeRequestId"`
 	MergeRequestId int64  `validate:"omitempty,gt=0"`
-	Identifier     string `validate:"required_if=Enabled true,omitempty,printascii,excludes=-->"`
+	Identifier     string `validate:"required_with=MergeRequestId,omitempty,printascii,excludes=-->"`
 }
 
 type MergeRequestReportResult struct {
