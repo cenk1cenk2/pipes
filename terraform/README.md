@@ -106,6 +106,8 @@ Plan terraform project.
 | `$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
 | `$TF_PLAN_CACHE`<br />`$TF_APPLY_OUTPUT`<br />`$TF_PLAN_OUTPUT` | Output file for terraform plan. | `string` | `false` | <code>"plan"</code> |
 | `$TF_PLAN_ARGS` | Additional arguments for terraform plan. | `string` | `false` | <code></code> |
+| `$TF_PLAN_PREVIEW_FOR_MRS` | Run merge request terraform plans as previews without state locking. | `bool` | `false` | <code>true</code> |
+| `$CI_PIPELINE_SOURCE` | GitLab CI pipeline source used to detect merge request pipelines. | `string` | `false` | <code></code> |
 | `$TF_PLAN_RETRY_TRIES` | Number of retries for terraform plan command. | `uint` | `false` | <code>5</code> |
 | `$TF_PLAN_RETRY_DELAY` | Delay between retries for terraform plan command. | `duration` | `false` | <code>1m0s</code> |
 | `$TERRAFORM_SUMMARY_OUTPUT` | Output file for terraform plan summary. Leave empty to skip summary generation. | `string` | `false` | <code>"terraform-summary.json"</code> |
