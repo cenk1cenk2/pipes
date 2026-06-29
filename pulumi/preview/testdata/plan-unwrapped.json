@@ -51,6 +51,15 @@
       "state": {
         "metadata": "secret-new-value"
       }
+    },
+    "urn:pulumi:dev::example::aws:iam/role:Role::task": {
+      "goal": {
+        "type": "aws:iam/role:Role",
+        "name": "task"
+      },
+      "steps": [
+        "same"
+      ]
     }
   }
 }

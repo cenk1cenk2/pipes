@@ -80,6 +80,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Expect(body).NotTo(ContainSubstring("secret-output-value"))
 		Expect(body).NotTo(ContainSubstring("secret-old-value"))
 		Expect(body).NotTo(ContainSubstring("secret-new-value"))
+		Expect(body).NotTo(ContainSubstring("aws:iam/role:Role"))
 	})
 
 	It("summarizes a versioned Pulumi deployment plan wrapper", func() {
