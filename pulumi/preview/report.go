@@ -114,6 +114,9 @@ func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*P
 
 	for urn, resource := range plan.ResourcePlans {
 		steps := resourceActions(resource)
+		steps = slices.DeleteFunc(steps, func(action string) bool {
+			return action == "same"
+		})
 		if len(steps) == 0 {
 			continue
 		}
