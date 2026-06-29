@@ -9,10 +9,12 @@ import (
 
 type (
 	Plan struct {
-		Args       string
-		Output     string
-		RetryDelay time.Duration
-		RetryTries uint32
+		Args                    string
+		Output                  string
+		PipelineSource          string
+		PreviewForMergeRequests bool
+		RetryDelay              time.Duration
+		RetryTries              uint32
 	}
 
 	Summary struct {
@@ -49,6 +51,7 @@ func New(p *Plumber) *TaskList {
 				TerraformPlan(tl).Job(),
 				TerraformSummary(tl).Job(),
 				TerraformMergeRequestReport(tl).Job(),
+				TerraformPlanCleanup(tl).Job(),
 			)
 		})
 }

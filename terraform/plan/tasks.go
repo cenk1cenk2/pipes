@@ -29,6 +29,10 @@ func TerraformPlan(tl *TaskList) *Task {
 						c.AppendArgs(P.Plan.Args)
 					}
 
+					if P.Plan.PreviewForMergeRequests && P.Plan.PipelineSource == "merge_request_event" {
+						c.AppendArgs("-lock=false")
+					}
+
 					return nil
 				}).
 				SetDir(setup.P.Project.Cwd).
@@ -179,5 +183,34 @@ func TerraformMergeRequestReport(tl *TaskList) *Task {
 		}).
 		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
+		})
+}
+
+func TerraformPlanCleanup(tl *TaskList) *Task {
+	return tl.CreateTask("cleanup").
+		ShouldDisable(func(t *Task) bool {
+			if !P.Plan.PreviewForMergeRequests || P.Plan.PipelineSource != "merge_request_event" {
+				return true
+			}
+
+			if P.Plan.Output == "" {
+				return true
+			}
+
+			return false
+		}).
+		Set(func(t *Task) error {
+			output := P.Plan.Output
+			if !filepath.IsAbs(output) {
+				output = filepath.Join(setup.P.Project.Cwd, output)
+			}
+
+			if err := os.Remove(output); err != nil {
+				return fmt.Errorf("remove Terraform plan file %s: %w", output, err)
+			}
+
+			t.Log.Infof("Removed Terraform plan file: %s", output)
+
+			return nil
 		})
 }

@@ -36,6 +36,28 @@ var Flags = CombineFlags(
 			Destination: &P.Plan.Args,
 		},
 
+		&cli.BoolFlag{
+			Name: "terraform-plan.preview-for-mrs",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TF_PLAN_PREVIEW_FOR_MRS"),
+			),
+			Usage:       "Run merge request terraform plans as previews without state locking.",
+			Required:    false,
+			Value:       true,
+			Destination: &P.Plan.PreviewForMergeRequests,
+		},
+
+		&cli.StringFlag{
+			Name: "terraform-plan.pipeline-source",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("CI_PIPELINE_SOURCE"),
+			),
+			Usage:       "GitLab CI pipeline source used to detect merge request pipelines.",
+			Required:    false,
+			Value:       "",
+			Destination: &P.Plan.PipelineSource,
+		},
+
 		&cli.Uint32Flag{
 			Name: "terraform-plan.retry-tries",
 			Sources: cli.NewValueSourceChain(
