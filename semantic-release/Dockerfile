@@ -12,6 +12,7 @@ ENV PATH="${PATH}:${PNPM_HOME}/bin:${SEMANTIC_RELEASE_HOME}/node_modules/.bin"
 
 RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
+  (command -v corepack > /dev/null 2>&1 || npm install --global corepack@latest) && \
   corepack enable && corepack prepare pnpm@latest --activate && \
   mkdir -p ${SEMANTIC_RELEASE_HOME} && \
   cd ${SEMANTIC_RELEASE_HOME} && \
