@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile-upstream:master-labs
-ARG NODE_VERSION=24-alpine
+ARG NODE_VERSION
 ARG PULUMI_VERSION=latest
 
 FROM docker.io/pulumi/pulumi-nodejs:${PULUMI_VERSION} AS pulumi

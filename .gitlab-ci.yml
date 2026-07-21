@@ -264,12 +264,12 @@ pipe-node:
               CONTAINER_IMAGE_TAGS: |-
                 {{ env "NODE_VERSION" }}
               NODE_VERSION:
-                - 20
-                - 20-alpine
                 - 22
                 - 22-alpine
                 - 24
                 - 24-alpine
+                - 26
+                - 26-alpine
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
@@ -313,7 +313,7 @@ pipe-pulumi:
                 {{ env "PULUMI_VERSION" }}-node
               PULUMI_VERSION:
                 - latest
-              NODE_VERSION: 24-alpine
+              NODE_VERSION: 26-alpine
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
@@ -385,7 +385,7 @@ pipe-semantic-release:
           container-matrix:
             - CONTAINER_FILE_NAME: Dockerfile
               CONTAINER_IMAGE_BUILD_ARGS: |-
-                NODE_VERSION: 24-alpine
+                NODE_VERSION: 26-alpine
               CONTAINER_IMAGE_TAGS: |-
                 latest
   rules:
