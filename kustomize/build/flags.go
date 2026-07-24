@@ -23,7 +23,7 @@ var Flags = CombineFlags(
 			),
 			Usage:       "Enable the Helm chart inflation generator while building overlays.",
 			Required:    false,
-			Value:       false,
+			Value:       true,
 			Destination: &P.EnableHelm,
 		},
 
@@ -47,7 +47,7 @@ var Flags = CombineFlags(
 			),
 			Usage:       "Load restrictor for Kustomize file access. format(enum(\"rootOnly\", \"none\"))",
 			Required:    false,
-			Value:       "rootOnly",
+			Value:       "none",
 			Destination: &P.LoadRestrictor,
 		},
 

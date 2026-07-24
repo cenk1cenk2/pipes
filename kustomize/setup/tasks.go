@@ -47,11 +47,21 @@ func DiscoverOverlays(tl *TaskList) *Task {
 
 			for _, pattern := range P.DiscoveryPattern {
 				match, err := glob.Glob(fs, pattern)
+
 				if err != nil {
 					return err
 				}
 
 				matches = append(matches, match...)
+			}
+
+			if len(matches) == 0 {
+				t.Log.Warnf(
+					"Can not discover any Kustomize overlays with the given patterns: %s",
+					strings.Join(P.DiscoveryPattern, ", "),
+				)
+
+				return nil
 			}
 
 			overlays := []string{}
@@ -60,15 +70,6 @@ func DiscoverOverlays(tl *TaskList) *Task {
 			}
 
 			overlays = slices.Compact(slices.Sorted(slices.Values(overlays)))
-
-			if len(overlays) == 0 {
-				t.Log.Warnf(
-					"Can not discover any Kustomize overlays with the given patterns: %s",
-					strings.Join(P.DiscoveryPattern, ", "),
-				)
-
-				return nil
-			}
 
 			t.Log.Debugf("Discovered Kustomize overlays: %s", strings.Join(overlays, ", "))
 
