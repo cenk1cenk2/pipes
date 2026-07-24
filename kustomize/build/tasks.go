@@ -63,21 +63,6 @@ func RenderOverlays(tl *TaskList) *Task {
 		})
 }
 
-func writeOverlay(overlay string, result OverlayResult) error {
-	name := strings.ReplaceAll(filepath.Clean(overlay), string(os.PathSeparator), "_")
-	name = strings.Trim(name, "._")
-	if name == "" {
-		name = "root"
-	}
-
-	output := filepath.Join(P.Output, fmt.Sprintf("%s.yaml", name))
-	if err := os.WriteFile(output, result.Yaml, 0o644); err != nil {
-		return fmt.Errorf("Can not write rendered Kustomize overlay: %s: %w", output, err)
-	}
-
-	return nil
-}
-
 func MergeRequestReport(tl *TaskList) *Task {
 	return tl.CreateTask("merge-request-report").
 		ShouldDisable(func(t *Task) bool {
@@ -126,4 +111,19 @@ func MergeRequestReport(tl *TaskList) *Task {
 
 			return nil
 		})
+}
+
+func writeOverlay(overlay string, result OverlayResult) error {
+	name := strings.ReplaceAll(filepath.Clean(overlay), string(os.PathSeparator), "_")
+	name = strings.Trim(name, "._")
+	if name == "" {
+		name = "root"
+	}
+
+	output := filepath.Join(P.Output, fmt.Sprintf("%s.yaml", name))
+	if err := os.WriteFile(output, result.Yaml, 0o644); err != nil {
+		return fmt.Errorf("Can not write rendered Kustomize overlay: %s: %w", output, err)
+	}
+
+	return nil
 }

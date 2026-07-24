@@ -71,7 +71,7 @@ func DiscoverOverlays(tl *TaskList) *Task {
 
 			dirs = slices.Compact(slices.Sorted(slices.Values(dirs)))
 
-			if P.DiscoveryStrategy == DISCOVERY_STRATEGY_ROOTS {
+			if P.DiscoveryStrategy == string(DiscoveryStrategyRoots) {
 				dirs = rootOverlays(dirs)
 			}
 

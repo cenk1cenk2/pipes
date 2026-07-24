@@ -13,8 +13,11 @@ import (
 func renderOverlay(root string, p *Pipe) OverlayResult {
 	opts := krusty.MakeDefaultOptions()
 
-	if p.LoadRestrictor == "none" {
+	switch LoadRestrictor(p.LoadRestrictor) {
+	case LoadRestrictorNone:
 		opts.LoadRestrictions = types.LoadRestrictionsNone
+	case LoadRestrictorRootOnly:
+		opts.LoadRestrictions = types.LoadRestrictionsRootOnly
 	}
 
 	if p.EnableHelm {

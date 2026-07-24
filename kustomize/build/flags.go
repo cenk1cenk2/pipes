@@ -8,8 +8,13 @@ import (
 
 //revive:disable:line-length-limit
 
+type LoadRestrictor string
+
 const (
 	CATEGORY_KUSTOMIZE_BUILD = "Kustomize Build"
+
+	LoadRestrictorRootOnly LoadRestrictor = "rootOnly"
+	LoadRestrictorNone     LoadRestrictor = "none"
 )
 
 var Flags = CombineFlags(
@@ -45,9 +50,9 @@ var Flags = CombineFlags(
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("KUSTOMIZE_LOAD_RESTRICTOR"),
 			),
-			Usage:       "Load restrictor for Kustomize file access. format(enum(\"rootOnly\", \"none\"))",
+			Usage:       "Load restrictor for Kustomize file access. \"rootOnly\" restricts loads to the overlay root, \"none\" allows loading files outside the overlay directory (matches ArgoCD). format(enum(\"rootOnly\", \"none\"))",
 			Required:    false,
-			Value:       "none",
+			Value:       string(LoadRestrictorNone),
 			Destination: &P.LoadRestrictor,
 		},
 

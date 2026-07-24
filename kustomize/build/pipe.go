@@ -38,6 +38,9 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
+			// Drop the merge request id when reporting is disabled so the
+			// required_with=MergeRequestId validation on the report config does
+			// not trip on an id populated from the CI environment.
 			if !P.MergeRequestReport.Enabled {
 				P.MergeRequestReport.MergeRequestId = 0
 			}
