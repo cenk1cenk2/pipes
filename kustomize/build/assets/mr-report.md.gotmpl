@@ -1,0 +1,39 @@
+## Kustomize build report
+
+{{- if .Overlays }}
+| Overlay | Status | Resources |
+| --- | --- | ---: |
+{{- range .Overlays }}
+| `{{ .Overlay }}` | {{ .Status }} | {{ .DocCount }} |
+{{- end }}
+
+**{{ .Summary.Succeeded }}/{{ .Summary.Total }}** overlays built successfully{{ if .Summary.Failed }}, **{{ .Summary.Failed }}** failed{{ end }}.
+{{- else }}
+No Kustomize overlays were discovered.
+{{- end }}
+
+{{- if .Summary.Failed }}
+
+### Failures
+{{- range .Overlays }}
+{{- if eq .Status "failed" }}
+
+#### `{{ .Overlay }}`
+
+```
+{{ .Error }}
+```
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- if .Metadata }}
+
+### Metadata
+
+| Name | Value |
+| --- | --- |
+{{- range .Metadata }}
+| {{ .Name }} | `{{ .Value }}` |
+{{- end }}
+{{- end }}
