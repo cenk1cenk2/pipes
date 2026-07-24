@@ -8,6 +8,9 @@ import (
 
 const (
 	CATEGORY_KUSTOMIZE = "Kustomize"
+
+	DISCOVERY_STRATEGY_ROOTS = "roots"
+	DISCOVERY_STRATEGY_ALL   = "all"
 )
 
 var Flags = []cli.Flag{
@@ -49,5 +52,17 @@ var Flags = []cli.Flag{
 			"**/Kustomization",
 		},
 		Destination: &P.DiscoveryPattern,
+	},
+
+	&cli.StringFlag{
+		Category: CATEGORY_KUSTOMIZE,
+		Name:     "kustomize.discovery-strategy",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("KUSTOMIZE_DISCOVERY_STRATEGY"),
+		),
+		Usage:       "How to filter discovered overlays. \"roots\" keeps only overlays that are not nested under another discovered overlay, mirroring what ArgoCD renders. \"all\" keeps every discovered kustomization, including nested ones. format(enum(\"roots\", \"all\"))",
+		Required:    false,
+		Value:       DISCOVERY_STRATEGY_ROOTS,
+		Destination: &P.DiscoveryStrategy,
 	},
 }

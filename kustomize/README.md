@@ -19,28 +19,7 @@ Kustomize operations for CI pipelines.
 
 Build and validate Kustomize overlays.
 
-Discovers every Kustomize overlay under the working directory and builds each one in parallel through the Kustomize library. On merge request pipelines it can upsert a report note that lists the build status and rendered resource count per overlay.
-
 #### Flags
-
-**Kustomize**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$KUSTOMIZE_ROOT` | Working directory for Kustomize commands. | `string` | `false` | <code>"."</code> |
-| `$KUSTOMIZE_PATHS` | Explicit overlay paths to build relative to the working directory. When set, overlay discovery is skipped. | `string[]` | `false` | <code></code> |
-| `$KUSTOMIZE_DISCOVERY_PATTERN` | Glob patterns to discover Kustomize overlays under the working directory. | `string[]` | `false` | <code>["**/kustomization.yaml", "**/kustomization.yml", "**/Kustomization"]</code> |
-
-**Kustomize Build**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$KUSTOMIZE_ENABLE_HELM` | Enable the Helm chart inflation generator while building overlays. | `bool` | `false` | <code>false</code> |
-| `$KUSTOMIZE_HELM_COMMAND` | Helm binary to use for the Helm chart inflation generator. | `string` | `false` | <code>"helm"</code> |
-| `$KUSTOMIZE_LOAD_RESTRICTOR` | Load restrictor for Kustomize file access. | `string`<br/>`enum("rootOnly", "none")` | `false` | <code>"rootOnly"</code> |
-| `$KUSTOMIZE_KUBE_VERSION` | Kubernetes version passed to the Helm chart inflation generator. | `string` | `false` | <code></code> |
-| `$KUSTOMIZE_BUILD_OUTPUT` | Output directory to write the rendered manifests per overlay. Leave empty to skip writing. | `string` | `false` | <code></code> |
-| `$KUSTOMIZE_BUILD_FAIL_FAST` | Fail on the first overlay that can not be built instead of collecting all results. | `bool` | `false` | <code>false</code> |
 
 **Gitlab Merge Request Report**
 
@@ -52,3 +31,23 @@ Discovers every Kustomize overlay under the working directory and builds each on
 | `$CI_PROJECT_ID` | GitLab project id for merge request report notes. | `string` | `false` | <code></code> |
 | `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `false` | <code>0</code> |
 | `$GITLAB_MR_REPORT_IDENTIFIER`<br />`$CI_JOB_NAME` | Hidden marker identifier for merge request report notes. | `string` | `false` | <code></code> |
+
+**Kustomize**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$KUSTOMIZE_ROOT` | Working directory for Kustomize commands. | `string` | `false` | <code>"."</code> |
+| `$KUSTOMIZE_PATHS` | Explicit overlay paths to build relative to the working directory. When set, overlay discovery is skipped. | `string[]` | `false` | <code></code> |
+| `$KUSTOMIZE_DISCOVERY_PATTERN` | Glob patterns to discover Kustomize overlays under the working directory. | `string[]`<br/>`format(glob)` | `false` | <code>"**/kustomization.yaml", "**/kustomization.yml", "**/Kustomization"</code> |
+| `$KUSTOMIZE_DISCOVERY_STRATEGY` | How to filter discovered overlays. "roots" keeps only overlays that are not nested under another discovered overlay, mirroring what ArgoCD renders. "all" keeps every discovered kustomization, including nested ones. | `string`<br/>`format(enum("roots", "all"))` | `false` | <code>"roots"</code> |
+
+**Kustomize Build**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$KUSTOMIZE_ENABLE_HELM` | Enable the Helm chart inflation generator while building overlays. | `bool` | `false` | <code>true</code> |
+| `$KUSTOMIZE_HELM_COMMAND` | Helm binary to use for the Helm chart inflation generator. | `string` | `false` | <code>"helm"</code> |
+| `$KUSTOMIZE_LOAD_RESTRICTOR` | Load restrictor for Kustomize file access. | `string`<br/>`format(enum("rootOnly", "none"))` | `false` | <code>"none"</code> |
+| `$KUSTOMIZE_KUBE_VERSION` | Kubernetes version passed to the Helm chart inflation generator. | `string` | `false` | <code></code> |
+| `$KUSTOMIZE_BUILD_OUTPUT` | Output directory to write the rendered manifests per overlay. Leave empty to skip writing. | `string` | `false` | <code></code> |
+| `$KUSTOMIZE_BUILD_FAIL_FAST` | Fail on the first overlay that can not be built instead of collecting all results. | `bool` | `false` | <code>false</code> |

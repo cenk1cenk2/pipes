@@ -6,6 +6,10 @@ import (
 	"sigs.k8s.io/kustomize/kyaml/filesys"
 )
 
+// renderOverlay builds a single overlay through the Kustomize library. The
+// enable-helm and load-restrictor defaults mirror ArgoCD's global
+// kustomize.buildOptions (--enable-helm --load-restrictor LoadRestrictionsNone),
+// so overlays validate here the same way ArgoCD renders them in the cluster.
 func renderOverlay(root string, p *Pipe) OverlayResult {
 	opts := krusty.MakeDefaultOptions()
 

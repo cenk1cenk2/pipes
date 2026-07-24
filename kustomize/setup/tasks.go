@@ -64,12 +64,21 @@ func DiscoverOverlays(tl *TaskList) *Task {
 				return nil
 			}
 
-			overlays := []string{}
+			dirs := make([]string, 0, len(matches))
 			for _, match := range matches {
-				overlays = append(overlays, filepath.Join(cwd, filepath.Dir(match)))
+				dirs = append(dirs, filepath.Dir(match))
 			}
 
-			overlays = slices.Compact(slices.Sorted(slices.Values(overlays)))
+			dirs = slices.Compact(slices.Sorted(slices.Values(dirs)))
+
+			if P.DiscoveryStrategy == DISCOVERY_STRATEGY_ROOTS {
+				dirs = rootOverlays(dirs)
+			}
+
+			overlays := make([]string, 0, len(dirs))
+			for _, dir := range dirs {
+				overlays = append(overlays, filepath.Join(cwd, dir))
+			}
 
 			t.Log.Debugf("Discovered Kustomize overlays: %s", strings.Join(overlays, ", "))
 
@@ -77,4 +86,34 @@ func DiscoverOverlays(tl *TaskList) *Task {
 
 			return nil
 		})
+}
+
+// rootOverlays keeps only overlay directories that are not nested under another
+// discovered overlay. ArgoCD points at the top-level overlay (e.g.
+// .deploy/<cluster>) and pulls nested kustomizations in through resources:, so
+// rendering each nested one standalone is redundant and can fail on relative
+// paths that only resolve from the parent context.
+func rootOverlays(dirs []string) []string {
+	set := make(map[string]struct{}, len(dirs))
+	for _, dir := range dirs {
+		set[dir] = struct{}{}
+	}
+
+	roots := make([]string, 0, len(dirs))
+	for _, dir := range dirs {
+		nested := false
+		for parent := filepath.Dir(dir); parent != "." && parent != string(filepath.Separator); parent = filepath.Dir(parent) {
+			if _, ok := set[parent]; ok {
+				nested = true
+
+				break
+			}
+		}
+
+		if !nested {
+			roots = append(roots, dir)
+		}
+	}
+
+	return roots
 }

@@ -6,9 +6,10 @@ import (
 
 type (
 	Pipe struct {
-		Cwd              string `validate:"omitempty,dirpath"`
-		Paths            []string
-		DiscoveryPattern []string
+		Cwd               string `validate:"omitempty,dirpath"`
+		Paths             []string
+		DiscoveryPattern  []string
+		DiscoveryStrategy string `validate:"omitempty,oneof=roots all"`
 	}
 
 	Ctx struct {
