@@ -27,6 +27,9 @@ includes:
   helm:
     dir: ./helm
     taskfile: ./Taskfile.pipe.yml
+  kustomize:
+    dir: ./kustomize
+    taskfile: ./Taskfile.pipe.yml
   node:
     dir: ./node
     taskfile: ./Taskfile.pipe.yml
@@ -54,6 +57,7 @@ tasks:
       - task: "buildah:{{ .command }}"
       - task: "go:{{ .command }}"
       - task: "helm:{{ .command }}"
+      - task: "kustomize:{{ .command }}"
       - task: "node:{{ .command }}"
       - task: "pulumi:{{ .command }}"
       - task: "select-env:{{ .command }}"
