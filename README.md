@@ -15,6 +15,7 @@ This repository still builds and publishes the pipe images used by `devops/pipel
 - [`cenk1cenk2/pipe-buildah`](./buildah/README.md)
 - [`cenk1cenk2/pipe-go`](./go/README.md)
 - [`cenk1cenk2/pipe-helm`](./helm/README.md)
+- [`cenk1cenk2/pipe-kustomize`](./kustomize/README.md)
 - [`cenk1cenk2/pipe-node`](./node/README.md)
 - [`cenk1cenk2/pipe-pulumi`](./pulumi/README.md)
 - [`cenk1cenk2/pipe-select-env`](./select-env/README.md)
