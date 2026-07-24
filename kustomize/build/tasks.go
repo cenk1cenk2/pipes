@@ -1,14 +1,12 @@
 package build
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
 	"gitlab.kilic.dev/devops/pipes/kustomize/setup"
 )
 
@@ -34,13 +32,7 @@ func RenderOverlays(tl *TaskList) *Task {
 						t.Lock.Unlock()
 
 						if result.Err != nil {
-							if P.FailFast {
-								return fmt.Errorf("Can not build Kustomize overlay: %s: %w", overlay, result.Err)
-							}
-
-							t.Log.Warnf("Failed to build Kustomize overlay: %s: %v", overlay, result.Err)
-
-							return nil
+							return fmt.Errorf("Can not build Kustomize overlay: %s: %w", overlay, result.Err)
 						}
 
 						t.Log.Infof("Built Kustomize overlay: %s (%d resources)", overlay, result.DocCount)
@@ -60,56 +52,6 @@ func RenderOverlays(tl *TaskList) *Task {
 		}).
 		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
-		})
-}
-
-func MergeRequestReport(tl *TaskList) *Task {
-	return tl.CreateTask("merge-request-report").
-		ShouldDisable(func(t *Task) bool {
-			if !P.MergeRequestReport.Enabled {
-				return true
-			}
-
-			if P.MergeRequestReport.MergeRequestId == 0 {
-				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
-
-				return true
-			}
-
-			return false
-		}).
-		Set(func(t *Task) error {
-			report := newMergeRequestReport(C.Results)
-
-			for _, item := range []mergeRequestReportMetadata{
-				{Name: "Kustomize working directory", Value: setup.P.Cwd},
-				{Name: "Overlays built", Value: fmt.Sprintf("%d", report.Summary.Total)},
-				{Name: "GitLab project id", Value: P.MergeRequestReport.ProjectId},
-				{Name: "GitLab merge request", Value: fmt.Sprintf("!%d", P.MergeRequestReport.MergeRequestId)},
-				{Name: "Report identifier", Value: P.MergeRequestReport.Identifier},
-			} {
-				if item.Value != "" {
-					report.Metadata = append(report.Metadata, item)
-				}
-			}
-
-			body, err := renderMergeRequestReport(report)
-			if err != nil {
-				return err
-			}
-
-			result, err := gitlab.UpsertMergeRequestReport(
-				context.Background(),
-				P.MergeRequestReport,
-				body,
-			)
-			if err != nil {
-				return err
-			}
-
-			t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
-
-			return nil
 		})
 }
 
