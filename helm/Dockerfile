@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile-upstream:master-labs
-FROM docker.io/alpine/helm:latest
+FROM docker.io/alpine/helm:4
 
 ARG BUILDOS
 ARG BUILDARCH
