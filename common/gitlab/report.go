@@ -184,8 +184,49 @@ func selectMergeRequestReportNote(notes []*clientgitlab.Note, marker string, leg
 	return nil
 }
 
+// The three calls the upsert makes against a merge request's notes, narrowed from
+// the client so the note bookkeeping below can be driven without a GitLab to talk to.
+// Signatures mirror clientgitlab.NotesService exactly.
+type mergeRequestNotes interface {
+	ListMergeRequestNotes(
+		pid any,
+		mergeRequest int64,
+		opt *clientgitlab.ListMergeRequestNotesOptions,
+		options ...clientgitlab.RequestOptionFunc,
+	) ([]*clientgitlab.Note, *clientgitlab.Response, error)
+	CreateMergeRequestNote(
+		pid any,
+		mergeRequest int64,
+		opt *clientgitlab.CreateMergeRequestNoteOptions,
+		options ...clientgitlab.RequestOptionFunc,
+	) (*clientgitlab.Note, *clientgitlab.Response, error)
+	UpdateMergeRequestNote(
+		pid any,
+		mergeRequest, note int64,
+		opt *clientgitlab.UpdateMergeRequestNoteOptions,
+		options ...clientgitlab.RequestOptionFunc,
+	) (*clientgitlab.Note, *clientgitlab.Response, error)
+}
+
 func UpsertMergeRequestReport(
 	ctx context.Context,
+	config MergeRequestReportConfig,
+	body string,
+) (*MergeRequestReportResult, error) {
+	client, err := clientgitlab.NewClient(
+		config.Token,
+		clientgitlab.WithBaseURL(config.ApiUrl),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("create GitLab client: %w", err)
+	}
+
+	return upsertMergeRequestReport(ctx, client.Notes, config, body)
+}
+
+func upsertMergeRequestReport(
+	ctx context.Context,
+	notes mergeRequestNotes,
 	config MergeRequestReportConfig,
 	body string,
 ) (*MergeRequestReportResult, error) {
@@ -207,19 +248,11 @@ func UpsertMergeRequestReport(
 		legacyMarkers = append(legacyMarkers, mergeRequestReportMarker(legacy))
 	}
 
-	client, err := clientgitlab.NewClient(
-		config.Token,
-		clientgitlab.WithBaseURL(config.ApiUrl),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("create GitLab client: %w", err)
-	}
-
-	notes := []*clientgitlab.Note{}
+	listed := []*clientgitlab.Note{}
 	page := int64(1)
 
 	for {
-		existing, response, err := client.Notes.ListMergeRequestNotes(
+		existing, response, err := notes.ListMergeRequestNotes(
 			config.ProjectId,
 			config.MergeRequestId,
 			&clientgitlab.ListMergeRequestNotesOptions{
@@ -234,7 +267,7 @@ func UpsertMergeRequestReport(
 			return nil, fmt.Errorf("list GitLab merge request notes: %w", err)
 		}
 
-		notes = append(notes, existing...)
+		listed = append(listed, existing...)
 
 		if response == nil || response.NextPage == 0 {
 			break
@@ -243,10 +276,10 @@ func UpsertMergeRequestReport(
 		page = response.NextPage
 	}
 
-	note := selectMergeRequestReportNote(notes, marker, legacyMarkers)
+	note := selectMergeRequestReportNote(listed, marker, legacyMarkers)
 
 	if note != nil {
-		updated, _, err := client.Notes.UpdateMergeRequestNote(
+		updated, _, err := notes.UpdateMergeRequestNote(
 			config.ProjectId,
 			config.MergeRequestId,
 			note.ID,
@@ -266,7 +299,7 @@ func UpsertMergeRequestReport(
 		}, nil
 	}
 
-	created, _, err := client.Notes.CreateMergeRequestNote(
+	created, _, err := notes.CreateMergeRequestNote(
 		config.ProjectId,
 		config.MergeRequestId,
 		&clientgitlab.CreateMergeRequestNoteOptions{
