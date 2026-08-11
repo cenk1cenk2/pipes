@@ -2,65 +2,18 @@ package preview
 
 import (
 	"bytes"
-	"cmp"
 	"encoding/json"
 	"fmt"
 	"maps"
 	"slices"
 	"strings"
-	"text/template"
 	"time"
 
-	_ "embed"
-
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 )
 
-//go:embed assets/mr-report.md.gotmpl
-var mrReportTemplate string
-
 type (
-	MergeRequestReportMetadata struct {
-		Stack          string
-		JobName        string
-		JobUrl         string
-		PipelineId     string
-		PipelineUrl    string
-		CommitSha      string
-		CommitShortSha string
-	}
-
-	PulumiPlanReport struct {
-		Metadata     MergeRequestReportMetadata
-		PlanVersion  int
-		Manifest     PulumiPlanManifest
-		Actions      []PulumiPlanAction
-		TotalActions int
-	}
-
-	PulumiPlanManifest struct {
-		Time    string
-		Version string
-	}
-
-	PulumiPlanAction struct {
-		Action    string
-		Count     int
-		Resources []PulumiPlanResource
-		Outputs   []PulumiPlanOutput
-	}
-
-	PulumiPlanResource struct {
-		Urn  string
-		Type string
-		Name string
-	}
-
-	PulumiPlanOutput struct {
-		Resource PulumiPlanResource
-		Names    []string
-	}
-
 	pulumiSummary struct {
 		Create int `json:"create"`
 		Update int `json:"update"`
@@ -69,8 +22,7 @@ type (
 
 	actionAccumulator struct {
 		Action      string
-		Count       int
-		Resources   map[string]PulumiPlanResource
+		Resources   map[string]iac.Resource
 		OutputNames map[string][]string
 	}
 )
@@ -91,23 +43,16 @@ var pulumiPlanActionOrder = []string{
 	"remove-pending-replace",
 }
 
-func (r PulumiPlanReport) HasMetadata() bool {
-	return r.Metadata.Stack != "" ||
-		r.Metadata.JobName != "" ||
-		r.Metadata.JobUrl != "" ||
-		r.Metadata.PipelineId != "" ||
-		r.Metadata.PipelineUrl != "" ||
-		r.Metadata.CommitSha != "" ||
-		r.Metadata.CommitShortSha != "" ||
-		r.PlanVersion != 0 ||
-		r.Manifest.Version != "" ||
-		r.Manifest.Time != ""
-}
-
-func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*PulumiPlanReport, error) {
+func parsePulumiPlanReport(data []byte, metadata iac.Metadata) (iac.Report, error) {
 	plan, planVersion, err := parsePulumiPlan(data)
 	if err != nil {
-		return nil, err
+		return iac.Report{}, err
+	}
+
+	metadata.ToolVersion = plan.Manifest.Version
+	metadata.PlanTime = formatManifestTime(plan.Manifest.Time)
+	if planVersion != 0 {
+		metadata.PlanSchema = fmt.Sprintf("%d", planVersion)
 	}
 
 	accumulators := map[string]*actionAccumulator{}
@@ -129,71 +74,52 @@ func parsePulumiPlanReport(data []byte, metadata MergeRequestReportMetadata) (*P
 			if accumulator == nil {
 				accumulator = &actionAccumulator{
 					Action:      action,
-					Resources:   map[string]PulumiPlanResource{},
+					Resources:   map[string]iac.Resource{},
 					OutputNames: map[string][]string{},
 				}
 				accumulators[action] = accumulator
 			}
 
-			accumulator.Count++
-			accumulator.Resources[summary.Urn] = summary
+			accumulator.Resources[summary.Id] = summary
 
 			if len(outputNames) > 0 {
-				accumulator.OutputNames[summary.Urn] = outputNames
+				accumulator.OutputNames[summary.Id] = outputNames
 			}
 		}
 	}
 
-	report := &PulumiPlanReport{
-		Metadata:    metadata,
-		PlanVersion: planVersion,
-		Manifest: PulumiPlanManifest{
-			Time:    formatManifestTime(plan.Manifest.Time),
-			Version: plan.Manifest.Version,
+	return iac.Report{
+		Title: "Pulumi preview report",
+		Labels: iac.Labels{
+			Target:      "Stack",
+			Outputs:     "Output properties",
+			ToolVersion: "Pulumi version",
 		},
-		Actions: buildPulumiPlanActions(accumulators),
-	}
-
-	for _, action := range report.Actions {
-		report.TotalActions += action.Count
-	}
-
-	return report, nil
+		Metadata: metadata,
+		Actions:  buildPulumiPlanActions(accumulators),
+	}, nil
 }
 
-func renderMergeRequestReport(report *PulumiPlanReport) (string, error) {
-	tmpl, err := template.New("mr-report.md.gotmpl").
-		Parse(mrReportTemplate)
-	if err != nil {
-		return "", fmt.Errorf("parse Pulumi merge request report template: %w", err)
-	}
-
-	var buf bytes.Buffer
-	if err := tmpl.Execute(&buf, report); err != nil {
-		return "", fmt.Errorf("render Pulumi merge request report: %w", err)
-	}
-
-	return strings.TrimRight(buf.String(), "\n") + "\n", nil
-}
-
-func summarizePulumiReport(report *PulumiPlanReport) pulumiSummary {
+func summarizePulumiReport(report iac.Report) pulumiSummary {
 	summary := pulumiSummary{}
-	hasReplacementDetails := slices.ContainsFunc(report.Actions, func(action PulumiPlanAction) bool {
+	hasReplacementDetails := slices.ContainsFunc(report.Actions, func(action iac.Action) bool {
 		return action.Action == "create-replacement" || action.Action == "delete-replaced"
 	})
 
 	for _, action := range report.Actions {
+		count := len(action.Resources)
+
 		switch action.Action {
 		case "create", "create-replacement":
-			summary.Create += action.Count
+			summary.Create += count
 		case "update", "update-replacement":
-			summary.Update += action.Count
+			summary.Update += count
 		case "delete", "delete-replaced":
-			summary.Delete += action.Count
+			summary.Delete += count
 		case "replace":
 			if !hasReplacementDetails {
-				summary.Create += action.Count
-				summary.Delete += action.Count
+				summary.Create += count
+				summary.Delete += count
 			}
 		}
 	}
@@ -264,28 +190,43 @@ func resourceActions(resource apitype.ResourcePlanV1) []string {
 	return actions
 }
 
-func resourceSummary(urn string, plan apitype.ResourcePlanV1) PulumiPlanResource {
-	summary := PulumiPlanResource{
-		Urn: urn,
-	}
+func resourceSummary(urn string, plan apitype.ResourcePlanV1) iac.Resource {
+	resourceType := ""
+	name := ""
 
 	if plan.Goal != nil {
-		summary.Type = string(plan.Goal.Type)
-		summary.Name = plan.Goal.Name
+		resourceType = string(plan.Goal.Type)
+		name = plan.Goal.Name
 	}
 
-	if summary.Type == "" || summary.Name == "" {
-		urnType, urnName := splitPulumiUrn(summary.Urn)
-		if summary.Type == "" {
-			summary.Type = urnType
+	if resourceType == "" || name == "" {
+		urnType, urnName := splitPulumiUrn(urn)
+		if resourceType == "" {
+			resourceType = urnType
 		}
 
-		if summary.Name == "" {
-			summary.Name = urnName
+		if name == "" {
+			name = urnName
 		}
 	}
 
-	return summary
+	return iac.Resource{
+		Name: pulumiResourceName(resourceType, name),
+		Id:   urn,
+	}
+}
+
+func pulumiResourceName(resourceType string, name string) string {
+	switch {
+	case resourceType != "" && name != "":
+		return fmt.Sprintf("%s/%s", resourceType, name)
+	case name != "":
+		return name
+	case resourceType != "":
+		return resourceType
+	}
+
+	return "unknown resource"
 }
 
 func resourceOutputNames(resource apitype.ResourcePlanV1) []string {
@@ -294,6 +235,7 @@ func resourceOutputNames(resource apitype.ResourcePlanV1) []string {
 	}
 
 	diff := resource.Goal.OutputDiff
+
 	return sortedUniqueStrings(slices.Concat(
 		slices.Collect(maps.Keys(diff.Adds)),
 		diff.Deletes,
@@ -301,48 +243,31 @@ func resourceOutputNames(resource apitype.ResourcePlanV1) []string {
 	))
 }
 
-func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []PulumiPlanAction {
-	actions := make([]PulumiPlanAction, 0, len(accumulators))
+func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []iac.Action {
+	actions := make([]iac.Action, 0, len(accumulators))
 
 	for _, accumulator := range accumulators {
 		resources := slices.Collect(maps.Values(accumulator.Resources))
-		slices.SortFunc(resources, func(left, right PulumiPlanResource) int {
-			return cmp.Compare(left.Urn, right.Urn)
+		slices.SortFunc(resources, func(left, right iac.Resource) int {
+			return strings.Compare(left.Id, right.Id)
 		})
 
-		outputs := make([]PulumiPlanOutput, 0, len(accumulator.OutputNames))
+		outputs := make([]iac.Output, 0, len(accumulator.OutputNames))
 		for _, urn := range slices.Sorted(maps.Keys(accumulator.OutputNames)) {
-			outputs = append(outputs, PulumiPlanOutput{
-				Resource: accumulator.Resources[urn],
-				Names:    sortedUniqueStrings(accumulator.OutputNames[urn]),
+			outputs = append(outputs, iac.Output{
+				Name:   accumulator.Resources[urn].Name,
+				Fields: sortedUniqueStrings(accumulator.OutputNames[urn]),
 			})
 		}
 
-		action := PulumiPlanAction{
+		actions = append(actions, iac.Action{
 			Action:    accumulator.Action,
-			Count:     accumulator.Count,
 			Resources: resources,
 			Outputs:   outputs,
-		}
-
-		actions = append(actions, action)
+		})
 	}
 
-	actionRank := func(action string) int {
-		if rank := slices.Index(pulumiPlanActionOrder, action); rank >= 0 {
-			return rank
-		}
-
-		return len(pulumiPlanActionOrder)
-	}
-
-	slices.SortFunc(actions, func(left, right PulumiPlanAction) int {
-		if rank := cmp.Compare(actionRank(left.Action), actionRank(right.Action)); rank != 0 {
-			return rank
-		}
-
-		return cmp.Compare(left.Action, right.Action)
-	})
+	iac.SortActions(actions, pulumiPlanActionOrder)
 
 	return actions
 }

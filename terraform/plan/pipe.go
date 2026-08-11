@@ -5,6 +5,7 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/gitlab"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 )
 
 type (
@@ -25,6 +26,7 @@ type (
 		Plan
 		Summary
 		MergeRequestReport gitlab.MergeRequestReportConfig
+		ReportMetadata     iac.Metadata
 	}
 )
 

@@ -8,9 +8,23 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/gitlab"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
+
+// Only the values that actually vary between concurrent preview jobs on one merge
+// request belong in the marker, since anything else changes the identifier for every
+// consumer without disambiguating anything.
+func pulumiReportDiscriminators() []string {
+	discriminators := []string{stack.P.Stack}
+
+	if cwd := setup.P.Cwd; cwd != "" && cwd != "." {
+		discriminators = append(discriminators, cwd)
+	}
+
+	return discriminators
+}
 
 func PulumiPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
@@ -55,7 +69,7 @@ func PulumiSummary(tl *TaskList) *Task {
 				return fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
 			}
 
-			report, err := parsePulumiPlanReport(data, MergeRequestReportMetadata{})
+			report, err := parsePulumiPlanReport(data, iac.Metadata{})
 			if err != nil {
 				return err
 			}
@@ -80,14 +94,14 @@ func PulumiSummary(tl *TaskList) *Task {
 		})
 }
 
-func MergeRequestReport(tl *TaskList) *Task {
-	return tl.CreateTask("gitlab", "merge-request-report").
+func PulumiMergeRequestReport(tl *TaskList) *Task {
+	return tl.CreateTask("merge-request-report").
 		ShouldDisable(func(t *Task) bool {
-			if !P.MergeRequestReportConfig.Enabled {
+			if !P.MergeRequestReport.Enabled {
 				return true
 			}
 
-			if P.MergeRequestReportConfig.MergeRequestId == 0 {
+			if P.MergeRequestReport.MergeRequestId == 0 {
 				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
 
 				return true
@@ -107,28 +121,42 @@ func MergeRequestReport(tl *TaskList) *Task {
 			}
 
 			metadata := P.ReportMetadata
-			metadata.Stack = stack.P.Stack
+			metadata.Target = stack.P.Stack
+			metadata.Cwd = setup.P.Cwd
 
 			report, err := parsePulumiPlanReport(data, metadata)
 			if err != nil {
 				return err
 			}
 
-			body, err := renderMergeRequestReport(report)
+			body, err := iac.RenderMergeRequestReport(report)
 			if err != nil {
 				return err
 			}
 
+			config := P.MergeRequestReport
+			config.Identifier = gitlab.ResolveReportIdentifier(
+				config.Identifier,
+				metadata.JobName,
+				pulumiReportDiscriminators()...,
+			)
+			config.LegacyIdentifiers = []string{metadata.JobName}
+
 			result, err := gitlab.UpsertMergeRequestReport(
 				context.Background(),
-				P.MergeRequestReportConfig,
+				config,
 				body,
 			)
 			if err != nil {
 				return err
 			}
 
-			t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
+			t.Log.Infof(
+				"Merge request report note %s: %d (identifier: %s)",
+				result.Action(),
+				result.NoteId,
+				result.Identifier,
+			)
 
 			return nil
 		})

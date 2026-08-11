@@ -1,0 +1,90 @@
+{{- define "resource" -}}
+`{{ .Name }}`{{ if .Id }} (`{{ .Id }}`){{ end }}{{ if .PreviousName }} (moved from `{{ .PreviousName }}`){{ end }}
+{{- end -}}
+## {{ .Title }}
+
+This report includes only plan metadata, resource actions, resource identifiers and output names. It does not include input values, output values or diff payload values.
+
+{{- if .Metadata.Any }}
+
+### Metadata
+
+| Field | Value |
+| --- | --- |
+{{- if .Metadata.Target }}
+| {{ .Labels.Target }} | `{{ .Metadata.Target }}` |
+{{- end }}
+{{- if .Metadata.Cwd }}
+| Working directory | `{{ .Metadata.Cwd }}` |
+{{- end }}
+{{- if .Metadata.JobName }}
+| Job | {{ if .Metadata.JobUrl }}[{{ .Metadata.JobName }}]({{ .Metadata.JobUrl }}){{ else }}`{{ .Metadata.JobName }}`{{ end }} |
+{{- else if .Metadata.JobUrl }}
+| Job | [{{ .Metadata.JobUrl }}]({{ .Metadata.JobUrl }}) |
+{{- end }}
+{{- if .Metadata.PipelineId }}
+| Pipeline | {{ if .Metadata.PipelineUrl }}[{{ .Metadata.PipelineId }}]({{ .Metadata.PipelineUrl }}){{ else }}`{{ .Metadata.PipelineId }}`{{ end }} |
+{{- else if .Metadata.PipelineUrl }}
+| Pipeline | [{{ .Metadata.PipelineUrl }}]({{ .Metadata.PipelineUrl }}) |
+{{- end }}
+{{- if .Metadata.CommitShortSha }}
+| Commit | `{{ .Metadata.CommitShortSha }}` |
+{{- else if .Metadata.CommitSha }}
+| Commit | `{{ .Metadata.CommitSha }}` |
+{{- end }}
+{{- if .Metadata.ToolVersion }}
+| {{ .Labels.ToolVersion }} | `{{ .Metadata.ToolVersion }}` |
+{{- end }}
+{{- if .Metadata.PlanTime }}
+| Plan time | `{{ .Metadata.PlanTime }}` |
+{{- end }}
+{{- if .Metadata.PlanSchema }}
+| Plan schema version | `{{ .Metadata.PlanSchema }}` |
+{{- end }}
+{{- end }}
+
+### Summary
+
+{{ if .Actions -}}
+| Action | Resources | {{ .Labels.Outputs }} |
+| --- | ---: | ---: |
+{{- range .Actions }}
+| `{{ .Action }}` | {{ len .Resources }} | {{ len .Outputs }} |
+{{- end }}
+
+Total planned actions: {{ .Total }}.
+{{- else -}}
+No changes detected.
+{{- end }}
+
+{{- if .HasResources }}
+
+### Resources
+
+{{- range .Actions }}
+{{- if .Resources }}
+
+#### `{{ .Action }}` ({{ len .Resources }})
+
+{{- range .Resources }}
+- {{ template "resource" . }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- if .HasOutputs }}
+
+### {{ .Labels.Outputs }}
+
+{{- range .Actions }}
+{{- if .Outputs }}
+
+#### `{{ .Action }}` ({{ len .Outputs }})
+
+{{- range .Outputs }}
+- `{{ .Name }}`{{ if .Fields }}: {{ range $index, $field := .Fields }}{{ if $index }}, {{ end }}`{{ $field }}`{{ end }}{{ end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

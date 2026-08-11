@@ -6,6 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 )
 
 var _ = Describe("Pulumi plan merge request report", func() {
@@ -18,9 +19,10 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		return data
 	}
 
-	metadata := func() MergeRequestReportMetadata {
-		return MergeRequestReportMetadata{
-			Stack:          "dev",
+	metadata := func() iac.Metadata {
+		return iac.Metadata{
+			Target:         "dev",
+			Cwd:            ".",
 			JobName:        "pulumi-preview",
 			JobUrl:         "https://gitlab.example.test/project/-/jobs/1",
 			PipelineId:     "42",
@@ -34,24 +36,19 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		report, err := parsePulumiPlanReport(readFixture("plan-unwrapped.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(report.PlanVersion).To(Equal(0))
-		Expect(report.Manifest.Version).To(Equal("3.187.0"))
-		Expect(report.Manifest.Time).To(Equal("2026-05-31T12:00:00Z"))
-		Expect(report.TotalActions).To(Equal(2))
+		Expect(report.Metadata.PlanSchema).To(BeEmpty())
+		Expect(report.Metadata.ToolVersion).To(Equal("3.187.0"))
+		Expect(report.Metadata.PlanTime).To(Equal("2026-05-31T12:00:00Z"))
+		Expect(report.Total()).To(Equal(2))
 		Expect(report.Actions).To(HaveLen(2))
 		Expect(report.Actions[0].Action).To(Equal("create"))
-		Expect(report.Actions[0].Resources).To(ContainElement(PulumiPlanResource{
-			Urn:  "urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs",
-			Type: "aws:s3/bucket:Bucket",
-			Name: "logs",
+		Expect(report.Actions[0].Resources).To(ContainElement(iac.Resource{
+			Name: "aws:s3/bucket:Bucket/logs",
+			Id:   "urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs",
 		}))
-		Expect(report.Actions[0].Outputs).To(ConsistOf(PulumiPlanOutput{
-			Resource: PulumiPlanResource{
-				Urn:  "urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs",
-				Type: "aws:s3/bucket:Bucket",
-				Name: "logs",
-			},
-			Names: []string{"bucketName"},
+		Expect(report.Actions[0].Outputs).To(ConsistOf(iac.Output{
+			Name:   "aws:s3/bucket:Bucket/logs",
+			Fields: []string{"bucketName"},
 		}))
 
 		summary := summarizePulumiReport(report)
@@ -70,9 +67,13 @@ var _ = Describe("Pulumi plan merge request report", func() {
 }
 `))
 
-		body, err := renderMergeRequestReport(report)
+		body, err := iac.RenderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(body).To(ContainSubstring("Pulumi preview report"))
+		Expect(body).To(ContainSubstring("## Pulumi preview report"))
+		Expect(body).To(ContainSubstring("| Stack | `dev` |"))
+		Expect(body).To(ContainSubstring("| Pulumi version | `3.187.0` |"))
+		Expect(body).To(ContainSubstring("### Output properties"))
+		Expect(body).To(ContainSubstring("Total planned actions: 2."))
 		Expect(body).To(ContainSubstring("`bucketName`"))
 		Expect(body).To(ContainSubstring("`metadata`"))
 		Expect(body).NotTo(ContainSubstring("secret-config-value"))
@@ -87,26 +88,21 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(report.PlanVersion).To(Equal(1))
-		Expect(report.TotalActions).To(Equal(3))
+		Expect(report.Metadata.PlanSchema).To(Equal("1"))
+		Expect(report.Total()).To(Equal(3))
 		Expect(report.Actions).To(HaveLen(3))
 		Expect(report.Actions[0].Action).To(Equal("replace"))
 		Expect(report.Actions[1].Action).To(Equal("create-replacement"))
 		Expect(report.Actions[2].Action).To(Equal("delete-replaced"))
 
 		for _, action := range report.Actions {
-			Expect(action.Resources).To(ContainElement(PulumiPlanResource{
-				Urn:  "urn:pulumi:stage::example::aws:lambda/function:Function::worker",
-				Type: "aws:lambda/function:Function",
-				Name: "worker",
+			Expect(action.Resources).To(ContainElement(iac.Resource{
+				Name: "aws:lambda/function:Function/worker",
+				Id:   "urn:pulumi:stage::example::aws:lambda/function:Function::worker",
 			}))
-			Expect(action.Outputs).To(ConsistOf(PulumiPlanOutput{
-				Resource: PulumiPlanResource{
-					Urn:  "urn:pulumi:stage::example::aws:lambda/function:Function::worker",
-					Type: "aws:lambda/function:Function",
-					Name: "worker",
-				},
-				Names: []string{"arn"},
+			Expect(action.Outputs).To(ConsistOf(iac.Output{
+				Name:   "aws:lambda/function:Function/worker",
+				Fields: []string{"arn"},
 			}))
 		}
 
@@ -117,7 +113,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Delete: 1,
 		}))
 
-		body, err := renderMergeRequestReport(report)
+		body, err := iac.RenderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("Plan schema version"))
 		Expect(body).NotTo(ContainSubstring("secret-arn-value"))

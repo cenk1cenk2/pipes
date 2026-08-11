@@ -9,8 +9,37 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/gitlab"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
+	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
+
+// The state name only means something once it has been set away from its default,
+// which most backends never do.
+func terraformStateName() string {
+	if name := state.P.State.Name; name != "default" {
+		return name
+	}
+
+	return ""
+}
+
+// Only the values that actually vary between concurrent plan jobs on one merge
+// request belong in the marker, since anything else changes the identifier for every
+// consumer without disambiguating anything.
+func terraformReportDiscriminators() []string {
+	discriminators := []string{}
+
+	if name := terraformStateName(); name != "" {
+		discriminators = append(discriminators, name)
+	}
+
+	if cwd := setup.P.Project.Cwd; cwd != "" && cwd != "." {
+		discriminators = append(discriminators, cwd)
+	}
+
+	return discriminators
+}
 
 func TerraformPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
@@ -142,38 +171,43 @@ func TerraformMergeRequestReport(tl *TaskList) *Task {
 				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command) error {
-					report, err := parseTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")))
+					metadata := P.ReportMetadata
+					metadata.Target = terraformStateName()
+					metadata.Cwd = setup.P.Project.Cwd
+
+					report, err := parseTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")), metadata)
 					if err != nil {
 						return err
 					}
 
-					for _, item := range []mergeRequestReportMetadata{
-						{Name: "Terraform working directory", Value: setup.P.Project.Cwd},
-						{Name: "Terraform plan file", Value: P.Plan.Output},
-						{Name: "GitLab project id", Value: P.MergeRequestReport.ProjectId},
-						{Name: "GitLab merge request", Value: fmt.Sprintf("!%d", P.MergeRequestReport.MergeRequestId)},
-						{Name: "Report identifier", Value: P.MergeRequestReport.Identifier},
-					} {
-						if item.Value != "" {
-							report.Metadata = append(report.Metadata, item)
-						}
-					}
-
-					body, err := renderMergeRequestReport(report)
+					body, err := iac.RenderMergeRequestReport(report)
 					if err != nil {
 						return err
 					}
+
+					config := P.MergeRequestReport
+					config.Identifier = gitlab.ResolveReportIdentifier(
+						config.Identifier,
+						metadata.JobName,
+						terraformReportDiscriminators()...,
+					)
+					config.LegacyIdentifiers = []string{metadata.JobName}
 
 					result, err := gitlab.UpsertMergeRequestReport(
 						context.Background(),
-						P.MergeRequestReport,
+						config,
 						body,
 					)
 					if err != nil {
 						return err
 					}
 
-					t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
+					t.Log.Infof(
+						"Merge request report note %s: %d (identifier: %s)",
+						result.Action(),
+						result.NoteId,
+						result.Identifier,
+					)
 
 					return nil
 				}).
