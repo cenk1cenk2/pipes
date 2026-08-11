@@ -202,7 +202,12 @@ func TerraformMergeRequestReport(tl *TaskList) *Task {
 						return err
 					}
 
-					t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
+					t.Log.Infof(
+						"Merge request report note %s: %d (identifier: %s)",
+						result.Action(),
+						result.NoteId,
+						result.Identifier,
+					)
 
 					return nil
 				}).

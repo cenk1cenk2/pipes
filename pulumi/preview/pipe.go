@@ -14,8 +14,8 @@ type (
 	Pipe struct {
 		Plan string
 		Summary
-		gitlab.MergeRequestReportConfig
-		ReportMetadata iac.Metadata
+		MergeRequestReport gitlab.MergeRequestReportConfig
+		ReportMetadata     iac.Metadata
 	}
 
 	Ctx struct {
@@ -31,8 +31,8 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if !P.MergeRequestReportConfig.Enabled {
-				P.MergeRequestReportConfig.MergeRequestId = 0
+			if !P.MergeRequestReport.Enabled {
+				P.MergeRequestReport.MergeRequestId = 0
 			}
 
 			if err := p.Validate(P); err != nil {
@@ -45,7 +45,7 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				PulumiPlan(tl).Job(),
 				PulumiSummary(tl).Job(),
-				MergeRequestReport(tl).Job(),
+				PulumiMergeRequestReport(tl).Job(),
 			)
 		})
 }

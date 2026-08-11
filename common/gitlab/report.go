@@ -32,7 +32,24 @@ type MergeRequestReportConfig struct {
 }
 
 type MergeRequestReportResult struct {
-	NoteId int64
+	NoteId     int64
+	Identifier string
+	Created    bool
+	// Set when the note was found under an earlier identifier scheme rather than the
+	// current one, which is the only signal that a marker migration took effect.
+	AdoptedLegacy bool
+}
+
+// Reads as the past tense of what happened to the note, for the job log.
+func (r MergeRequestReportResult) Action() string {
+	switch {
+	case r.Created:
+		return "created"
+	case r.AdoptedLegacy:
+		return "adopted"
+	}
+
+	return "updated"
 }
 
 func NewMergeRequestReportFlags(config *MergeRequestReportConfig) []cli.Flag {
@@ -243,7 +260,9 @@ func UpsertMergeRequestReport(
 		}
 
 		return &MergeRequestReportResult{
-			NoteId: updated.ID,
+			NoteId:        updated.ID,
+			Identifier:    config.Identifier,
+			AdoptedLegacy: !strings.Contains(note.Body, marker),
 		}, nil
 	}
 
@@ -260,6 +279,8 @@ func UpsertMergeRequestReport(
 	}
 
 	return &MergeRequestReportResult{
-		NoteId: created.ID,
+		NoteId:     created.ID,
+		Identifier: config.Identifier,
+		Created:    true,
 	}, nil
 }

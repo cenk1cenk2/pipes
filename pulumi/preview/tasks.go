@@ -13,6 +13,19 @@ import (
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
 
+// Only the values that actually vary between concurrent preview jobs on one merge
+// request belong in the marker, since anything else changes the identifier for every
+// consumer without disambiguating anything.
+func pulumiReportDiscriminators() []string {
+	discriminators := []string{stack.P.Stack}
+
+	if cwd := setup.P.Cwd; cwd != "" && cwd != "." {
+		discriminators = append(discriminators, cwd)
+	}
+
+	return discriminators
+}
+
 func PulumiPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
 		Set(func(t *Task) error {
@@ -81,14 +94,14 @@ func PulumiSummary(tl *TaskList) *Task {
 		})
 }
 
-func MergeRequestReport(tl *TaskList) *Task {
-	return tl.CreateTask("gitlab", "merge-request-report").
+func PulumiMergeRequestReport(tl *TaskList) *Task {
+	return tl.CreateTask("merge-request-report").
 		ShouldDisable(func(t *Task) bool {
-			if !P.MergeRequestReportConfig.Enabled {
+			if !P.MergeRequestReport.Enabled {
 				return true
 			}
 
-			if P.MergeRequestReportConfig.MergeRequestId == 0 {
+			if P.MergeRequestReport.MergeRequestId == 0 {
 				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
 
 				return true
@@ -121,11 +134,11 @@ func MergeRequestReport(tl *TaskList) *Task {
 				return err
 			}
 
-			config := P.MergeRequestReportConfig
+			config := P.MergeRequestReport
 			config.Identifier = gitlab.ResolveReportIdentifier(
 				config.Identifier,
 				metadata.JobName,
-				stack.P.Stack,
+				pulumiReportDiscriminators()...,
 			)
 			config.LegacyIdentifiers = []string{metadata.JobName}
 
@@ -138,7 +151,12 @@ func MergeRequestReport(tl *TaskList) *Task {
 				return err
 			}
 
-			t.Log.Infof("Upserted GitLab merge request report note: %d", result.NoteId)
+			t.Log.Infof(
+				"Merge request report note %s: %d (identifier: %s)",
+				result.Action(),
+				result.NoteId,
+				result.Identifier,
+			)
 
 			return nil
 		})
