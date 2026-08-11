@@ -1,5 +1,7 @@
 {
   "format_version": "1.2",
+  "terraform_version": "1.9.8",
+  "timestamp": "2026-05-31T12:00:00Z",
   "resource_changes": [
     {
       "address": "aws_s3_bucket.logs",
@@ -40,6 +42,14 @@
       "change": {
         "actions": ["no-op"],
         "after": { "triggers": { "secret": "secret-noop-value" } }
+      }
+    },
+    {
+      "address": "aws_sqs_queue.jobs",
+      "previous_address": "aws_sqs_queue.legacy_jobs",
+      "change": {
+        "actions": ["no-op"],
+        "after": { "name": "secret-queue-name" }
       }
     }
   ],

@@ -2,89 +2,74 @@ package plan
 
 import (
 	"bytes"
-	"cmp"
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"maps"
 	"slices"
 	"strings"
-	"text/template"
 
 	tfjson "github.com/hashicorp/terraform-json"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 )
 
-//go:embed assets/mr-report.md.gotmpl
-var mergeRequestReportTemplate string
-
-type (
-	mergeRequestReport struct {
-		Metadata       []mergeRequestReportMetadata
-		Summary        []mergeRequestReportSummary
-		ResourceGroups []mergeRequestReportGroup
-		OutputGroups   []mergeRequestReportGroup
-	}
-
-	mergeRequestReportMetadata struct {
-		Name  string
-		Value string
-	}
-
-	mergeRequestReportSummary struct {
-		Action        string
-		ResourceCount int
-		OutputCount   int
-	}
-
-	mergeRequestReportGroup struct {
-		Action string
-		Items  []string
-	}
-
-	terraformSummary struct {
-		Create int `json:"create"`
-		Update int `json:"update"`
-		Delete int `json:"delete"`
-	}
-)
+type terraformSummary struct {
+	Create int `json:"create"`
+	Update int `json:"update"`
+	Delete int `json:"delete"`
+}
 
 var mergeRequestReportActionOrder = []string{
 	"create",
 	"update",
 	"delete",
 	"replace",
+	"move",
 	"read",
 	"import",
 	"forget",
 	"unknown",
 }
 
-func parseTerraformShowPlan(output []byte) (*mergeRequestReport, error) {
-	var plan tfjson.Plan
-
-	decoder := json.NewDecoder(bytes.NewReader(output))
-	if err := decoder.Decode(&plan); err != nil {
-		return nil, fmt.Errorf("parse terraform show -json output: %w", err)
-	}
-	if err := plan.Validate(); err != nil {
-		return nil, fmt.Errorf("validate terraform show -json output: %w", err)
+func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, error) {
+	plan, err := decodeTerraformShowPlan(output)
+	if err != nil {
+		return iac.Report{}, err
 	}
 
-	resources := map[string][]string{}
+	metadata.ToolVersion = plan.TerraformVersion
+	metadata.PlanTime = plan.Timestamp
+	metadata.PlanSchema = plan.FormatVersion
+
+	resources := map[string][]iac.Resource{}
 	for _, change := range plan.ResourceChanges {
 		if change == nil || change.Change == nil {
 			continue
 		}
 
 		action := terraformChangeAction(change.Change.Actions)
+		moved := change.PreviousAddress != "" && change.PreviousAddress != change.Address
+
+		// A resource that only moved carries no-op actions, which would otherwise drop
+		// it from the report entirely.
 		if action == "no-op" {
-			continue
+			if !moved {
+				continue
+			}
+
+			action = "move"
 		}
 
-		resources[action] = append(resources[action], change.Address)
+		resource := iac.Resource{
+			Name: change.Address,
+		}
+		if moved {
+			resource.PreviousName = change.PreviousAddress
+		}
+
+		resources[action] = append(resources[action], resource)
 	}
 
-	outputs := map[string][]string{}
+	outputs := map[string][]iac.Output{}
 	for name, change := range plan.OutputChanges {
 		if change == nil {
 			continue
@@ -95,25 +80,25 @@ func parseTerraformShowPlan(output []byte) (*mergeRequestReport, error) {
 			continue
 		}
 
-		outputs[action] = append(outputs[action], name)
+		outputs[action] = append(outputs[action], iac.Output{Name: name})
 	}
 
-	return &mergeRequestReport{
-		Summary:        mergeRequestReportSummaryItems(resources, outputs),
-		ResourceGroups: mergeRequestReportGroups(resources),
-		OutputGroups:   mergeRequestReportGroups(outputs),
+	return iac.Report{
+		Title: "Terraform plan report",
+		Labels: iac.Labels{
+			Target:      "State",
+			Outputs:     "Outputs",
+			ToolVersion: "Terraform version",
+		},
+		Metadata: metadata,
+		Actions:  mergeRequestReportActions(resources, outputs),
 	}, nil
 }
 
 func summarizeTerraformShowPlan(output []byte) (terraformSummary, error) {
-	var plan tfjson.Plan
-
-	decoder := json.NewDecoder(bytes.NewReader(output))
-	if err := decoder.Decode(&plan); err != nil {
-		return terraformSummary{}, fmt.Errorf("parse terraform show -json output: %w", err)
-	}
-	if err := plan.Validate(); err != nil {
-		return terraformSummary{}, fmt.Errorf("validate terraform show -json output: %w", err)
+	plan, err := decodeTerraformShowPlan(output)
+	if err != nil {
+		return terraformSummary{}, err
 	}
 
 	summary := terraformSummary{}
@@ -146,6 +131,20 @@ func renderSummary(summary terraformSummary) ([]byte, error) {
 	return append(body, '\n'), nil
 }
 
+func decodeTerraformShowPlan(output []byte) (tfjson.Plan, error) {
+	var plan tfjson.Plan
+
+	decoder := json.NewDecoder(bytes.NewReader(output))
+	if err := decoder.Decode(&plan); err != nil {
+		return tfjson.Plan{}, fmt.Errorf("parse terraform show -json output: %w", err)
+	}
+	if err := plan.Validate(); err != nil {
+		return tfjson.Plan{}, fmt.Errorf("validate terraform show -json output: %w", err)
+	}
+
+	return plan, nil
+}
+
 func terraformChangeAction(actions tfjson.Actions) string {
 	if len(actions) == 0 {
 		return "unknown"
@@ -163,74 +162,32 @@ func terraformChangeAction(actions tfjson.Actions) string {
 	return strings.Join(names, "+")
 }
 
-func mergeRequestReportSummaryItems(
-	resources map[string][]string,
-	outputs map[string][]string,
-) []mergeRequestReportSummary {
-	summary := []mergeRequestReportSummary{}
+func mergeRequestReportActions(
+	resources map[string][]iac.Resource,
+	outputs map[string][]iac.Output,
+) []iac.Action {
+	names := slices.Concat(slices.Collect(maps.Keys(resources)), slices.Collect(maps.Keys(outputs)))
+	slices.Sort(names)
 
-	for _, action := range mergeRequestReportActions(resources, outputs) {
-		summary = append(summary, mergeRequestReportSummary{
-			Action:        action,
-			ResourceCount: len(resources[action]),
-			OutputCount:   len(outputs[action]),
-		})
-	}
-
-	return summary
-}
-
-func mergeRequestReportGroups(items map[string][]string) []mergeRequestReportGroup {
-	groups := []mergeRequestReportGroup{}
-
-	for _, action := range mergeRequestReportActions(items) {
-		groups = append(groups, mergeRequestReportGroup{
-			Action: action,
-			Items:  slices.Sorted(slices.Values(items[action])),
-		})
-	}
-
-	return groups
-}
-
-func mergeRequestReportActions(groups ...map[string][]string) []string {
-	actions := []string{}
-	for _, group := range groups {
-		actions = slices.Concat(actions, slices.Collect(maps.Keys(group)))
-	}
-	slices.Sort(actions)
-	actions = slices.Compact(actions)
-
-	actionRank := func(action string) int {
-		if rank := slices.Index(mergeRequestReportActionOrder, action); rank >= 0 {
-			return rank
+	actions := []iac.Action{}
+	for _, name := range slices.Compact(names) {
+		action := iac.Action{
+			Action:    name,
+			Resources: slices.Clone(resources[name]),
+			Outputs:   slices.Clone(outputs[name]),
 		}
 
-		return len(mergeRequestReportActionOrder)
+		slices.SortFunc(action.Resources, func(left, right iac.Resource) int {
+			return strings.Compare(left.Name, right.Name)
+		})
+		slices.SortFunc(action.Outputs, func(left, right iac.Output) int {
+			return strings.Compare(left.Name, right.Name)
+		})
+
+		actions = append(actions, action)
 	}
 
-	slices.SortFunc(actions, func(left, right string) int {
-		if rank := cmp.Compare(actionRank(left), actionRank(right)); rank != 0 {
-			return rank
-		}
-
-		return cmp.Compare(left, right)
-	})
+	iac.SortActions(actions, mergeRequestReportActionOrder)
 
 	return actions
-}
-
-func renderMergeRequestReport(report *mergeRequestReport) (string, error) {
-	tmpl, err := template.New("mr-report.md.gotmpl").
-		Parse(mergeRequestReportTemplate)
-	if err != nil {
-		return "", fmt.Errorf("parse GitLab merge request report template: %w", err)
-	}
-
-	var body bytes.Buffer
-	if err := tmpl.Execute(&body, report); err != nil {
-		return "", fmt.Errorf("render GitLab merge request report template: %w", err)
-	}
-
-	return body.String(), nil
 }

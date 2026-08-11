@@ -8,6 +8,7 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/common/gitlab"
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
@@ -55,7 +56,7 @@ func PulumiSummary(tl *TaskList) *Task {
 				return fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
 			}
 
-			report, err := parsePulumiPlanReport(data, MergeRequestReportMetadata{})
+			report, err := parsePulumiPlanReport(data, iac.Metadata{})
 			if err != nil {
 				return err
 			}
@@ -107,21 +108,30 @@ func MergeRequestReport(tl *TaskList) *Task {
 			}
 
 			metadata := P.ReportMetadata
-			metadata.Stack = stack.P.Stack
+			metadata.Target = stack.P.Stack
+			metadata.Cwd = setup.P.Cwd
 
 			report, err := parsePulumiPlanReport(data, metadata)
 			if err != nil {
 				return err
 			}
 
-			body, err := renderMergeRequestReport(report)
+			body, err := iac.RenderMergeRequestReport(report)
 			if err != nil {
 				return err
 			}
 
+			config := P.MergeRequestReportConfig
+			config.Identifier = gitlab.ResolveReportIdentifier(
+				config.Identifier,
+				metadata.JobName,
+				stack.P.Stack,
+			)
+			config.LegacyIdentifiers = []string{metadata.JobName}
+
 			result, err := gitlab.UpsertMergeRequestReport(
 				context.Background(),
-				P.MergeRequestReportConfig,
+				config,
 				body,
 			)
 			if err != nil {
