@@ -135,15 +135,36 @@ func ResolveReportIdentifier(override string, jobName string, discriminators ...
 // Stack and state names reach the identifier from user configuration, and the
 // identifier ends up inside an HTML comment marker.
 func sanitizeReportIdentifier(value string) string {
-	value = strings.ReplaceAll(value, "-->", "")
-
-	return strings.TrimSpace(strings.Map(func(r rune) rune {
+	value = strings.Map(func(r rune) rune {
 		if r > unicode.MaxASCII || !unicode.IsPrint(r) {
 			return -1
 		}
 
 		return r
-	}, value))
+	}, value)
+
+	// One pass splices a fresh terminator out of what it leaves behind, so "--->->"
+	// would come back out as "-->" and cut the marker comment short.
+	for strings.Contains(value, "-->") {
+		value = strings.ReplaceAll(value, "-->", "")
+	}
+
+	return strings.TrimSpace(value)
+}
+
+// The note carrying the current marker always wins, wherever it sits in the
+// listing. Falling back to a legacy marker before exhausting the current one would
+// strand the note this job already owns and leave a stale plan on the merge request.
+func selectMergeRequestReportNote(notes []*clientgitlab.Note, marker string, legacy []string) *clientgitlab.Note {
+	for _, candidate := range append([]string{marker}, legacy...) {
+		if index := slices.IndexFunc(notes, func(note *clientgitlab.Note) bool {
+			return note != nil && strings.Contains(note.Body, candidate)
+		}); index >= 0 {
+			return notes[index]
+		}
+	}
+
+	return nil
 }
 
 func UpsertMergeRequestReport(
@@ -160,13 +181,13 @@ func UpsertMergeRequestReport(
 		body = fmt.Sprintf("%s\n\n%s", strings.TrimRight(body, "\n"), marker)
 	}
 
-	markers := []string{marker}
+	legacyMarkers := []string{}
 	for _, legacy := range config.LegacyIdentifiers {
 		if legacy == "" || legacy == config.Identifier {
 			continue
 		}
 
-		markers = append(markers, mergeRequestReportMarker(legacy))
+		legacyMarkers = append(legacyMarkers, mergeRequestReportMarker(legacy))
 	}
 
 	client, err := clientgitlab.NewClient(
@@ -177,7 +198,7 @@ func UpsertMergeRequestReport(
 		return nil, fmt.Errorf("create GitLab client: %w", err)
 	}
 
-	var note *clientgitlab.Note
+	notes := []*clientgitlab.Note{}
 	page := int64(1)
 
 	for {
@@ -196,21 +217,16 @@ func UpsertMergeRequestReport(
 			return nil, fmt.Errorf("list GitLab merge request notes: %w", err)
 		}
 
-		for _, n := range existing {
-			if slices.ContainsFunc(markers, func(m string) bool {
-				return strings.Contains(n.Body, m)
-			}) {
-				note = n
-				break
-			}
-		}
+		notes = append(notes, existing...)
 
-		if note != nil || response == nil || response.NextPage == 0 {
+		if response == nil || response.NextPage == 0 {
 			break
 		}
 
 		page = response.NextPage
 	}
+
+	note := selectMergeRequestReportNote(notes, marker, legacyMarkers)
 
 	if note != nil {
 		updated, _, err := client.Notes.UpdateMergeRequestNote(

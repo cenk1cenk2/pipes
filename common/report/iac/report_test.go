@@ -1,110 +1,87 @@
-package iac
+package iac_test
 
 import (
 	"strings"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 )
 
-func report(labels Labels) Report {
-	return Report{
-		Title:  "Example report",
-		Labels: labels,
-		Metadata: Metadata{
-			Target:         "example",
-			JobName:        "plan",
-			JobUrl:         "https://gitlab.example.test/project/-/jobs/1",
-			PipelineId:     "42",
-			PipelineUrl:    "https://gitlab.example.test/project/-/pipelines/42",
-			CommitShortSha: "01234567",
-			ToolVersion:    "1.0.0",
-		},
-		Actions: []Action{
-			{
-				Action:    "create",
-				Resources: []Resource{{Name: "one"}},
-				Outputs:   []Output{{Name: "first"}},
+var _ = Describe("IaC merge request report", func() {
+	report := func(labels iac.Labels) iac.Report {
+		return iac.Report{
+			Title:  "Example report",
+			Labels: labels,
+			Metadata: iac.Metadata{
+				Target:         "example",
+				JobName:        "plan",
+				JobUrl:         "https://gitlab.example.test/project/-/jobs/1",
+				PipelineId:     "42",
+				PipelineUrl:    "https://gitlab.example.test/project/-/pipelines/42",
+				CommitShortSha: "01234567",
+				ToolVersion:    "1.0.0",
 			},
-			{
-				Action:    "move",
-				Resources: []Resource{{Name: "two", PreviousName: "old-two"}},
+			Actions: []iac.Action{
+				{
+					Action:    "create",
+					Resources: []iac.Resource{{Name: "one"}},
+					Outputs:   []iac.Output{{Name: "first"}},
+				},
+				{
+					Action:    "move",
+					Resources: []iac.Resource{{Name: "two", PreviousName: "old-two"}},
+				},
 			},
-		},
+		}
 	}
-}
 
-// Both pipes render through this template, so the section skeleton is the contract
-// that keeps their reports readable side by side on one merge request.
-func TestRenderMergeRequestReportKeepsOneStructureAcrossLabels(t *testing.T) {
-	t.Parallel()
+	terraformLabels := iac.Labels{Target: "State", Outputs: "Outputs", ToolVersion: "Terraform version"}
+	pulumiLabels := iac.Labels{Target: "Stack", Outputs: "Output properties", ToolVersion: "Pulumi version"}
 
-	skeleton := func(body string) []string {
-		headings := []string{}
+	headings := func(body string) []string {
+		found := []string{}
 		for _, line := range strings.Split(body, "\n") {
 			if strings.HasPrefix(line, "#") {
-				headings = append(headings, strings.SplitN(line, " ", 2)[0])
+				found = append(found, strings.SplitN(line, " ", 2)[0])
 			}
 		}
 
-		return headings
+		return found
 	}
 
-	terraform, err := RenderMergeRequestReport(report(Labels{Target: "State", Outputs: "Outputs", ToolVersion: "Terraform version"}))
-	if err != nil {
-		t.Fatalf("render terraform flavored report: %v", err)
-	}
+	// Both pipes render through this template, so the section skeleton is the
+	// contract that keeps their reports readable side by side on one merge request.
+	It("keeps one structure whichever labels it renders", func() {
+		terraform, err := iac.RenderMergeRequestReport(report(terraformLabels))
+		Expect(err).NotTo(HaveOccurred())
 
-	pulumi, err := RenderMergeRequestReport(report(Labels{Target: "Stack", Outputs: "Output properties", ToolVersion: "Pulumi version"}))
-	if err != nil {
-		t.Fatalf("render pulumi flavored report: %v", err)
-	}
+		pulumi, err := iac.RenderMergeRequestReport(report(pulumiLabels))
+		Expect(err).NotTo(HaveOccurred())
 
-	left := strings.Join(skeleton(terraform), ",")
-	right := strings.Join(skeleton(pulumi), ",")
-	if left != right {
-		t.Fatalf("expected both flavors to share a heading skeleton, got %q and %q", left, right)
-	}
+		Expect(headings(terraform)).To(Equal(headings(pulumi)))
+		Expect(headings(terraform)).To(Equal([]string{"##", "###", "###", "###", "####", "####", "###", "####"}))
+	})
 
-	if want := "##,###,###,###,####,####,###,####"; left != want {
-		t.Fatalf("expected heading skeleton %q, got %q", want, left)
-	}
-}
+	It("names the tool specific concepts from the labels", func() {
+		body, err := iac.RenderMergeRequestReport(report(pulumiLabels))
+		Expect(err).NotTo(HaveOccurred())
 
-func TestRenderMergeRequestReportUsesLabels(t *testing.T) {
-	t.Parallel()
+		Expect(body).To(ContainSubstring("## Example report"))
+		Expect(body).To(ContainSubstring("| Stack | `example` |"))
+		Expect(body).To(ContainSubstring("| Pulumi version | `1.0.0` |"))
+		Expect(body).To(ContainSubstring("| Job | [plan](https://gitlab.example.test/project/-/jobs/1) |"))
+		Expect(body).To(ContainSubstring("### Output properties"))
+		Expect(body).To(ContainSubstring("Total planned actions: 2."))
+		Expect(body).To(ContainSubstring("- `two` (moved from `old-two`)"))
+	})
 
-	body, err := RenderMergeRequestReport(report(Labels{Target: "Stack", Outputs: "Output properties", ToolVersion: "Pulumi version"}))
-	if err != nil {
-		t.Fatalf("render report: %v", err)
-	}
+	It("says so when there is nothing to report", func() {
+		body, err := iac.RenderMergeRequestReport(iac.Report{Title: "Example report"})
+		Expect(err).NotTo(HaveOccurred())
 
-	for _, expected := range []string{
-		"## Example report",
-		"| Stack | `example` |",
-		"| Pulumi version | `1.0.0` |",
-		"| Job | [plan](https://gitlab.example.test/project/-/jobs/1) |",
-		"### Output properties",
-		"Total planned actions: 2.",
-		"- `two` (moved from `old-two`)",
-	} {
-		if !strings.Contains(body, expected) {
-			t.Fatalf("expected rendered report to contain %q, got:\n%s", expected, body)
-		}
-	}
-}
-
-func TestRenderMergeRequestReportWithoutChanges(t *testing.T) {
-	t.Parallel()
-
-	body, err := RenderMergeRequestReport(Report{Title: "Example report"})
-	if err != nil {
-		t.Fatalf("render report: %v", err)
-	}
-
-	if !strings.Contains(body, "No changes detected.") {
-		t.Fatalf("expected an empty report to say so, got:\n%s", body)
-	}
-
-	if strings.Contains(body, "### Metadata") {
-		t.Fatalf("expected no metadata section without metadata, got:\n%s", body)
-	}
-}
+		Expect(body).To(ContainSubstring("No changes detected."))
+		Expect(body).NotTo(ContainSubstring("### Metadata"))
+	})
+})

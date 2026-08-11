@@ -14,13 +14,23 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
+// The state name only means something once it has been set away from its default,
+// which most backends never do.
+func terraformStateName() string {
+	if name := state.P.State.Name; name != "default" {
+		return name
+	}
+
+	return ""
+}
+
 // Only the values that actually vary between concurrent plan jobs on one merge
 // request belong in the marker, since anything else changes the identifier for every
 // consumer without disambiguating anything.
 func terraformReportDiscriminators() []string {
 	discriminators := []string{}
 
-	if name := state.P.State.Name; name != "" && name != "default" {
+	if name := terraformStateName(); name != "" {
 		discriminators = append(discriminators, name)
 	}
 
@@ -162,7 +172,7 @@ func TerraformMergeRequestReport(tl *TaskList) *Task {
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command) error {
 					metadata := P.ReportMetadata
-					metadata.Target = state.P.State.Name
+					metadata.Target = terraformStateName()
 					metadata.Cwd = setup.P.Project.Cwd
 
 					report, err := parseTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")), metadata)
