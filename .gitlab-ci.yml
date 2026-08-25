@@ -186,9 +186,16 @@ pipe-go:
               CONTAINER_IMAGE_TAGS: |-
                 {{ env "GO_VERSION" }}
               GO_VERSION:
-                - 1.24-alpine
                 - 1.25-alpine
                 - 1.26-alpine
+            - CONTAINER_FILE_NAME: Dockerfile
+              CONTAINER_IMAGE_BUILD_ARGS: |-
+                GO_VERSION: '{{ env "GO_VERSION" }}'
+              CONTAINER_IMAGE_TAGS: |-
+                {{ env "GO_VERSION" }}
+              CONTAINER_IMAGE_TAGS_AS_LATEST: '["^heads/main$", "^tags/.*"]'
+              GO_VERSION:
+                - 1.27-alpine
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
