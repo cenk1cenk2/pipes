@@ -12,41 +12,41 @@ env:
 output: prefixed
 
 includes:
-  go-library:
-    taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-library.yml?ref_type=heads
+  go-workspace:
+    taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-workspace.yml?ref_type=heads
     flatten: true
   template:
-    dir: ./_template
+    dir: ./template
     taskfile: ./Taskfile.pipe.yml
   buildah:
-    dir: ./buildah
+    dir: ./pipes/buildah
     taskfile: ./Taskfile.pipe.yml
   go:
-    dir: ./go
+    dir: ./pipes/go
     taskfile: ./Taskfile.pipe.yml
   helm:
-    dir: ./helm
+    dir: ./pipes/helm
     taskfile: ./Taskfile.pipe.yml
   kustomize:
-    dir: ./kustomize
+    dir: ./pipes/kustomize
     taskfile: ./Taskfile.pipe.yml
   node:
-    dir: ./node
+    dir: ./pipes/node
     taskfile: ./Taskfile.pipe.yml
   pulumi:
-    dir: ./pulumi
+    dir: ./pipes/pulumi
     taskfile: ./Taskfile.pipe.yml
   select-env:
-    dir: ./select-env
+    dir: ./pipes/select-env
     taskfile: ./Taskfile.pipe.yml
   semantic-release:
-    dir: ./semantic-release
+    dir: ./pipes/semantic-release
     taskfile: ./Taskfile.pipe.yml
   terraform:
-    dir: ./terraform
+    dir: ./pipes/terraform
     taskfile: ./Taskfile.pipe.yml
   update-docker-hub-readme:
-    dir: ./update-docker-hub-readme
+    dir: ./pipes/update-docker-hub-readme
     taskfile: ./Taskfile.pipe.yml
 
 tasks:
@@ -94,4 +94,5 @@ tasks:
       - .mockery.yaml
       - "**/*.go"
       - "**/go.{mod,sum}"
+      - go.work
       - exclude: "**/test/mocks/**"

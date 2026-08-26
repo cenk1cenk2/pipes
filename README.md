@@ -12,17 +12,17 @@ Consumer-facing GitLab CI templates have moved to [`devops/pipelines`](https://g
 
 This repository still builds and publishes the pipe images used by `devops/pipelines`:
 
-- [`cenk1cenk2/pipe-buildah`](./buildah/README.md)
-- [`cenk1cenk2/pipe-go`](./go/README.md)
-- [`cenk1cenk2/pipe-helm`](./helm/README.md)
-- [`cenk1cenk2/pipe-kustomize`](./kustomize/README.md)
-- [`cenk1cenk2/pipe-node`](./node/README.md)
-- [`cenk1cenk2/pipe-pulumi`](./pulumi/README.md)
-- [`cenk1cenk2/pipe-select-env`](./select-env/README.md)
-- [`cenk1cenk2/pipe-semantic-release`](./semantic-release/README.md)
-- [`cenk1cenk2/pipe-terraform`](./terraform/README.md)
-- [`cenk1cenk2/pipe-update-docker-hub-readme`](./update-docker-hub-readme/README.md)
+- [`cenk1cenk2/pipe-buildah`](./pipes/buildah/README.md)
+- [`cenk1cenk2/pipe-go`](./pipes/go/README.md)
+- [`cenk1cenk2/pipe-helm`](./pipes/helm/README.md)
+- [`cenk1cenk2/pipe-kustomize`](./pipes/kustomize/README.md)
+- [`cenk1cenk2/pipe-node`](./pipes/node/README.md)
+- [`cenk1cenk2/pipe-pulumi`](./pipes/pulumi/README.md)
+- [`cenk1cenk2/pipe-select-env`](./pipes/select-env/README.md)
+- [`cenk1cenk2/pipe-semantic-release`](./pipes/semantic-release/README.md)
+- [`cenk1cenk2/pipe-terraform`](./pipes/terraform/README.md)
+- [`cenk1cenk2/pipe-update-docker-hub-readme`](./pipes/update-docker-hub-readme/README.md)
 
 ## Methodology
 
-The `_template` directory contains the scaffold for creating a pipe. Pipes use the [plumber](https://gitlab.kilic.dev/libraries/plumber) framework to create a CLI and execute commands in a specific order.
+The `template` directory contains the scaffold for creating a pipe, and every pipe lives under `pipes/`. Pipes use the [plumber](https://gitlab.kilic.dev/libraries/plumber) framework to create a CLI and execute commands in a specific order.

@@ -1,7 +1,8 @@
 .idea
 *.iml
 env
-**/vendor/
+/vendor/
+/.go/
 **/dist/
 **/.sonarqube
 **/node_modules

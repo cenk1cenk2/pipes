@@ -13,14 +13,6 @@ spec:
       default:
         - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
         - if: $CI_COMMIT_TAG
-    extra-path-1:
-      type: string
-      description: Extra path to watch for changes, for pipes that import from another pipe.
-      default: .never/**
-    extra-path-2:
-      type: string
-      description: Extra path to watch for changes, for pipes that import from another pipe.
-      default: .never/**
 ---
 "pipe-$[[inputs.name]]":
   stage: pipes
@@ -31,7 +23,7 @@ spec:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
-          cwd: ./$[[inputs.name]]
+          cwd: ./pipes/$[[inputs.name]]
           container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
           container-matrix: $[[inputs.container-matrix]]
           container-rules: $[[inputs.container-rules]]
@@ -42,12 +34,9 @@ spec:
           - .gitlab-ci.yml
           - .gitlab-ci.trigger.yml
           - .gitlab-ci.pipe.yml
-          - go.mod
-          - go.sum
+          - go.work
           - internal/**/*
-          - $[[inputs.name]]/**/*
-          - $[[inputs.extra-path-1]]
-          - $[[inputs.extra-path-2]]
+          - pipes/$[[inputs.name]]/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       interruptible: true
       changes:
