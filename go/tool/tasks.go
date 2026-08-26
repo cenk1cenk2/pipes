@@ -4,42 +4,27 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoTool(tl *TaskList) *Task {
-	return CreateGoToolTask(tl, CreateGoToolTaskOptions{
-		Cwd:  setup.C.Cwd,
-		Tool: P.Tool,
-		Args: P.Args,
-	})
-}
-
-type CreateGoToolTaskOptions struct {
-	Cwd  string
-	Tool string
-	Args string
-}
-
-func CreateGoToolTask(tl *TaskList, options CreateGoToolTaskOptions) *Task {
-	return tl.CreateTask("tool", options.Tool).
+func GoTool(tl *TaskList, deps Deps) *Task {
+	return tl.CreateTask("tool", P.Tool).
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"go",
 				"tool",
 			).
-				SetDir(options.Cwd).
+				SetDir(deps.Tool.Cwd).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command) error {
-					t.Log.Infof("Tool: %s in %s", options.Tool, setup.C.Cwd)
+					t.Log.Infof("Tool: %s in %s", P.Tool, deps.Tool.Cwd)
 
-					c.AppendArgs(options.Tool)
+					c.AppendArgs(P.Tool)
 
-					c.AppendArgs(strings.Split(options.Args, " ")...)
+					c.AppendArgs(strings.Split(P.Args, " ")...)
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.Env).
+				AppendEnvironment(deps.Tool.Env).
 				AddSelfToTheTask()
 
 			return nil

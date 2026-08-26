@@ -21,11 +21,6 @@ func GoEnv(tl *plumber.TaskList) *plumber.Task {
 				C.Env["GOLANGCI_LINT_CACHE"] = filepath.Join(cache, "golangci-lint")
 			}
 
-			t.CreateCommand("go", "env").
-				SetLogLevel(plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG).
-				AppendEnvironment(C.Env).
-				AddSelfToTheTask()
-
 			return nil
 		})
 }
