@@ -1,7 +1,6 @@
 package login
 
 import (
-	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
@@ -18,5 +17,3 @@ var Spec = registry.Spec{
 	Command:   "login",
 	LegacyEnv: "CONTAINER",
 }
-
-var Flags = []cli.Flag(registry.NewFlags(Spec, P))

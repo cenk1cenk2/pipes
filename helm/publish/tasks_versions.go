@@ -1,13 +1,12 @@
 package publish
 
 import (
-	"gitlab.kilic.dev/devops/pipes/helm/setup"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
 // The collector reads the parsed flags and the working directory the setup task
 // list resolved, so it is only built from inside a task list.
-func HelmChartVersions() *versions.Collector {
+func HelmChartVersions(deps Deps) *versions.Collector {
 	return &versions.Collector{
 		Name:  "versions",
 		Label: "Helm Chart versions",
@@ -16,7 +15,7 @@ func HelmChartVersions() *versions.Collector {
 
 		File:       P.HelmChart.VersionFile,
 		FileStrict: P.HelmChart.VersionFileStrict,
-		FileDir:    setup.C.Cwd,
+		FileDir:    deps.Tool.Cwd,
 
 		Templates: P.HelmChart.VersionsTemplate,
 		Sanitize:  P.HelmChart.VersionsSanitize,

@@ -4,7 +4,8 @@ import (
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/buildah/login"
+	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
 type (
@@ -28,6 +29,13 @@ type (
 		ManifestedImages map[string][]string
 		Matches          []string
 	}
+
+	// Deps is the registry the login step authenticated against, whose uri the
+	// target manifest is prefixed with so it is created under the name the images
+	// beneath it were pushed to.
+	Deps struct {
+		Registry *registry.Credentials
+	}
 )
 
 var TL = TaskList{}
@@ -35,17 +43,17 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
-func New(p *Plumber) *TaskList {
+func New(p *Plumber, deps Deps) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if login.P.Uri != "" {
-				P.ContainerManifest.Target = fmt.Sprintf("%s/%s", login.P.Uri, P.ContainerManifest.Target)
+			if deps.Registry.Uri != "" {
+				P.ContainerManifest.Target = fmt.Sprintf("%s/%s", deps.Registry.Uri, P.ContainerManifest.Target)
 
 				tl.Log.Infof("Using default manifest target: %s", P.ContainerManifest.Target)
 			}
 
-			if err := p.Validate(P); err != nil {
+			if err := icli.Validated(p, P); err != nil {
 				return err
 			}
 
@@ -65,4 +73,11 @@ func New(p *Plumber) *TaskList {
 				UpdateManifests(tl).Job(),
 			)
 		})
+}
+
+func Step(deps Deps) icli.Step {
+	return icli.Step{
+		Flags: Flags,
+		New:   func(p *Plumber) *TaskList { return New(p, deps) },
+	}
 }

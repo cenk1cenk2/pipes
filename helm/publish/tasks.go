@@ -5,10 +5,9 @@ import (
 	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmPackage(tl *TaskList) *Task {
+func HelmPackage(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("package").
 		ShouldDisable(func(t *Task) bool {
 			if len(C.Versions) == 0 {
@@ -21,9 +20,9 @@ func HelmPackage(tl *TaskList) *Task {
 		}).
 		Set(func(t *Task) error {
 			for _, version := range C.Versions {
-				t.CreateSubtask(fmt.Sprintf("%s@%s", setup.C.Chart.Name(), version)).
+				t.CreateSubtask(fmt.Sprintf("%s@%s", deps.Tool.Chart.Name(), version)).
 					Set(func(t *Task) error {
-						t.Log.Infof("Packaging Helm Chart with version: %s@%s", setup.C.Chart.Name(), version)
+						t.Log.Infof("Packaging Helm Chart with version: %s@%s", deps.Tool.Chart.Name(), version)
 
 						t.CreateCommand(
 							"helm",
@@ -35,7 +34,7 @@ func HelmPackage(tl *TaskList) *Task {
 							version,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							SetDir(setup.C.Cwd).
+							SetDir(deps.Tool.Cwd).
 							Set(func(c *Command) error {
 								if P.HelmChart.AppVersion != "" {
 									c.AppendArgs("--app-version", P.HelmChart.AppVersion)
@@ -60,7 +59,7 @@ func HelmPackage(tl *TaskList) *Task {
 		})
 }
 
-func HelmPublish(tl *TaskList) *Task {
+func HelmPublish(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("publish").
 		ShouldDisable(func(t *Task) bool {
 			if len(C.Versions) == 0 {
@@ -75,16 +74,16 @@ func HelmPublish(tl *TaskList) *Task {
 			for _, version := range C.Versions {
 				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, P.HelmChart.Target)
 
-				t.CreateSubtask(fmt.Sprintf("%s@%s", setup.C.Chart.Name(), version)).
+				t.CreateSubtask(fmt.Sprintf("%s@%s", deps.Tool.Chart.Name(), version)).
 					Set(func(t *Task) error {
 						t.CreateCommand(
 							"helm",
 							"push",
-							filepath.Join(P.HelmChart.Destination, fmt.Sprintf("%s-%s.tgz", setup.C.Chart.Name(), version)),
+							filepath.Join(P.HelmChart.Destination, fmt.Sprintf("%s-%s.tgz", deps.Tool.Chart.Name(), version)),
 							P.HelmChart.Target,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							SetDir(setup.C.Cwd).
+							SetDir(deps.Tool.Cwd).
 							AddSelfToTheTask()
 
 						return nil
