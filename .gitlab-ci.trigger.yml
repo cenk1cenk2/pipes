@@ -1,0 +1,57 @@
+---
+spec:
+  inputs:
+    name:
+      type: string
+      description: The name of the pipe, which matches its directory and image suffix.
+    container-matrix:
+      type: array
+      description: A matrix of containers for building images.
+    container-rules:
+      type: array
+      description: Rules for container publishing.
+      default:
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        - if: $CI_COMMIT_TAG
+    extra-path-1:
+      type: string
+      description: Extra path to watch for changes, for pipes that import from another pipe.
+      default: .never/**
+    extra-path-2:
+      type: string
+      description: Extra path to watch for changes, for pipes that import from another pipe.
+      default: .never/**
+---
+"pipe-$[[inputs.name]]":
+  stage: pipes
+  variables:
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./$[[inputs.name]]
+          container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
+          container-matrix: $[[inputs.container-matrix]]
+          container-rules: $[[inputs.container-rules]]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths: &changes-paths
+          - .gitlab-ci.yml
+          - .gitlab-ci.trigger.yml
+          - .gitlab-ci.pipe.yml
+          - go.mod
+          - go.sum
+          - common/**/*
+          - internal/**/*
+          - $[[inputs.name]]/**/*
+          - $[[inputs.extra-path-1]]
+          - $[[inputs.extra-path-2]]
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *changes-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - if: $CI_COMMIT_TAG

@@ -6,6 +6,117 @@ stages:
   - pipes
   - post
 
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: buildah
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: go
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_BUILD_ARGS: |-
+            GO_VERSION: '{{ env "GO_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "GO_VERSION" }}
+          GO_VERSION:
+            - 1.25-alpine
+            - 1.26-alpine
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_BUILD_ARGS: |-
+            GO_VERSION: '{{ env "GO_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "GO_VERSION" }}
+          CONTAINER_IMAGE_TAGS_AS_LATEST: '["^heads/main$", "^tags/.*"]'
+          GO_VERSION:
+            - 1.27-alpine
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: helm
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: kustomize
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: node
+      extra-path-1: select-env/**/*
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_BUILD_ARGS: |-
+            NODE_VERSION: '{{ env "NODE_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "NODE_VERSION" }}
+          NODE_VERSION:
+            - 22
+            - 22-alpine
+            - 24
+            - 24-alpine
+            - 26
+            - 26-alpine
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: pulumi
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile-node
+          CONTAINER_IMAGE_BUILD_ARGS: |-
+            PULUMI_VERSION: '{{ env "PULUMI_VERSION" }}'
+            NODE_VERSION: '{{ env "NODE_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "PULUMI_VERSION" }}-node
+          PULUMI_VERSION:
+            - latest
+          NODE_VERSION: 26-alpine
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: select-env
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: semantic-release
+      extra-path-1: select-env/**/*
+      extra-path-2: node/**/*
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_BUILD_ARGS: |-
+            NODE_VERSION: 26-alpine
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: terraform
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: update-docker-hub-readme
+      container-matrix:
+        - CONTAINER_FILE_NAME: Dockerfile
+          CONTAINER_IMAGE_TAGS: |-
+            latest
+
+.rules-default: &rules-default
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    interruptible: true
+  - if: $CI_COMMIT_TAG
+
 bootstrap:
   stage: bootstrap
   trigger:
@@ -37,24 +148,7 @@ install:
       paths:
         - vendor/
         - .go/
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      # changes:
-      #   paths:
-      #     - .gitlab-ci.yml
-      #     - go.mod
-      #     - go.sum
-      #     - "**/*.go"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      # changes:
-      #   paths:
-      #     - .gitlab-ci.yml
-      #     - go.mod
-      #     - go.sum
-      #     - "**/*.go"
-      #   compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
+  rules: *rules-default
   tags:
     - amd64
     - docker
@@ -66,467 +160,28 @@ lint:
     - key: $CI_JOB_NAME_SLUG
       paths:
         - .go/cache/
-  # needs:
-  #   - pipeline: $CI_PARENT_PIPELINE_ID
-  #     job: install
-  #     artifacts: true
   script:
     - pipe lint
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      # changes:
-      #   paths:
-      #     - .gitlab-ci.yml
-      #     - go.mod
-      #     - go.sum
-      #     - "**/*.go"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      # changes:
-      #   paths:
-      #     - .gitlab-ci.yml
-      #     - go.mod
-      #     - go.sum
-      #     - "**/*.go"
-      #   compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
+  rules: *rules-default
   tags:
     - amd64
     - docker
 
-pipe-template:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./_template
-          container-image-name: cenk1cenk2/pipe-template
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-          container-rules:
-            - when: never
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - _template/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - _template/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-buildah:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./buildah
-          container-image-name: cenk1cenk2/pipe-buildah
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - buildah/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - buildah/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-go:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./go
-          container-image-name: cenk1cenk2/pipe-go
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_BUILD_ARGS: |-
-                GO_VERSION: '{{ env "GO_VERSION" }}'
-              CONTAINER_IMAGE_TAGS: |-
-                {{ env "GO_VERSION" }}
-              GO_VERSION:
-                - 1.25-alpine
-                - 1.26-alpine
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_BUILD_ARGS: |-
-                GO_VERSION: '{{ env "GO_VERSION" }}'
-              CONTAINER_IMAGE_TAGS: |-
-                {{ env "GO_VERSION" }}
-              CONTAINER_IMAGE_TAGS_AS_LATEST: '["^heads/main$", "^tags/.*"]'
-              GO_VERSION:
-                - 1.27-alpine
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - go/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - go/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-helm:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./helm
-          container-image-name: cenk1cenk2/pipe-helm
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - helm/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - helm/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-kustomize:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./kustomize
-          container-image-name: cenk1cenk2/pipe-kustomize
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - kustomize/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - kustomize/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-node:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./node
-          container-image-name: cenk1cenk2/pipe-node
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_BUILD_ARGS: |-
-                NODE_VERSION: '{{ env "NODE_VERSION" }}'
-              CONTAINER_IMAGE_TAGS: |-
-                {{ env "NODE_VERSION" }}
-              NODE_VERSION:
-                - 22
-                - 22-alpine
-                - 24
-                - 24-alpine
-                - 26
-                - 26-alpine
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - node/**/*
-          - select-env/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - node/**/*
-          - select-env/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-pulumi:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./pulumi
-          container-image-name: cenk1cenk2/pipe-pulumi
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile-node
-              CONTAINER_IMAGE_BUILD_ARGS: |-
-                PULUMI_VERSION: '{{ env "PULUMI_VERSION" }}'
-                NODE_VERSION: '{{ env "NODE_VERSION" }}'
-              CONTAINER_IMAGE_TAGS: |-
-                {{ env "PULUMI_VERSION" }}-node
-              PULUMI_VERSION:
-                - latest
-              NODE_VERSION: 26-alpine
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - pulumi/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - pulumi/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-select-env:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./select-env
-          container-image-name: cenk1cenk2/pipe-select-env
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - select-env/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - select-env/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-semantic-release:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./semantic-release
-          container-image-name: cenk1cenk2/pipe-semantic-release
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_BUILD_ARGS: |-
-                NODE_VERSION: 26-alpine
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - semantic-release/**/*
-          - select-env/**/*
-          - node/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - semantic-release/**
-          - select-env/**/*
-          - node/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-terraform:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./terraform
-          container-image-name: cenk1cenk2/pipe-terraform
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - terraform/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - terraform/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
-
-pipe-update-docker-hub-readme:
-  stage: pipes
-  variables:
-    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  trigger:
-    strategy: depend
-    include:
-      - local: .gitlab-ci.pipe.yml
-        inputs:
-          cwd: ./update-docker-hub-readme
-          container-image-name: cenk1cenk2/pipe-update-docker-hub-readme
-          container-matrix:
-            - CONTAINER_FILE_NAME: Dockerfile
-              CONTAINER_IMAGE_TAGS: |-
-                latest
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - update-docker-hub-readme/**/*
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - go.mod
-          - go.sum
-          - .gitlab-ci.pipe.yml
-          - update-docker-hub-readme/**/*
-        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG
+test:
+  stage: test
+  image: cenk1cenk2/pipe-go:bootstrap
+  needs:
+    - install
+  cache:
+    - key: $CI_JOB_NAME_SLUG
+      paths:
+        - .go/cache/
+  script:
+    - go test -v ./...
+  rules: *rules-default
+  tags:
+    - amd64
+    - docker
 
 update-docker-hub-readme:
   stage: post
@@ -556,6 +211,11 @@ update-docker-hub-readme:
           "repository": "cenk1cenk2/pipe-go",
           "file": "./go/README.md",
           "description": "Golang operations for pipelines."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-helm",
+          "file": "./helm/README.md",
+          "description": "Helm operations for pipelines."
         },
         {
           "repository": "cenk1cenk2/pipe-kustomize",
