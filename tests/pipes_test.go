@@ -100,7 +100,10 @@ var _ = Describe("Pipes", func() {
 						continue
 					}
 
-					Expect(aliased).To(HaveKeyWithValue(f.Name(), envs), fmt.Sprintf("%s: %s answers to more than one name, record the chain in legacyEnvAliases", f.Command, f.Name()))
+					Expect(aliased).To(
+						HaveKeyWithValue(f.Name(), envs),
+						fmt.Sprintf("%s: %s answers to more than one name, record the chain in legacyEnvAliases", f.Command, f.Name()),
+					)
 
 					if !slices.Contains(seen, f.Name()) {
 						seen = append(seen, f.Name())
