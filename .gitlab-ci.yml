@@ -68,7 +68,7 @@ include:
     inputs:
       name: pulumi
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile-node
+        - CONTAINER_FILE_NAME: Dockerfile
           CONTAINER_IMAGE_BUILD_ARGS: |-
             PULUMI_VERSION: '{{ env "PULUMI_VERSION" }}'
             NODE_VERSION: '{{ env "NODE_VERSION" }}'
