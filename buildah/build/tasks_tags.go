@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 	"path"
-	"regexp"
 	"slices"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/buildah/manifest"
-	"gitlab.kilic.dev/devops/pipes/common/parser"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 	"go.yaml.in/yaml/v4"
 )
 
@@ -59,7 +59,7 @@ func ContainerImageTagsFromFile(tl *TaskList) *Task {
 		}).
 		Set(func(t *Task) error {
 			// add tags through tags file
-			tags, err := parser.ParseTagsFile(t.Log, path.Join(P.ContainerFile.Context, P.ContainerImage.TagsFile), P.ContainerImage.TagsFileStrict)
+			tags, err := tagsfile.Parse(t.Log, path.Join(P.ContainerFile.Context, P.ContainerImage.TagsFile), P.ContainerImage.TagsFileStrict)
 
 			if err != nil {
 				return err
@@ -86,32 +86,24 @@ func ContainerImageTagsFromLatest(tl *TaskList) *Task {
 			return P.ContainerImage.TagAsLatest == nil
 		}).
 		Set(func(t *Task) error {
-		out:
-			for _, expression := range P.ContainerImage.TagAsLatest {
-				for _, reference := range C.References {
-					re, err := regexp.Compile(expression)
-
-					if err != nil {
-						return fmt.Errorf("Can not process regular expression for latest tag: %w", err)
-					}
-
-					t.Log.Debugf("Trying to match condition for given reference: %s with %v", reference, re.String())
-
-					if re.MatchString(reference) {
-						if err := AddContainerImageTag(t, P.ContainerImage.LatestTag); err != nil {
-							return err
-						}
-
-						t.Log.Infof(
-							"Will tag image as latest since tag regex matches: %s -> %s",
-							P.ContainerImage.LatestTag,
-							expression,
-						)
-
-						break out
-					}
-				}
+			matched, err := git.MatchAny(P.ContainerImage.TagAsLatest, C.References)
+			if err != nil {
+				return fmt.Errorf("Can not process regular expression for latest tag: %w", err)
 			}
+
+			if matched < 0 {
+				return nil
+			}
+
+			if err := AddContainerImageTag(t, P.ContainerImage.LatestTag); err != nil {
+				return err
+			}
+
+			t.Log.Infof(
+				"Will tag image as latest since tag regex matches: %s -> %s",
+				P.ContainerImage.LatestTag,
+				P.ContainerImage.TagAsLatest[matched],
+			)
 
 			return nil
 		})

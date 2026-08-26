@@ -4,15 +4,18 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
 	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
 //revive:disable:line-length-limit
 
+const (
+	CATEGORY_PACKAGES = "Packages"
+)
+
 var Flags = []cli.Flag{
 	&cli.StringSliceFlag{
-		Category: flags.CATEGORY_PACKAGES,
+		Category: CATEGORY_PACKAGES,
 		Name:     "packages.node",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PACKAGES_NODE"),
@@ -24,7 +27,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: flags.CATEGORY_PACKAGES,
+		Category: CATEGORY_PACKAGES,
 		Name:     "packages.node.global",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PACKAGES_NODE_GLOBAL"),
@@ -36,7 +39,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: flags.CATEGORY_PACKAGES,
+		Category: CATEGORY_PACKAGES,
 		Name:     "packages.node.script_args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PACKAGES_NODE_SCRIPT_ARGS"),
@@ -48,7 +51,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: flags.CATEGORY_PACKAGES,
+		Category: CATEGORY_PACKAGES,
 		Name:     "packages.node.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PACKAGES_NODE_CWD"),

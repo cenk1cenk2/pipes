@@ -4,7 +4,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/common/gitlab"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/ci"
 )
 
 //revive:disable:line-length-limit
@@ -34,5 +34,5 @@ var Flags = CombineFlags(
 		},
 	},
 	gitlab.NewMergeRequestReportFlags(&P.MergeRequestReport),
-	iac.NewMetadataFlags(&P.ReportMetadata),
+	ci.NewMetadataFlags(&P.ReportMetadata),
 )

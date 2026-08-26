@@ -1,12 +1,12 @@
 package publish
 
 import (
-	"fmt"
 	"strings"
 
-	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
-	"gopkg.in/yaml.v3"
+	ucli "github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 
 	. "github.com/cenk1cenk2/plumber/v6"
 )
@@ -15,123 +15,79 @@ import (
 
 const (
 	CATEGORY_HELM_CHART = "Helm Chart"
+
+	DEFAULT_SANITIZE_VERSIONS = `[
+    { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }
+]`
 )
 
-var Flags = CombineFlags(flags.NewGitFlags(
-	flags.GitFlagsSetup{
-		GitBranchDestination: &P.Git.Branch,
-		GitTagDestination:    &P.Git.Tag,
-	},
-), flags.NewTagsFileFlags(
-	flags.TagsFileFlagsSetup{
-		TagsFileDestination: &P.HelmChart.VersionFile,
-		TagsFileRequired:    false,
-	},
-), flags.NewTagsFileStrictFlags(
-	flags.TagsFileStrictFlagsSetup{
-		TagsFileStrictDestination: &P.HelmChart.VersionFileStrict,
-		TagsFileStrictRequired:    false,
-	},
-), []cli.Flag{
-	&cli.StringFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.target",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_TARGET"),
-		),
-		Usage:       "Helm chart repository target to publish to.",
-		Required:    true,
-		Destination: &P.HelmChart.Target,
-	},
+var Flags = CombineFlags(
+	git.NewFlags(&P.Git),
+	tagsfile.NewFlags(&P.HelmChart.VersionFile, "", &P.HelmChart.VersionFileStrict, false),
+	[]ucli.Flag{
+		&ucli.StringFlag{
+			Category:    CATEGORY_HELM_CHART,
+			Name:        "helm-chart.target",
+			Sources:     cli.EnvVars("HELM_CHART_TARGET"),
+			Usage:       "Helm chart repository target to publish to.",
+			Required:    true,
+			Destination: &P.HelmChart.Target,
+		},
 
-	&cli.StringSliceFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.versions",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_VERSIONS"),
-		),
-		Usage:       "Versions for the helm chart to be published.",
-		Required:    false,
-		Destination: &P.HelmChart.Versions,
-	},
+		&ucli.StringSliceFlag{
+			Category:    CATEGORY_HELM_CHART,
+			Name:        "helm-chart.versions",
+			Sources:     cli.EnvVars("HELM_CHART_VERSIONS"),
+			Usage:       "Versions for the helm chart to be published.",
+			Required:    false,
+			Destination: &P.HelmChart.Versions,
+		},
 
-	&cli.StringFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.versions-template",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_VERSIONS_TEMPLATE"),
-		),
-		Usage: strings.TrimSpace(`
+		cli.YAMLFlag(&ucli.StringFlag{
+			Category: CATEGORY_HELM_CHART,
+			Name:     "helm-chart.versions-template",
+			Sources:  cli.EnvVars("HELM_CHART_VERSIONS_TEMPLATE"),
+			Usage: strings.TrimSpace(`
     Modifies every version that matches a certain condition.
     Template is interpolated with the given matches in the regular expression.
 
     format(yaml([]struct{ match: RegExp, template: Template(match) }))
     `),
-		Required:         false,
-		Value:            "[]",
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
+			Required: false,
+			Value:    "[]",
+		}, &P.HelmChart.VersionsTemplate),
 
-			if err := yaml.Unmarshal([]byte(v), &P.HelmChart.VersionsTemplate); err != nil {
-				return fmt.Errorf("Cannot unmarshal helm chart templating version conditions: %w", err)
-			}
-
-			return nil
-		},
-	},
-
-	&cli.StringFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.sanitize-versions",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_SANITIZE_VERSIONS"),
-		),
-		Usage: strings.TrimSpace(`
+		cli.YAMLFlag(&ucli.StringFlag{
+			Category: CATEGORY_HELM_CHART,
+			Name:     "helm-chart.sanitize-versions",
+			Sources:  cli.EnvVars("HELM_CHART_SANITIZE_VERSIONS"),
+			Usage: strings.TrimSpace(`
     Sanitizes the given regex pattern out of version name.
     Template is interpolated with the given matches in the regular expression.
 
     format(yaml([]struct{ match: RegExp, template: Template(match) }))
     `),
-		Required:         false,
-		Value:            flags.FLAG_DEFAULT_DOCKER_IMAGE_SANITIZE_TAGS,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
+			Required: false,
+			Value:    DEFAULT_SANITIZE_VERSIONS,
+		}, &P.HelmChart.VersionsSanitize),
 
-			if err := yaml.Unmarshal([]byte(v), &P.HelmChart.VersionsSanitize); err != nil {
-				return fmt.Errorf("Cannot unmarshal helm chart sanitizing versions conditions: %w", err)
-			}
-
-			return nil
+		&ucli.StringFlag{
+			Category:    CATEGORY_HELM_CHART,
+			Name:        "helm-chart.destination",
+			Sources:     cli.EnvVars("HELM_CHART_DESTINATION"),
+			Usage:       "Destination directory for the packaged helm chart.",
+			Required:    false,
+			Value:       "./dist/",
+			Destination: &P.HelmChart.Destination,
 		},
-	},
 
-	&cli.StringFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.destination",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_DESTINATION"),
-		),
-		Usage:       "Destination directory for the packaged helm chart.",
-		Required:    false,
-		Value:       "./dist/",
-		Destination: &P.HelmChart.Destination,
-	},
-
-	&cli.StringFlag{
-		Category: CATEGORY_HELM_CHART,
-		Name:     "helm-chart.app-version",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_CHART_APP_VERSION"),
-		),
-		Usage:       "Application version for the packaged helm chart.",
-		Required:    false,
-		Value:       "",
-		Destination: &P.HelmChart.AppVersion,
-	},
-})
+		&ucli.StringFlag{
+			Category:    CATEGORY_HELM_CHART,
+			Name:        "helm-chart.app-version",
+			Sources:     cli.EnvVars("HELM_CHART_APP_VERSION"),
+			Usage:       "Application version for the packaged helm chart.",
+			Required:    false,
+			Value:       "",
+			Destination: &P.HelmChart.AppVersion,
+		},
+	})

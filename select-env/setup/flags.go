@@ -1,83 +1,69 @@
 package setup
 
 import (
-	"encoding/json"
-	"fmt"
-
 	. "github.com/cenk1cenk2/plumber/v6"
-	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	ucli "github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
 )
 
 //revive:disable:line-length-limit
 
-var Flags = CombineFlags(flags.NewGitFlags(
-	flags.GitFlagsSetup{
-		GitBranchDestination: &P.Git.Branch,
-		GitTagDestination:    &P.Git.Tag,
-	},
-), []cli.Flag{
-	&cli.BoolFlag{
-		Category: flags.CATEGORY_ENVIRONMENT,
-		Name:     "environment.enable",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("ENVIRONMENT_ENABLE"),
-		),
-		Usage:       "Enable environment injection.",
-		Required:    false,
-		Hidden:      true,
-		Value:       true,
-		Destination: &P.Environment.Enable,
-	},
+const (
+	CATEGORY_ENVIRONMENT = "Environment"
 
-	// CATEGORY_ENVIRONMENT
+	DEFAULT_ENVIRONMENT_CONDITIONS = `[
+    { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },
+    { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },
+    { "match" :"^heads/main$", "environment": "develop" },
+    { "match": "^heads/master$", "environment": "develop" }
+]`
+)
 
-	&cli.StringFlag{
-		Category: flags.CATEGORY_ENVIRONMENT,
-		Name:     "environment.conditions",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("ENVIRONMENT_CONDITIONS"),
-		),
-		Usage: `Regex pattern to select an environment.
+var Flags = CombineFlags(
+	git.NewFlags(&P.Git),
+	[]ucli.Flag{
+		&ucli.BoolFlag{
+			Category:    CATEGORY_ENVIRONMENT,
+			Name:        "environment.enable",
+			Sources:     cli.EnvVars("ENVIRONMENT_ENABLE"),
+			Usage:       "Enable environment injection.",
+			Required:    false,
+			Hidden:      true,
+			Value:       true,
+			Destination: &P.Environment.Enable,
+		},
+
+		// CATEGORY_ENVIRONMENT
+
+		cli.JSONFlag(&ucli.StringFlag{
+			Category: CATEGORY_ENVIRONMENT,
+			Name:     "environment.conditions",
+			Sources:  cli.EnvVars("ENVIRONMENT_CONDITIONS"),
+			Usage: `Regex pattern to select an environment.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json([]struct{ match: RegExp, environment: string })`,
-		Required:         false,
-		Value:            flags.FLAG_DEFAULT_ENVIRONMENT_CONDITIONS,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
+			Required: false,
+			Value:    DEFAULT_ENVIRONMENT_CONDITIONS,
+		}, &P.Environment.Conditions),
 
-			if err := json.Unmarshal([]byte(v), &P.Environment.Conditions); err != nil {
-				return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
-			}
-
-			return nil
+		&ucli.BoolFlag{
+			Category:    CATEGORY_ENVIRONMENT,
+			Name:        "environment.fail-on-no-reference",
+			Sources:     cli.EnvVars("ENVIRONMENT_FAIL_ON_NO_REFERENCE"),
+			Usage:       "Fail on missing environment references.",
+			Required:    false,
+			Value:       true,
+			Destination: &P.Environment.FailOnNoReference,
 		},
-	},
 
-	&cli.BoolFlag{
-		Category: flags.CATEGORY_ENVIRONMENT,
-		Name:     "environment.fail-on-no-reference",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("ENVIRONMENT_FAIL_ON_NO_REFERENCE"),
-		),
-		Usage:       "Fail on missing environment references.",
-		Required:    false,
-		Value:       true,
-		Destination: &P.Environment.FailOnNoReference,
-	},
-
-	&cli.BoolFlag{
-		Category: flags.CATEGORY_ENVIRONMENT,
-		Name:     "environment.strict",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("ENVIRONMENT_STRICT"),
-		),
-		Usage:       "Fail on no environment selected.",
-		Required:    false,
-		Value:       true,
-		Destination: &P.Environment.Strict,
-	},
-})
+		&ucli.BoolFlag{
+			Category:    CATEGORY_ENVIRONMENT,
+			Name:        "environment.strict",
+			Sources:     cli.EnvVars("ENVIRONMENT_STRICT"),
+			Usage:       "Fail on no environment selected.",
+			Required:    false,
+			Value:       true,
+			Destination: &P.Environment.Strict,
+		},
+	})
