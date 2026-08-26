@@ -7,7 +7,9 @@ require (
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
 	github.com/pulumi/pulumi/sdk/v3 v3.187.0
+	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.36.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 )
 
@@ -42,9 +44,9 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.10.2 // indirect
+	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	github.com/zclconf/go-cty v1.16.4 // indirect
-	gitlab.com/gitlab-org/api/client-go/v2 v2.36.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.4 // indirect
