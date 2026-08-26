@@ -48,4 +48,16 @@ var Flags = []cli.Flag{
 		Value:       "./.golangci-lint",
 		Destination: &P.Cache,
 	},
+
+	&cli.BoolFlag{
+		Category: CATEGORY_LINT,
+		Name:     "go.lint.workspace",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_LINT_WORKSPACE"),
+		),
+		Usage:       "Lint every module of the Go workspace instead of the current module.",
+		Required:    false,
+		Value:       false,
+		Destination: &P.Workspace,
+	},
 }
