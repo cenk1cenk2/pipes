@@ -4,3 +4,4 @@ LICENSE
 **/README.md
 renovate.json
 .golangci.yml
+test/mocks/

@@ -5,9 +5,9 @@ import (
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
 	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 var _ = Describe("NewMetadataFlags", func() {

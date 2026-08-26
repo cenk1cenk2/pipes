@@ -2,7 +2,6 @@ package preview
 
 import (
 	"bytes"
-	"encoding/json/jsontext"
 	json "encoding/json/v2"
 	"fmt"
 	"maps"
@@ -11,16 +10,10 @@ import (
 	"time"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 type (
-	pulumiSummary struct {
-		Create int `json:"create"`
-		Update int `json:"update"`
-		Delete int `json:"delete"`
-	}
-
 	actionAccumulator struct {
 		Action      string
 		Resources   map[string]iac.Resource
@@ -99,42 +92,6 @@ func parsePulumiPlanReport(data []byte, metadata iac.Metadata) (iac.Report, erro
 		Metadata: metadata,
 		Actions:  buildPulumiPlanActions(accumulators),
 	}, nil
-}
-
-func summarizePulumiReport(report iac.Report) pulumiSummary {
-	summary := pulumiSummary{}
-	hasReplacementDetails := slices.ContainsFunc(report.Actions, func(action iac.Action) bool {
-		return action.Action == "create-replacement" || action.Action == "delete-replaced"
-	})
-
-	for _, action := range report.Actions {
-		count := len(action.Resources)
-
-		switch action.Action {
-		case "create", "create-replacement":
-			summary.Create += count
-		case "update", "update-replacement":
-			summary.Update += count
-		case "delete", "delete-replaced":
-			summary.Delete += count
-		case "replace":
-			if !hasReplacementDetails {
-				summary.Create += count
-				summary.Delete += count
-			}
-		}
-	}
-
-	return summary
-}
-
-func renderSummary(summary pulumiSummary) ([]byte, error) {
-	body, err := json.Marshal(summary, jsontext.Multiline(true), jsontext.WithIndent("  "))
-	if err != nil {
-		return nil, fmt.Errorf("render Pulumi summary: %w", err)
-	}
-
-	return append(body, '\n'), nil
 }
 
 func parsePulumiPlan(data []byte) (apitype.DeploymentPlanV1, int, error) {

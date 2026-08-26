@@ -78,3 +78,20 @@ tasks:
       - task: packages
         vars:
           command: docs
+
+  generate:
+    desc: Generates checked-in files.
+    cmds:
+      - task: generate:mockery
+
+  generate:mockery:
+    internal: true
+    cmds:
+      - go tool mockery
+    generates:
+      - "**/test/mocks/**"
+    sources:
+      - .mockery.yaml
+      - "**/*.go"
+      - "**/go.{mod,sum}"
+      - exclude: "**/test/mocks/**"

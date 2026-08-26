@@ -4,8 +4,8 @@ import (
 	"time"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 type (
@@ -39,7 +39,7 @@ func New(p *Plumber) *TaskList {
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
 			if !P.MergeRequestReport.Enabled {
-				P.MergeRequestReport.MergeRequestId = 0
+				P.MergeRequestReport.MergeRequestIid = 0
 			}
 
 			if err := p.Validate(P); err != nil {
@@ -49,10 +49,12 @@ func New(p *Plumber) *TaskList {
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
+			source := TerraformReportSource()
+
 			return JobSequence(
 				TerraformPlan(tl).Job(),
-				TerraformSummary(tl).Job(),
-				TerraformMergeRequestReport(tl).Job(),
+				iac.SummaryTask(tl, source).Job(),
+				iac.MergeRequestReportTask(tl, source).Job(),
 				TerraformPlanCleanup(tl).Job(),
 			)
 		})

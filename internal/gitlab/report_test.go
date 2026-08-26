@@ -17,14 +17,14 @@ var _ = Describe("Merge request report config", func() {
 
 	It("rejects an invalid merge request id", func() {
 		Expect(validator.New().Struct(MergeRequestReportConfig{
-			MergeRequestId: -1,
+			MergeRequestIid: -1,
 		})).NotTo(Succeed())
 	})
 
 	It("requires the GitLab context alongside a merge request id", func() {
 		Expect(validator.New().Struct(MergeRequestReportConfig{
-			Enabled:        true,
-			MergeRequestId: 1,
+			Enabled:         true,
+			MergeRequestIid: 1,
 		})).NotTo(Succeed())
 	})
 })
