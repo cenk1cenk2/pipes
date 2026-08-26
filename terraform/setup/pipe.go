@@ -22,6 +22,10 @@ type (
 var P = &Pipe{}
 var C = tool.NewCtx()
 
+// Step is what every terraform command starts with, since the tool has to be
+// resolved before anything can be asked of it.
+var Step = cli.Step{Flags: Flags, New: New}
+
 func New(p *plumber.Plumber) *plumber.TaskList {
 	return tool.Setup(p, Spec, &P.Config, C, GenerateTerraformEnvVars).
 		ShouldRunBefore(func(_ *plumber.TaskList) error {

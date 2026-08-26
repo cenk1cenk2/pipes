@@ -2,10 +2,9 @@ package install
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformInstall(tl *TaskList) *Task {
+func TerraformInstall(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -32,8 +31,8 @@ func TerraformInstall(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.C.Cwd).
-				AppendEnvironment(setup.C.Env).
+				SetDir(deps.Tool.Cwd).
+				AppendEnvironment(deps.Tool.Env).
 				AddSelfToTheTask()
 
 			return nil

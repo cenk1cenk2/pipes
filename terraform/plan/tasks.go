@@ -7,16 +7,13 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
-	"gitlab.kilic.dev/devops/pipes/terraform/setup"
-	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
 // The state name only means something once it has been set away from its default,
 // which most backends never do.
-func terraformStateName() string {
-	if name := state.P.State.Name; name != "default" {
+func terraformStateName(deps Deps) string {
+	if name := deps.State.State.Name; name != "default" {
 		return name
 	}
 
@@ -26,24 +23,24 @@ func terraformStateName() string {
 // Only the values that actually vary between concurrent plan jobs on one merge
 // request belong in the marker, since anything else changes the identifier for every
 // consumer without disambiguating anything.
-func terraformReportDiscriminators() []string {
+func terraformReportDiscriminators(deps Deps) []string {
 	discriminators := []string{}
 
-	if name := terraformStateName(); name != "" {
+	if name := terraformStateName(deps); name != "" {
 		discriminators = append(discriminators, name)
 	}
 
-	if cwd := setup.C.Cwd; cwd != "" && cwd != "." {
+	if cwd := deps.Tool.Cwd; cwd != "" && cwd != "." {
 		discriminators = append(discriminators, cwd)
 	}
 
 	return discriminators
 }
 
-func TerraformReportSource() iac.Source {
+func TerraformReportSource(deps Deps) iac.Source {
 	metadata := P.ReportMetadata
-	metadata.Target = terraformStateName()
-	metadata.Cwd = setup.C.Cwd
+	metadata.Target = terraformStateName(deps)
+	metadata.Cwd = deps.Tool.Cwd
 
 	// terraform show reads the plan back out of the file terraform plan wrote, so
 	// without one there is nothing to summarize.
@@ -64,8 +61,8 @@ func TerraformReportSource() iac.Source {
 				"-json",
 				P.Plan.Output,
 			).
-				SetDir(setup.C.Cwd).
-				AppendEnvironment(setup.C.Env).
+				SetDir(deps.Tool.Cwd).
+				AppendEnvironment(deps.Tool.Env).
 				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
 				EnableStreamRecording()
 
@@ -77,15 +74,15 @@ func TerraformReportSource() iac.Source {
 		},
 		Summary:        iac.Summarize,
 		SummaryOutput:  summaryOutput,
-		Cwd:            setup.C.Cwd,
+		Cwd:            deps.Tool.Cwd,
 		MergeRequest:   P.MergeRequestReport,
-		Notes:          gitlab.NewNotes,
-		Discriminators: terraformReportDiscriminators,
+		Notes:          deps.Notes,
+		Discriminators: func() []string { return terraformReportDiscriminators(deps) },
 		Metadata:       metadata,
 	}
 }
 
-func TerraformPlan(tl *TaskList) *Task {
+func TerraformPlan(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("plan").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -108,8 +105,8 @@ func TerraformPlan(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.C.Cwd).
-				AppendEnvironment(setup.C.Env).
+				SetDir(deps.Tool.Cwd).
+				AppendEnvironment(deps.Tool.Env).
 				SetRetries(&CommandRetry{
 					Tries: P.Plan.RetryTries,
 					Delay: P.Plan.RetryDelay,
@@ -123,7 +120,7 @@ func TerraformPlan(tl *TaskList) *Task {
 		})
 }
 
-func TerraformPlanCleanup(tl *TaskList) *Task {
+func TerraformPlanCleanup(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("cleanup").
 		ShouldDisable(func(t *Task) bool {
 			if !P.Plan.PreviewForMergeRequests || P.Plan.PipelineSource != "merge_request_event" {
@@ -139,7 +136,7 @@ func TerraformPlanCleanup(tl *TaskList) *Task {
 		Set(func(t *Task) error {
 			output := P.Plan.Output
 			if !filepath.IsAbs(output) {
-				output = filepath.Join(setup.C.Cwd, output)
+				output = filepath.Join(deps.Tool.Cwd, output)
 			}
 
 			if err := os.Remove(output); err != nil {
