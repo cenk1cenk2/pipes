@@ -35,7 +35,10 @@ var _ = Describe("README", func() {
 			It("documents every environment source of every visible flag", func() {
 				for _, f := range p.visibleFlags() {
 					for _, env := range f.EnvVars() {
-						Expect(readme).To(ContainSubstring("$"+env+"`"), fmt.Sprintf("%s: %s reads $%s, regenerate the documentation with: task %s:docs", f.Command, f.Name(), env, p.Dir))
+						Expect(readme).To(
+							ContainSubstring("$"+env+"`"),
+							fmt.Sprintf("%s: %s reads $%s, regenerate the documentation with: task %s:docs", f.Command, f.Name(), env, p.Dir),
+						)
 					}
 				}
 			})
