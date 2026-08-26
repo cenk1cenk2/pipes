@@ -1,8 +1,8 @@
 package plan
 
 import (
-	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"maps"
 	"slices"
@@ -123,7 +123,7 @@ func summarizeTerraformShowPlan(output []byte) (terraformSummary, error) {
 }
 
 func renderSummary(summary terraformSummary) ([]byte, error) {
-	body, err := json.MarshalIndent(summary, "", "  ")
+	body, err := json.Marshal(summary, jsontext.Multiline(true), jsontext.WithIndent("  "))
 	if err != nil {
 		return nil, fmt.Errorf("render terraform summary: %w", err)
 	}
@@ -134,8 +134,7 @@ func renderSummary(summary terraformSummary) ([]byte, error) {
 func decodeTerraformShowPlan(output []byte) (tfjson.Plan, error) {
 	var plan tfjson.Plan
 
-	decoder := json.NewDecoder(bytes.NewReader(output))
-	if err := decoder.Decode(&plan); err != nil {
+	if err := json.Unmarshal(output, &plan, json.RejectUnknownMembers(true)); err != nil {
 		return tfjson.Plan{}, fmt.Errorf("parse terraform show -json output: %w", err)
 	}
 	if err := plan.Validate(); err != nil {

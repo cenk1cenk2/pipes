@@ -2,7 +2,8 @@ package pipe
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,7 +19,7 @@ func LoginToDockerHubRegistry(tl *TaskList) *Task {
 			login, err := json.Marshal(registry.AuthConfig{
 				Username: P.DockerHub.Username,
 				Password: P.DockerHub.Password,
-			})
+			}, jsontext.EscapeForHTML(true))
 
 			if err != nil {
 				return err
@@ -45,7 +46,7 @@ func LoginToDockerHubRegistry(tl *TaskList) *Task {
 			}
 
 			b := DockerHubLoginResponse{}
-			if err = json.Unmarshal(body, &b); err != nil {
+			if err = json.Unmarshal(body, &b, json.RejectUnknownMembers(true)); err != nil {
 				return err
 			}
 
@@ -109,6 +110,7 @@ func UpdateDockerReadme(tl *TaskList) *Task {
 
 						body, err := json.Marshal(
 							update,
+							jsontext.EscapeForHTML(true),
 						)
 
 						if err != nil {
@@ -145,7 +147,7 @@ func UpdateDockerReadme(tl *TaskList) *Task {
 						t.Log.Debugf("Response body: %s", string(body))
 
 						b := DockerHubUpdateReadmeResponse{}
-						err = json.Unmarshal(body, &b)
+						err = json.Unmarshal(body, &b, json.RejectUnknownMembers(true))
 
 						if err != nil {
 							return fmt.Errorf("Response unexpected: %w > %s", err, string(body))
