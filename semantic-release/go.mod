@@ -6,6 +6,7 @@ require (
 	github.com/cenk1cenk2/plumber/v6 v6.5.0
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
+	github.com/sirupsen/logrus v1.10.2
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 )
@@ -24,7 +25,6 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410 // indirect
-	github.com/sirupsen/logrus v1.10.2 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect

@@ -1,0 +1,54 @@
+---
+# The pipes this repository publishes. Every entry is checked against the command
+# tree the pipe builds and against the README matrix the pipeline pushes to
+# Docker Hub, so a pipe added without an entry here fails the conformance suite.
+pipes:
+  - name: buildah
+    image: cenk1cenk2/pipe-buildah
+    readme: ./buildah/README.md
+    description: Builds and publishes a container image with given conditions.
+
+  - name: go
+    image: cenk1cenk2/pipe-go
+    readme: ./go/README.md
+    description: Golang operations for pipelines.
+
+  - name: helm
+    image: cenk1cenk2/pipe-helm
+    readme: ./helm/README.md
+    description: Helm operations for pipelines.
+
+  - name: kustomize
+    image: cenk1cenk2/pipe-kustomize
+    readme: ./kustomize/README.md
+    description: Kustomize operations for pipelines.
+
+  - name: node
+    image: cenk1cenk2/pipe-node
+    readme: ./node/README.md
+    description: Node.JS operations for pipelines.
+
+  - name: pulumi
+    image: cenk1cenk2/pipe-pulumi
+    readme: ./pulumi/README.md
+    description: Pulumi operations for pipelines.
+
+  - name: select-env
+    image: cenk1cenk2/pipe-select-env
+    readme: ./select-env/README.md
+    description: Selects an environment given on the conditions.
+
+  - name: semantic-release
+    image: cenk1cenk2/pipe-semantic-release
+    readme: ./semantic-release/README.md
+    description: semantic-release embedded inside a container for CI jobs.
+
+  - name: terraform
+    image: cenk1cenk2/pipe-terraform
+    readme: ./terraform/README.md
+    description: Terraform helper pipe.
+
+  - name: update-docker-hub-readme
+    image: cenk1cenk2/pipe-update-docker-hub-readme
+    readme: ./update-docker-hub-readme/README.md
+    description: Updates the README on DockerHub for given repository.

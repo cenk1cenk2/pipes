@@ -12,5 +12,6 @@ use (
 	./semantic-release
 	./template
 	./terraform
+	./tests
 	./update-docker-hub-readme
 )
