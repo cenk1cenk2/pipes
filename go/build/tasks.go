@@ -42,9 +42,9 @@ func GoBuild(tl *TaskList) *Task {
 							"-mod=vendor",
 							"-v",
 						).
-							SetDir(setup.P.Cwd).
+							SetDir(setup.C.Cwd).
 							Set(func(c *Command) error {
-								t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, setup.P.Cwd, target.Os, target.Arch)
+								t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, setup.C.Cwd, target.Os, target.Arch)
 
 								if !P.EnableCGO {
 									c.AppendEnvironment(map[string]string{
@@ -80,7 +80,7 @@ func GoBuild(tl *TaskList) *Task {
 
 								return nil
 							}).
-							AppendEnvironment(setup.C.EnvVars).
+							AppendEnvironment(setup.C.Env).
 							AddSelfToTheTask()
 
 						return nil

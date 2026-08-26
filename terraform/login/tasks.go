@@ -19,7 +19,7 @@ func GenerateTerraformRegistryCredentialsEnvVars(tl *TaskList) *Task {
 				sanitized := strings.ReplaceAll(c.Registry, ".", "_")
 				sanitized = strings.ReplaceAll(sanitized, "-", "__")
 
-				setup.C.EnvVars["TF_TOKEN_"+sanitized] = c.Token
+				setup.C.Env["TF_TOKEN_"+sanitized] = c.Token
 			}
 
 			return nil

@@ -6,17 +6,6 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func ParseReferences(tl *TaskList) *Task {
-	return tl.CreateTask("init", "references").
-		Set(func(t *Task) error {
-			C.References = P.Git.References()
-
-			t.Log.Debugf("References for environment selection: %v", C.References)
-
-			return nil
-		})
-}
-
 func ContainerBuild(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		Set(func(t *Task) error {

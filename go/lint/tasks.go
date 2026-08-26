@@ -20,9 +20,9 @@ func GoLint(tl *TaskList) *Task {
 					"-f",
 					"{{.Dir}}",
 				).
-					AppendEnvironment(setup.C.EnvVars).
+					AppendEnvironment(setup.C.Env).
 					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-					SetDir(setup.P.Cwd).
+					SetDir(setup.C.Cwd).
 					EnableStreamRecording().
 					ShouldRunAfter(func(c *Command) error {
 						for _, module := range c.GetStdoutStream() {
@@ -56,7 +56,7 @@ func GoLint(tl *TaskList) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.EnvVars).
+				AppendEnvironment(setup.C.Env).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
 				AddSelfToTheTask()
 

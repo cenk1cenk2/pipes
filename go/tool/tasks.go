@@ -9,7 +9,7 @@ import (
 
 func GoTool(tl *TaskList) *Task {
 	return CreateGoToolTask(tl, CreateGoToolTaskOptions{
-		Cwd:  setup.P.Cwd,
+		Cwd:  setup.C.Cwd,
 		Tool: P.Tool,
 		Args: P.Args,
 	})
@@ -31,7 +31,7 @@ func CreateGoToolTask(tl *TaskList, options CreateGoToolTaskOptions) *Task {
 				SetDir(options.Cwd).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command) error {
-					t.Log.Infof("Tool: %s in %s", options.Tool, setup.P.Cwd)
+					t.Log.Infof("Tool: %s in %s", options.Tool, setup.C.Cwd)
 
 					c.AppendArgs(options.Tool)
 
@@ -39,7 +39,7 @@ func CreateGoToolTask(tl *TaskList, options CreateGoToolTaskOptions) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.EnvVars).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil

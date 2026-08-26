@@ -11,7 +11,7 @@ import (
 var _ = Describe("Terraform report discriminators", func() {
 	BeforeEach(func() {
 		state.P.State.Name = "default"
-		setup.P.Project.Cwd = "."
+		setup.C.Cwd = "."
 	})
 
 	It("holds nothing back when neither value has moved off its default", func() {
@@ -25,14 +25,14 @@ var _ = Describe("Terraform report discriminators", func() {
 	})
 
 	It("carries a root module other than the working directory", func() {
-		setup.P.Project.Cwd = ".deploy/sun"
+		setup.C.Cwd = ".deploy/sun"
 
 		Expect(terraformReportDiscriminators()).To(Equal([]string{".deploy/sun"}))
 	})
 
 	It("carries both, state first", func() {
 		state.P.State.Name = "production"
-		setup.P.Project.Cwd = ".deploy/sun"
+		setup.C.Cwd = ".deploy/sun"
 
 		Expect(terraformReportDiscriminators()).To(Equal([]string{"production", ".deploy/sun"}))
 	})

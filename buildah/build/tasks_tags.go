@@ -3,113 +3,45 @@ package build
 import (
 	"fmt"
 	"os"
-	"path"
-	"slices"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	"gitlab.kilic.dev/devops/pipes/buildah/manifest"
-	"gitlab.kilic.dev/devops/pipes/internal/git"
-	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 	"go.yaml.in/yaml/v4"
 )
 
-func ContainerImageTagsParent(tl *TaskList) *Task {
-	return tl.CreateTask("tags").
-		SetJobWrapper(func(job Job, t *Task) Job {
-			return JobSequence(
-				JobParallel(
-					ContainerImageTagsFromUser(tl).Job(),
-					ContainerImageTagsFromFile(tl).Job(),
-				),
-				ContainerImageTagsFromLatest(tl).Job(),
-				job,
-				ContainerManifestFileWrite(tl).Job(),
-			)
-		}).
-		Set(func(t *Task) error {
-			C.Tags = slices.Compact(C.Tags)
+// The collector reads the parsed flags, so it is only built from inside a task
+// list, never at package level.
+func ContainerImageTags() *versions.Collector {
+	return &versions.Collector{
+		Name:  "tags",
+		Label: "Image tags",
 
-			t.Log.Infof(
-				"Image tags: %s", strings.Join(C.Tags, ", "),
-			)
+		FromUser: P.ContainerImage.Tags,
 
-			return nil
-		})
+		File:       P.ContainerImage.TagsFile,
+		FileStrict: P.ContainerImage.TagsFileStrict,
+		FileDir:    P.ContainerFile.Context,
+
+		LatestWhen:  P.ContainerImage.TagAsLatest,
+		LatestValue: P.ContainerImage.LatestTag,
+		References:  P.Git.References(),
+
+		Templates: P.ContainerImage.TagsTemplate,
+		Sanitize:  P.ContainerImage.TagsSanitize,
+
+		Format: func(tag string) string {
+			if login.P.Uri == "" {
+				return fmt.Sprintf("%s:%s", P.ContainerImage.Name, tag)
+			}
+
+			return fmt.Sprintf("%s/%s:%s", login.P.Uri, P.ContainerImage.Name, tag)
+		},
+	}
 }
 
-func ContainerImageTagsFromUser(tl *TaskList) *Task {
-	return tl.CreateTask("tags", "user").
-		Set(func(t *Task) error {
-			// add all the specified tags
-			for _, v := range slices.Compact(P.ContainerImage.Tags) {
-				if err := AddContainerImageTag(t, v); err != nil {
-					return err
-				}
-			}
-
-			return nil
-		})
-}
-
-func ContainerImageTagsFromFile(tl *TaskList) *Task {
-	return tl.CreateTask("tags", "file").
-		ShouldDisable(func(t *Task) bool {
-			return P.ContainerImage.TagsFile == ""
-		}).
-		Set(func(t *Task) error {
-			// add tags through tags file
-			tags, err := tagsfile.Parse(t.Log, path.Join(P.ContainerFile.Context, P.ContainerImage.TagsFile), P.ContainerImage.TagsFileStrict)
-
-			if err != nil {
-				return err
-			}
-
-			for _, v := range tags {
-				t.CreateSubtask(v).
-					Set(func(t *Task) error {
-						return AddContainerImageTag(t, v)
-					}).
-					AddSelfToTheParentAsParallel()
-			}
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
-		})
-}
-
-func ContainerImageTagsFromLatest(tl *TaskList) *Task {
-	return tl.CreateTask("tags", "latest").
-		ShouldDisable(func(t *Task) bool {
-			return P.ContainerImage.TagAsLatest == nil
-		}).
-		Set(func(t *Task) error {
-			matched, err := git.MatchAny(P.ContainerImage.TagAsLatest, C.References)
-			if err != nil {
-				return fmt.Errorf("Can not process regular expression for latest tag: %w", err)
-			}
-
-			if matched < 0 {
-				return nil
-			}
-
-			if err := AddContainerImageTag(t, P.ContainerImage.LatestTag); err != nil {
-				return err
-			}
-
-			t.Log.Infof(
-				"Will tag image as latest since tag regex matches: %s -> %s",
-				P.ContainerImage.LatestTag,
-				P.ContainerImage.TagAsLatest[matched],
-			)
-
-			return nil
-		})
-}
-
-func ContainerManifestFileWrite(tl *TaskList) *Task {
+func ContainerManifestFileWrite(tl *TaskList, collector *versions.Collector) *Task {
 	return tl.CreateTask("tags", "manifest").
 		ShouldDisable(func(t *Task) bool {
 			return P.ContainerManifest.File == "" || P.ContainerManifest.Target == ""
@@ -120,7 +52,7 @@ func ContainerManifestFileWrite(tl *TaskList) *Task {
 				return err
 			}
 
-			image, err := ProcessContainerImageTag(t, target)
+			image, err := collector.Process(t.Log, target)
 			if err != nil {
 				return err
 			}

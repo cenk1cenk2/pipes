@@ -13,7 +13,7 @@ func HelmInstall(tl *TaskList) *Task {
 				"dependency",
 				"update",
 			).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

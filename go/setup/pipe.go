@@ -1,41 +1,22 @@
 package setup
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
-type (
-	Pipe struct {
-		Cwd   string `validate:"omitempty,dir"`
-		Cache string `validate:"omitempty,dirpath"`
-	}
-
-	Ctx struct {
-		EnvVars map[string]string
-	}
-)
-
-var TL = TaskList{}
-
-var P = &Pipe{}
-var C = &Ctx{
-	EnvVars: map[string]string{},
+type Pipe struct {
+	tool.Config
+	Cache string `validate:"omitempty,dirpath"`
 }
 
-func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
+var P = &Pipe{}
+var C = tool.NewCtx()
 
-			return nil
-		}).
-		Set(func(tl *TaskList) Job {
-			return JobParallel(
-				GoVersion(tl).Job(),
-				GoEnv(tl).Job(),
-			)
+func New(p *plumber.Plumber) *plumber.TaskList {
+	return tool.Setup(p, Spec, &P.Config, C, GoEnv).
+		ShouldRunBefore(func(_ *plumber.TaskList) error {
+			return cli.Validated(p, P)
 		})
 }

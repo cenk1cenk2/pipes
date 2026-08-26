@@ -35,7 +35,7 @@ func HelmPackage(tl *TaskList) *Task {
 							version,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							SetDir(setup.P.Cwd).
+							SetDir(setup.C.Cwd).
 							Set(func(c *Command) error {
 								if P.HelmChart.AppVersion != "" {
 									c.AppendArgs("--app-version", P.HelmChart.AppVersion)
@@ -84,7 +84,7 @@ func HelmPublish(tl *TaskList) *Task {
 							P.HelmChart.Target,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							SetDir(setup.P.Cwd).
+							SetDir(setup.C.Cwd).
 							AddSelfToTheTask()
 
 						return nil

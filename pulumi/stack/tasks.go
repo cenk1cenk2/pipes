@@ -18,7 +18,7 @@ func PulumiSelectStack(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil
