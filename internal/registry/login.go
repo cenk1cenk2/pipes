@@ -9,6 +9,19 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/cli"
 )
 
+// LoginStep is the login stage of a pipe: the registry flags it declares and the
+// task list that authenticates with them. It is declared once per pipe, so every
+// command that publishes composes the same step rather than its own copy of the
+// flags.
+func LoginStep(spec Spec, creds *Credentials, binary string, args ...string) cli.Step {
+	return cli.Step{
+		Flags: NewFlags(spec, creds),
+		New: func(p *plumber.Plumber) *plumber.TaskList {
+			return LoginTaskList(p, creds, binary, args...)
+		},
+	}
+}
+
 // LoginTaskList logs in to the registry with the given binary, which is invoked
 // as "<binary> <args...> <uri> --username <username> --password-stdin".
 func LoginTaskList(p *plumber.Plumber, creds *Credentials, binary string, args ...string) *plumber.TaskList {

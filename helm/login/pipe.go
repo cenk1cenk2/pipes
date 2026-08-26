@@ -1,12 +1,12 @@
 package login
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
+// P is the chart registry the pipe authenticates against.
 var P = &registry.Credentials{}
 
-func New(p *plumber.Plumber) *plumber.TaskList {
-	return registry.LoginTaskList(p, P, "helm", "registry", "login")
-}
+// Step is the login stage of the helm commands that reach the registry, which is
+// every command that pulls a dependency or pushes a chart.
+var Step = registry.LoginStep(Spec, P, "helm", "registry", "login")

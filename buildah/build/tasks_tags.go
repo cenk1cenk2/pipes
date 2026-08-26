@@ -5,7 +5,6 @@ import (
 	"os"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	"gitlab.kilic.dev/devops/pipes/buildah/manifest"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 	"go.yaml.in/yaml/v4"
@@ -13,7 +12,7 @@ import (
 
 // The collector reads the parsed flags, so it is only built from inside a task
 // list, never at package level.
-func ContainerImageTags() *versions.Collector {
+func ContainerImageTags(deps Deps) *versions.Collector {
 	return &versions.Collector{
 		Name:  "tags",
 		Label: "Image tags",
@@ -32,11 +31,11 @@ func ContainerImageTags() *versions.Collector {
 		Sanitize:  P.ContainerImage.TagsSanitize,
 
 		Format: func(tag string) string {
-			if login.P.Uri == "" {
+			if deps.Registry.Uri == "" {
 				return fmt.Sprintf("%s:%s", P.ContainerImage.Name, tag)
 			}
 
-			return fmt.Sprintf("%s/%s:%s", login.P.Uri, P.ContainerImage.Name, tag)
+			return fmt.Sprintf("%s/%s:%s", deps.Registry.Uri, P.ContainerImage.Name, tag)
 		},
 	}
 }
