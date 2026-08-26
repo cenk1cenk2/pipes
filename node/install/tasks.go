@@ -17,7 +17,7 @@ func InstallNodeDependencies(tl *TaskList, deps Deps) *Task {
 				packageManager.Exe,
 			).
 				Set(func(c *Command) error {
-					if P.NodeInstall.UseLockFile {
+					if P.Install.UseLockFile {
 						c.AppendArgs(packageManager.Commands.InstallWithLock...)
 
 						t.Log.Infoln("Using lockfile for installation.")
@@ -27,9 +27,9 @@ func InstallNodeDependencies(tl *TaskList, deps Deps) *Task {
 						t.Log.Infoln("Installing dependencies without a lockfile.")
 					}
 
-					c.AppendArgs(strings.Split(P.NodeInstall.Args, " ")...)
+					c.AppendArgs(strings.Split(P.Install.Args, " ")...)
 
-					if P.NodeInstall.Cache {
+					if P.Install.Cache {
 						cacheDir := fmt.Sprintf(".%s", packageManager.Exe)
 						t.Log.Infof("Setting up cache: %s", cacheDir)
 
@@ -37,7 +37,7 @@ func InstallNodeDependencies(tl *TaskList, deps Deps) *Task {
 						c.AppendArgs(cacheDir)
 					}
 
-					c.SetDir(P.NodeInstall.Cwd)
+					c.SetDir(P.Install.Cwd)
 
 					c.AppendDirectEnvironment(os.Environ()...).
 						AppendEnvironment(deps.Environment.EnvVars)

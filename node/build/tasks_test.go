@@ -51,7 +51,7 @@ var _ = Describe("Node build", func() {
 	}
 
 	pipe := func() Pipe {
-		return Pipe{NodeBuild: NodeBuild{Script: "build", Cwd: "projects/web"}}
+		return Pipe{Build: Build{Script: "build", Cwd: "projects/web"}}
 	}
 
 	It("runs the build script through the resolved package manager", func() {
@@ -72,7 +72,7 @@ var _ = Describe("Node build", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.NodeBuild.ScriptArgs = "--verbose"
+		p.Build.ScriptArgs = "--verbose"
 
 		Expect(run(runner, p, deps("npm"))).To(Succeed())
 
@@ -85,8 +85,8 @@ var _ = Describe("Node build", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.NodeBuild.Script = "build:{{ .Environment }}"
-		p.NodeBuild.ScriptArgs = "--url {{ index .EnvVars \"API_URL\" }}"
+		p.Build.Script = "build:{{ .Environment }}"
+		p.Build.ScriptArgs = "--url {{ index .EnvVars \"API_URL\" }}"
 
 		Expect(run(runner, p, deps("pnpm"))).To(Succeed())
 

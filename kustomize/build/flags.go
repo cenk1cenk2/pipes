@@ -19,9 +19,10 @@ var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
 		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize-build.enable-helm",
+		Name:     "kustomize.build.enable-helm",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_ENABLE_HELM"),
+			cli.EnvVar("KUSTOMIZE_BUILD_ENABLE_HELM"),
 		),
 		Usage:       "Enable the Helm chart inflation generator while building overlays.",
 		Required:    false,
@@ -31,9 +32,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize-build.helm-command",
+		Name:     "kustomize.build.helm-command",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_HELM_COMMAND"),
+			cli.EnvVar("KUSTOMIZE_BUILD_HELM_COMMAND"),
 		),
 		Usage:       "Helm binary to use for the Helm chart inflation generator.",
 		Required:    false,
@@ -43,9 +45,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize-build.load-restrictor",
+		Name:     "kustomize.build.load-restrictor",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_LOAD_RESTRICTOR"),
+			cli.EnvVar("KUSTOMIZE_BUILD_LOAD_RESTRICTOR"),
 		),
 		Usage:       "Load restrictor for Kustomize file access. \"rootOnly\" restricts loads to the overlay root, \"none\" allows loading files outside the overlay directory (matches ArgoCD). format(enum(\"rootOnly\", \"none\"))",
 		Required:    false,
@@ -55,9 +58,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize-build.kube-version",
+		Name:     "kustomize.build.kube-version",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_KUBE_VERSION"),
+			cli.EnvVar("KUSTOMIZE_BUILD_KUBE_VERSION"),
 		),
 		Usage:       "Kubernetes version passed to the Helm chart inflation generator.",
 		Required:    false,
@@ -67,7 +71,7 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize-build.output",
+		Name:     "kustomize.build.output",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_BUILD_OUTPUT"),
 		),

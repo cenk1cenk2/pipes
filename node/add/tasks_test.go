@@ -51,7 +51,7 @@ var _ = Describe("Node add", func() {
 	}
 
 	pipe := func() Pipe {
-		return Pipe{NodeAdd: NodeAdd{Packages: []string{"typescript", "eslint"}, Cwd: "projects/web"}}
+		return Pipe{Add: Add{Packages: []string{"typescript", "eslint"}, Cwd: "projects/web"}}
 	}
 
 	It("adds the packages through the resolved package manager", func() {
@@ -72,7 +72,7 @@ var _ = Describe("Node add", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.NodeAdd.Global = true
+		p.Add.Global = true
 
 		Expect(run(runner, p, deps("yarn"))).To(Succeed())
 
@@ -85,7 +85,7 @@ var _ = Describe("Node add", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.NodeAdd.ScriptArgs = "--registry={{ index .EnvVars \"REGISTRY\" }}"
+		p.Add.ScriptArgs = "--registry={{ index .EnvVars \"REGISTRY\" }}"
 
 		Expect(run(runner, p, deps("pnpm"))).To(Succeed())
 

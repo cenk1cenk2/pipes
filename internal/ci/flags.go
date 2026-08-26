@@ -14,7 +14,7 @@ func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
 	return []ucli.Flag{
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,
-			Name:        "report.job-name",
+			Name:        "ci.job-name",
 			Sources:     cli.EnvVars("CI_JOB_NAME"),
 			Usage:       "GitLab CI job name to include in the plan report metadata.",
 			Required:    false,
@@ -24,7 +24,7 @@ func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
 
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,
-			Name:        "report.job-url",
+			Name:        "ci.job-url",
 			Sources:     cli.EnvVars("CI_JOB_URL"),
 			Usage:       "GitLab CI job URL to include in the plan report metadata.",
 			Required:    false,
@@ -34,7 +34,7 @@ func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
 
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,
-			Name:        "report.pipeline-id",
+			Name:        "ci.pipeline-id",
 			Sources:     cli.EnvVars("CI_PIPELINE_ID"),
 			Usage:       "GitLab CI pipeline id to include in the plan report metadata.",
 			Required:    false,
@@ -44,7 +44,7 @@ func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
 
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,
-			Name:        "report.pipeline-url",
+			Name:        "ci.pipeline-url",
 			Sources:     cli.EnvVars("CI_PIPELINE_URL"),
 			Usage:       "GitLab CI pipeline URL to include in the plan report metadata.",
 			Required:    false,
@@ -54,7 +54,7 @@ func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
 
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,
-			Name:        "report.commit-sha",
+			Name:        "ci.commit-sha",
 			Sources:     cli.EnvVars("CI_COMMIT_SHA"),
 			Usage:       "Git commit sha to include in the plan report metadata.",
 			Required:    false,
@@ -64,7 +64,7 @@ func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
 
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,
-			Name:        "report.commit-short-sha",
+			Name:        "ci.commit-short-sha",
 			Sources:     cli.EnvVars("CI_COMMIT_SHORT_SHA"),
 			Usage:       "Short git commit sha to include in the plan report metadata.",
 			Required:    false,

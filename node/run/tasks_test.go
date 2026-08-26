@@ -54,7 +54,7 @@ var _ = Describe("Node run", func() {
 	It("runs the arguments it was given as the script and its arguments", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, Pipe{NodeCommand: NodeCommand{Cwd: "."}}, "tsc", "src")).To(Succeed())
+		Expect(run(runner, Pipe{Run: Run{Cwd: "."}}, "tsc", "src")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -68,7 +68,7 @@ var _ = Describe("Node run", func() {
 	It("cuts the script flag into the script and its arguments", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, Pipe{NodeCommand: NodeCommand{Script: "lint --fix", Cwd: "."}})).To(Succeed())
+		Expect(run(runner, Pipe{Run: Run{Script: "lint --fix", Cwd: "."}})).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -81,7 +81,7 @@ var _ = Describe("Node run", func() {
 		runner := fixtures.Runner()
 
 		Expect(run(runner, Pipe{
-			NodeCommand: NodeCommand{Script: "deploy:{{.Environment}} {{ index .EnvVars \"API_URL\" }}", Cwd: "."},
+			Run: Run{Script: "deploy:{{.Environment}} {{ index .EnvVars \"API_URL\" }}", Cwd: "."},
 		})).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()

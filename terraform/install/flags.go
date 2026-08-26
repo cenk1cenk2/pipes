@@ -8,9 +8,10 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Name: "terraform-install.reconfigure",
+		Name: "terraform.install.reconfigure",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_INSTALL_RECONFIGURE"),
+			cli.EnvVar("TERRAFORM_INSTALL_RECONFIGURE"),
 		),
 		Usage:       "Reconfigure flag for terraform init.",
 		Required:    false,
@@ -19,9 +20,10 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Name: "terraform-install.use-lockfile",
+		Name: "terraform.install.use-lockfile",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_INSTALL_USE_LOCKFILE"),
+			cli.EnvVar("TERRAFORM_INSTALL_USE_LOCKFILE"),
 		),
 		Usage:       "Use lockfile for terraform init.",
 		Required:    false,
@@ -30,9 +32,10 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Name: "terraform-install.args",
+		Name: "terraform.install.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_INSTALL_ARGS"),
+			cli.EnvVar("TERRAFORM_INSTALL_ARGS"),
 		),
 		Usage:       "Additional arguments for terraform init.",
 		Required:    false,

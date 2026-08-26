@@ -10,14 +10,14 @@ import (
 )
 
 type (
-	NodeCommand struct {
+	Run struct {
 		Script  string
 		Cwd     string `validate:"dir"`
 		Command []string
 	}
 
 	Pipe struct {
-		NodeCommand
+		Run
 	}
 
 	Ctx struct {
@@ -42,11 +42,11 @@ func New(p *Plumber, deps Deps) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if P.NodeCommand.Script == "" {
+			if P.Run.Script == "" {
 				C.Script = P.Command[0]
 				C.ScriptArgs = strings.Join(P.Command[1:], " ")
 			} else {
-				C.Script, C.ScriptArgs, _ = strings.Cut(P.NodeCommand.Script, " ")
+				C.Script, C.ScriptArgs, _ = strings.Cut(P.Run.Script, " ")
 			}
 
 			return icli.Validated(p, P)

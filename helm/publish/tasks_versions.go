@@ -11,13 +11,13 @@ func HelmChartVersions(deps Deps) *versions.Collector {
 		Name:  "versions",
 		Label: "Helm Chart versions",
 
-		FromUser: P.HelmChart.Versions,
+		FromUser: P.Chart.Versions,
 
-		File:       P.HelmChart.VersionFile,
-		FileStrict: P.HelmChart.VersionFileStrict,
+		File:       P.Chart.VersionFile,
+		FileStrict: P.Chart.VersionFileStrict,
 		FileDir:    deps.Tool.Cwd,
 
-		Templates: P.HelmChart.VersionsTemplate,
-		Sanitize:  P.HelmChart.VersionsSanitize,
+		Templates: P.Chart.VersionsTemplate,
+		Sanitize:  P.Chart.VersionsSanitize,
 	}
 }

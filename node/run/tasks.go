@@ -41,7 +41,7 @@ func RunNodeScript(tl *TaskList, deps Deps) *Task {
 						c.AppendArgs(tmpl)
 					}
 
-					c.SetDir(P.NodeCommand.Cwd)
+					c.SetDir(P.Run.Cwd)
 
 					return nil
 				}).

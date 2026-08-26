@@ -9,7 +9,7 @@ import (
 )
 
 type (
-	ContainerImage struct {
+	Image struct {
 		Platforms      []string
 		Name           string
 		Tags           []string
@@ -27,21 +27,21 @@ type (
 		StorageDriver  string `validate:"oneof=overlay overlay2 vfs"`
 	}
 
-	ContainerFile struct {
+	File struct {
 		Context string
 		Name    string
 	}
 
-	ContainerManifest struct {
+	Manifest struct {
 		Target string
 		File   string
 	}
 
 	Pipe struct {
 		Git git.Refs
-		ContainerImage
-		ContainerFile
-		ContainerManifest
+		Image
+		File
+		Manifest
 	}
 
 	Ctx struct {

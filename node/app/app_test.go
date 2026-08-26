@@ -101,7 +101,7 @@ var _ = Describe("New", func() {
 
 		runner := fixtures.Runner()
 
-		Expect(run(runner, "build", "--node.build_script", "compile")).To(Succeed())
+		Expect(run(runner, "build", "--node.build.script", "compile")).To(Succeed())
 
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("run compile")))
 	})

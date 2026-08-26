@@ -34,8 +34,8 @@ var Flags = CombineFlags(
 		// CATEGORY_CONFIG
 		&ucli.StringFlag{
 			Category:    CATEGORY_CONFIG,
-			Name:        "terraform-config.log-level",
-			Sources:     cli.EnvVars("TF_LOG_LEVEL", "TF_LOG"),
+			Name:        "terraform.log-level",
+			Sources:     cli.EnvVars("TF_LOG_LEVEL", "TF_LOG", "TERRAFORM_LOG_LEVEL"),
 			Usage:       `Terraform log level. enum("trace", "debug", "info", "warn", "error")`,
 			Required:    false,
 			Value:       "",
@@ -46,8 +46,8 @@ var Flags = CombineFlags(
 
 		&ucli.StringFlag{
 			Category:    CATEGORY_CI_VARIABLES,
-			Name:        "terraform-var.api-url",
-			Sources:     cli.EnvVars("TF_VAR_CI_API_V4_URL", "CI_API_V4_URL"),
+			Name:        "terraform.ci.api-url",
+			Sources:     cli.EnvVars("TF_VAR_CI_API_V4_URL", "CI_API_V4_URL", "TERRAFORM_CI_API_URL"),
 			Usage:       "Injected CI api-url variable to the deployment.",
 			Required:    false,
 			Value:       "",
@@ -56,8 +56,8 @@ var Flags = CombineFlags(
 
 		&ucli.StringFlag{
 			Category:    CATEGORY_CI_VARIABLES,
-			Name:        "terraform-var.project-id",
-			Sources:     cli.EnvVars("TF_VAR_CI_PROJECT_ID", "CI_PROJECT_ID"),
+			Name:        "terraform.ci.project-id",
+			Sources:     cli.EnvVars("TF_VAR_CI_PROJECT_ID", "CI_PROJECT_ID", "TERRAFORM_CI_PROJECT_ID"),
 			Usage:       "Injected CI project-id variable to the deployment.",
 			Required:    false,
 			Value:       "",

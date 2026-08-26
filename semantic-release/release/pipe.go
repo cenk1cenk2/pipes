@@ -11,7 +11,7 @@ type (
 	}
 
 	SemanticRelease struct {
-		IsDryRun          bool
+		DryRun            bool
 		Workspace         bool
 		IsolateWorkspaces []string
 	}

@@ -17,14 +17,14 @@ var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
 		Category: CATEGORY_SEMANTIC_RELEASE,
-		Name:     "semantic-release.dry_run",
+		Name:     "semantic-release.dry-run",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_DRY_RUN"),
 		),
 		Usage:       "Run semantic-release in dry mode without making changes.",
 		Required:    false,
 		Value:       false,
-		Destination: &P.SemanticRelease.IsDryRun,
+		Destination: &P.SemanticRelease.DryRun,
 	},
 
 	&cli.BoolFlag{
@@ -43,9 +43,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_CI_VARIABLES,
-		Name:     "ci.commit-ref-name",
+		Name:     "semantic-release.ci.commit-reference",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("CI_COMMIT_REF_NAME"),
+			cli.EnvVar("SEMANTIC_RELEASE_CI_COMMIT_REFERENCE"),
 		),
 		Usage:       "Current commit reference that can be branch or tag name of the project..",
 		Required:    false,

@@ -15,6 +15,7 @@ var Flags = CombineFlags(
 			Name: "pulumi.preview.plan",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("PULUMI_PLAN"),
+				cli.EnvVar("PULUMI_PREVIEW_PLAN"),
 			),
 			Usage:       "Output file for pulumi plan.",
 			Required:    false,
@@ -23,9 +24,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "pulumi.preview.summary-output",
+			Name: "pulumi.preview.summary.output",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("PULUMI_SUMMARY_OUTPUT"),
+				cli.EnvVar("PULUMI_PREVIEW_SUMMARY_OUTPUT"),
 			),
 			Usage:       "Output file for Pulumi preview summary. Leave empty to skip summary generation.",
 			Required:    false,

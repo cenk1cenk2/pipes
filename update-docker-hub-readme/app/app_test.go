@@ -69,9 +69,9 @@ var _ = Describe("New", func() {
 			"--docker-hub.username", "user",
 			"--docker-hub.password", "password",
 			"--docker-hub.address", "https://hub.example.test/v2/repositories",
-			"--readme.repository", "cenk1cenk2/pipe-go",
-			"--readme.file", readme,
-			"--readme.short-description", "Golang operations for pipelines.",
+			"--docker-hub.readme.repository", "cenk1cenk2/pipe-go",
+			"--docker-hub.readme.file", readme,
+			"--docker-hub.readme.description", "Golang operations for pipelines.",
 		)).To(Succeed())
 
 		// The user agent is the name of the pipe, which is what makes the dial worth

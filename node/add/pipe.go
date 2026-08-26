@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	NodeAdd struct {
+	Add struct {
 		Packages   []string
 		Global     bool
 		ScriptArgs string
@@ -16,7 +16,7 @@ type (
 	}
 
 	Pipe struct {
-		NodeAdd
+		Add
 	}
 
 	// Deps is the package manager the packages are added with and the
@@ -35,7 +35,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldDisable(func(tl *TaskList) bool {
-			return len(P.NodeAdd.Packages) == 0
+			return len(P.Add.Packages) == 0
 		}).
 		ShouldRunBefore(func(tl *TaskList) error {
 			return icli.Validated(p, P)

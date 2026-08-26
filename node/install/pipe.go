@@ -8,7 +8,7 @@ import (
 )
 
 type (
-	NodeInstall struct {
+	Install struct {
 		Cwd         string `validate:"dir"`
 		UseLockFile bool
 		Args        string
@@ -16,7 +16,7 @@ type (
 	}
 
 	Pipe struct {
-		NodeInstall
+		Install
 	}
 
 	// Deps is the package manager the dependencies are installed with and the

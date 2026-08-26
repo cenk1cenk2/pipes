@@ -11,6 +11,7 @@ var Flags = []cli.Flag{
 		Name: "pulumi.up.plan",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PULUMI_PLAN"),
+			cli.EnvVar("PULUMI_UP_PLAN"),
 		),
 		Usage:       "Input file for pulumi plan.",
 		Required:    false,

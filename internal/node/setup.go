@@ -30,7 +30,7 @@ func NewFlags(cfg *Config) []ucli.Flag {
 	return []ucli.Flag{
 		&ucli.StringFlag{
 			Category:    CATEGORY_PACKAGE_MANAGER,
-			Name:        "node.package_manager",
+			Name:        "node.package-manager",
 			Sources:     cli.EnvVars("NODE_PACKAGE_MANAGER"),
 			Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
 			Required:    false,
