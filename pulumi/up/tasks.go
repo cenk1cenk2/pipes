@@ -2,10 +2,9 @@ package up
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 )
 
-func PulumiUp(tl *TaskList) *Task {
+func PulumiUp(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("up").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -17,7 +16,7 @@ func PulumiUp(tl *TaskList) *Task {
 				"--plan",
 				P.Plan,
 			).
-				SetDir(setup.C.Cwd).
+				SetDir(deps.Tool.Cwd).
 				AddSelfToTheTask()
 
 			return nil
