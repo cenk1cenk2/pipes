@@ -15,3 +15,9 @@ packages:
     interfaces:
       Notes:
       ModuleRegistry:
+  gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub:
+    config:
+      dir: update-docker-hub-readme/test/mocks/hub
+      pkgname: mockhub
+    interfaces:
+      Client:

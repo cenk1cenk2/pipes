@@ -1,31 +1,20 @@
 package main
 
 import (
-	"context"
-
-	"github.com/urfave/cli/v3"
+	ucli "github.com/urfave/cli/v3"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/pipe"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
+	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
 )
 
 func main() {
 	NewPlumber(
-		func(p *Plumber) *cli.Command {
-			return &cli.Command{
-				Name:        CLI_NAME,
-				Version:     VERSION,
-				Usage:       DESCRIPTION,
-				Description: DESCRIPTION,
-				Flags:       pipe.Flags,
-				Action: func(_ context.Context, c *cli.Command) error {
-					return p.RunJobs(
-						CombineTaskLists(
-							pipe.New(p),
-						),
-					)
-				},
-			}
+		func(p *Plumber) *ucli.Command {
+			return cli.Root(p, CLI_NAME, DESCRIPTION, VERSION,
+				update.Step(update.Deps{Hub: hub.NewClient}),
+			)
 		}).
 		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
