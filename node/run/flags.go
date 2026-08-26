@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v3"
-	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
 //revive:disable:line-length-limit
@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 		),
 		Usage: fmt.Sprintf(
 			"package.json script for given command operation. %s",
-			environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE,
+			environment.HELP_FORMAT_TEMPLATE,
 		),
 		Required:    false,
 		Destination: &P.NodeCommand.Script,

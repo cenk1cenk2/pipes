@@ -51,7 +51,6 @@ include:
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: node
-      extra-path-1: select-env/**/*
       container-matrix:
         - CONTAINER_FILE_NAME: Dockerfile
           CONTAINER_IMAGE_BUILD_ARGS: |-
@@ -88,8 +87,6 @@ include:
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: semantic-release
-      extra-path-1: select-env/**/*
-      extra-path-2: node/**/*
       container-matrix:
         - CONTAINER_FILE_NAME: Dockerfile
           CONTAINER_IMAGE_BUILD_ARGS: |-

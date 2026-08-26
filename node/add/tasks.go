@@ -2,27 +2,27 @@ package pipe
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
-	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
 func AddNodeModules(tl *TaskList) *Task {
 	return tl.CreateTask("packages", "node").
 		Set(func(t *Task) error {
 			t.CreateCommand(
-				setup.C.PackageManager.Exe,
+				setup.NodeCtx.PackageManager.Exe,
 			).
 				Set(func(c *Command) error {
-					ctx := environment.EnvironmentTemplate{
-						Environment: environment.C.Environment,
-						EnvVars:     environment.C.EnvVars,
+					ctx := environment.Template{
+						Environment: setup.EnvironmentCtx.Environment,
+						EnvVars:     setup.EnvironmentCtx.EnvVars,
 					}
 
 					if P.NodeAdd.Global {
-						c.AppendArgs(setup.C.PackageManager.Commands.Global...)
+						c.AppendArgs(setup.NodeCtx.PackageManager.Commands.Global...)
 					}
 
-					c.AppendArgs(setup.C.PackageManager.Commands.Add...)
+					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.Add...)
 
 					if P.NodeAdd.ScriptArgs != "" {
 						tmpl, err := InlineTemplate(P.NodeAdd.ScriptArgs, ctx)

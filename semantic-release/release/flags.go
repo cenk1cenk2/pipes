@@ -1,4 +1,4 @@
-package pipe
+package release
 
 import (
 	"github.com/urfave/cli/v3"

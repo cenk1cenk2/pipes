@@ -1,9 +1,8 @@
-package pipe
+package write
 
 import (
 	"github.com/urfave/cli/v3"
-
-	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
 //revive:disable:line-length-limit
