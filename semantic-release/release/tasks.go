@@ -1,4 +1,4 @@
-package pipe
+package release
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"

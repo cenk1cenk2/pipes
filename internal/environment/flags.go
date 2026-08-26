@@ -1,7 +1,6 @@
-package setup
+package environment
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
 	ucli "github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
@@ -9,20 +8,25 @@ import (
 
 //revive:disable:line-length-limit
 
-const (
-	CATEGORY_ENVIRONMENT = "Environment"
+const CATEGORY_ENVIRONMENT = "Environment"
 
-	DEFAULT_ENVIRONMENT_CONDITIONS = `[
-    { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },
-    { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },
-    { "match" :"^heads/main$", "environment": "develop" },
-    { "match": "^heads/master$", "environment": "develop" }
-]`
-)
+// Config is the environment selection a pipe was configured with.
+type Config struct {
+	Enable            bool
+	Conditions        []Condition
+	FailOnNoReference bool
+	Strict            bool
+	Git               git.Refs
+}
 
-var Flags = CombineFlags(
-	git.NewFlags(&P.Git),
-	[]ucli.Flag{
+// NewFlags builds the environment flags onto cfg. The git flags come first
+// because the references they carry are what the conditions match against.
+//
+// The pipes that only inject an environment on request unhide the enable flag
+// and flip its default with OverwriteCliFlag, so the flag stays hidden and on
+// here for the pipe whose whole job this is.
+func NewFlags(cfg *Config) []ucli.Flag {
+	return append(git.NewFlags(&cfg.Git), []ucli.Flag{
 		&ucli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.enable",
@@ -31,10 +35,8 @@ var Flags = CombineFlags(
 			Required:    false,
 			Hidden:      true,
 			Value:       true,
-			Destination: &P.Environment.Enable,
+			Destination: &cfg.Enable,
 		},
-
-		// CATEGORY_ENVIRONMENT
 
 		cli.JSONFlag(&ucli.StringFlag{
 			Category: CATEGORY_ENVIRONMENT,
@@ -44,8 +46,8 @@ var Flags = CombineFlags(
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json([]struct{ match: RegExp, environment: string })`,
 			Required: false,
-			Value:    DEFAULT_ENVIRONMENT_CONDITIONS,
-		}, &P.Environment.Conditions),
+			Value:    DEFAULT_CONDITIONS,
+		}, &cfg.Conditions),
 
 		&ucli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
@@ -54,7 +56,7 @@ var Flags = CombineFlags(
 			Usage:       "Fail on missing environment references.",
 			Required:    false,
 			Value:       true,
-			Destination: &P.Environment.FailOnNoReference,
+			Destination: &cfg.FailOnNoReference,
 		},
 
 		&ucli.BoolFlag{
@@ -64,6 +66,7 @@ var Flags = CombineFlags(
 			Usage:       "Fail on no environment selected.",
 			Required:    false,
 			Value:       true,
-			Destination: &P.Environment.Strict,
+			Destination: &cfg.Strict,
 		},
-	})
+	}...)
+}

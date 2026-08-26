@@ -1,4 +1,4 @@
-package pipe
+package release
 
 const (
 	SEMANTIC_RELEASE_EXE       = "semantic-release"
