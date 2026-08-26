@@ -42,7 +42,7 @@ var _ = Describe("IaC merge request report", func() {
 
 	headings := func(body string) []string {
 		found := []string{}
-		for _, line := range strings.Split(body, "\n") {
+		for line := range strings.SplitSeq(body, "\n") {
 			if strings.HasPrefix(line, "#") {
 				found = append(found, strings.SplitN(line, " ", 2)[0])
 			}

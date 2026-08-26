@@ -36,8 +36,7 @@ func New(p *Plumber) *TaskList {
 				C.Script = P.Command[0]
 				C.ScriptArgs = strings.Join(P.Command[1:], " ")
 			} else {
-				C.Script = strings.Split(P.NodeCommand.Script, " ")[0]
-				C.ScriptArgs = strings.Join(strings.Split(P.NodeCommand.Script, " ")[1:], " ")
+				C.Script, C.ScriptArgs, _ = strings.Cut(P.NodeCommand.Script, " ")
 			}
 
 			if err := p.Validate(P); err != nil {

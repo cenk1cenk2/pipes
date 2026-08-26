@@ -256,10 +256,8 @@ func upsertMergeRequestReport(
 			config.ProjectId,
 			config.MergeRequestId,
 			&clientgitlab.ListMergeRequestNotesOptions{
-				ListOptions: clientgitlab.ListOptions{
-					Page:    page,
-					PerPage: 100,
-				},
+				Page:    page,
+				PerPage: 100,
 			},
 			clientgitlab.WithContext(ctx),
 		)
@@ -284,7 +282,7 @@ func upsertMergeRequestReport(
 			config.MergeRequestId,
 			note.ID,
 			&clientgitlab.UpdateMergeRequestNoteOptions{
-				Body: clientgitlab.Ptr(body),
+				Body: new(body),
 			},
 			clientgitlab.WithContext(ctx),
 		)
@@ -303,7 +301,7 @@ func upsertMergeRequestReport(
 		config.ProjectId,
 		config.MergeRequestId,
 		&clientgitlab.CreateMergeRequestNoteOptions{
-			Body: clientgitlab.Ptr(body),
+			Body: new(body),
 		},
 		clientgitlab.WithContext(ctx),
 	)
