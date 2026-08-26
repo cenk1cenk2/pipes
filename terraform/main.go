@@ -1,11 +1,11 @@
 package main
 
 import (
-	"context"
-
-	"github.com/urfave/cli/v3"
+	ucli "github.com/urfave/cli/v3"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/terraform/apply"
 	"gitlab.kilic.dev/devops/pipes/terraform/install"
 	"gitlab.kilic.dev/devops/pipes/terraform/lint"
@@ -18,89 +18,18 @@ import (
 
 func main() {
 	NewPlumber(
-		func(p *Plumber) *cli.Command {
-			return &cli.Command{
-				Name:        CLI_NAME,
-				Version:     VERSION,
-				Usage:       DESCRIPTION,
-				Description: DESCRIPTION,
-				Commands: []*cli.Command{
-					{
-						Name:        "install",
-						Description: "Install terraform project.",
-						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, install.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									login.New(p),
-									state.New(p),
-									install.New(p),
-								),
-							)
-						},
-					},
+		func(p *Plumber) *ucli.Command {
+			tool := setup.Step
+			credentials := login.Step(login.Deps{Tool: setup.C})
+			backend := state.Step(state.Deps{Tool: setup.C, CI: &setup.P.CiVariables})
 
-					{
-						Name:        "lint",
-						Description: "Lint terraform project with terraform.",
-						Flags:       CombineFlags(setup.Flags, lint.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									lint.New(p),
-								),
-							)
-						},
-					},
-
-					{
-						Name:        "plan",
-						Description: "Plan terraform project.",
-						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, plan.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									login.New(p),
-									state.New(p),
-									plan.New(p),
-								),
-							)
-						},
-					},
-
-					{
-						Name:        "apply",
-						Description: "Apply terraform project.",
-						Flags:       CombineFlags(setup.Flags, login.Flags, state.Flags, apply.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									login.New(p),
-									state.New(p),
-									apply.New(p),
-								),
-							)
-						},
-					},
-
-					{
-						Name:        "publish",
-						Description: "Publish terraform project.",
-						Flags:       CombineFlags(publish.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									publish.New(p),
-								),
-							)
-						},
-					},
-				},
-			}
+			return cli.App(CLI_NAME, DESCRIPTION, VERSION,
+				cli.Command(p, "install", "Install terraform project.", tool, credentials, backend, install.Step(install.Deps{Tool: setup.C})),
+				cli.Command(p, "lint", "Lint terraform project with terraform.", tool, lint.Step(lint.Deps{Tool: setup.C})),
+				cli.Command(p, "plan", "Plan terraform project.", tool, credentials, backend, plan.Step(plan.Deps{Tool: setup.C, State: state.P, Notes: gitlab.NewNotes})),
+				cli.Command(p, "apply", "Apply terraform project.", tool, credentials, backend, apply.Step(apply.Deps{Tool: setup.C})),
+				cli.Command(p, "publish", "Publish terraform project.", publish.Step(publish.Deps{Registry: gitlab.NewModuleRegistry})),
+			)
 		}).
 		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
