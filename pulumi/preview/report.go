@@ -2,7 +2,8 @@ package preview
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"maps"
 	"slices"
@@ -128,7 +129,7 @@ func summarizePulumiReport(report iac.Report) pulumiSummary {
 }
 
 func renderSummary(summary pulumiSummary) ([]byte, error) {
-	body, err := json.MarshalIndent(summary, "", "  ")
+	body, err := json.Marshal(summary, jsontext.Multiline(true), jsontext.WithIndent("  "))
 	if err != nil {
 		return nil, fmt.Errorf("render Pulumi summary: %w", err)
 	}
@@ -137,16 +138,16 @@ func renderSummary(summary pulumiSummary) ([]byte, error) {
 }
 
 func parsePulumiPlan(data []byte) (apitype.DeploymentPlanV1, int, error) {
+	// A decode failure means the payload is an unwrapped plan rather than a version
+	// envelope, so it falls through to the unversioned path instead of erroring.
 	var versioned apitype.VersionedDeploymentPlan
-	if err := json.Unmarshal(data, &versioned); err != nil {
-		return apitype.DeploymentPlanV1{}, 0, fmt.Errorf("parse Pulumi plan JSON: %w", err)
-	}
+	if err := json.Unmarshal(data, &versioned, json.RejectUnknownMembers(true)); err == nil {
+		plan := bytes.TrimSpace(versioned.Plan)
+		if len(plan) > 0 && !bytes.Equal(plan, []byte("null")) {
+			deployment, err := parsePulumiDeploymentPlan(plan)
 
-	plan := bytes.TrimSpace(versioned.Plan)
-	if len(plan) > 0 && !bytes.Equal(plan, []byte("null")) {
-		deployment, err := parsePulumiDeploymentPlan(plan)
-
-		return deployment, versioned.Version, err
+			return deployment, versioned.Version, err
+		}
 	}
 
 	deployment, err := parsePulumiDeploymentPlan(data)
@@ -156,7 +157,7 @@ func parsePulumiPlan(data []byte) (apitype.DeploymentPlanV1, int, error) {
 
 func parsePulumiDeploymentPlan(data []byte) (apitype.DeploymentPlanV1, error) {
 	var plan apitype.DeploymentPlanV1
-	if err := json.Unmarshal(data, &plan); err != nil {
+	if err := json.Unmarshal(data, &plan, json.RejectUnknownMembers(true)); err != nil {
 		return apitype.DeploymentPlanV1{}, fmt.Errorf("parse Pulumi plan: %w", err)
 	}
 

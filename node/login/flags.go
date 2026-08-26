@@ -1,7 +1,7 @@
 package login
 
 import (
-	"encoding/json"
+	json "encoding/json/v2"
 	"fmt"
 
 	"github.com/urfave/cli/v3"
@@ -32,7 +32,7 @@ var Flags = []cli.Flag{
 				return nil
 			}
 
-			if err := json.Unmarshal([]byte(v), &P.Npm.Login); err != nil {
+			if err := json.Unmarshal([]byte(v), &P.Npm.Login, json.RejectUnknownMembers(true)); err != nil {
 				return fmt.Errorf("Can not unmarshal Npm registry login credentials: %w", err)
 			}
 

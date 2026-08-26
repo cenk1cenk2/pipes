@@ -1,7 +1,7 @@
 package setup
 
 import (
-	"encoding/json"
+	json "encoding/json/v2"
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -49,7 +49,7 @@ var Flags = CombineFlags(flags.NewGitFlags(
 				return nil
 			}
 
-			if err := json.Unmarshal([]byte(v), &P.Environment.Conditions); err != nil {
+			if err := json.Unmarshal([]byte(v), &P.Environment.Conditions, json.RejectUnknownMembers(true)); err != nil {
 				return fmt.Errorf("Can not unmarshal environment conditions: %w", err)
 			}
 
