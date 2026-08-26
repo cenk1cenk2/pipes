@@ -8,13 +8,13 @@ import (
 	"path"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/parser"
+	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
 func TerraformTagsFile(tl *TaskList) *Task {
 	return tl.CreateTask("tags").
 		Set(func(t *Task) error {
-			tags, err := parser.ParseTagsFile(t.Log, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
+			tags, err := tagsfile.Parse(t.Log, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
 
 			if err != nil {
 				return err

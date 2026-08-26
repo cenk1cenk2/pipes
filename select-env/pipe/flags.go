@@ -3,14 +3,14 @@ package pipe
 import (
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: flags.CATEGORY_ENVIRONMENT,
+		Category: environment.CATEGORY_ENVIRONMENT,
 		Name:     "environment.file",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("ENVIRONMENT_FILE"),

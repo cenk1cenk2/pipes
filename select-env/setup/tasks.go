@@ -3,11 +3,10 @@ package setup
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/parser"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
 )
 
 func Setup(tl *TaskList) *Task {
@@ -23,7 +22,7 @@ func Setup(tl *TaskList) *Task {
 func ParseReferences(tl *TaskList) *Task {
 	return tl.CreateTask("init", "references").
 		Set(func(t *Task) error {
-			C.References = parser.ParseGitReferences(P.Git.Tag, P.Git.Branch)
+			C.References = P.Git.References()
 
 			if P.Environment.FailOnNoReference && len(C.References) == 0 {
 				return fmt.Errorf("References for the given environment has not been found.")
@@ -40,23 +39,20 @@ func SelectEnvironment(tl *TaskList) *Task {
 		Set(func(t *Task) error {
 			t.Log.Debugf("Conditions for environment variable selection: %+v", P.Environment.Conditions)
 
-		out:
+			matches := make([]string, 0, len(P.Environment.Conditions))
 			for _, c := range P.Environment.Conditions {
-				for _, reference := range C.References {
-					re, err := regexp.Compile(c.Match)
+				matches = append(matches, c.Match)
+			}
 
-					if err != nil {
-						return fmt.Errorf("Can not process regular expression for environment: %s -> %w", c.Environment, err)
-					}
+			matched, err := git.MatchAny(matches, C.References)
+			if err != nil {
+				return fmt.Errorf("Can not process regular expression for environment: %w", err)
+			}
 
-					if re.MatchString(reference) {
-						C.Environment = c.Environment
+			if matched >= 0 {
+				C.Environment = P.Environment.Conditions[matched].Environment
 
-						t.Log.Infof("Environment selected: %s", c.Environment)
-
-						break out
-					}
-				}
+				t.Log.Infof("Environment selected: %s", C.Environment)
 			}
 
 			if P.Environment.Strict && C.Environment == "" {

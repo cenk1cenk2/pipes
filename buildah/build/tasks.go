@@ -4,13 +4,12 @@ import (
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/parser"
 )
 
 func ParseReferences(tl *TaskList) *Task {
 	return tl.CreateTask("init", "references").
 		Set(func(t *Task) error {
-			C.References = parser.ParseGitReferences(P.Git.Tag, P.Git.Branch)
+			C.References = P.Git.References()
 
 			t.Log.Debugf("References for environment selection: %v", C.References)
 

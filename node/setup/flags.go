@@ -2,13 +2,14 @@ package setup
 
 import (
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
 )
 
 //revive:disable:line-length-limit
 
 const (
 	CATEGORY_NODE_PACKAGE_MANAGER = "Package Manager"
+
+	DEFAULT_PACKAGE_MANAGER = "pnpm"
 )
 
 var Flags = []cli.Flag{
@@ -23,7 +24,7 @@ var Flags = []cli.Flag{
 		),
 		Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
 		Required:    false,
-		Value:       flags.FLAG_DEFAULT_NODE_PACKAGE_MANAGER,
+		Value:       DEFAULT_PACKAGE_MANAGER,
 		Destination: &P.Node.PackageManager,
 	},
 }

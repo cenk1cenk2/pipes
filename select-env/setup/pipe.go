@@ -2,7 +2,7 @@ package setup
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
 )
 
 type (
@@ -13,11 +13,9 @@ type (
 		Strict            bool
 	}
 
-	Git flags.GitFlags
-
 	Pipe struct {
 		Environment
-		Git
+		Git git.Refs
 	}
 
 	Ctx struct {

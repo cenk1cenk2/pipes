@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
 func HelmChartVersionsParent(tl *TaskList) *Task {
@@ -56,7 +56,7 @@ func HelmChartVersionsFromFile(tl *TaskList) *Task {
 		}).
 		Set(func(t *Task) error {
 			// add versions through versions file
-			versions, err := parser.ParseTagsFile(t.Log, path.Join(setup.P.Cwd, P.HelmChart.VersionFile), P.HelmChart.VersionFileStrict)
+			versions, err := tagsfile.Parse(t.Log, path.Join(setup.P.Cwd, P.HelmChart.VersionFile), P.HelmChart.VersionFileStrict)
 
 			if err != nil {
 				return err

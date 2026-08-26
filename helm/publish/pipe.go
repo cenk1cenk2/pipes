@@ -2,7 +2,7 @@ package publish
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
 )
 
 type (
@@ -23,7 +23,7 @@ type (
 	}
 
 	Pipe struct {
-		Git flags.GitFlags
+		Git git.Refs
 		HelmChart
 	}
 
