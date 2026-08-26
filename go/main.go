@@ -1,85 +1,28 @@
 package main
 
 import (
-	"context"
+	ucli "github.com/urfave/cli/v3"
 
-	"github.com/urfave/cli/v3"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/go/build"
 	"gitlab.kilic.dev/devops/pipes/go/install"
 	"gitlab.kilic.dev/devops/pipes/go/lint"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 	"gitlab.kilic.dev/devops/pipes/go/tool"
-
-	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
 )
 
 func main() {
 	NewPlumber(
-		func(p *Plumber) *cli.Command {
-			return &cli.Command{
-				Name:        CLI_NAME,
-				Version:     VERSION,
-				Usage:       DESCRIPTION,
-				Description: DESCRIPTION,
-				Commands: []*cli.Command{
-					{
-						Name:        "install",
-						Description: "Vendor go modules.",
-						Flags:       CombineFlags(setup.Flags, install.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									install.New(p),
-								),
-							)
-						},
-					},
-
-					{
-						Name:        "build",
-						Description: "Build an application.",
-						Flags:       CombineFlags(setup.Flags, build.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									build.New(p),
-								),
-							)
-						},
-					},
-
-					{
-						Name:        "lint",
-						Description: "Run golangci-lint on the project.",
-						Flags:       CombineFlags(setup.Flags, lint.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									lint.New(p),
-								),
-							)
-						},
-					},
-
-					{
-						Name:        "tool",
-						Description: "Run a specified go tool.",
-						Arguments:   CombineArguments(tool.Arguments),
-						Flags:       CombineFlags(setup.Flags, tool.Flags),
-						Action: func(_ context.Context, _ *cli.Command) error {
-							return p.RunJobs(
-								CombineTaskLists(
-									setup.New(p),
-									tool.New(p),
-								),
-							)
-						},
-					},
-				},
-			}
+		func(p *Plumber) *ucli.Command {
+			// The setup step is not aliased the way the other pipes alias it, since
+			// this pipe already has a subcommand named after the tool.
+			return cli.App(CLI_NAME, DESCRIPTION, VERSION,
+				cli.Command(p, "install", "Vendor go modules.", setup.Step, install.Step(install.Deps{Tool: setup.C})),
+				cli.Command(p, "build", "Build an application.", setup.Step, build.Step(build.Deps{Tool: setup.C})),
+				cli.Command(p, "lint", "Run golangci-lint on the project.", setup.Step, lint.Step(lint.Deps{Tool: setup.C})),
+				cli.Command(p, "tool", "Run a specified go tool.", setup.Step, tool.Step(tool.Deps{Tool: setup.C})),
+			)
 		}).
 		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,

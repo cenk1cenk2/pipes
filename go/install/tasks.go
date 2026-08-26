@@ -4,10 +4,9 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoModVendor(tl *TaskList) *Task {
+func GoModVendor(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("vendor").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -16,7 +15,7 @@ func GoModVendor(tl *TaskList) *Task {
 				"GOWORK",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				SetDir(setup.C.Cwd).
+				SetDir(deps.Tool.Cwd).
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetStdoutStream()
@@ -32,23 +31,23 @@ func GoModVendor(tl *TaskList) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.Env).
+				AppendEnvironment(deps.Tool.Env).
 				AddSelfToTheTask()
 
 			t.CreateCommand(
 				"go",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(setup.C.Cwd).
+				SetDir(deps.Tool.Cwd).
 				Set(func(c *Command) error {
 					if C.Workspace != "" {
 						c.AppendArgs("work", "vendor")
 
-						t.Log.Infof("Vendoring workspace: %s in %s", C.Workspace, setup.C.Cwd)
+						t.Log.Infof("Vendoring workspace: %s in %s", C.Workspace, deps.Tool.Cwd)
 					} else {
 						c.AppendArgs("mod", "vendor")
 
-						t.Log.Infof("Vendoring: in %s", setup.C.Cwd)
+						t.Log.Infof("Vendoring: in %s", deps.Tool.Cwd)
 					}
 
 					if P.Args != "" {
@@ -57,7 +56,7 @@ func GoModVendor(tl *TaskList) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.Env).
+				AppendEnvironment(deps.Tool.Env).
 				AddSelfToTheTask()
 
 			return nil
@@ -67,7 +66,7 @@ func GoModVendor(tl *TaskList) *Task {
 		})
 }
 
-func GoModVerify(tl *TaskList) *Task {
+func GoModVerify(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("verify").
 		ShouldDisable(func(t *Task) bool {
 			return !P.Verify
@@ -79,9 +78,9 @@ func GoModVerify(tl *TaskList) *Task {
 				"verify",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(setup.C.Cwd).
+				SetDir(deps.Tool.Cwd).
 				Set(func(c *Command) error {
-					t.Log.Infof("Verifying modules: in %s", setup.C.Cwd)
+					t.Log.Infof("Verifying modules: in %s", deps.Tool.Cwd)
 
 					return nil
 				}).
