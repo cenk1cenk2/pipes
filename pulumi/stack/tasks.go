@@ -2,10 +2,9 @@ package stack
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 )
 
-func PulumiSelectStack(tl *TaskList) *Task {
+func PulumiSelectStack(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("stack").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -18,7 +17,7 @@ func PulumiSelectStack(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.C.Cwd).
+				SetDir(deps.Tool.Cwd).
 				AddSelfToTheTask()
 
 			return nil
