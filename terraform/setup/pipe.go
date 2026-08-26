@@ -1,55 +1,30 @@
 package setup
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 type (
-	Project struct {
-		Cwd string `validate:"omitempty,dir"`
-	}
-
 	CiVariables struct {
 		ProjectId string
 		ApiUrl    string
 	}
 
-	Config struct {
-		LogLevel string `validate:"omitempty,oneof=trace debug info warn error"`
-	}
-
 	Pipe struct {
-		Project
-		Config
+		tool.Config
 		CiVariables
-	}
-
-	Ctx struct {
-		EnvVars map[string]string
+		LogLevel string `validate:"omitempty,oneof=trace debug info warn error"`
 	}
 )
 
-var TL = TaskList{}
-
 var P = &Pipe{}
-var C = &Ctx{}
+var C = tool.NewCtx()
 
-func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			C.EnvVars = make(map[string]string)
-
-			return nil
-		}).
-		Set(func(tl *TaskList) Job {
-			return JobParallel(
-				Version(tl).Job(),
-				GenerateTerraformEnvVars(tl).Job(),
-			)
+func New(p *plumber.Plumber) *plumber.TaskList {
+	return tool.Setup(p, Spec, &P.Config, C, GenerateTerraformEnvVars).
+		ShouldRunBefore(func(_ *plumber.TaskList) error {
+			return cli.Validated(p, P)
 		})
 }

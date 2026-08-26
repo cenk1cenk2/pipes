@@ -18,7 +18,7 @@ import (
 func pulumiReportDiscriminators() []string {
 	discriminators := []string{stack.P.Stack}
 
-	if cwd := setup.P.Cwd; cwd != "" && cwd != "." {
+	if cwd := setup.C.Cwd; cwd != "" && cwd != "." {
 		discriminators = append(discriminators, cwd)
 	}
 
@@ -28,13 +28,13 @@ func pulumiReportDiscriminators() []string {
 func PulumiReportSource() iac.Source {
 	metadata := P.ReportMetadata
 	metadata.Target = stack.P.Stack
-	metadata.Cwd = setup.P.Cwd
+	metadata.Cwd = setup.C.Cwd
 
 	return iac.Source{
 		Read: func(_ *Task) (iac.Report, error) {
 			planPath := P.Plan
 			if !filepath.IsAbs(planPath) {
-				planPath = filepath.Join(setup.P.Cwd, planPath)
+				planPath = filepath.Join(setup.C.Cwd, planPath)
 			}
 
 			data, err := os.ReadFile(planPath)
@@ -46,7 +46,7 @@ func PulumiReportSource() iac.Source {
 		},
 		Summary:        iac.Summarize,
 		SummaryOutput:  P.Summary.Output,
-		Cwd:            setup.P.Cwd,
+		Cwd:            setup.C.Cwd,
 		MergeRequest:   P.MergeRequestReport,
 		Notes:          gitlab.NewNotes,
 		Discriminators: pulumiReportDiscriminators,
@@ -65,7 +65,7 @@ func PulumiPlan(tl *TaskList) *Task {
 				"--save-plan",
 				P.Plan,
 			).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

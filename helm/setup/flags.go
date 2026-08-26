@@ -2,6 +2,7 @@ package setup
 
 import (
 	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 //revive:disable:line-length-limit
@@ -10,17 +11,13 @@ const (
 	CATEGORY_HELM = "Helm"
 )
 
-var Flags = []cli.Flag{
-
-	&cli.StringFlag{
-		Category: CATEGORY_HELM,
-		Name:     "helm.cwd",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("HELM_ROOT"),
-		),
-		Usage:       "Working directory for Helm commands.",
-		Required:    false,
-		Value:       ".",
-		Destination: &P.Cwd,
-	},
+var Spec = tool.Spec{
+	Name:          "helm",
+	Category:      CATEGORY_HELM,
+	FlagPrefix:    "helm",
+	EnvPrefix:     "HELM",
+	CwdEnvAliases: []string{"HELM_ROOT"},
+	VersionArgs:   []string{"version"},
 }
+
+var Flags = []cli.Flag(tool.Flags(Spec, P))

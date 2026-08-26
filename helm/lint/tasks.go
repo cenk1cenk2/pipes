@@ -21,7 +21,7 @@ func HelmLint(tl *TaskList) *Task {
 					return nil
 				}).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil
@@ -43,7 +43,7 @@ func HelmTemplate(tl *TaskList) *Task {
 				".",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

@@ -1,38 +1,12 @@
 package login
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
-type (
-	HelmRegistry struct {
-		Uri      string
-		Username string
-		Password string
-	}
+var P = &registry.Credentials{}
 
-	Pipe struct {
-		HelmRegistry
-	}
-)
-
-var TL = TaskList{}
-
-var P = &Pipe{}
-
-func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
-		}).
-		Set(func(tl *TaskList) Job {
-			return JobSequence(
-				HelmLogin(tl).Job(),
-			)
-		})
+func New(p *plumber.Plumber) *plumber.TaskList {
+	return registry.LoginTaskList(p, P, "helm", "registry", "login")
 }

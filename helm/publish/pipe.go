@@ -3,6 +3,7 @@ package publish
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
 type (
@@ -11,15 +12,10 @@ type (
 		Versions          []string
 		VersionFile       string
 		VersionFileStrict bool
-		VersionsSanitize  []HelmChartMatch
-		VersionsTemplate  []HelmChartMatch
+		VersionsSanitize  []versions.Match
+		VersionsTemplate  []versions.Match
 		Destination       string `validate:"dirpath"`
 		AppVersion        string
-	}
-
-	HelmChartMatch struct {
-		Match    string `json:"match"    yaml:"match"    validate:"required"`
-		Template string `json:"template" yaml:"template" validate:"required"`
 	}
 
 	Pipe struct {
@@ -49,7 +45,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmChartVersionsParent(tl).Job(),
+				HelmChartVersions().Tasks(tl, &C.Versions).Job(),
 				HelmPackage(tl).Job(),
 				HelmPublish(tl).Job(),
 			)

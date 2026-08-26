@@ -33,7 +33,7 @@ func terraformReportDiscriminators() []string {
 		discriminators = append(discriminators, name)
 	}
 
-	if cwd := setup.P.Project.Cwd; cwd != "" && cwd != "." {
+	if cwd := setup.C.Cwd; cwd != "" && cwd != "." {
 		discriminators = append(discriminators, cwd)
 	}
 
@@ -43,7 +43,7 @@ func terraformReportDiscriminators() []string {
 func TerraformReportSource() iac.Source {
 	metadata := P.ReportMetadata
 	metadata.Target = terraformStateName()
-	metadata.Cwd = setup.P.Project.Cwd
+	metadata.Cwd = setup.C.Cwd
 
 	// terraform show reads the plan back out of the file terraform plan wrote, so
 	// without one there is nothing to summarize.
@@ -64,8 +64,8 @@ func TerraformReportSource() iac.Source {
 				"-json",
 				P.Plan.Output,
 			).
-				SetDir(setup.P.Project.Cwd).
-				AppendEnvironment(setup.C.EnvVars).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
 				EnableStreamRecording()
 
@@ -77,7 +77,7 @@ func TerraformReportSource() iac.Source {
 		},
 		Summary:        iac.Summarize,
 		SummaryOutput:  summaryOutput,
-		Cwd:            setup.P.Project.Cwd,
+		Cwd:            setup.C.Cwd,
 		MergeRequest:   P.MergeRequestReport,
 		Notes:          gitlab.NewNotes,
 		Discriminators: terraformReportDiscriminators,
@@ -108,8 +108,8 @@ func TerraformPlan(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.P.Project.Cwd).
-				AppendEnvironment(setup.C.EnvVars).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				SetRetries(&CommandRetry{
 					Tries: P.Plan.RetryTries,
 					Delay: P.Plan.RetryDelay,
@@ -139,7 +139,7 @@ func TerraformPlanCleanup(tl *TaskList) *Task {
 		Set(func(t *Task) error {
 			output := P.Plan.Output
 			if !filepath.IsAbs(output) {
-				output = filepath.Join(setup.P.Project.Cwd, output)
+				output = filepath.Join(setup.C.Cwd, output)
 			}
 
 			if err := os.Remove(output); err != nil {

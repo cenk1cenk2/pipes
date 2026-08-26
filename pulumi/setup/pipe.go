@@ -1,36 +1,13 @@
 package setup
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
-type (
-	Pipe struct {
-		Cwd string `validate:"dirpath"`
-	}
+var P = &tool.Config{}
+var C = tool.NewCtx()
 
-	Ctx struct {
-	}
-)
-
-var TL = TaskList{}
-
-var P = &Pipe{}
-var C = &Ctx{}
-
-func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
-		}).
-		Set(func(tl *TaskList) Job {
-			return JobSequence(
-				Setup(tl).Job(),
-			)
-		})
+func New(p *plumber.Plumber) *plumber.TaskList {
+	return tool.Setup(p, Spec, P, C)
 }

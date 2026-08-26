@@ -39,8 +39,8 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if login.P.ContainerRegistry.Uri != "" {
-				P.ContainerManifest.Target = fmt.Sprintf("%s/%s", login.P.ContainerRegistry.Uri, P.ContainerManifest.Target)
+			if login.P.Uri != "" {
+				P.ContainerManifest.Target = fmt.Sprintf("%s/%s", login.P.Uri, P.ContainerManifest.Target)
 
 				tl.Log.Infof("Using default manifest target: %s", P.ContainerManifest.Target)
 			}

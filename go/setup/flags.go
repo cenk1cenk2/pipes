@@ -1,7 +1,11 @@
 package setup
 
 import (
-	"github.com/urfave/cli/v3"
+	ucli "github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/tool"
+
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 //revive:disable:line-length-limit
@@ -10,28 +14,24 @@ const (
 	CATEGORY_SETUP = "Setup"
 )
 
-var Flags = []cli.Flag{
-	&cli.StringFlag{
-		Category: CATEGORY_SETUP,
-		Name:     "go.build.cwd",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("GO_CWD"),
-		),
-		Usage:       "Build CWD for the package manager.",
-		Required:    false,
-		Value:       ".",
-		Destination: &P.Cwd,
-	},
-
-	&cli.StringFlag{
-		Category: CATEGORY_SETUP,
-		Name:     "go.cache",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("GO_CACHE"),
-		),
-		Usage:       "Enable go cache.",
-		Required:    false,
-		Value:       "./.go/",
-		Destination: &P.Cache,
-	},
+var Spec = tool.Spec{
+	Name:        "go",
+	Category:    CATEGORY_SETUP,
+	FlagPrefix:  "go",
+	EnvPrefix:   "GO",
+	VersionArgs: []string{"version"},
 }
+
+var Flags = CombineFlags(
+	tool.Flags(Spec, &P.Config),
+	[]ucli.Flag{
+		&ucli.StringFlag{
+			Category:    CATEGORY_SETUP,
+			Name:        "go.cache",
+			Sources:     cli.EnvVars("GO_CACHE"),
+			Usage:       "Enable go cache.",
+			Required:    false,
+			Value:       "./.go/",
+			Destination: &P.Cache,
+		},
+	})

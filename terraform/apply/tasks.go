@@ -24,8 +24,8 @@ func TerraformApply(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.P.Project.Cwd).
-				AppendEnvironment(setup.C.EnvVars).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil

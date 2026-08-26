@@ -1,39 +1,21 @@
 package setup
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	helmv2 "helm.sh/helm/v4/pkg/chart/v2"
 )
 
-type (
-	Pipe struct {
-		Cwd string `validate:"omitempty,dirpath"`
-	}
+// Ctx carries the chart alongside what every tool pipe resolves, so the pipes
+// that publish it read one context instead of two.
+type Ctx struct {
+	*tool.Ctx
+	Chart *helmv2.Chart
+}
 
-	Ctx struct {
-		Chart *helmv2.Chart
-	}
-)
+var P = &tool.Config{}
+var C = &Ctx{Ctx: tool.NewCtx()}
 
-var TL = TaskList{}
-
-var P = &Pipe{}
-var C = &Ctx{}
-
-func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
-		}).
-		Set(func(tl *TaskList) Job {
-			return JobSequence(
-				HelmVersion(tl).Job(),
-				HelmLoadChart(tl).Job(),
-			)
-		})
+func New(p *plumber.Plumber) *plumber.TaskList {
+	return tool.Setup(p, Spec, P, C.Ctx, HelmLoadChart)
 }

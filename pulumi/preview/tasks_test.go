@@ -11,7 +11,7 @@ import (
 var _ = Describe("Pulumi report discriminators", func() {
 	BeforeEach(func() {
 		stack.P.Stack = "main"
-		setup.P.Cwd = "."
+		setup.C.Cwd = "."
 	})
 
 	It("carries the stack on its own from the working directory", func() {
@@ -19,7 +19,7 @@ var _ = Describe("Pulumi report discriminators", func() {
 	})
 
 	It("carries a project directory alongside the stack", func() {
-		setup.P.Cwd = "projects/warehouse"
+		setup.C.Cwd = "projects/warehouse"
 
 		Expect(pulumiReportDiscriminators()).To(Equal([]string{"main", "projects/warehouse"}))
 	})

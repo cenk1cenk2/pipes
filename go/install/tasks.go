@@ -16,7 +16,7 @@ func GoModVendor(tl *TaskList) *Task {
 				"GOWORK",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				EnableStreamRecording().
 				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetStdoutStream()
@@ -32,23 +32,23 @@ func GoModVendor(tl *TaskList) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.EnvVars).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			t.CreateCommand(
 				"go",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				Set(func(c *Command) error {
 					if C.Workspace != "" {
 						c.AppendArgs("work", "vendor")
 
-						t.Log.Infof("Vendoring workspace: %s in %s", C.Workspace, setup.P.Cwd)
+						t.Log.Infof("Vendoring workspace: %s in %s", C.Workspace, setup.C.Cwd)
 					} else {
 						c.AppendArgs("mod", "vendor")
 
-						t.Log.Infof("Vendoring: in %s", setup.P.Cwd)
+						t.Log.Infof("Vendoring: in %s", setup.C.Cwd)
 					}
 
 					if P.Args != "" {
@@ -57,7 +57,7 @@ func GoModVendor(tl *TaskList) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(setup.C.EnvVars).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil
@@ -79,9 +79,9 @@ func GoModVerify(tl *TaskList) *Task {
 				"verify",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				Set(func(c *Command) error {
-					t.Log.Infof("Verifying modules: in %s", setup.P.Cwd)
+					t.Log.Infof("Verifying modules: in %s", setup.C.Cwd)
 
 					return nil
 				}).

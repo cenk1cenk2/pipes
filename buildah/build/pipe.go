@@ -3,6 +3,7 @@ package build
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
 type (
@@ -13,8 +14,8 @@ type (
 		TagAsLatest    []string
 		TagsFile       string
 		TagsFileStrict bool
-		TagsSanitize   []ContainerImageMatch
-		TagsTemplate   []ContainerImageMatch
+		TagsSanitize   []versions.Match
+		TagsTemplate   []versions.Match
 		Pull           bool
 		Push           bool
 		BuildArgs      map[string]string
@@ -34,11 +35,6 @@ type (
 		File   string
 	}
 
-	ContainerImageMatch struct {
-		Match    string `json:"match"    yaml:"match"    validate:"required"`
-		Template string `json:"template" yaml:"template" validate:"required"`
-	}
-
 	Pipe struct {
 		Git git.Refs
 		ContainerImage
@@ -47,8 +43,7 @@ type (
 	}
 
 	Ctx struct {
-		Tags       []string
-		References []string
+		Tags []string
 	}
 )
 
@@ -68,9 +63,11 @@ func New(p *Plumber) *TaskList {
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
+			collector := ContainerImageTags()
+
 			return JobSequence(
-				ParseReferences(tl).Job(),
-				ContainerImageTagsParent(tl).Job(),
+				collector.Tasks(tl, &C.Tags).Job(),
+				ContainerManifestFileWrite(tl, collector).Job(),
 				ContainerBuild(tl).Job(),
 				ContainerPush(tl).Job(),
 			)

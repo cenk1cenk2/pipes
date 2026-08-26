@@ -17,7 +17,7 @@ func PulumiUp(tl *TaskList) *Task {
 				"--plan",
 				P.Plan,
 			).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil
