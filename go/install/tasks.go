@@ -12,13 +12,44 @@ func GoModVendor(tl *TaskList) *Task {
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"go",
-				"mod",
-				"vendor",
+				"env",
+				"GOWORK",
+			).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				SetDir(setup.P.Cwd).
+				EnableStreamRecording().
+				ShouldRunAfter(func(c *Command) error {
+					stream := c.GetStdoutStream()
+
+					if len(stream) == 0 {
+						return nil
+					}
+
+					// go env reports "off" instead of an empty value when workspace mode is explicitly disabled.
+					if workspace := strings.TrimSpace(stream[0]); workspace != "off" {
+						C.Workspace = workspace
+					}
+
+					return nil
+				}).
+				AppendEnvironment(setup.C.EnvVars).
+				AddSelfToTheTask()
+
+			t.CreateCommand(
+				"go",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				SetDir(setup.P.Cwd).
 				Set(func(c *Command) error {
-					t.Log.Infof("Vendoring: in %s", setup.P.Cwd)
+					if C.Workspace != "" {
+						c.AppendArgs("work", "vendor")
+
+						t.Log.Infof("Vendoring workspace: %s in %s", C.Workspace, setup.P.Cwd)
+					} else {
+						c.AppendArgs("mod", "vendor")
+
+						t.Log.Infof("Vendoring: in %s", setup.P.Cwd)
+					}
 
 					if P.Args != "" {
 						c.AppendArgs(strings.Split(P.Args, " ")...)

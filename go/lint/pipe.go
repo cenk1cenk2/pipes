@@ -8,12 +8,14 @@ import (
 
 type (
 	Pipe struct {
-		Args    string
-		Timeout time.Duration
-		Cache   string
+		Args      string
+		Timeout   time.Duration
+		Cache     string
+		Workspace bool
 	}
 
 	Ctx struct {
+		Modules []string
 	}
 )
 

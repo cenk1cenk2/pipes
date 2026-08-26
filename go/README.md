@@ -33,7 +33,7 @@ Vendor go modules.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
-| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code></code> |
+| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go build`
 
@@ -60,7 +60,29 @@ Build an application.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
-| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code></code> |
+| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
+
+### `pipe-go lint`
+
+Run golangci-lint on the project.
+
+#### Flags
+
+**Lint**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GO_LINT_ARGS` | Arguments to append to lint command. | `string` | `false` | <code></code> |
+| `$GO_LINT_TIMEOUT` | Timeout for the lint command. | `duration` | `false` | <code>5m0s</code> |
+| `$GO_LINT_CACHE` | Path to cache lint results. | `string` | `false` | <code>"./.golangci-lint"</code> |
+| `$GO_LINT_WORKSPACE` | Lint every module of the Go workspace instead of the current module. | `bool` | `false` | <code>false</code> |
+
+**Setup**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
+| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go tool`
 
@@ -73,7 +95,7 @@ Run a specified go tool.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
-| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code></code> |
+| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 **Tool**
 

@@ -11,6 +11,7 @@ type (
 	}
 
 	Ctx struct {
+		Workspace string
 	}
 )
 
