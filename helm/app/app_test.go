@@ -84,8 +84,8 @@ var _ = Describe("New", func() {
 			runner,
 			"publish",
 			"--helm.cwd", chart(),
-			"--helm-chart.target", "oci://registry.example.test/charts",
-			"--helm-chart.versions", "1.0.0",
+			"--helm.publish.chart.target", "oci://registry.example.test/charts",
+			"--helm.publish.chart.versions", "1.0.0",
 		)).To(Succeed())
 
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("package -d ./dist/ . --version 1.0.0")))

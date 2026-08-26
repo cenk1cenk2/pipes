@@ -57,7 +57,7 @@ func run(
 }
 
 func pipe() Pipe {
-	return Pipe{HelmChart: HelmChart{
+	return Pipe{Chart: Chart{
 		Target:      "oci://registry.example.com/charts",
 		Destination: "./dist/",
 	}}
@@ -82,7 +82,7 @@ var _ = Describe("Helm package", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.HelmChart.AppVersion = "2.3.4"
+		p.Chart.AppVersion = "2.3.4"
 
 		Expect(run(runner, p, []string{"1.0.0"}, HelmPackage)).To(Succeed())
 

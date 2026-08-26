@@ -76,7 +76,7 @@ var _ = Describe("Semantic release", func() {
 			runner := fixtures.Runner()
 
 			Expect(run(runner, Pipe{
-				SemanticRelease: SemanticRelease{IsDryRun: true},
+				SemanticRelease: SemanticRelease{DryRun: true},
 				CI:              CI{CommitReference: "feature/branch"},
 			}, false)).To(Succeed())
 

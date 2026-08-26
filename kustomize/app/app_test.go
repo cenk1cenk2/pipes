@@ -59,7 +59,7 @@ var _ = Describe("New", func() {
 		Expect(run(
 			"build",
 			"--kustomize.cwd", cwd,
-			"--kustomize-build.output", output,
+			"--kustomize.build.output", output,
 		)).To(Succeed())
 
 		rendered, err := os.ReadDir(output)

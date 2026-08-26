@@ -9,7 +9,7 @@ import (
 )
 
 type (
-	HelmChart struct {
+	Chart struct {
 		Target            string
 		Versions          []string
 		VersionFile       string
@@ -22,7 +22,7 @@ type (
 
 	Pipe struct {
 		Git git.Refs
-		HelmChart
+		Chart
 	}
 
 	Ctx struct {

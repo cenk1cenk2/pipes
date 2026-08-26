@@ -10,7 +10,7 @@ Releases applications through the semantic-release library.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CI_COMMIT_REF_NAME` | Current commit reference that can be branch or tag name of the project.. | `string` | `false` | <code></code> |
+| `$CI_COMMIT_REF_NAME`<br />`$SEMANTIC_RELEASE_CI_COMMIT_REFERENCE` | Current commit reference that can be branch or tag name of the project.. | `string` | `false` | <code></code> |
 
 **CLI**
 

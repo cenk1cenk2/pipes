@@ -24,12 +24,12 @@ var _ = Describe("NewMetadataFlags", func() {
 		metadata := iac.Metadata{}
 
 		Expect(names(ci.NewMetadataFlags(&metadata))).To(Equal([]string{
-			"report.job-name",
-			"report.job-url",
-			"report.pipeline-id",
-			"report.pipeline-url",
-			"report.commit-sha",
-			"report.commit-short-sha",
+			"ci.job-name",
+			"ci.job-url",
+			"ci.pipeline-id",
+			"ci.pipeline-url",
+			"ci.commit-sha",
+			"ci.commit-short-sha",
 		}))
 	})
 

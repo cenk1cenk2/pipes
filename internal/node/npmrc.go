@@ -45,7 +45,7 @@ func NewLoginFlags(cfg *Login) []ucli.Flag {
 
 		&ucli.StringSliceFlag{
 			Category:    CATEGORY_LOGIN,
-			Name:        "npm.npmrc_file",
+			Name:        "npm.npmrc-file",
 			Sources:     cli.EnvVars("NPM_NPMRC_FILE"),
 			Usage:       ".npmrc file to use.",
 			Required:    false,

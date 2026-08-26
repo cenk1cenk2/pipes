@@ -8,10 +8,11 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name:  "kubernetes.version",
+		Name:  "helm.lint.kubernetes.version",
 		Usage: "Kubernetes version to use for linting charts.",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUBERNETES_VERSION"),
+			cli.EnvVar("HELM_LINT_KUBERNETES_VERSION"),
 		),
 		Required:    false,
 		Value:       "",
@@ -19,7 +20,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Name:  "helm-lint.should-template",
+		Name:  "helm.lint.should-template",
 		Usage: "If set to true, the lint command will also template the chart.",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LINT_SHOULD_TEMPLATE"),

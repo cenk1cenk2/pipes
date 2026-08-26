@@ -20,6 +20,7 @@ var Flags = []cli.Flag{
 		Name:     "docker-hub.username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_USERNAME"),
+			cli.EnvVar("DOCKER_HUB_USERNAME"),
 		),
 		Usage:       "DockerHub username for updating the readme.",
 		Required:    true,
@@ -31,6 +32,7 @@ var Flags = []cli.Flag{
 		Name:     "docker-hub.password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_PASSWORD"),
+			cli.EnvVar("DOCKER_HUB_PASSWORD"),
 		),
 		Usage:       "DockerHub password for updating the readme.",
 		Required:    true,
@@ -50,11 +52,12 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_README,
-		Name:     "readme.repository",
+		Name:     "docker-hub.readme.repository",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_IMAGE_NAME"),
 			cli.EnvVar("CONTAINER_IMAGE_NAME"),
 			cli.EnvVar("README_REPOSITORY"),
+			cli.EnvVar("DOCKER_HUB_README_REPOSITORY"),
 		),
 		Usage:       "Repository for applying the readme on.",
 		Required:    false,
@@ -64,9 +67,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_README,
-		Name:     "readme.file",
+		Name:     "docker-hub.readme.file",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("README_FILE"),
+			cli.EnvVar("DOCKER_HUB_README_FILE"),
 		),
 		Usage:       "Readme file for the given repository.",
 		Value:       "README.md",
@@ -76,9 +80,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_README,
-		Name:     "readme.short-description",
+		Name:     "docker-hub.readme.description",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("README_SHORT_DESCRIPTION"),
+			cli.EnvVar("DOCKER_HUB_README_DESCRIPTION"),
 		),
 		Usage:       "Short description to display on DockerHub.",
 		Destination: &P.Readme.Description,
@@ -87,9 +92,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_README,
-		Name:     "readme.matrix",
+		Name:     "docker-hub.readme.matrix",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("README_MATRIX"),
+			cli.EnvVar("DOCKER_HUB_README_MATRIX"),
 		),
 		Usage:            "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
 		Required:         false,

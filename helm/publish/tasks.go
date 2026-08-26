@@ -28,7 +28,7 @@ func HelmPackage(tl *TaskList, deps Deps) *Task {
 							"helm",
 							"package",
 							"-d",
-							P.HelmChart.Destination,
+							P.Chart.Destination,
 							".",
 							"--version",
 							version,
@@ -36,8 +36,8 @@ func HelmPackage(tl *TaskList, deps Deps) *Task {
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 							SetDir(deps.Tool.Cwd).
 							Set(func(c *Command) error {
-								if P.HelmChart.AppVersion != "" {
-									c.AppendArgs("--app-version", P.HelmChart.AppVersion)
+								if P.Chart.AppVersion != "" {
+									c.AppendArgs("--app-version", P.Chart.AppVersion)
 								}
 
 								return nil
@@ -72,15 +72,15 @@ func HelmPublish(tl *TaskList, deps Deps) *Task {
 		}).
 		Set(func(t *Task) error {
 			for _, version := range C.Versions {
-				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, P.HelmChart.Target)
+				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, P.Chart.Target)
 
 				t.CreateSubtask(fmt.Sprintf("%s@%s", deps.Tool.Chart.Name(), version)).
 					Set(func(t *Task) error {
 						t.CreateCommand(
 							"helm",
 							"push",
-							filepath.Join(P.HelmChart.Destination, fmt.Sprintf("%s-%s.tgz", deps.Tool.Chart.Name(), version)),
-							P.HelmChart.Target,
+							filepath.Join(P.Chart.Destination, fmt.Sprintf("%s-%s.tgz", deps.Tool.Chart.Name(), version)),
+							P.Chart.Target,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 							SetDir(deps.Tool.Cwd).

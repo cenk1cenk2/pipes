@@ -50,14 +50,14 @@ var _ = Describe("Node install", func() {
 	}
 
 	pipe := func() Pipe {
-		return Pipe{NodeInstall: NodeInstall{Cwd: "projects/web", Args: "--foo"}}
+		return Pipe{Install: Install{Cwd: "projects/web", Args: "--foo"}}
 	}
 
 	It("installs against the lockfile of the resolved package manager", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.NodeInstall.UseLockFile = true
+		p.Install.UseLockFile = true
 
 		Expect(run(runner, p, deps("pnpm"))).To(Succeed())
 
@@ -84,7 +84,7 @@ var _ = Describe("Node install", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.NodeInstall.Cache = true
+		p.Install.Cache = true
 
 		Expect(run(runner, p, deps("yarn"))).To(Succeed())
 

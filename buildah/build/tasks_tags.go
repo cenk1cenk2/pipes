@@ -17,25 +17,25 @@ func ContainerImageTags(deps Deps) *versions.Collector {
 		Name:  "tags",
 		Label: "Image tags",
 
-		FromUser: P.ContainerImage.Tags,
+		FromUser: P.Image.Tags,
 
-		File:       P.ContainerImage.TagsFile,
-		FileStrict: P.ContainerImage.TagsFileStrict,
-		FileDir:    P.ContainerFile.Context,
+		File:       P.Image.TagsFile,
+		FileStrict: P.Image.TagsFileStrict,
+		FileDir:    P.File.Context,
 
-		LatestWhen:  P.ContainerImage.TagAsLatest,
-		LatestValue: P.ContainerImage.LatestTag,
+		LatestWhen:  P.Image.TagAsLatest,
+		LatestValue: P.Image.LatestTag,
 		References:  P.Git.References(),
 
-		Templates: P.ContainerImage.TagsTemplate,
-		Sanitize:  P.ContainerImage.TagsSanitize,
+		Templates: P.Image.TagsTemplate,
+		Sanitize:  P.Image.TagsSanitize,
 
 		Format: func(tag string) string {
 			if deps.Registry.Uri == "" {
-				return fmt.Sprintf("%s:%s", P.ContainerImage.Name, tag)
+				return fmt.Sprintf("%s:%s", P.Image.Name, tag)
 			}
 
-			return fmt.Sprintf("%s/%s:%s", deps.Registry.Uri, P.ContainerImage.Name, tag)
+			return fmt.Sprintf("%s/%s:%s", deps.Registry.Uri, P.Image.Name, tag)
 		},
 	}
 }
@@ -43,10 +43,10 @@ func ContainerImageTags(deps Deps) *versions.Collector {
 func ContainerManifestFileWrite(tl *TaskList, collector *versions.Collector) *Task {
 	return tl.CreateTask("tags", "manifest").
 		ShouldDisable(func(t *Task) bool {
-			return P.ContainerManifest.File == "" || P.ContainerManifest.Target == ""
+			return P.Manifest.File == "" || P.Manifest.Target == ""
 		}).
 		Set(func(t *Task) error {
-			target, err := InlineTemplate(P.ContainerManifest.Target, C.Tags)
+			target, err := InlineTemplate(P.Manifest.Target, C.Tags)
 			if err != nil {
 				return err
 			}
@@ -56,7 +56,7 @@ func ContainerManifestFileWrite(tl *TaskList, collector *versions.Collector) *Ta
 				return err
 			}
 
-			tags, err := yaml.Marshal(&manifest.ContainerManifestMatrix{
+			tags, err := yaml.Marshal(&manifest.ManifestMatrix{
 				Target: image,
 				Images: C.Tags,
 			})
@@ -65,7 +65,7 @@ func ContainerManifestFileWrite(tl *TaskList, collector *versions.Collector) *Ta
 				return err
 			}
 
-			filename, err := InlineTemplate(P.ContainerManifest.File, C.Tags)
+			filename, err := InlineTemplate(P.Manifest.File, C.Tags)
 
 			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
 

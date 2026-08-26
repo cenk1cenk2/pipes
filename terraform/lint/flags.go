@@ -8,9 +8,10 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Name: "terraform-lint.fmt-check.enable",
+		Name: "terraform.lint.format-check.enable",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_LINT_FMT_CHECK_ENABLE"),
+			cli.EnvVar("TERRAFORM_LINT_FORMAT_CHECK_ENABLE"),
 		),
 		Usage:       "Enable terraform fmt.",
 		Required:    false,
@@ -18,9 +19,10 @@ var Flags = []cli.Flag{
 		Destination: &P.Lint.FormatCheckEnable,
 	},
 	&cli.StringFlag{
-		Name: "terraform-lint.fmt-check.args",
+		Name: "terraform.lint.format-check.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_LINT_FMT_CHECK_ARGS"),
+			cli.EnvVar("TERRAFORM_LINT_FORMAT_CHECK_ARGS"),
 		),
 		Usage:       "Additional arguments for terraform fmt.",
 		Required:    false,
@@ -28,9 +30,10 @@ var Flags = []cli.Flag{
 		Destination: &P.Lint.FormatCheckArgs,
 	},
 	&cli.BoolFlag{
-		Name: "terraform-lint.validate.enable",
+		Name: "terraform.lint.validate.enable",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_LINT_VALIDATE_ENABLE"),
+			cli.EnvVar("TERRAFORM_LINT_VALIDATE_ENABLE"),
 		),
 		Usage:       "Enable terraform validate.",
 		Required:    false,
@@ -38,9 +41,10 @@ var Flags = []cli.Flag{
 		Destination: &P.Lint.ValidateEnable,
 	},
 	&cli.StringFlag{
-		Name: "terraform-lint.validate.args",
+		Name: "terraform.lint.validate.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_LINT_VALIDATE_ARGS"),
+			cli.EnvVar("TERRAFORM_LINT_VALIDATE_ARGS"),
 		),
 		Usage:       "Additional arguments for terraform validate.",
 		Required:    false,

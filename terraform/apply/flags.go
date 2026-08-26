@@ -8,11 +8,12 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name: "terraform-apply.out",
+		Name: "terraform.apply.output",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_PLAN_CACHE"),
 			cli.EnvVar("TF_APPLY_OUTPUT"),
 			cli.EnvVar("TF_PLAN_OUTPUT"),
+			cli.EnvVar("TERRAFORM_APPLY_OUTPUT"),
 		),
 		Usage:       "Output file for terraform apply.",
 		Required:    false,
@@ -21,9 +22,10 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Name: "terraform-apply.args",
+		Name: "terraform.apply.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_APPLY_ARGS"),
+			cli.EnvVar("TERRAFORM_APPLY_ARGS"),
 		),
 		Usage:       "Additional arguments for terraform apply.",
 		Required:    false,

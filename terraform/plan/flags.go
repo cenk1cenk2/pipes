@@ -14,11 +14,12 @@ import (
 var Flags = CombineFlags(
 	[]cli.Flag{
 		&cli.StringFlag{
-			Name: "terraform-plan.out",
+			Name: "terraform.plan.output",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TF_PLAN_CACHE"),
 				cli.EnvVar("TF_APPLY_OUTPUT"),
 				cli.EnvVar("TF_PLAN_OUTPUT"),
+				cli.EnvVar("TERRAFORM_PLAN_OUTPUT"),
 			),
 			Usage:       "Output file for terraform plan.",
 			Required:    false,
@@ -27,9 +28,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform-plan.args",
+			Name: "terraform.plan.args",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TF_PLAN_ARGS"),
+				cli.EnvVar("TERRAFORM_PLAN_ARGS"),
 			),
 			Usage:       "Additional arguments for terraform plan.",
 			Required:    false,
@@ -38,9 +40,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.BoolFlag{
-			Name: "terraform-plan.preview-for-mrs",
+			Name: "terraform.plan.preview-for-merge-requests",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TF_PLAN_PREVIEW_FOR_MRS"),
+				cli.EnvVar("TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS"),
 			),
 			Usage:       "Run merge request terraform plans as previews without state locking.",
 			Required:    false,
@@ -49,9 +52,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform-plan.pipeline-source",
+			Name: "terraform.plan.pipeline-source",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_PIPELINE_SOURCE"),
+				cli.EnvVar("TERRAFORM_PLAN_PIPELINE_SOURCE"),
 			),
 			Usage:       "GitLab CI pipeline source used to detect merge request pipelines.",
 			Required:    false,
@@ -60,9 +64,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.Uint32Flag{
-			Name: "terraform-plan.retry-tries",
+			Name: "terraform.plan.retry-tries",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TF_PLAN_RETRY_TRIES"),
+				cli.EnvVar("TERRAFORM_PLAN_RETRY_TRIES"),
 			),
 			Usage:       "Number of retries for terraform plan command.",
 			Required:    false,
@@ -71,9 +76,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.DurationFlag{
-			Name: "terraform-plan.retry-delay",
+			Name: "terraform.plan.retry-delay",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TF_PLAN_RETRY_DELAY"),
+				cli.EnvVar("TERRAFORM_PLAN_RETRY_DELAY"),
 			),
 			Usage:       "Delay between retries for terraform plan command.",
 			Required:    false,
@@ -82,9 +88,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform-plan.summary-output",
+			Name: "terraform.plan.summary.output",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_SUMMARY_OUTPUT"),
+				cli.EnvVar("TERRAFORM_PLAN_SUMMARY_OUTPUT"),
 			),
 			Usage:       "Output file for terraform plan summary. Leave empty to skip summary generation.",
 			Required:    false,

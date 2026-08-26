@@ -14,7 +14,7 @@ import (
 func DiscoverPublishedImageFiles(tl *TaskList) *Task {
 	return tl.CreateTask("discover", "file").
 		ShouldDisable(func(t *Task) bool {
-			return len(P.ContainerManifest.Files) == 0
+			return len(P.Manifest.Files) == 0
 		}).
 		Set(func(t *Task) error {
 			cwd, err := os.Getwd()
@@ -27,7 +27,7 @@ func DiscoverPublishedImageFiles(tl *TaskList) *Task {
 
 			matches := []string{}
 
-			for _, v := range P.ContainerManifest.Files {
+			for _, v := range P.Manifest.Files {
 				match, err := glob.Glob(fs, v)
 
 				if err != nil {
@@ -40,7 +40,7 @@ func DiscoverPublishedImageFiles(tl *TaskList) *Task {
 			if len(matches) == 0 {
 				t.Log.Warnf(
 					"Can not match any files with the given pattern: %s",
-					strings.Join(P.ContainerManifest.Files, ", "),
+					strings.Join(P.Manifest.Files, ", "),
 				)
 
 				return nil
@@ -70,7 +70,7 @@ func FetchPublishedImagesFromFiles(tl *TaskList) *Task {
 							return err
 						}
 
-						parsed := &ContainerManifestMatrix{}
+						parsed := &ManifestMatrix{}
 						if err := yaml.Unmarshal(content, parsed); err != nil {
 							return fmt.Errorf("Can not unmarshal container manifest matrix: %w", err)
 						}
@@ -99,23 +99,23 @@ func FetchPublishedImagesFromFiles(tl *TaskList) *Task {
 func FetchUserPublishedImages(tl *TaskList) *Task {
 	return tl.CreateTask("fetch", "user").
 		ShouldDisable(func(t *Task) bool {
-			return len(P.ContainerManifest.Images) == 0
+			return len(P.Manifest.Images) == 0
 		}).
 		Set(func(t *Task) error {
-			if P.ContainerManifest.Target != "" && len(P.ContainerManifest.Images) > 0 {
+			if P.Manifest.Target != "" && len(P.Manifest.Images) > 0 {
 				t.Lock.Lock()
 				var err error
-				if P.ContainerManifest.Target, err = InlineTemplate[any](P.ContainerManifest.Target, nil); err != nil {
+				if P.Manifest.Target, err = InlineTemplate[any](P.Manifest.Target, nil); err != nil {
 					return err
 				}
 
-				C.ManifestedImages[P.ContainerManifest.Target] = append(C.ManifestedImages[P.ContainerManifest.Target], P.ContainerManifest.Images...)
+				C.ManifestedImages[P.Manifest.Target] = append(C.ManifestedImages[P.Manifest.Target], P.Manifest.Images...)
 				t.Lock.Unlock()
 
-				t.Log.Debugf("Fetched direct image: %s -> %v", P.ContainerManifest.Target, P.ContainerManifest.Images)
+				t.Log.Debugf("Fetched direct image: %s -> %v", P.Manifest.Target, P.Manifest.Images)
 			}
 
-			for _, manifest := range P.ContainerManifest.Matrix {
+			for _, manifest := range P.Manifest.Matrix {
 				t.Lock.Lock()
 				C.ManifestedImages[manifest.Target] = append(C.ManifestedImages[manifest.Target], manifest.Images...)
 				t.Lock.Unlock()

@@ -11,8 +11,8 @@ func ContainerBuild(tl *TaskList) *Task {
 		Set(func(t *Task) error {
 			t.Log.Infof(
 				"Building container image: %s in %s",
-				P.ContainerFile.Name,
-				P.ContainerFile.Context,
+				P.File.Name,
+				P.File.Context,
 			)
 
 			// build image
@@ -20,25 +20,25 @@ func ContainerBuild(tl *TaskList) *Task {
 				"buildah",
 				"build",
 			).
-				SetDir(P.ContainerFile.Context).
+				SetDir(P.File.Context).
 				Set(func(c *Command) error {
 					c.AppendEnvironment(map[string]string{
-						"STORAGE_DRIVER": P.ContainerImage.StorageDriver,
+						"STORAGE_DRIVER": P.Image.StorageDriver,
 					})
 
-					c.AppendArgs("--format", P.ContainerImage.Format)
+					c.AppendArgs("--format", P.Image.Format)
 
-					if P.ContainerImage.Cache != "" {
+					if P.Image.Cache != "" {
 						c.AppendArgs(
 							"--layers",
 							"--cache-from",
-							P.ContainerImage.Cache,
+							P.Image.Cache,
 							"--cache-to",
-							P.ContainerImage.Cache,
+							P.Image.Cache,
 						)
 					}
 
-					for k, t := range P.ContainerImage.BuildArgs {
+					for k, t := range P.Image.BuildArgs {
 						v, err := InlineTemplate[any](t, nil)
 						if err != nil {
 							return fmt.Errorf("Cannot process build argument template for %s: %w", k, err)
@@ -47,7 +47,7 @@ func ContainerBuild(tl *TaskList) *Task {
 						c.AppendArgs("--build-arg", fmt.Sprintf("%s=%s", k, v))
 					}
 
-					if P.ContainerImage.Pull {
+					if P.Image.Pull {
 						c.AppendArgs("--pull")
 					}
 
@@ -57,7 +57,7 @@ func ContainerBuild(tl *TaskList) *Task {
 
 					c.AppendArgs(
 						"--file",
-						P.ContainerFile.Name,
+						P.File.Name,
 						".",
 					)
 
@@ -75,7 +75,7 @@ func ContainerBuild(tl *TaskList) *Task {
 func ContainerPush(tl *TaskList) *Task {
 	return tl.CreateTask("push").
 		ShouldDisable(func(t *Task) bool {
-			return !P.ContainerImage.Push
+			return !P.Image.Push
 		}).
 		Set(func(t *Task) error {
 			for _, tag := range C.Tags {
@@ -93,7 +93,7 @@ func ContainerPush(tl *TaskList) *Task {
 								)
 
 								c.AppendEnvironment(map[string]string{
-									"STORAGE_DRIVER": P.ContainerImage.StorageDriver,
+									"STORAGE_DRIVER": P.Image.StorageDriver,
 								})
 
 								return nil

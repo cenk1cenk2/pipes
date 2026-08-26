@@ -11,7 +11,7 @@ import (
 type (
 	Git git.Refs
 
-	NodeBuild struct {
+	Build struct {
 		Script     string
 		ScriptArgs string
 		Cwd        string `validate:"dir"`
@@ -19,7 +19,7 @@ type (
 
 	Pipe struct {
 		Git
-		NodeBuild
+		Build
 	}
 
 	// Deps is the package manager the script is run through and the environment

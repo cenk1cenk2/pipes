@@ -21,8 +21,8 @@ func BuildNodeApplication(tl *TaskList, deps Deps) *Task {
 
 					c.AppendArgs(deps.Node.PackageManager.Commands.Run...)
 
-					if P.NodeBuild.Script != "" {
-						tmpl, err := InlineTemplate(P.NodeBuild.Script, ctx)
+					if P.Build.Script != "" {
+						tmpl, err := InlineTemplate(P.Build.Script, ctx)
 
 						if err != nil {
 							return err
@@ -33,8 +33,8 @@ func BuildNodeApplication(tl *TaskList, deps Deps) *Task {
 
 					c.AppendArgs(deps.Node.PackageManager.Commands.RunDelimiter...)
 
-					if P.NodeBuild.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(P.NodeBuild.ScriptArgs, ctx)
+					if P.Build.ScriptArgs != "" {
+						tmpl, err := InlineTemplate(P.Build.ScriptArgs, ctx)
 
 						if err != nil {
 							return err
@@ -43,7 +43,7 @@ func BuildNodeApplication(tl *TaskList, deps Deps) *Task {
 						c.AppendArgs(tmpl)
 					}
 
-					c.SetDir(P.NodeBuild.Cwd)
+					c.SetDir(P.Build.Cwd)
 
 					c.AppendDirectEnvironment(os.Environ()...).
 						AppendEnvironment(deps.Environment.EnvVars)

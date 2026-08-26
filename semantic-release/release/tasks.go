@@ -22,7 +22,7 @@ func RunSemanticRelease(tl *TaskList) *Task {
 					// 	c.AppendArgs("--ignore-private-packages")
 					// }
 
-					if P.SemanticRelease.IsDryRun {
+					if P.SemanticRelease.DryRun {
 						c.AppendEnvironment(map[string]string{
 							// detected by the following rules, have to disable them to trick
 							// https://github.com/semantic-release/env-ci/tree/master/services

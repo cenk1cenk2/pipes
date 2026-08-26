@@ -49,7 +49,7 @@ Build an application.
 | `$GO_BUILD_OUTPUT` | Output location for the build artifacts. | `string` | `false` | <code>"./dist/"</code> |
 | `$GO_BUILD_BINARY_NAME` | Name of the binary to output during build. | `string` | `false` | <code>"bin"</code> |
 | `$GO_BUILD_BINARY_TEMPLATE` | Binary naming for the build artifact. | `string`<br/>`format(Template(map[string]))` | `false` | <code>"{{ .name }}{{ if .os }}-{{ .os }}{{ end }}{{ if .arch }}-{{ .arch }}{{ end }}"</code> |
-| `$GO_BUILD_LINKER` | Arguments for the linker during the build process. | `string`<br/>`format(Template())` | `false` | <code></code> |
+| `$GO_BUILD_LINKER`<br />`$GO_BUILD_LINKER_FLAGS` | Arguments for the linker during the build process. | `string`<br/>`format(Template())` | `false` | <code></code> |
 | `$GO_BUILD_ENABLE_CGO`<br />`$CGO_ENABLED` | Enable CGO during the build process. | `bool` | `false` | <code>false</code> |
 | `$GO_BUILD_TARGETS` | Build targets for the build process. | `string`<br/>`format(yaml([]struct{ os: string?, arch: string? }))` | `false` | <code>"[]"</code> |
 | `$GO_BUILD_TAGS` | Build tags for the build process. | `string[]` | `false` | <code></code> |

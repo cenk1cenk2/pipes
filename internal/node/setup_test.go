@@ -50,7 +50,7 @@ var _ = Describe("NewFlags", func() {
 		flags := node.NewFlags(&cfg)
 
 		Expect(flags).To(HaveLen(1))
-		Expect(flags[0].Names()).To(Equal([]string{"node.package_manager"}))
+		Expect(flags[0].Names()).To(Equal([]string{"node.package-manager"}))
 	})
 
 	// A pipe reads the choice back off the same instance it registered, so a flag
@@ -81,7 +81,7 @@ var _ = Describe("NewLoginFlags", func() {
 
 		Expect(names(node.NewLoginFlags(&cfg))).To(Equal([]string{
 			"npm.login",
-			"npm.npmrc_file",
+			"npm.npmrc-file",
 			"npm.npmrc",
 		}))
 	})

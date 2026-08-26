@@ -17,14 +17,14 @@ func AddNodeModules(tl *TaskList, deps Deps) *Task {
 						EnvVars:     deps.Environment.EnvVars,
 					}
 
-					if P.NodeAdd.Global {
+					if P.Add.Global {
 						c.AppendArgs(deps.Node.PackageManager.Commands.Global...)
 					}
 
 					c.AppendArgs(deps.Node.PackageManager.Commands.Add...)
 
-					if P.NodeAdd.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(P.NodeAdd.ScriptArgs, ctx)
+					if P.Add.ScriptArgs != "" {
+						tmpl, err := InlineTemplate(P.Add.ScriptArgs, ctx)
 
 						if err != nil {
 							return err
@@ -33,9 +33,9 @@ func AddNodeModules(tl *TaskList, deps Deps) *Task {
 						c.AppendArgs(tmpl)
 					}
 
-					c.AppendArgs(P.NodeAdd.Packages...)
+					c.AppendArgs(P.Add.Packages...)
 
-					c.SetDir(P.NodeAdd.Cwd)
+					c.SetDir(P.Add.Cwd)
 
 					return nil
 				}).

@@ -24,8 +24,8 @@ Preview the Pulumi changes.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
-| `$PULUMI_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
-| `$PULUMI_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
+| `$PULUMI_PLAN`<br />`$PULUMI_PREVIEW_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+| `$PULUMI_SUMMARY_OUTPUT`<br />`$PULUMI_PREVIEW_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
 
 **Gitlab Merge Request Report**
 
@@ -64,7 +64,7 @@ Apply the Pulumi changes.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
-| `$PULUMI_PLAN` | Input file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+| `$PULUMI_PLAN`<br />`$PULUMI_UP_PLAN` | Input file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
 
 **pulumi**
 

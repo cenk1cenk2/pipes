@@ -70,9 +70,9 @@ var _ = Describe("New", func() {
 		Expect(run(
 			runner,
 			"build",
-			"--container-image.name", "group/image",
-			"--container-image.tags", "v1.0.0",
-			"--container-image.push=false",
+			"--buildah.build.image.name", "group/image",
+			"--buildah.build.image.tags", "v1.0.0",
+			"--buildah.build.image.push=false",
 		)).To(Succeed())
 
 		Expect(runner.InvocationNames()).To(Equal([]string{"buildah", "buildah"}))
@@ -87,8 +87,8 @@ var _ = Describe("New", func() {
 		Expect(run(
 			runner,
 			"manifest",
-			"--container-manifest.target", "group/image:v1.0.0",
-			"--container-manifest.images", "group/image:v1.0.0-amd64",
+			"--buildah.manifest.target", "group/image:v1.0.0",
+			"--buildah.manifest.images", "group/image:v1.0.0-amd64",
 		)).To(Succeed())
 
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("manifest create docker.io/group/image:v1.0.0")))

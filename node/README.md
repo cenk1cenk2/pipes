@@ -48,7 +48,7 @@ Install node.js dependencies with the given package manager.
 | `$NODE_INSTALL_CWD` | Install CWD for the package manager. | `string` | `false` | <code>"."</code> |
 | `$NODE_INSTALL_USE_LOCK_FILE` | Use the lockfile while installing the packages. | `bool` | `false` | <code>true</code> |
 | `$NODE_INSTALL_ARGS` | Arguments to append to install command. | `string` | `false` | <code></code> |
-| `$NODE_INSTALL_CACHE_ENABLE` | Enable caching for the package manager. | `bool` | `false` | <code>true</code> |
+| `$NODE_INSTALL_CACHE_ENABLE`<br />`$NODE_INSTALL_CACHE` | Enable caching for the package manager. | `bool` | `false` | <code>true</code> |
 
 **Login**
 
@@ -106,8 +106,8 @@ Install node.js dependencies with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_COMMAND_SCRIPT` | package.json script for given command operation. | `string`<br/>`Template(struct { Environment: string, EnvVars: map[string]string })` | `false` | <code></code> |
-| `$NODE_COMMAND_CWD` | Working directory for the given command operation. | `string` | `false` | <code>"."</code> |
+| `$NODE_COMMAND_SCRIPT`<br />`$NODE_RUN_SCRIPT` | package.json script for given command operation. | `string`<br/>`Template(struct { Environment: string, EnvVars: map[string]string })` | `false` | <code></code> |
+| `$NODE_COMMAND_CWD`<br />`$NODE_RUN_CWD` | Working directory for the given command operation. | `string` | `false` | <code>"."</code> |
 
 **Environment**
 

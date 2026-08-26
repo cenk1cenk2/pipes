@@ -164,10 +164,10 @@ var _ = Describe("New", func() {
 				return nil
 			}},
 			"publish",
-			"--terraform-module.name", "vpc",
-			"--terraform-module.registry.gitlab.api-url", "https://gitlab.example.test/api/v4",
-			"--terraform-module.registry.gitlab.project-id", "3",
-			"--terraform-module.registry.gitlab.token", "job-token",
+			"--terraform.publish.module.name", "vpc",
+			"--terraform.publish.registry.gitlab.api-url", "https://gitlab.example.test/api/v4",
+			"--terraform.publish.registry.gitlab.project-id", "3",
+			"--terraform.publish.registry.gitlab.token", "job-token",
 		)).To(Succeed())
 
 		Expect(dialed).To(Equal([]string{"https://gitlab.example.test/api/v4", "3", "job-token"}))

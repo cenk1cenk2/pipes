@@ -9,20 +9,20 @@ import (
 )
 
 type (
-	ContainerManifest struct {
+	Manifest struct {
 		Target string
 		Images []string
 		Files  []string
-		Matrix []ContainerManifestMatrix
+		Matrix []ManifestMatrix
 	}
 
-	ContainerManifestMatrix struct {
+	ManifestMatrix struct {
 		Target string   `json:"target,omitempty" yaml:"target,omitempty"`
 		Images []string `json:"images"           yaml:"images"`
 	}
 
 	Pipe struct {
-		ContainerManifest
+		Manifest
 	}
 
 	Ctx struct {
@@ -48,9 +48,9 @@ func New(p *Plumber, deps Deps) *TaskList {
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
 			if deps.Registry.Uri != "" {
-				P.ContainerManifest.Target = fmt.Sprintf("%s/%s", deps.Registry.Uri, P.ContainerManifest.Target)
+				P.Manifest.Target = fmt.Sprintf("%s/%s", deps.Registry.Uri, P.Manifest.Target)
 
-				tl.Log.Infof("Using default manifest target: %s", P.ContainerManifest.Target)
+				tl.Log.Infof("Using default manifest target: %s", P.Manifest.Target)
 			}
 
 			if err := icli.Validated(p, P); err != nil {

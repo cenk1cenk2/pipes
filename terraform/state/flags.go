@@ -15,9 +15,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.type",
+		Name:     "terraform.state.type",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_STATE_TYPE"),
+			cli.EnvVar("TERRAFORM_STATE_TYPE"),
 		),
 		Usage:       `Terraform state type. enum("gitlab-http")`,
 		Required:    false,
@@ -27,9 +28,10 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.name",
+		Name:     "terraform.state.name",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_STATE_NAME"),
+			cli.EnvVar("TERRAFORM_STATE_NAME"),
 		),
 		Usage:       "Terraform state name.",
 		Required:    false,
@@ -39,9 +41,10 @@ var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.strict",
+		Name:     "terraform.state.strict",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_STATE_STRICT"),
+			cli.EnvVar("TERRAFORM_STATE_STRICT"),
 		),
 		Usage:       "Terraform state strict.",
 		Required:    false,
@@ -53,10 +56,11 @@ var Flags = []cli.Flag{
 
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-address",
+		Name:     "terraform.state.gitlab-http.http-address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_ADDRESS"),
 			cli.EnvVar("TF_ADDRESS"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS"),
 		),
 		Usage:       "State configuration for terraform: http-address",
 		Required:    false,
@@ -65,9 +69,10 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-lock-address",
+		Name:     "terraform.state.gitlab-http.http-lock-address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_LOCK_ADDRESS"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS"),
 		),
 		Usage:       "State configuration for terraform: http-lock-address",
 		Required:    false,
@@ -76,9 +81,10 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-lock-method",
+		Name:     "terraform.state.gitlab-http.http-lock-method",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_LOCK_METHOD"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD"),
 		),
 		Usage:       "State configuration for terraform: http-lock-method",
 		Required:    false,
@@ -87,9 +93,10 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-unlock-address",
+		Name:     "terraform.state.gitlab-http.http-unlock-address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_UNLOCK_ADDRESS"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS"),
 		),
 		Usage:       "State configuration for terraform: http-unlock-address",
 		Required:    false,
@@ -98,9 +105,10 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-unlock-method",
+		Name:     "terraform.state.gitlab-http.http-unlock-method",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_UNLOCK_METHOD"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD"),
 		),
 		Usage:       "State configuration for terraform: http-unlock-method",
 		Required:    false,
@@ -109,10 +117,11 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-username",
+		Name:     "terraform.state.gitlab-http.http-username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_USERNAME"),
 			cli.EnvVar("TF_USERNAME"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME"),
 		),
 		Usage:       "State configuration for terraform: http-username",
 		Required:    false,
@@ -121,11 +130,12 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-password",
+		Name:     "terraform.state.gitlab-http.http-password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_PASSWORD"),
 			cli.EnvVar("TF_PASSWORD"),
 			cli.EnvVar("CI_JOB_TOKEN"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD"),
 		),
 		Usage:       "State configuration for terraform: http-password",
 		Required:    false,
@@ -134,10 +144,11 @@ var Flags = []cli.Flag{
 	},
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
-		Name:     "terraform-state.gitlab-http.http-retry-wait-min",
+		Name:     "terraform.state.gitlab-http.http-retry-wait-min",
 		Usage:    "State configuration for terraform: http-retry-wait-min",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TF_HTTP_RETRY_WAIT_MIN"),
+			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN"),
 		),
 		Required:    false,
 		Value:       "5",

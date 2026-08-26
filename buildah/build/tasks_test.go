@@ -11,7 +11,7 @@ var _ = Describe("Container image tags", func() {
 	format := func(uri, name, tag string) string {
 		GinkgoHelper()
 
-		P.ContainerImage.Name = name
+		P.Image.Name = name
 
 		return ContainerImageTags(Deps{Registry: &registry.Credentials{Uri: uri}}).Format(tag)
 	}
