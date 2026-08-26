@@ -5,22 +5,21 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
-	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func BuildNodeApplication(tl *TaskList) *Task {
+func BuildNodeApplication(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("build").
 		Set(func(t *Task) error {
 			t.CreateCommand(
-				setup.NodeCtx.PackageManager.Exe,
+				deps.Node.PackageManager.Exe,
 			).
 				Set(func(c *Command) error {
 					ctx := environment.Template{
-						Environment: setup.EnvironmentCtx.Environment,
-						EnvVars:     setup.EnvironmentCtx.EnvVars,
+						Environment: deps.Environment.Environment,
+						EnvVars:     deps.Environment.EnvVars,
 					}
 
-					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.Run...)
+					c.AppendArgs(deps.Node.PackageManager.Commands.Run...)
 
 					if P.NodeBuild.Script != "" {
 						tmpl, err := InlineTemplate(P.NodeBuild.Script, ctx)
@@ -32,7 +31,7 @@ func BuildNodeApplication(tl *TaskList) *Task {
 						c.AppendArgs(tmpl)
 					}
 
-					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.RunDelimiter...)
+					c.AppendArgs(deps.Node.PackageManager.Commands.RunDelimiter...)
 
 					if P.NodeBuild.ScriptArgs != "" {
 						tmpl, err := InlineTemplate(P.NodeBuild.ScriptArgs, ctx)
@@ -47,7 +46,7 @@ func BuildNodeApplication(tl *TaskList) *Task {
 					c.SetDir(P.NodeBuild.Cwd)
 
 					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(setup.EnvironmentCtx.EnvVars)
+						AppendEnvironment(deps.Environment.EnvVars)
 
 					return nil
 				}).
