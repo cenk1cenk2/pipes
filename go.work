@@ -1,16 +1,16 @@
 go 1.27.0
 
 use (
+	./buildah
+	./go
+	./helm
 	./internal
-	./pipes/buildah
-	./pipes/go
-	./pipes/helm
-	./pipes/kustomize
-	./pipes/node
-	./pipes/pulumi
-	./pipes/select-env
-	./pipes/semantic-release
-	./pipes/terraform
-	./pipes/update-docker-hub-readme
+	./kustomize
+	./node
+	./pulumi
+	./select-env
+	./semantic-release
 	./template
+	./terraform
+	./update-docker-hub-readme
 )

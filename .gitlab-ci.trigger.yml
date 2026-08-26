@@ -23,7 +23,7 @@ spec:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
-          cwd: ./pipes/$[[inputs.name]]
+          cwd: ./$[[inputs.name]]
           container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
           container-matrix: $[[inputs.container-matrix]]
           container-rules: $[[inputs.container-rules]]
@@ -36,7 +36,7 @@ spec:
           - .gitlab-ci.pipe.yml
           - go.work
           - internal/**/*
-          - pipes/$[[inputs.name]]/**/*
+          - $[[inputs.name]]/**/*
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       interruptible: true
       changes:

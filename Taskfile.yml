@@ -19,34 +19,34 @@ includes:
     dir: ./template
     taskfile: ./Taskfile.pipe.yml
   buildah:
-    dir: ./pipes/buildah
+    dir: ./buildah
     taskfile: ./Taskfile.pipe.yml
   go:
-    dir: ./pipes/go
+    dir: ./go
     taskfile: ./Taskfile.pipe.yml
   helm:
-    dir: ./pipes/helm
+    dir: ./helm
     taskfile: ./Taskfile.pipe.yml
   kustomize:
-    dir: ./pipes/kustomize
+    dir: ./kustomize
     taskfile: ./Taskfile.pipe.yml
   node:
-    dir: ./pipes/node
+    dir: ./node
     taskfile: ./Taskfile.pipe.yml
   pulumi:
-    dir: ./pipes/pulumi
+    dir: ./pulumi
     taskfile: ./Taskfile.pipe.yml
   select-env:
-    dir: ./pipes/select-env
+    dir: ./select-env
     taskfile: ./Taskfile.pipe.yml
   semantic-release:
-    dir: ./pipes/semantic-release
+    dir: ./semantic-release
     taskfile: ./Taskfile.pipe.yml
   terraform:
-    dir: ./pipes/terraform
+    dir: ./terraform
     taskfile: ./Taskfile.pipe.yml
   update-docker-hub-readme:
-    dir: ./pipes/update-docker-hub-readme
+    dir: ./update-docker-hub-readme
     taskfile: ./Taskfile.pipe.yml
 
 tasks:
