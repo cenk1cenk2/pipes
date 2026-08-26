@@ -53,7 +53,7 @@ Preview the Pulumi changes.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$PULUMI_CWD` | Path to the Pulumi working directory. | `string` | `false` | <code>"."</code> |
+| `$PULUMI_CWD` | Working directory for pulumi commands. | `string` | `false` | <code>"."</code> |
 
 ### `pipe-pulumi up`
 
@@ -70,4 +70,4 @@ Apply the Pulumi changes.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$PULUMI_CWD` | Path to the Pulumi working directory. | `string` | `false` | <code>"."</code> |
+| `$PULUMI_CWD` | Working directory for pulumi commands. | `string` | `false` | <code>"."</code> |

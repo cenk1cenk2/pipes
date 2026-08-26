@@ -45,7 +45,7 @@ Install terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>"."</code> |
+| `$TF_ROOT`<br />`$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 **State**
 
@@ -93,7 +93,7 @@ Lint terraform project with terraform.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>"."</code> |
+| `$TF_ROOT`<br />`$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 ### `pipe-terraform plan`
 
@@ -151,7 +151,7 @@ Plan terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>"."</code> |
+| `$TF_ROOT`<br />`$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 **State**
 
@@ -198,7 +198,7 @@ Apply terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TF_ROOT` | Terraform project working directory | `string` | `false` | <code>"."</code> |
+| `$TF_ROOT`<br />`$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 **State**
 

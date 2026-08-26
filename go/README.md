@@ -32,7 +32,7 @@ Vendor go modules.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go build`
@@ -59,7 +59,7 @@ Build an application.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go lint`
@@ -81,7 +81,7 @@ Run golangci-lint on the project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go tool`
@@ -94,7 +94,7 @@ Run a specified go tool.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
 
 **Tool**
