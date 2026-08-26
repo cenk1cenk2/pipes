@@ -1,4 +1,4 @@
-package pipe
+package update
 
 import (
 	"encoding/json"

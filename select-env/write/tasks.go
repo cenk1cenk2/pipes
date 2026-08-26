@@ -5,9 +5,9 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
-func WriteEnvironmentFile(tl *TaskList) *Task {
+func WriteEnvironmentFile(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("environment", "file").
 		Set(func(t *Task) error {
-			return environment.WriteFile(P.Environment.File, EnvironmentCtx.EnvVars)
+			return environment.WriteFile(P.Environment.File, deps.Environment.EnvVars)
 		})
 }
