@@ -9,14 +9,8 @@ import (
 	"strings"
 
 	tfjson "github.com/hashicorp/terraform-json"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
-
-type terraformSummary struct {
-	Create int `json:"create"`
-	Update int `json:"update"`
-	Delete int `json:"delete"`
-}
 
 var mergeRequestReportActionOrder = []string{
 	"create",
@@ -93,42 +87,6 @@ func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, e
 		Metadata: metadata,
 		Actions:  mergeRequestReportActions(resources, outputs),
 	}, nil
-}
-
-func summarizeTerraformShowPlan(output []byte) (terraformSummary, error) {
-	plan, err := decodeTerraformShowPlan(output)
-	if err != nil {
-		return terraformSummary{}, err
-	}
-
-	summary := terraformSummary{}
-	for _, change := range plan.ResourceChanges {
-		if change == nil || change.Change == nil {
-			continue
-		}
-
-		for _, action := range change.Change.Actions {
-			switch action {
-			case tfjson.ActionCreate:
-				summary.Create++
-			case tfjson.ActionUpdate:
-				summary.Update++
-			case tfjson.ActionDelete:
-				summary.Delete++
-			}
-		}
-	}
-
-	return summary, nil
-}
-
-func renderSummary(summary terraformSummary) ([]byte, error) {
-	body, err := json.MarshalIndent(summary, "", "  ")
-	if err != nil {
-		return nil, fmt.Errorf("render terraform summary: %w", err)
-	}
-
-	return append(body, '\n'), nil
 }
 
 func decodeTerraformShowPlan(output []byte) (tfjson.Plan, error) {

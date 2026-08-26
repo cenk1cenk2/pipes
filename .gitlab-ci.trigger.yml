@@ -44,7 +44,6 @@ spec:
           - .gitlab-ci.pipe.yml
           - go.mod
           - go.sum
-          - common/**/*
           - internal/**/*
           - $[[inputs.name]]/**/*
           - $[[inputs.extra-path-1]]

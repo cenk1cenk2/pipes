@@ -1,9 +1,8 @@
 package publish
 
 import (
+	"context"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path"
 
@@ -99,15 +98,6 @@ func TerraformPublishGitlab(tl *TaskList) *Task {
 			for _, p := range C.Packages {
 				t.CreateSubtask(p.Tag).
 					Set(func(t *Task) error {
-						url := fmt.Sprintf(
-							"%s/projects/%s/packages/terraform/modules/%s/%s/%s/file",
-							P.Registry.Gitlab.ApiUrl,
-							P.Registry.Gitlab.ProjectId,
-							P.Module.Name,
-							P.Module.System,
-							p.Tag,
-						)
-
 						file, err := os.Open(p.Output)
 						if err != nil {
 							return err
@@ -115,38 +105,17 @@ func TerraformPublishGitlab(tl *TaskList) *Task {
 
 						defer file.Close()
 
-						req, err := http.NewRequest(http.MethodPut, url, file)
-
-						if err != nil {
+						if err := C.Registry.UploadModule(
+							context.Background(),
+							P.Module.Name,
+							P.Module.System,
+							p.Tag,
+							file,
+						); err != nil {
 							return err
 						}
 
-						req.Header.Set("Content-Type", "application/tar+gzip")
-						req.Header.Set("JOB-TOKEN", P.Registry.Gitlab.Token)
-
-						client := &http.Client{}
-
-						res, err := client.Do(req)
-
-						if err != nil {
-							return err
-						}
-
-						defer res.Body.Close()
-
-						body, err := io.ReadAll(res.Body)
-
-						if err != nil {
-							return err
-						}
-
-						if res.StatusCode == http.StatusCreated {
-							t.Log.Infof("Package has been published: %s@%s", P.Module.Name, p.Tag)
-
-							t.Log.Debugln(string(body))
-						} else {
-							t.Log.Warnln(string(body))
-						}
+						t.Log.Infof("Package has been published: %s@%s", P.Module.Name, p.Tag)
 
 						return nil
 					}).

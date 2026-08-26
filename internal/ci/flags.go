@@ -2,8 +2,8 @@ package ci
 
 import (
 	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
 	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 //revive:disable:line-length-limit

@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 var _ = Describe("Terraform merge request report", func() {
@@ -116,17 +116,17 @@ var _ = Describe("Terraform merge request report", func() {
 	})
 
 	It("keeps the summary artifact independent of the report grouping", func() {
-		summary, err := summarizeTerraformShowPlan(readFixture("plan.json"))
+		report, err := parseTerraformShowPlan(readFixture("plan.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
-		Expect(summary).To(Equal(terraformSummary{
+
+		summary := iac.Summarize(report)
+		Expect(summary).To(Equal(iac.Summary{
 			Create: 2,
 			Update: 1,
 			Delete: 1,
 		}))
 
-		body, err := renderSummary(summary)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(body)).To(Equal(`{
+		Expect(iac.RenderSummary(summary)).To(Equal(`{
   "create": 2,
   "update": 1,
   "delete": 1

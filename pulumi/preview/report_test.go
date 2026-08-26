@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 var _ = Describe("Pulumi plan merge request report", func() {
@@ -51,16 +51,14 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Fields: []string{"bucketName"},
 		}))
 
-		summary := summarizePulumiReport(report)
-		Expect(summary).To(Equal(pulumiSummary{
+		summary := iac.Summarize(report)
+		Expect(summary).To(Equal(iac.Summary{
 			Create: 1,
 			Update: 1,
 			Delete: 0,
 		}))
 
-		summaryBody, err := renderSummary(summary)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(summaryBody)).To(Equal(`{
+		Expect(iac.RenderSummary(summary)).To(Equal(`{
   "create": 1,
   "update": 1,
   "delete": 0
@@ -106,8 +104,8 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			}))
 		}
 
-		summary := summarizePulumiReport(report)
-		Expect(summary).To(Equal(pulumiSummary{
+		summary := iac.Summarize(report)
+		Expect(summary).To(Equal(iac.Summary{
 			Create: 1,
 			Update: 0,
 			Delete: 1,

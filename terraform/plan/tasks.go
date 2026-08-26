@@ -1,15 +1,14 @@
 package plan
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
@@ -41,6 +40,51 @@ func terraformReportDiscriminators() []string {
 	return discriminators
 }
 
+func TerraformReportSource() iac.Source {
+	metadata := P.ReportMetadata
+	metadata.Target = terraformStateName()
+	metadata.Cwd = setup.P.Project.Cwd
+
+	// terraform show reads the plan back out of the file terraform plan wrote, so
+	// without one there is nothing to summarize.
+	summaryOutput := P.Summary.Output
+	if P.Plan.Output == "" {
+		summaryOutput = ""
+	}
+
+	return iac.Source{
+		Read: func(t *Task) (iac.Report, error) {
+			if P.Plan.Output == "" {
+				return iac.Report{}, fmt.Errorf("terraform plan output is required for the plan report")
+			}
+
+			show := t.CreateCommand(
+				"terraform",
+				"show",
+				"-json",
+				P.Plan.Output,
+			).
+				SetDir(setup.P.Project.Cwd).
+				AppendEnvironment(setup.C.EnvVars).
+				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
+				EnableStreamRecording()
+
+			if err := show.Run(); err != nil {
+				return iac.Report{}, err
+			}
+
+			return parseTerraformShowPlan([]byte(strings.Join(show.GetStdoutStream(), "")), metadata)
+		},
+		Summary:        iac.Summarize,
+		SummaryOutput:  summaryOutput,
+		Cwd:            setup.P.Project.Cwd,
+		MergeRequest:   P.MergeRequestReport,
+		Notes:          gitlab.NewNotes,
+		Discriminators: terraformReportDiscriminators,
+		Metadata:       metadata,
+	}
+}
+
 func TerraformPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
 		Set(func(t *Task) error {
@@ -69,147 +113,6 @@ func TerraformPlan(tl *TaskList) *Task {
 				SetRetries(&CommandRetry{
 					Tries: P.Plan.RetryTries,
 					Delay: P.Plan.RetryDelay,
-				}).
-				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
-		})
-}
-
-func TerraformSummary(tl *TaskList) *Task {
-	return tl.CreateTask("summary").
-		ShouldDisable(func(t *Task) bool {
-			if P.Summary.Output == "" {
-				t.Log.Debugln("Skipping Terraform summary because no summary output file is configured.")
-
-				return true
-			}
-
-			if P.Plan.Output == "" {
-				t.Log.Debugln("Skipping Terraform summary because no plan output file is configured.")
-
-				return true
-			}
-
-			return false
-		}).
-		Set(func(t *Task) error {
-			t.CreateCommand(
-				"terraform",
-				"show",
-				"-json",
-				P.Plan.Output,
-			).
-				SetDir(setup.P.Project.Cwd).
-				AppendEnvironment(setup.C.EnvVars).
-				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
-				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command) error {
-					summary, err := summarizeTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")))
-					if err != nil {
-						return err
-					}
-
-					body, err := renderSummary(summary)
-					if err != nil {
-						return err
-					}
-
-					output := P.Summary.Output
-					if !filepath.IsAbs(output) {
-						output = filepath.Join(setup.P.Project.Cwd, output)
-					}
-
-					if err := os.WriteFile(output, body, 0o644); err != nil {
-						return fmt.Errorf("write Terraform summary %s: %w", output, err)
-					}
-
-					t.Log.Infof("Wrote Terraform summary: %s", output)
-
-					return nil
-				}).
-				AddSelfToTheTask()
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
-		})
-}
-
-func TerraformMergeRequestReport(tl *TaskList) *Task {
-	return tl.CreateTask("merge-request-report").
-		ShouldDisable(func(t *Task) bool {
-			if !P.MergeRequestReport.Enabled {
-				return true
-			}
-
-			if P.MergeRequestReport.MergeRequestId == 0 {
-				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
-
-				return true
-			}
-
-			return false
-		}).
-		Set(func(t *Task) error {
-			if P.Plan.Output == "" {
-				return fmt.Errorf("terraform plan output is required for GitLab merge request report")
-			}
-
-			t.CreateCommand(
-				"terraform",
-				"show",
-				"-json",
-				P.Plan.Output,
-			).
-				SetDir(setup.P.Project.Cwd).
-				AppendEnvironment(setup.C.EnvVars).
-				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
-				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command) error {
-					metadata := P.ReportMetadata
-					metadata.Target = terraformStateName()
-					metadata.Cwd = setup.P.Project.Cwd
-
-					report, err := parseTerraformShowPlan([]byte(strings.Join(c.GetStdoutStream(), "")), metadata)
-					if err != nil {
-						return err
-					}
-
-					body, err := iac.RenderMergeRequestReport(report)
-					if err != nil {
-						return err
-					}
-
-					config := P.MergeRequestReport
-					config.Identifier = gitlab.ResolveReportIdentifier(
-						config.Identifier,
-						metadata.JobName,
-						terraformReportDiscriminators()...,
-					)
-					config.LegacyIdentifiers = []string{metadata.JobName}
-
-					result, err := gitlab.UpsertMergeRequestReport(
-						context.Background(),
-						config,
-						body,
-					)
-					if err != nil {
-						return err
-					}
-
-					t.Log.Infof(
-						"Merge request report note %s: %d (identifier: %s)",
-						result.Action(),
-						result.NoteId,
-						result.Identifier,
-					)
-
-					return nil
 				}).
 				AddSelfToTheTask()
 

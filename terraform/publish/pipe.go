@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
 type (
@@ -31,6 +32,7 @@ type (
 	Ctx struct {
 		Tags     []string
 		Packages []PublishablePackage
+		Registry gitlab.ModuleRegistry
 	}
 )
 
@@ -50,6 +52,12 @@ func New(p *Plumber) *TaskList {
 			if err := p.Validate(P); err != nil {
 				return err
 			}
+
+			C.Registry = gitlab.NewModuleRegistry(
+				P.Registry.Gitlab.ApiUrl,
+				P.Registry.Gitlab.ProjectId,
+				P.Registry.Gitlab.Token,
+			)
 
 			return nil
 		}).
