@@ -25,7 +25,7 @@ Build and validate Kustomize overlays.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$KUSTOMIZE_ROOT` | Working directory for Kustomize commands. | `string` | `false` | <code>"."</code> |
+| `$KUSTOMIZE_ROOT`<br />`$KUSTOMIZE_CWD` | Working directory for kustomize commands. | `string` | `false` | <code>"."</code> |
 | `$KUSTOMIZE_PATHS` | Explicit overlay paths to build relative to the working directory. | `string[]` | `false` | <code></code> |
 
 **Kustomize Build**
