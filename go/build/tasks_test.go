@@ -17,6 +17,11 @@ var _ = Describe("Go build", func() {
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
 		GinkgoHelper()
 
+		// The build inherits the environment it runs in and the Taskfile exports
+		// CGO_ENABLED for every task, so the spec below would assert against the
+		// setting of whatever ran it rather than the one the pipe put there.
+		tests.WithoutEnvironment("CGO_ENABLED")
+
 		*P = pipe
 		deps := Deps{Tool: &tool.Ctx{Cwd: "projects/api", Env: map[string]string{}}}
 
