@@ -15,9 +15,15 @@ includes:
   go-workspace:
     taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-workspace.yml?ref_type=heads
     flatten: true
+    excludes:
+      - test
   template:
     dir: ./template
     taskfile: ./Taskfile.pipe.yml
+    # The scaffold ships no specs of its own, and ginkgo fails a run that finds
+    # no suites, so the pipe it seeds is the first thing with a test task.
+    excludes:
+      - test
   buildah:
     dir: ./buildah
     taskfile: ./Taskfile.pipe.yml
@@ -78,6 +84,16 @@ tasks:
       - task: packages
         vars:
           command: docs
+
+  test:
+    desc: Tests every module in the workspace with ginkgo.
+    cmds:
+      - |-
+        go tool ginkgo \
+        --cover --coverpkg=./... --coverprofile=coverage.out \
+        -vv --silence-skips --fail-fast -r \
+        {{ .CLI_ARGS }} \
+        ./...
 
   generate:
     desc: Generates checked-in files.

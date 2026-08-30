@@ -62,9 +62,14 @@ tasks:
       - rm -f {{ .BINARY_DIR }}
 
   test:
-    desc: Tests the given application.
+    desc: Tests the given application with ginkgo.
     cmds:
-      - go test -v ./...
+      - |-
+        go tool ginkgo \
+        --cover --coverpkg=./... --coverprofile=coverage.out \
+        -vv --silence-skips --fail-fast -r \
+        {{ .CLI_ARGS }} \
+        ./...
 
   build.platform:
     internal: true

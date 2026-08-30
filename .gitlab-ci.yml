@@ -206,10 +206,7 @@ test:
       paths:
         - .go/cache/
   script:
-    - |-
-      for mod in $(go list -m -f '{{.Dir}}'); do
-        go -C "$mod" test -v ./...
-      done
+    - task --yes test
   rules: *rules-default
   tags:
     - amd64
