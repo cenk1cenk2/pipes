@@ -28,8 +28,8 @@ func New(p *plumber.Plumber, version string, _ Options) *ucli.Command {
 	// pipe already has a subcommand named after the tool.
 	return cli.App(Name, Description, version,
 		cli.Command(p, "install", "Vendor go modules.", setup.Step, install.Step(install.Deps{Tool: setup.C})),
-		cli.Command(p, "build", "Build an application.", setup.Step, build.Step(build.Deps{Tool: setup.C})),
+		cli.Command(p, "build", "Build an application.", setup.Step, build.Step(build.Deps{Tool: setup.C.Ctx})),
 		cli.Command(p, "lint", "Run golangci-lint on the project.", setup.Step, lint.Step(lint.Deps{Tool: setup.C})),
-		cli.Command(p, "tool", "Run a specified go tool.", setup.Step, gotool.Step(gotool.Deps{Tool: setup.C})),
+		cli.Command(p, "tool", "Run a specified go tool.", setup.Step, gotool.Step(gotool.Deps{Tool: setup.C.Ctx})),
 	)
 }

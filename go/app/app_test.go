@@ -26,6 +26,20 @@ func run(runner *tests.TestingCommandRunner, args ...string) error {
 	return fixture.RunCli(append([]string{"pipe-go"}, args...)...)
 }
 
+// answer lets the runner reply to one invocation of the given command. Seeding
+// any response makes the runner strict, so a spec that stubs one command has to
+// account for every other command the run makes.
+func answer(name string, args ...string) tests.TestingCommandResponse {
+	return tests.TestingCommandResponse{Name: name, Args: args}
+}
+
+func stdout(out, name string, args ...string) tests.TestingCommandResponse {
+	response := answer(name, args...)
+	response.Stdout = out
+
+	return response
+}
+
 func formatted(runner *tests.TestingCommandRunner) []string {
 	GinkgoHelper()
 
@@ -63,6 +77,52 @@ var _ = Describe("New", func() {
 
 		Expect(runner.InvocationNames()).To(ContainElement("golangci-lint"))
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("run -v --timeout")))
+	})
+
+	It("vendors the whole workspace when the pipeline asked for one", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, "install", "--go.workspace")).To(Succeed())
+
+		Expect(formatted(runner)).To(ContainElement(ContainSubstring("work vendor")))
+	})
+
+	// The explicit flag is what the pipelines set, so the toolchain is never asked
+	// where the workspace is when it is on. Seeding a response makes the runner
+	// strict, so every command of the run has to be answered for.
+	It("vendors the workspace the toolchain reports when the flag is off", func() {
+		runner := fixtures.Runner(
+			answer("go", "version"),
+			stdout("/repository/go.work\n", "go", "env", "GOWORK"),
+			answer("go", "work", "vendor"),
+			answer("go", "mod", "verify"),
+		)
+
+		Expect(run(runner, "install")).To(Succeed())
+
+		Expect(formatted(runner)).To(ContainElement(ContainSubstring("env GOWORK")))
+		Expect(formatted(runner)).To(ContainElement(ContainSubstring("work vendor")))
+	})
+
+	It("does not ask the toolchain where the workspace is when the flag is on", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, "install", "--go.workspace")).To(Succeed())
+
+		Expect(formatted(runner)).NotTo(ContainElement(ContainSubstring("env GOWORK")))
+	})
+
+	It("lints every module of the workspace when the pipeline asked for one", func() {
+		runner := fixtures.Runner(
+			answer("go", "version"),
+			stdout("/repository/api\n/repository/worker\n", "go", "list", "-m", "-f", "{{.Dir}}"),
+			answer("golangci-lint"),
+		)
+
+		Expect(run(runner, "lint", "--go.workspace")).To(Succeed())
+
+		Expect(formatted(runner)).
+			To(ContainElement(ContainSubstring("/repository/api/... /repository/worker/...")))
 	})
 
 	// The tool and its arguments are positional, which is the only command in the
