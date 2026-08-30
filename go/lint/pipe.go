@@ -4,26 +4,26 @@ import (
 	"time"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 type (
 	Pipe struct {
-		Args      string
-		Timeout   time.Duration
-		Cache     string
-		Workspace bool
+		Args    string
+		Timeout time.Duration
+		Cache   string
 	}
 
 	Ctx struct {
 		Modules []string
 	}
 
-	// Deps is the resolved go tool: the directory the modules are listed from and
-	// the environment the cache setup has written into.
+	// Deps is the resolved go tool: the directory the modules are listed from,
+	// whether they are a workspace and the environment the cache setup has
+	// written into.
 	Deps struct {
-		Tool *tool.Ctx
+		Tool *setup.Ctx
 	}
 )
 

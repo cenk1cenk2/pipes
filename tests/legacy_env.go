@@ -41,6 +41,7 @@ var legacyEnvAliases = map[string]map[string][]string{
 	"go": {
 		"go.build.enable-cgo":   {"GO_BUILD_ENABLE_CGO", "CGO_ENABLED"},
 		"go.build.linker-flags": {"GO_BUILD_LINKER", "GO_BUILD_LINKER_FLAGS"},
+		"go.workspace":          {"GO_LINT_WORKSPACE", "GO_WORKSPACE"},
 	},
 
 	"helm": {

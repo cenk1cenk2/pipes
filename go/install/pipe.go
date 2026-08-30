@@ -2,8 +2,8 @@ package install
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 type (
@@ -12,21 +12,17 @@ type (
 		Args   string
 	}
 
-	Ctx struct {
-		Workspace string
-	}
-
-	// Deps is the resolved go tool: the directory the modules are vendored in and
-	// the environment the cache setup has written into.
+	// Deps is the resolved go tool: the directory the modules are vendored in,
+	// whether they are a workspace and the environment the cache setup has
+	// written into.
 	Deps struct {
-		Tool *tool.Ctx
+		Tool *setup.Ctx
 	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
-var C = &Ctx{}
 
 func New(p *Plumber, deps Deps) *TaskList {
 	return TL.New(p).

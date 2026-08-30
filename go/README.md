@@ -34,6 +34,7 @@ Vendor go modules.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
+| `$GO_LINT_WORKSPACE`<br />`$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go build`
 
@@ -61,6 +62,7 @@ Build an application.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
+| `$GO_LINT_WORKSPACE`<br />`$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go lint`
 
@@ -75,7 +77,6 @@ Run golangci-lint on the project.
 | `$GO_LINT_ARGS` | Arguments to append to lint command. | `string` | `false` | <code></code> |
 | `$GO_LINT_TIMEOUT` | Timeout for the lint command. | `duration` | `false` | <code>5m0s</code> |
 | `$GO_LINT_CACHE` | Path to cache lint results. | `string` | `false` | <code>"./.golangci-lint"</code> |
-| `$GO_LINT_WORKSPACE` | Lint every module of the Go workspace instead of the current module. | `bool` | `false` | <code>false</code> |
 
 **Setup**
 
@@ -83,6 +84,7 @@ Run golangci-lint on the project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
+| `$GO_LINT_WORKSPACE`<br />`$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go tool`
 
@@ -96,6 +98,7 @@ Run a specified go tool.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
+| `$GO_LINT_WORKSPACE`<br />`$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 **Tool**
 

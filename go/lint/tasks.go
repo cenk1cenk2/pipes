@@ -11,7 +11,7 @@ import (
 func GoLint(tl *TaskList, deps Deps) *Task {
 	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
-			if P.Workspace {
+			if deps.Tool.Workspace {
 				t.CreateCommand(
 					"go",
 					"list",
@@ -24,6 +24,8 @@ func GoLint(tl *TaskList, deps Deps) *Task {
 					SetDir(deps.Tool.Cwd).
 					EnableStreamRecording().
 					ShouldRunAfter(func(c *Command) error {
+						C.Modules = nil
+
 						for _, module := range c.GetStdoutStream() {
 							if module := strings.TrimSpace(module); module != "" {
 								C.Modules = append(C.Modules, module)
@@ -57,6 +59,7 @@ func GoLint(tl *TaskList, deps Deps) *Task {
 				}).
 				AppendEnvironment(deps.Tool.Env).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+				SetDir(deps.Tool.Cwd).
 				AddSelfToTheTask()
 
 			return nil
