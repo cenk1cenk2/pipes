@@ -24,6 +24,11 @@ import (
 func run(runner *tests.TestingCommandRunner, opts app.Options, args ...string) error {
 	GinkgoHelper()
 
+	// $CI_PIPELINE_SOURCE has no argument to pass it through, so the pipeline this
+	// suite runs in is the one the plan reads: on a merge request it plans as a
+	// preview and then deletes a plan file the stubbed command never wrote.
+	tests.WithoutEnvironment("CI_PIPELINE_SOURCE")
+
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
 		return app.New(p, "test", opts)
 	})
