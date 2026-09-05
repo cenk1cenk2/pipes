@@ -15,7 +15,7 @@ require (
 	github.com/pulumi/pulumi/sdk/v3 v3.261.0
 	github.com/sirupsen/logrus v1.10.2
 	github.com/urfave/cli/v3 v3.11.0
-	gitlab.com/gitlab-org/api/client-go/v2 v2.63.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.64.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 	gopkg.in/yaml.v3 v3.0.1
 	helm.sh/helm/v4 v4.2.4
