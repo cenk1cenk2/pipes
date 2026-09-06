@@ -27,9 +27,6 @@ type Spec struct {
 	Label   string
 	Prefix  string
 	Command string
-	// LegacyEnv is the prefix of the environment names the flags answered to
-	// before they were unified. They are kept forever and listed first.
-	LegacyEnv string
 }
 
 func NewFlags(spec Spec, dst *Credentials) []ucli.Flag {
@@ -69,8 +66,5 @@ func (s Spec) name(key string) string {
 }
 
 func (s Spec) envs(key string) ucli.ValueSourceChain {
-	return cli.EnvVars(
-		fmt.Sprintf("%s_REGISTRY_%s", s.LegacyEnv, key),
-		strings.ToUpper(fmt.Sprintf("%s_%s_REGISTRY_%s", s.Prefix, s.Command, key)),
-	)
+	return cli.EnvVars(strings.ToUpper(fmt.Sprintf("%s_%s_REGISTRY_%s", s.Prefix, s.Command, key)))
 }

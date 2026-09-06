@@ -24,14 +24,7 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
-	},
-	LegacyEnvAliases: map[string][]string{
-		"kustomize.build.enable-helm":     {"KUSTOMIZE_ENABLE_HELM", "KUSTOMIZE_BUILD_ENABLE_HELM"},
-		"kustomize.build.helm-command":    {"KUSTOMIZE_HELM_COMMAND", "KUSTOMIZE_BUILD_HELM_COMMAND"},
-		"kustomize.build.kube-version":    {"KUSTOMIZE_KUBE_VERSION", "KUSTOMIZE_BUILD_KUBE_VERSION"},
-		"kustomize.build.load-restrictor": {"KUSTOMIZE_LOAD_RESTRICTOR", "KUSTOMIZE_BUILD_LOAD_RESTRICTOR"},
-		"kustomize.cwd":                   {"KUSTOMIZE_ROOT", "KUSTOMIZE_CWD"},
+		return newCommand(p)
 	},
 })
 
@@ -42,8 +35,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})
 

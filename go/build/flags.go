@@ -63,12 +63,9 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
-		Name:     "go.build.linker-flags",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("GO_BUILD_LINKER"),
-			cli.EnvVar("GO_BUILD_LINKER_FLAGS"),
-		),
+		Category:    CATEGORY_BUILD,
+		Name:        "go.build.linker-flags",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("GO_BUILD_LINKER_FLAGS")),
 		Usage:       "Arguments for the linker during the build process. format(Template())",
 		Required:    false,
 		Value:       "",

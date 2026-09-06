@@ -15,12 +15,11 @@ const (
 )
 
 var Spec = tool.Spec{
-	Name:          "kustomize",
-	Category:      CATEGORY_KUSTOMIZE,
-	FlagPrefix:    "kustomize",
-	EnvPrefix:     "KUSTOMIZE",
-	CwdEnvAliases: []string{"KUSTOMIZE_ROOT"},
-	VersionArgs:   []string{"version"},
+	Name:        "kustomize",
+	Category:    CATEGORY_KUSTOMIZE,
+	FlagPrefix:  "kustomize",
+	EnvPrefix:   "KUSTOMIZE",
+	VersionArgs: []string{"version"},
 }
 
 var Flags = CombineFlags(

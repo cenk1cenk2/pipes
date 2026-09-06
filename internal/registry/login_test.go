@@ -13,11 +13,10 @@ import (
 )
 
 var buildah = registry.Spec{
-	Category:  "Container Registry",
-	Label:     "Container registry",
-	Prefix:    "buildah",
-	Command:   "login",
-	LegacyEnv: "CONTAINER",
+	Category: "Container Registry",
+	Label:    "Container registry",
+	Prefix:   "buildah",
+	Command:  "login",
 }
 
 var _ = Describe("NewFlags", func() {
@@ -42,16 +41,10 @@ var _ = Describe("NewFlags", func() {
 		Expect(flag(2).Name).To(Equal("buildah.login.registry.password"))
 	})
 
-	// The legacy name is what every pipeline consuming this image sets today, so
-	// it has to keep winning over the name that replaced it.
-	It("puts the legacy environment name ahead of the canonical one", func() {
-		Expect(flag(0).Sources.Chain).To(HaveLen(2))
-		Expect(flag(0).Sources.Chain[0].String()).To(ContainSubstring("CONTAINER_REGISTRY_URI"))
-		Expect(flag(0).Sources.Chain[1].String()).To(ContainSubstring("BUILDAH_LOGIN_REGISTRY_URI"))
-	})
-
-	It("uppercases the canonical environment name", func() {
-		Expect(flag(2).Sources.Chain[1].String()).To(ContainSubstring("BUILDAH_LOGIN_REGISTRY_PASSWORD"))
+	It("builds the environment name out of the prefix and the command", func() {
+		Expect(flag(0).Sources.Chain).To(HaveLen(1))
+		Expect(flag(0).Sources.Chain[0].String()).To(ContainSubstring("BUILDAH_LOGIN_REGISTRY_URI"))
+		Expect(flag(2).Sources.Chain[0].String()).To(ContainSubstring("BUILDAH_LOGIN_REGISTRY_PASSWORD"))
 	})
 
 	It("reads the label into the usage of every flag", func() {

@@ -2,6 +2,7 @@
 *.iml
 env
 /vendor/
+/go.work.sum
 /.go/
 **/dist/
 coverage.out

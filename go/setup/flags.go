@@ -38,7 +38,7 @@ var Flags = CombineFlags(
 		&ucli.BoolFlag{
 			Category:    CATEGORY_SETUP,
 			Name:        "go.workspace",
-			Sources:     cli.EnvVars("GO_LINT_WORKSPACE", "GO_WORKSPACE"),
+			Sources:     cli.EnvVars("GO_WORKSPACE"),
 			Usage:       "Drive the modules as a Go workspace instead of the single module in the working directory.",
 			Required:    false,
 			Value:       false,

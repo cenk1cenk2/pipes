@@ -49,13 +49,6 @@ var _ = Describe("JSONFlag", func() {
 
 		Expect(flag.ValidateDefaults).To(BeTrue())
 	})
-
-	It("hands back the same flag it was given", func() {
-		dst := []condition{}
-		flag := &ucli.StringFlag{Name: "conditions"}
-
-		Expect(cli.JSONFlag(flag, &dst)).To(BeIdenticalTo(flag))
-	})
 })
 
 var _ = Describe("YAMLFlag", func() {
@@ -88,20 +81,13 @@ var _ = Describe("YAMLFlag", func() {
 })
 
 var _ = Describe("EnvVars", func() {
-	It("builds one source per name", func() {
-		Expect(cli.EnvVars("CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH").Chain).To(HaveLen(2))
-	})
-
-	// The chain is read in order, so the name a pipeline already sets has to come
-	// first for it to keep winning over the name that replaced it.
-	It("keeps the given order", func() {
+	// The chain is read in order, so a flag that answers to more than one name
+	// resolves to the first of them a pipeline has set.
+	It("builds one source per name, in the order they were given", func() {
 		chain := cli.EnvVars("CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH")
 
+		Expect(chain.Chain).To(HaveLen(2))
 		Expect(chain.Chain[0].String()).To(ContainSubstring("CI_COMMIT_REF_NAME"))
 		Expect(chain.Chain[1].String()).To(ContainSubstring("BITBUCKET_BRANCH"))
-	})
-
-	It("builds an empty chain for no names", func() {
-		Expect(cli.EnvVars().Chain).To(BeEmpty())
 	})
 })

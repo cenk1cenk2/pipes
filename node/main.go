@@ -19,13 +19,7 @@ const description = "Pipe for installing node.js dependencies and building node.
 
 var VERSION = "latest"
 
-// options is where a service the pipe reaches outside the machine for would be
-// injected. This pipe drives only its own tool, so there is nothing to swap.
-type options struct{}
-
-// newCommand builds the command tree. The version is a parameter so a spec
-// can build the same tree main does without the build stamp.
-func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
+func newCommand(p *plumber.Plumber) *ucli.Command {
 	// The environment feature is opt-in for this pipe, unlike the pipes that own
 	// their environment. The flags are shared package level values, so this runs
 	// before the command tree reads them.
@@ -38,7 +32,7 @@ func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
 		return f
 	})
 
-	return cli.App(name, description, version,
+	return cli.App(name, description, VERSION,
 		cli.Command(p, "login", "Login to the given NPM registries.",
 			setup.Step,
 			setup.LoginStep,
@@ -65,9 +59,7 @@ func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, VERSION, options{})
-	}).
+	plumber.NewPlumber(newCommand).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

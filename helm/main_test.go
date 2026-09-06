@@ -24,26 +24,7 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
-	},
-	UncategorizedFlags: []string{
-		"helm.lint.kubernetes.version",
-		"helm.lint.should-template",
-	},
-	LegacyEnvAliases: map[string][]string{
-		"git.branch":                           {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
-		"git.tag":                              {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
-		"helm.cwd":                             {"HELM_ROOT", "HELM_CWD"},
-		"helm.lint.kubernetes.version":         {"KUBERNETES_VERSION", "HELM_LINT_KUBERNETES_VERSION"},
-		"helm.login.registry.password":         {"HELM_REGISTRY_PASSWORD", "HELM_LOGIN_REGISTRY_PASSWORD"},
-		"helm.login.registry.uri":              {"HELM_REGISTRY_URI", "HELM_LOGIN_REGISTRY_URI"},
-		"helm.login.registry.username":         {"HELM_REGISTRY_USERNAME", "HELM_LOGIN_REGISTRY_USERNAME"},
-		"helm.publish.chart.app-version":       {"HELM_CHART_APP_VERSION", "HELM_PUBLISH_CHART_APP_VERSION"},
-		"helm.publish.chart.destination":       {"HELM_CHART_DESTINATION", "HELM_PUBLISH_CHART_DESTINATION"},
-		"helm.publish.chart.target":            {"HELM_CHART_TARGET", "HELM_PUBLISH_CHART_TARGET"},
-		"helm.publish.chart.versions":          {"HELM_CHART_VERSIONS", "HELM_PUBLISH_CHART_VERSIONS"},
-		"helm.publish.chart.versions-sanitize": {"HELM_CHART_SANITIZE_VERSIONS", "HELM_PUBLISH_CHART_VERSIONS_SANITIZE"},
-		"helm.publish.chart.versions-template": {"HELM_CHART_VERSIONS_TEMPLATE", "HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"},
+		return newCommand(p)
 	},
 })
 
@@ -54,8 +35,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 

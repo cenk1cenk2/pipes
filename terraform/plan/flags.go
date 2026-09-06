@@ -9,18 +9,16 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
+const CATEGORY_PLAN = "Plan"
+
 //revive:disable:line-length-limit
 
 var Flags = CombineFlags(
 	[]cli.Flag{
 		&cli.StringFlag{
-			Name: "terraform.plan.output",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_PLAN_CACHE"),
-				cli.EnvVar("TF_APPLY_OUTPUT"),
-				cli.EnvVar("TF_PLAN_OUTPUT"),
-				cli.EnvVar("TERRAFORM_PLAN_OUTPUT"),
-			),
+			Category:    CATEGORY_PLAN,
+			Name:        "terraform.plan.output",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PLAN_OUTPUT")),
 			Usage:       "Output file for terraform plan.",
 			Required:    false,
 			Value:       "plan",
@@ -28,11 +26,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform.plan.args",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_PLAN_ARGS"),
-				cli.EnvVar("TERRAFORM_PLAN_ARGS"),
-			),
+			Category:    CATEGORY_PLAN,
+			Name:        "terraform.plan.args",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PLAN_ARGS")),
 			Usage:       "Additional arguments for terraform plan.",
 			Required:    false,
 			Value:       "",
@@ -40,11 +36,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.BoolFlag{
-			Name: "terraform.plan.preview-for-merge-requests",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_PLAN_PREVIEW_FOR_MRS"),
-				cli.EnvVar("TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS"),
-			),
+			Category:    CATEGORY_PLAN,
+			Name:        "terraform.plan.preview-for-merge-requests",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS")),
 			Usage:       "Run merge request terraform plans as previews without state locking.",
 			Required:    false,
 			Value:       true,
@@ -52,10 +46,11 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform.plan.pipeline-source",
+			Category: CATEGORY_PLAN,
+			Name:     "terraform.plan.pipeline-source",
 			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("CI_PIPELINE_SOURCE"),
 				cli.EnvVar("TERRAFORM_PLAN_PIPELINE_SOURCE"),
+				cli.EnvVar("CI_PIPELINE_SOURCE"),
 			),
 			Usage:       "GitLab CI pipeline source used to detect merge request pipelines.",
 			Required:    false,
@@ -64,11 +59,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.Uint32Flag{
-			Name: "terraform.plan.retry-tries",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_PLAN_RETRY_TRIES"),
-				cli.EnvVar("TERRAFORM_PLAN_RETRY_TRIES"),
-			),
+			Category:    CATEGORY_PLAN,
+			Name:        "terraform.plan.retry-tries",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PLAN_RETRY_TRIES")),
 			Usage:       "Number of retries for terraform plan command.",
 			Required:    false,
 			Value:       5,
@@ -76,11 +69,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.DurationFlag{
-			Name: "terraform.plan.retry-delay",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_PLAN_RETRY_DELAY"),
-				cli.EnvVar("TERRAFORM_PLAN_RETRY_DELAY"),
-			),
+			Category:    CATEGORY_PLAN,
+			Name:        "terraform.plan.retry-delay",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PLAN_RETRY_DELAY")),
 			Usage:       "Delay between retries for terraform plan command.",
 			Required:    false,
 			Value:       60 * time.Second,
@@ -88,11 +79,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform.plan.summary.output",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TERRAFORM_SUMMARY_OUTPUT"),
-				cli.EnvVar("TERRAFORM_PLAN_SUMMARY_OUTPUT"),
-			),
+			Category:    CATEGORY_PLAN,
+			Name:        "terraform.plan.summary.output",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PLAN_SUMMARY_OUTPUT")),
 			Usage:       "Output file for terraform plan summary. Leave empty to skip summary generation.",
 			Required:    false,
 			Value:       "terraform-summary.json",
@@ -102,8 +91,3 @@ var Flags = CombineFlags(
 	gitlab.NewMergeRequestReportFlags(&P.MergeRequestReport),
 	ci.NewMetadataFlags(&P.ReportMetadata),
 )
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList) error {
-	return nil
-}

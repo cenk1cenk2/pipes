@@ -16,16 +16,10 @@ const description = "template-cli"
 
 var VERSION = "latest"
 
-// options is where a service the pipe reaches outside the machine for would be
-// injected. This scaffold reaches for nothing, so there is nothing to swap.
-type options struct{}
-
-// newCommand builds the command tree. The version is a parameter so a spec can
-// build the same tree main does without the build stamp.
-func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
+func newCommand(p *plumber.Plumber) *ucli.Command {
 	return &ucli.Command{
 		Name:        name,
-		Version:     version,
+		Version:     VERSION,
 		Usage:       description,
 		Description: description,
 		Flags:       plumber.CombineFlags(pipe.Flags),
@@ -40,9 +34,7 @@ func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, VERSION, options{})
-	}).
+	plumber.NewPlumber(newCommand).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

@@ -22,12 +22,7 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
-	},
-	LegacyEnvAliases: map[string][]string{
-		"go.build.enable-cgo":   {"GO_BUILD_ENABLE_CGO", "CGO_ENABLED"},
-		"go.build.linker-flags": {"GO_BUILD_LINKER", "GO_BUILD_LINKER_FLAGS"},
-		"go.workspace":          {"GO_LINT_WORKSPACE", "GO_WORKSPACE"},
+		return newCommand(p)
 	},
 })
 
@@ -38,8 +33,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 

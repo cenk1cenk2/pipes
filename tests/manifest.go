@@ -32,7 +32,7 @@ type ManifestEntry struct {
 }
 
 // ReadmeMatrix is the shape the update-docker-hub-readme pipe is handed through
-// README_MATRIX. The manifest has to agree with it, since the pipeline is what
+// DOCKER_HUB_README_MATRIX. The manifest has to agree with it, since the pipeline is what
 // actually publishes the descriptions.
 type ReadmeMatrix []ReadmeMatrixEntry
 
@@ -46,7 +46,7 @@ type ReadmeMatrixEntry struct {
 type pipeline struct {
 	UpdateDockerHubReadme struct {
 		Variables struct {
-			ReadmeMatrix string `yaml:"README_MATRIX"`
+			ReadmeMatrix string `yaml:"DOCKER_HUB_README_MATRIX"`
 		} `yaml:"variables"`
 	} `yaml:"update-docker-hub-readme"`
 }
@@ -95,11 +95,11 @@ func ReadReadmeMatrix() (ReadmeMatrix, error) {
 	raw := ci.UpdateDockerHubReadme.Variables.ReadmeMatrix
 
 	if raw == "" {
-		return matrix, fmt.Errorf("README_MATRIX is not set on the update-docker-hub-readme job")
+		return matrix, fmt.Errorf("DOCKER_HUB_README_MATRIX is not set on the update-docker-hub-readme job")
 	}
 
 	if err := json.Unmarshal([]byte(raw), &matrix); err != nil {
-		return matrix, fmt.Errorf("Can not unmarshal README_MATRIX: %w", err)
+		return matrix, fmt.Errorf("Can not unmarshal DOCKER_HUB_README_MATRIX: %w", err)
 	}
 
 	return matrix, nil

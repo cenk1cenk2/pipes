@@ -23,14 +23,7 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
-	},
-	LegacyEnvAliases: map[string][]string{
-		"git.branch":         {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
-		"git.tag":            {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
-		"node.install.cache": {"NODE_INSTALL_CACHE_ENABLE", "NODE_INSTALL_CACHE"},
-		"node.run.cwd":       {"NODE_COMMAND_CWD", "NODE_RUN_CWD"},
-		"node.run.script":    {"NODE_COMMAND_SCRIPT", "NODE_RUN_SCRIPT"},
+		return newCommand(p)
 	},
 })
 
@@ -41,8 +34,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func runPipe(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
@@ -130,7 +123,7 @@ var _ = Describe("New", func() {
 	// The environment feature is hidden and on by default everywhere it is owned
 	// by the pipe. Here it is opt-in, and newCommand is what turns it around.
 	It("offers the environment selection as an opt-in", func() {
-		command := newCommand(nil, "test", options{})
+		command := newCommand(nil)
 
 		build := commandNamed(command, "build")
 		Expect(build).NotTo(BeNil())

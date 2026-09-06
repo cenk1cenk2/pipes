@@ -12,15 +12,10 @@ type Spec struct {
 	Name string
 	// Category is the heading the generated documentation files the flag under. It
 	// stays whatever the pipe already printed, since the docs are a published page.
-	Category   string
-	FlagPrefix string
-	EnvPrefix  string
-	// CwdEnvAliases are the environment variable names the working directory
-	// answered to before the pipes agreed on one. They are kept forever and listed
-	// ahead of the canonical name, so a pipeline that already sets one keeps
-	// winning over the name that replaced it.
-	CwdEnvAliases []string
-	VersionArgs   []string
+	Category    string
+	FlagPrefix  string
+	EnvPrefix   string
+	VersionArgs []string
 	// VersionPattern narrows the probe output down to its first submatch. Without
 	// one the whole output is reported.
 	VersionPattern *regexp.Regexp

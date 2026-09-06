@@ -44,8 +44,8 @@ var _ = Describe("Pulumi preview", func() {
 			Flags:       Flags,
 			Environment: environment,
 			WithoutEnvironment: []string{
-				"PULUMI_PLAN",
-				"PULUMI_SUMMARY_OUTPUT",
+				"PULUMI_PREVIEW_PLAN",
+				"PULUMI_PREVIEW_SUMMARY_OUTPUT",
 			},
 			TaskLists: []tests.TaskListFactory{
 				func(p *plumber.Plumber, _ *ucli.Command) *plumber.TaskList {
@@ -77,7 +77,7 @@ var _ = Describe("Pulumi preview", func() {
 	It("saves the plan where the flag pointed it", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, map[string]string{"PULUMI_PLAN": "preview.json"})).To(Succeed())
+		Expect(run(runner, map[string]string{"PULUMI_PREVIEW_PLAN": "preview.json"})).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())

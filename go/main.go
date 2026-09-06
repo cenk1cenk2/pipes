@@ -19,16 +19,10 @@ const description = "Build Go applications with the CI pipe."
 
 var VERSION = "latest"
 
-// options is where a service the pipe reaches outside the machine for would be
-// injected. This pipe drives only its own tool, so there is nothing to swap.
-type options struct{}
-
-// newCommand builds the command tree. The version is a parameter so a spec
-// can build the same tree main does without the build stamp.
-func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
+func newCommand(p *plumber.Plumber) *ucli.Command {
 	// The setup step is not aliased the way the other pipes alias it, since this
 	// pipe already has a subcommand named after the tool.
-	return cli.App(name, description, version,
+	return cli.App(name, description, VERSION,
 		cli.Command(p, "install", "Vendor go modules.", setup.Step, install.Step(install.Deps{Tool: setup.C})),
 		cli.Command(p, "build", "Build an application.", setup.Step, build.Step(build.Deps{Tool: setup.C.Ctx})),
 		cli.Command(p, "lint", "Run golangci-lint on the project.", setup.Step, lint.Step(lint.Deps{Tool: setup.C})),
@@ -37,9 +31,7 @@ func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, VERSION, options{})
-	}).
+	plumber.NewPlumber(newCommand).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

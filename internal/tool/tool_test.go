@@ -15,7 +15,6 @@ var terraform = tool.Spec{
 	Category:       "Project",
 	FlagPrefix:     "terraform",
 	EnvPrefix:      "TERRAFORM",
-	CwdEnvAliases:  []string{"TF_ROOT"},
 	VersionArgs:    []string{"version"},
 	VersionPattern: regexp.MustCompile(`Terraform (v\d+\.\d+\.\d+)`),
 }
@@ -36,31 +35,11 @@ var _ = Describe("Flags", func() {
 		Expect(f.Category).To(Equal("Project"))
 	})
 
-	// A pipeline that already exports the old name has to keep winning, which is
-	// the only reason the aliases are kept at all.
-	It("puts the legacy environment names ahead of the canonical one", func() {
+	It("reads the environment name the prefix builds", func() {
 		f := flag(terraform, &tool.Config{})
 
-		Expect(f.Sources.Chain).To(HaveLen(2))
-		Expect(f.Sources.Chain[0].String()).To(ContainSubstring("TF_ROOT"))
-		Expect(f.Sources.Chain[1].String()).To(ContainSubstring("TERRAFORM_CWD"))
-	})
-
-	It("falls back to the canonical name alone when there is no alias", func() {
-		f := flag(tool.Spec{Name: "buildah", FlagPrefix: "buildah", EnvPrefix: "BUILDAH"}, &tool.Config{})
-
 		Expect(f.Sources.Chain).To(HaveLen(1))
-		Expect(f.Sources.Chain[0].String()).To(ContainSubstring("BUILDAH_CWD"))
-	})
-
-	// Flags is called once per pipe on a Spec whose alias slice is a literal, so a
-	// destructive append would corrupt the next call.
-	It("leaves the spec aliases alone", func() {
-		spec := tool.Spec{Name: "helm", FlagPrefix: "helm", EnvPrefix: "HELM", CwdEnvAliases: []string{"HELM_ROOT"}}
-
-		tool.Flags(spec, &tool.Config{})
-
-		Expect(spec.CwdEnvAliases).To(Equal([]string{"HELM_ROOT"}))
+		Expect(f.Sources.Chain[0].String()).To(ContainSubstring("TERRAFORM_CWD"))
 	})
 
 	It("writes into the given destination", func() {

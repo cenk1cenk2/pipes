@@ -18,11 +18,19 @@ type Step struct {
 
 // Command builds a subcommand that runs every step in the order it was given.
 func Command(p *plumber.Plumber, name, description string, steps ...Step) *ucli.Command {
+	flags := []ucli.Flag{}
+	arguments := []ucli.Argument{}
+
+	for _, step := range steps {
+		flags = append(flags, step.Flags...)
+		arguments = append(arguments, step.Arguments...)
+	}
+
 	return &ucli.Command{
 		Name:        name,
 		Description: description,
-		Flags:       stepFlags(steps),
-		Arguments:   stepArguments(steps),
+		Flags:       flags,
+		Arguments:   arguments,
 		Action:      stepAction(p, steps),
 	}
 }
@@ -46,26 +54,6 @@ func Root(p *plumber.Plumber, name, description, version string, steps ...Step) 
 	command.Usage = description
 
 	return command
-}
-
-func stepFlags(steps []Step) []ucli.Flag {
-	flags := []ucli.Flag{}
-
-	for _, step := range steps {
-		flags = append(flags, step.Flags...)
-	}
-
-	return flags
-}
-
-func stepArguments(steps []Step) []ucli.Argument {
-	arguments := []ucli.Argument{}
-
-	for _, step := range steps {
-		arguments = append(arguments, step.Arguments...)
-	}
-
-	return arguments
 }
 
 func stepAction(p *plumber.Plumber, steps []Step) ucli.ActionFunc {

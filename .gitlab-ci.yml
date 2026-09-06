@@ -15,51 +15,51 @@ include:
     inputs:
       name: buildah
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_TAGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: go
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_BUILD_ARGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_BUILD_ARGS: |-
             GO_VERSION: '{{ env "GO_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             {{ env "GO_VERSION" }}
           GO_VERSION:
             - 1.25-alpine
             - 1.26-alpine
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_BUILD_ARGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_BUILD_ARGS: |-
             GO_VERSION: '{{ env "GO_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             {{ env "GO_VERSION" }}
-          CONTAINER_IMAGE_TAGS_AS_LATEST: '["^heads/main$", "^tags/.*"]'
+          BUILDAH_BUILD_IMAGE_TAG_AS_LATEST: '["^heads/main$", "^tags/.*"]'
           GO_VERSION:
             - 1.27-alpine
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: helm
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_TAGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: kustomize
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_TAGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: node
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_BUILD_ARGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_BUILD_ARGS: |-
             NODE_VERSION: '{{ env "NODE_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             {{ env "NODE_VERSION" }}
           NODE_VERSION:
             - 22
@@ -72,11 +72,11 @@ include:
     inputs:
       name: pulumi
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_BUILD_ARGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_BUILD_ARGS: |-
             PULUMI_VERSION: '{{ env "PULUMI_VERSION" }}'
             NODE_VERSION: '{{ env "NODE_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             {{ env "PULUMI_VERSION" }}-node
           PULUMI_VERSION:
             - latest
@@ -85,31 +85,31 @@ include:
     inputs:
       name: select-env
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_TAGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: semantic-release
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_BUILD_ARGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_BUILD_ARGS: |-
             NODE_VERSION: 26-alpine
-          CONTAINER_IMAGE_TAGS: |-
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: terraform
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_TAGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: update-docker-hub-readme
       container-matrix:
-        - CONTAINER_FILE_NAME: Dockerfile
-          CONTAINER_IMAGE_TAGS: |-
+        - BUILDAH_BUILD_FILE_NAME: Dockerfile
+          BUILDAH_BUILD_IMAGE_TAGS: |-
             latest
 
 .rules-default: &rules-default
@@ -167,14 +167,14 @@ lint:
   needs:
     - install
   variables:
-    GO_LINT_WORKSPACE: "true"
+    GO_WORKSPACE: "true"
   cache:
     - key: $CI_JOB_NAME_SLUG-v2
       paths:
         - .go/cache/
   script:
-    # GO_LINT_WORKSPACE only exists on the pipe this branch ships; the one baked
-    # into the image ignores it and lints the workspace root, which is not a module.
+    # The binary built from this branch is the one that answers to GO_WORKSPACE;
+    # the one baked into the image lints the workspace root, which is not a module.
     - ./go/dist/pipe-bootstrap lint
   rules: *rules-default
   tags:
@@ -217,9 +217,9 @@ update-docker-hub-readme:
   image: cenk1cenk2/pipe-update-docker-hub-readme:latest
   dependencies: []
   variables:
-    DOCKER_USERNAME: $DOCKERHUB_USERNAME
-    DOCKER_PASSWORD: $DOCKERHUB_API_PASSWORD
-    README_MATRIX: |
+    DOCKER_HUB_USERNAME: $DOCKERHUB_USERNAME
+    DOCKER_HUB_PASSWORD: $DOCKERHUB_API_PASSWORD
+    DOCKER_HUB_README_MATRIX: |
       [
         {
           "repository": "cenk1cenk2/pipe-buildah",

@@ -42,16 +42,14 @@ func (o options) defaults() options {
 	return o
 }
 
-// newCommand builds the command tree. The version is a parameter so a spec
-// can build the same tree main does without the build stamp.
-func newCommand(p *plumber.Plumber, version string, opts options) *ucli.Command {
+func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 	opts = opts.defaults()
 
 	tool := setup.Step
 	credentials := login.Step(login.Deps{Tool: setup.C})
 	backend := state.Step(state.Deps{Tool: setup.C, CI: &setup.P.CiVariables})
 
-	return cli.App(name, description, version,
+	return cli.App(name, description, VERSION,
 		cli.Command(p, "install", "Install terraform project.", tool, credentials, backend, install.Step(install.Deps{Tool: setup.C})),
 		cli.Command(p, "lint", "Lint terraform project with terraform.", tool, lint.Step(lint.Deps{Tool: setup.C})),
 		cli.Command(p, "plan", "Plan terraform project.", tool, credentials, backend, plan.Step(plan.Deps{Tool: setup.C, State: state.P, Notes: opts.Notes})),
@@ -62,7 +60,7 @@ func newCommand(p *plumber.Plumber, version string, opts options) *ucli.Command 
 
 func main() {
 	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, VERSION, options{})
+		return newCommand(p, options{})
 	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,

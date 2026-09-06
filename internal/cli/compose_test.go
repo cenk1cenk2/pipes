@@ -42,7 +42,7 @@ func step(binary string, flags ...ucli.Flag) cli.Step {
 func run(runner *tests.TestingCommandRunner, command func(*plumber.Plumber) *ucli.Command, args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(command)
+	fixture := tests.NewPlumber(command)
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
 	return fixture.RunCli(args...)

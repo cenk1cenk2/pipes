@@ -4,17 +4,15 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+const CATEGORY_APPLY = "Apply"
+
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name: "terraform.apply.output",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("TF_PLAN_CACHE"),
-			cli.EnvVar("TF_APPLY_OUTPUT"),
-			cli.EnvVar("TF_PLAN_OUTPUT"),
-			cli.EnvVar("TERRAFORM_APPLY_OUTPUT"),
-		),
+		Category:    CATEGORY_APPLY,
+		Name:        "terraform.apply.output",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_APPLY_OUTPUT")),
 		Usage:       "Output file for terraform apply.",
 		Required:    false,
 		Value:       "plan",
@@ -22,11 +20,9 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Name: "terraform.apply.args",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("TF_APPLY_ARGS"),
-			cli.EnvVar("TERRAFORM_APPLY_ARGS"),
-		),
+		Category:    CATEGORY_APPLY,
+		Name:        "terraform.apply.args",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_APPLY_ARGS")),
 		Usage:       "Additional arguments for terraform apply.",
 		Required:    false,
 		Value:       "",

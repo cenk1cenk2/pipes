@@ -12,12 +12,11 @@ const (
 )
 
 var Spec = tool.Spec{
-	Name:          "helm",
-	Category:      CATEGORY_HELM,
-	FlagPrefix:    "helm",
-	EnvPrefix:     "HELM",
-	CwdEnvAliases: []string{"HELM_ROOT"},
-	VersionArgs:   []string{"version"},
+	Name:        "helm",
+	Category:    CATEGORY_HELM,
+	FlagPrefix:  "helm",
+	EnvPrefix:   "HELM",
+	VersionArgs: []string{"version"},
 }
 
 var Flags = []cli.Flag(tool.Flags(Spec, P))

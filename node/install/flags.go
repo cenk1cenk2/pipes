@@ -51,12 +51,9 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_NODE_INSTALL,
-		Name:     "node.install.cache",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("NODE_INSTALL_CACHE_ENABLE"),
-			cli.EnvVar("NODE_INSTALL_CACHE"),
-		),
+		Category:    CATEGORY_NODE_INSTALL,
+		Name:        "node.install.cache",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("NODE_INSTALL_CACHE")),
 		Usage:       "Enable caching for the package manager.",
 		Required:    false,
 		Value:       true,

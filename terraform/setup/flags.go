@@ -23,7 +23,6 @@ var Spec = tool.Spec{
 	Category:       CATEGORY_PROJECT,
 	FlagPrefix:     "terraform",
 	EnvPrefix:      "TERRAFORM",
-	CwdEnvAliases:  []string{"TF_ROOT"},
 	VersionArgs:    []string{"version"},
 	VersionPattern: regexp.MustCompile(`Terraform (v\d+\.\d+\.\d+)`),
 }
@@ -35,7 +34,7 @@ var Flags = CombineFlags(
 		&ucli.StringFlag{
 			Category:    CATEGORY_CONFIG,
 			Name:        "terraform.log-level",
-			Sources:     cli.EnvVars("TF_LOG_LEVEL", "TF_LOG", "TERRAFORM_LOG_LEVEL"),
+			Sources:     cli.EnvVars("TERRAFORM_LOG_LEVEL", "TF_LOG"),
 			Usage:       `Terraform log level. enum("trace", "debug", "info", "warn", "error")`,
 			Required:    false,
 			Value:       "",
@@ -47,7 +46,7 @@ var Flags = CombineFlags(
 		&ucli.StringFlag{
 			Category:    CATEGORY_CI_VARIABLES,
 			Name:        "terraform.ci.api-url",
-			Sources:     cli.EnvVars("TF_VAR_CI_API_V4_URL", "CI_API_V4_URL", "TERRAFORM_CI_API_URL"),
+			Sources:     cli.EnvVars("TERRAFORM_CI_API_URL", "CI_API_V4_URL"),
 			Usage:       "Injected CI api-url variable to the deployment.",
 			Required:    false,
 			Value:       "",
@@ -57,7 +56,7 @@ var Flags = CombineFlags(
 		&ucli.StringFlag{
 			Category:    CATEGORY_CI_VARIABLES,
 			Name:        "terraform.ci.project-id",
-			Sources:     cli.EnvVars("TF_VAR_CI_PROJECT_ID", "CI_PROJECT_ID", "TERRAFORM_CI_PROJECT_ID"),
+			Sources:     cli.EnvVars("TERRAFORM_CI_PROJECT_ID", "CI_PROJECT_ID"),
 			Usage:       "Injected CI project-id variable to the deployment.",
 			Required:    false,
 			Value:       "",

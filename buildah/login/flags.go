@@ -11,9 +11,8 @@ const (
 )
 
 var Spec = registry.Spec{
-	Category:  CATEGORY_CONTAINER_REGISTRY,
-	Label:     "Container registry",
-	Prefix:    "buildah",
-	Command:   "login",
-	LegacyEnv: "CONTAINER",
+	Category: CATEGORY_CONTAINER_REGISTRY,
+	Label:    "Container registry",
+	Prefix:   "buildah",
+	Command:  "login",
 }

@@ -42,9 +42,9 @@ func unmarshalFlag[T any](flag *ucli.StringFlag, dst *T, unmarshal func([]byte, 
 	return flag
 }
 
-// EnvVars builds a value source chain out of environment variable names. Legacy
-// names come first so a variable already set in a pipeline keeps winning over the
-// name that replaced it.
+// EnvVars builds a value source chain out of environment variable names. The
+// chain is read in order, so the first name a pipeline sets is the one that
+// wins.
 func EnvVars(names ...string) ucli.ValueSourceChain {
 	sources := make([]ucli.ValueSource, 0, len(names))
 

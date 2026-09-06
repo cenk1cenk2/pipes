@@ -11,9 +11,8 @@ const (
 )
 
 var Spec = registry.Spec{
-	Category:  CATEGORY_HELM_REGISTRY,
-	Label:     "Helm registry",
-	Prefix:    "helm",
-	Command:   "login",
-	LegacyEnv: "HELM",
+	Category: CATEGORY_HELM_REGISTRY,
+	Label:    "Helm registry",
+	Prefix:   "helm",
+	Command:  "login",
 }

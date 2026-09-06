@@ -30,19 +30,17 @@ func (o options) defaults() options {
 	return o
 }
 
-// newCommand builds the command tree. The version is a parameter so a spec
-// can build the same tree main does without the build stamp.
-func newCommand(p *plumber.Plumber, version string, opts options) *ucli.Command {
+func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 	opts = opts.defaults()
 
-	return cli.Root(p, name, description, version,
+	return cli.Root(p, name, description, VERSION,
 		update.Step(update.Deps{Hub: opts.Hub}),
 	)
 }
 
 func main() {
 	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, VERSION, options{})
+		return newCommand(p, options{})
 	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,

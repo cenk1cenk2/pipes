@@ -24,13 +24,9 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
+		return newCommand(p)
 	},
 	Unprefixed: true,
-	LegacyEnvAliases: map[string][]string{
-		"git.branch": {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
-		"git.tag":    {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
-	},
 })
 
 // The reference and the output file are passed as arguments rather than through
@@ -40,8 +36,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})
 

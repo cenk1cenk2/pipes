@@ -33,7 +33,7 @@ build:
       artifacts: true
   variables:
     GO_BUILD_BINARY_NAME: pipe
-    GO_BUILD_LINKER: -w -s
+    GO_BUILD_LINKER_FLAGS: -w -s
     GO_BUILD_VARIABLES: |-
       main.VERSION: BUILD.{{ now | date "2006-01-02T15:04:05Z0700" }}
     GO_BUILD_TARGETS: |-
@@ -47,7 +47,9 @@ build:
     paths:
       - $GO_CWD/dist/
   script:
-    - pipe build
+    # The parent hands down the binary it built from this commit, so the pipe that
+    # builds every other pipe is never a release behind the flags it is given.
+    - ./go/dist/pipe-bootstrap build
   rules:
     - when: always
   tags:
@@ -60,10 +62,10 @@ container:
   needs:
     - job: build
   variables:
-    CONTAINER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
-    CONTAINER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
-    CONTAINER_FILE_CONTEXT: $[[inputs.cwd]]
-    CONTAINER_IMAGE_NAME: $[[inputs.container-image-name]]
+    BUILDAH_LOGIN_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
+    BUILDAH_LOGIN_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
+    BUILDAH_BUILD_FILE_CONTEXT: $[[inputs.cwd]]
+    BUILDAH_BUILD_IMAGE_NAME: $[[inputs.container-image-name]]
   parallel:
     matrix: $[[inputs.container-matrix]]
   script:

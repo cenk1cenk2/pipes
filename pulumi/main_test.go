@@ -28,21 +28,7 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
-	},
-	UncategorizedFlags: []string{
-		"pulumi.preview.plan",
-		"pulumi.preview.summary.output",
-		"pulumi.stack",
-		"pulumi.up.plan",
-	},
-	// Both commands have always read $PULUMI_PLAN, so a job that runs preview and
-	// up in turn hands them the same file. The canonical names are per command,
-	// which is the way out of that without breaking the jobs that rely on it.
-	LegacyEnvAliases: map[string][]string{
-		"pulumi.preview.plan":           {"PULUMI_PLAN", "PULUMI_PREVIEW_PLAN"},
-		"pulumi.preview.summary.output": {"PULUMI_SUMMARY_OUTPUT", "PULUMI_PREVIEW_SUMMARY_OUTPUT"},
-		"pulumi.up.plan":                {"PULUMI_PLAN", "PULUMI_UP_PLAN"},
+		return newCommand(p, options{})
 	},
 })
 
@@ -53,8 +39,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(runner *tests.TestingCommandRunner, opts options, args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", opts)
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, opts)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 

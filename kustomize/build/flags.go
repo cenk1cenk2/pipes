@@ -18,12 +18,9 @@ const (
 var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize.build.enable-helm",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("KUSTOMIZE_ENABLE_HELM"),
-			cli.EnvVar("KUSTOMIZE_BUILD_ENABLE_HELM"),
-		),
+		Category:    CATEGORY_KUSTOMIZE_BUILD,
+		Name:        "kustomize.build.enable-helm",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("KUSTOMIZE_BUILD_ENABLE_HELM")),
 		Usage:       "Enable the Helm chart inflation generator while building overlays.",
 		Required:    false,
 		Value:       true,
@@ -31,12 +28,9 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize.build.helm-command",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("KUSTOMIZE_HELM_COMMAND"),
-			cli.EnvVar("KUSTOMIZE_BUILD_HELM_COMMAND"),
-		),
+		Category:    CATEGORY_KUSTOMIZE_BUILD,
+		Name:        "kustomize.build.helm-command",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("KUSTOMIZE_BUILD_HELM_COMMAND")),
 		Usage:       "Helm binary to use for the Helm chart inflation generator.",
 		Required:    false,
 		Value:       "helm",
@@ -44,12 +38,9 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize.build.load-restrictor",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("KUSTOMIZE_LOAD_RESTRICTOR"),
-			cli.EnvVar("KUSTOMIZE_BUILD_LOAD_RESTRICTOR"),
-		),
+		Category:    CATEGORY_KUSTOMIZE_BUILD,
+		Name:        "kustomize.build.load-restrictor",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("KUSTOMIZE_BUILD_LOAD_RESTRICTOR")),
 		Usage:       "Load restrictor for Kustomize file access. \"rootOnly\" restricts loads to the overlay root, \"none\" allows loading files outside the overlay directory (matches ArgoCD). format(enum(\"rootOnly\", \"none\"))",
 		Required:    false,
 		Value:       string(LoadRestrictorNone),
@@ -57,12 +48,9 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
-		Name:     "kustomize.build.kube-version",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("KUSTOMIZE_KUBE_VERSION"),
-			cli.EnvVar("KUSTOMIZE_BUILD_KUBE_VERSION"),
-		),
+		Category:    CATEGORY_KUSTOMIZE_BUILD,
+		Name:        "kustomize.build.kube-version",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("KUSTOMIZE_BUILD_KUBE_VERSION")),
 		Usage:       "Kubernetes version passed to the Helm chart inflation generator.",
 		Required:    false,
 		Value:       "",

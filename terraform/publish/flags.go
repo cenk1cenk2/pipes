@@ -23,9 +23,8 @@ var Flags = CombineFlags(
 			Category: CATEGORY_MODULE,
 			Name:     "terraform.publish.module.name",
 			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_MODULE_NAME"),
-				cli.EnvVar("CI_PROJECT_NAME"),
 				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_NAME"),
+				cli.EnvVar("CI_PROJECT_NAME"),
 			),
 			Usage:       "Name for the module that will be published.",
 			Required:    true,
@@ -34,13 +33,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_MODULE,
-			Name:     "terraform.publish.module.cwd",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_MODULE_CWD"),
-				cli.EnvVar("TF_ROOT"),
-				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_CWD"),
-			),
+			Category:    CATEGORY_MODULE,
+			Name:        "terraform.publish.module.cwd",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PUBLISH_MODULE_CWD")),
 			Usage:       "Directory for the module that will be published.",
 			Required:    false,
 			Value:       ".",
@@ -48,12 +43,9 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_MODULE,
-			Name:     "terraform.publish.module.system",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_MODULE_SYSTEM"),
-				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_SYSTEM"),
-			),
+			Category:    CATEGORY_MODULE,
+			Name:        "terraform.publish.module.system",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PUBLISH_MODULE_SYSTEM")),
 			Usage:       "Module system for the module that will be published.",
 			Required:    false,
 			Value:       "local",
@@ -63,12 +55,9 @@ var Flags = CombineFlags(
 		// CATEGORY_REGISTRY
 
 		&cli.StringFlag{
-			Category: CATEGORY_REGISTRY,
-			Name:     "terraform.publish.registry.name",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TF_MODULE_REGISTRY"),
-				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_NAME"),
-			),
+			Category:    CATEGORY_REGISTRY,
+			Name:        "terraform.publish.registry.name",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_NAME")),
 			Usage:       "Registry of the module that will be published.",
 			Required:    false,
 			Value:       TF_REGISTRY_GITLAB,
@@ -81,8 +70,8 @@ var Flags = CombineFlags(
 			Category: CATEGORY_REGISTRY_GITLAB,
 			Name:     "terraform.publish.registry.gitlab.api-url",
 			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("CI_API_V4_URL"),
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_API_URL"),
+				cli.EnvVar("CI_API_V4_URL"),
 			),
 			Usage:       "Gitlab API URL for publish call.",
 			Required:    false,
@@ -93,8 +82,8 @@ var Flags = CombineFlags(
 			Category: CATEGORY_REGISTRY_GITLAB,
 			Name:     "terraform.publish.registry.gitlab.project-id",
 			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("CI_PROJECT_ID"),
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_PROJECT_ID"),
+				cli.EnvVar("CI_PROJECT_ID"),
 			),
 			Usage:       "Gitlab project id for publish call.",
 			Required:    false,
@@ -106,8 +95,8 @@ var Flags = CombineFlags(
 			Name:     "terraform.publish.registry.gitlab.token",
 			Usage:    "Gitlab API token for publish call.",
 			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("CI_JOB_TOKEN"),
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_TOKEN"),
+				cli.EnvVar("CI_JOB_TOKEN"),
 			),
 			Required:    false,
 			Destination: &P.Registry.Gitlab.Token,

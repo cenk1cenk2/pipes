@@ -17,24 +17,15 @@ const description = "Selects an set of environment variable prefix depending on 
 
 var VERSION = "latest"
 
-// options is where a service the pipe reaches outside the machine for would be
-// injected. This pipe only rewrites its own environment, so there is nothing to
-// swap.
-type options struct{}
-
-// newCommand builds the command tree. The version is a parameter so a spec
-// can build the same tree main does without the build stamp.
-func newCommand(p *plumber.Plumber, version string, _ options) *ucli.Command {
-	return cli.Root(p, name, description, version,
+func newCommand(p *plumber.Plumber) *ucli.Command {
+	return cli.Root(p, name, description, VERSION,
 		setup.Step,
 		write.Step(write.Deps{Environment: setup.EnvironmentCtx}),
 	)
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, VERSION, options{})
-	}).
+	plumber.NewPlumber(newCommand).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

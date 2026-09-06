@@ -45,8 +45,8 @@ var Flags = []cli.Flag{
 		Category: CATEGORY_CI_VARIABLES,
 		Name:     "semantic-release.ci.commit-reference",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("CI_COMMIT_REF_NAME"),
 			cli.EnvVar("SEMANTIC_RELEASE_CI_COMMIT_REFERENCE"),
+			cli.EnvVar("CI_COMMIT_REF_NAME"),
 		),
 		Usage:       "Current commit reference that can be branch or tag name of the project..",
 		Required:    false,

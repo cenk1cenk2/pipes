@@ -61,10 +61,10 @@ var _ = Describe("Terraform plan", func() {
 			Environment: environment,
 			WithoutEnvironment: []string{
 				"CI_PIPELINE_SOURCE",
-				"TF_PLAN_ARGS",
-				"TF_PLAN_CACHE",
-				"TF_PLAN_OUTPUT",
-				"TF_PLAN_PREVIEW_FOR_MRS",
+				"TERRAFORM_PLAN_ARGS",
+				"TERRAFORM_PLAN_OUTPUT",
+				"TERRAFORM_PLAN_PIPELINE_SOURCE",
+				"TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS",
 			},
 			TaskLists: []tests.TaskListFactory{
 				func(p *plumber.Plumber, _ *ucli.Command) *plumber.TaskList {

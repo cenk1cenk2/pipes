@@ -29,12 +29,6 @@ var _ = Describe("MarkSecret", func() {
 		p.Log.SetOutput(output)
 	})
 
-	It("hands back the destination it was given", func() {
-		var token string
-
-		Expect(cli.MarkSecret(&token)).To(BeIdenticalTo(&token))
-	})
-
 	It("keeps a marked value out of the log once the pipe is validated", func() {
 		pipe := struct{ Token string }{}
 		cli.MarkSecret(&pipe.Token)

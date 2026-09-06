@@ -4,24 +4,25 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+const CATEGORY_HELM_LINT = "Helm Lint"
+
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name:  "helm.lint.kubernetes.version",
-		Usage: "Kubernetes version to use for linting charts.",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("KUBERNETES_VERSION"),
-			cli.EnvVar("HELM_LINT_KUBERNETES_VERSION"),
-		),
+		Category:    CATEGORY_HELM_LINT,
+		Name:        "helm.lint.kubernetes.version",
+		Usage:       "Kubernetes version to use for linting charts.",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_LINT_KUBERNETES_VERSION")),
 		Required:    false,
 		Value:       "",
 		Destination: &P.Kubernetes.Version,
 	},
 
 	&cli.BoolFlag{
-		Name:  "helm.lint.should-template",
-		Usage: "If set to true, the lint command will also template the chart.",
+		Category: CATEGORY_HELM_LINT,
+		Name:     "helm.lint.should-template",
+		Usage:    "If set to true, the lint command will also template the chart.",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LINT_SHOULD_TEMPLATE"),
 		),

@@ -29,15 +29,7 @@ var _ = conformance.Verify(conformance.Pipe{
 	Name:        name,
 	Description: description,
 	New: func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", options{})
-	},
-	LegacyEnvAliases: map[string][]string{
-		"docker-hub.password":           {"DOCKER_PASSWORD", "DOCKER_HUB_PASSWORD"},
-		"docker-hub.readme.description": {"README_SHORT_DESCRIPTION", "DOCKER_HUB_README_DESCRIPTION"},
-		"docker-hub.readme.file":        {"README_FILE", "DOCKER_HUB_README_FILE"},
-		"docker-hub.readme.matrix":      {"README_MATRIX", "DOCKER_HUB_README_MATRIX"},
-		"docker-hub.readme.repository":  {"DOCKER_IMAGE_NAME", "CONTAINER_IMAGE_NAME", "README_REPOSITORY", "DOCKER_HUB_README_REPOSITORY"},
-		"docker-hub.username":           {"DOCKER_USERNAME", "DOCKER_HUB_USERNAME"},
+		return newCommand(p, options{})
 	},
 })
 
@@ -48,8 +40,8 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(opts options, args ...string) error {
 	GinkgoHelper()
 
-	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return newCommand(p, "test", opts)
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, opts)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})
 

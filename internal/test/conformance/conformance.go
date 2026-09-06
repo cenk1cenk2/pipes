@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 
 	"github.com/cenk1cenk2/plumber/v6"
@@ -20,8 +19,7 @@ import (
 )
 
 // Pipe is everything a pipe has to state about itself for the contract to be
-// checked: the tree it builds, and the tables recording what it is still allowed
-// to be missing.
+// checked.
 type Pipe struct {
 	Name        string
 	Description string
@@ -32,20 +30,6 @@ type Pipe struct {
 	// Only select-env sets it, since the pipelines that call it were written
 	// before the convention.
 	Unprefixed bool
-	// UncategorizedFlags are the visible flags that predate the categories the
-	// generated documentation files flags under. The list only ever shrinks: a new
-	// flag without a category fails, and so does an entry that has since been
-	// given one.
-	UncategorizedFlags []string
-	// LegacyEnvAliases is the exact, ordered environment source chain of every
-	// visible flag that answers to more than one name. The names a pipeline
-	// already sets are kept forever and listed ahead of the canonical one, so the
-	// order is the precedence and dropping or reordering an entry silently changes
-	// which value a running pipeline picks up.
-	//
-	// The table is closed in both directions: a flag listed here has to keep this
-	// chain, and a flag that grows a second source has to be added here.
-	LegacyEnvAliases map[string][]string
 }
 
 // Verify registers the conformance specs of the pipe. It answers with a bool so
@@ -84,61 +68,9 @@ func Verify(pipe Pipe) bool {
 		})
 
 		It("gives every visible flag a category", func() {
-			allowed := pipe.UncategorizedFlags
-
-			var seen []string
-
 			for _, f := range pipe.visibleFlags() {
-				if f.Category() != "" {
-					Expect(allowed).NotTo(ContainElement(f.Name()), fmt.Sprintf("%s now has a category, drop it from UncategorizedFlags", f.Name()))
-
-					continue
-				}
-
-				Expect(allowed).To(ContainElement(f.Name()), fmt.Sprintf("%s: %s has no category", f.Command, f.Name()))
-
-				if !slices.Contains(seen, f.Name()) {
-					seen = append(seen, f.Name())
-				}
+				Expect(f.Category()).NotTo(BeEmpty(), fmt.Sprintf("%s: %s has no category", f.Command, f.Name()))
 			}
-
-			slices.Sort(seen)
-			Expect(seen).To(Equal(allowed), "UncategorizedFlags lists a flag the tree no longer carries")
-		})
-
-		It("keeps the legacy environment names ahead of the canonical one", func() {
-			aliased := pipe.LegacyEnvAliases
-
-			var seen []string
-
-			for _, f := range pipe.visibleFlags() {
-				envs := f.EnvVars()
-
-				if len(envs) < 2 {
-					Expect(aliased).NotTo(HaveKey(f.Name()), fmt.Sprintf("%s lost its legacy environment names", f.Name()))
-
-					continue
-				}
-
-				Expect(aliased).To(
-					HaveKeyWithValue(f.Name(), envs),
-					fmt.Sprintf("%s: %s answers to more than one name, record the chain in LegacyEnvAliases", f.Command, f.Name()),
-				)
-
-				if !slices.Contains(seen, f.Name()) {
-					seen = append(seen, f.Name())
-				}
-			}
-
-			var recorded []string
-			for name := range aliased {
-				recorded = append(recorded, name)
-			}
-
-			slices.Sort(recorded)
-			slices.Sort(seen)
-
-			Expect(seen).To(Equal(recorded), "LegacyEnvAliases lists a flag the tree no longer carries")
 		})
 
 		// The README is generated from the command tree, so it goes stale the moment
