@@ -21,12 +21,6 @@ Preview the Pulumi changes.
 
 #### Flags
 
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
-| `$PULUMI_PLAN`<br />`$PULUMI_PREVIEW_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
-| `$PULUMI_SUMMARY_OUTPUT`<br />`$PULUMI_PREVIEW_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
-
 **Gitlab Merge Request Report**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -49,6 +43,19 @@ Preview the Pulumi changes.
 | `$CI_COMMIT_SHA` | Git commit sha to include in the plan report metadata. | `string` | `false` | <code></code> |
 | `$CI_COMMIT_SHORT_SHA` | Short git commit sha to include in the plan report metadata. | `string` | `false` | <code></code> |
 
+**Preview**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$PULUMI_PREVIEW_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+| `$PULUMI_PREVIEW_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
+
+**Stack**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
+
 **pulumi**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
@@ -61,10 +68,17 @@ Apply the Pulumi changes.
 
 #### Flags
 
+**Stack**
+
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$PULUMI_STACK` | Stack name for the pulumi to be used in the commands. | `string` | `true` | <code></code> |
-| `$PULUMI_PLAN`<br />`$PULUMI_UP_PLAN` | Input file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+
+**Up**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$PULUMI_UP_PLAN` | Input file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
 
 **pulumi**
 
