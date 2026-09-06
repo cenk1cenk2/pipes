@@ -1,8 +1,9 @@
-package app_test
+package main
 
 import (
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
@@ -13,24 +14,51 @@ import (
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
 
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	mockgitlab "gitlab.kilic.dev/devops/pipes/internal/test/mocks/gitlab"
-	"gitlab.kilic.dev/devops/pipes/pulumi/app"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Pulumi Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	UncategorizedFlags: []string{
+		"pulumi.preview.plan",
+		"pulumi.preview.summary.output",
+		"pulumi.stack",
+		"pulumi.up.plan",
+	},
+	// Both commands have always read $PULUMI_PLAN, so a job that runs preview and
+	// up in turn hands them the same file. The canonical names are per command,
+	// which is the way out of that without breaking the jobs that rely on it.
+	LegacyEnvAliases: map[string][]string{
+		"pulumi.preview.plan":           {"PULUMI_PLAN", "PULUMI_PREVIEW_PLAN"},
+		"pulumi.preview.summary.output": {"PULUMI_SUMMARY_OUTPUT", "PULUMI_PREVIEW_SUMMARY_OUTPUT"},
+		"pulumi.up.plan":                {"PULUMI_PLAN", "PULUMI_UP_PLAN"},
+	},
+})
 
 // Everything a spec needs is passed as an argument rather than through the
 // environment, since the flags are package level and urfave only reads an env
 // source on the first parse of a flag instance: driving values in through the
 // environment would make the specs depend on the order Ginkgo runs them in.
-func run(runner *tests.TestingCommandRunner, opts app.Options, args ...string) error {
+func run(runner *tests.TestingCommandRunner, opts options, args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", opts)
+		return newCommand(p, "test", opts)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
-	return fixture.RunCli(append([]string{"pipe-pulumi"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 func formatted(runner *tests.TestingCommandRunner) []string {
@@ -82,7 +110,7 @@ var _ = Describe("New", func() {
 
 		Expect(run(
 			runner,
-			app.Options{Notes: func(c gitlab.MergeRequestReportConfig) (gitlab.Notes, error) {
+			options{Notes: func(c gitlab.MergeRequestReportConfig) (gitlab.Notes, error) {
 				config = c
 
 				return notes, nil
@@ -108,7 +136,7 @@ var _ = Describe("New", func() {
 	It("selects the stack and applies the plan on up", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, app.Options{}, "up", "--pulumi.stack", "production")).To(Succeed())
+		Expect(run(runner, options{}, "up", "--pulumi.stack", "production")).To(Succeed())
 
 		Expect(runner.InvocationNames()).To(Equal([]string{"pulumi", "pulumi", "pulumi"}))
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("stack select production")))

@@ -1,3 +1,9 @@
+// Package tests is the aggregate conformance suite: the checks that are about the
+// repository rather than about any one pipe. What a single pipe has to answer to
+// lives in internal/test/conformance and runs inside that pipe's own suite.
+//
+// Nothing here imports a pipe, which is what lets a pipe keep its command tree
+// to itself.
 package tests
 
 import (
@@ -5,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"go.yaml.in/yaml/v4"
 )
@@ -121,4 +128,40 @@ func ModuleDirs() ([]string, error) {
 	}
 
 	return dirs, nil
+}
+
+// Excluded are the directories that hold a Go module but no pipe. They are named
+// here rather than skipped by a pattern, so adding one is a decision somebody
+// writes down.
+var Excluded = []string{
+	// template is the scaffold a new pipe is copied from. It ships no image and
+	// runs no conformance suite, so there is nothing to conform to.
+	"template",
+	// internal is the shared library the pipes are built out of.
+	"internal",
+	// tests is this module.
+	"tests",
+}
+
+// Pipes are the module directories that are pipes: every module of the workspace
+// that is not written down as something else. The list is read while the spec
+// tree is built, so a directory added without a manifest entry gets a failing
+// spec of its own instead of one assertion buried inside another.
+func Pipes() []string {
+	dirs, err := ModuleDirs()
+	if err != nil {
+		panic(err)
+	}
+
+	pipes := []string{}
+
+	for _, dir := range dirs {
+		if slices.Contains(Excluded, dir) {
+			continue
+		}
+
+		pipes = append(pipes, dir)
+	}
+
+	return pipes
 }

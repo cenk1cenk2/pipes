@@ -1,7 +1,8 @@
-package app_test
+package main
 
 import (
 	"os"
+	"testing"
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
@@ -9,23 +10,43 @@ import (
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
-	"gitlab.kilic.dev/devops/pipes/node/app"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Node Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	LegacyEnvAliases: map[string][]string{
+		"git.branch":         {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
+		"git.tag":            {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
+		"node.install.cache": {"NODE_INSTALL_CACHE_ENABLE", "NODE_INSTALL_CACHE"},
+		"node.run.cwd":       {"NODE_COMMAND_CWD", "NODE_RUN_CWD"},
+		"node.run.script":    {"NODE_COMMAND_SCRIPT", "NODE_RUN_SCRIPT"},
+	},
+})
 
 // Everything a spec needs is passed as an argument rather than through the
 // environment, since the flags are package level and urfave only reads an env
 // source on the first parse of a flag instance: driving values in through the
 // environment would make the specs depend on the order Ginkgo runs them in.
-func run(runner *tests.TestingCommandRunner, args ...string) error {
+func runPipe(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", app.Options{})
+		return newCommand(p, "test", options{})
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
-	return fixture.RunCli(append([]string{"pipe-node"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 func formatted(runner *tests.TestingCommandRunner) []string {
@@ -75,7 +96,7 @@ var _ = Describe("New", func() {
 
 		runner := fixtures.Runner()
 
-		Expect(run(
+		Expect(runPipe(
 			runner,
 			"login",
 			"--npm.login", `[{ "username": "user", "token": "npm-token", "registry": "registry.example.test" }]`,
@@ -91,7 +112,7 @@ var _ = Describe("New", func() {
 
 		runner := fixtures.Runner()
 
-		Expect(run(runner, "install")).To(Succeed())
+		Expect(runPipe(runner, "install")).To(Succeed())
 
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("i --frozen-lockfile")))
 	})
@@ -101,15 +122,15 @@ var _ = Describe("New", func() {
 
 		runner := fixtures.Runner()
 
-		Expect(run(runner, "build", "--node.build.script", "compile")).To(Succeed())
+		Expect(runPipe(runner, "build", "--node.build.script", "compile")).To(Succeed())
 
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("run compile")))
 	})
 
 	// The environment feature is hidden and on by default everywhere it is owned
-	// by the pipe. Here it is opt-in, and app.New is what turns it around.
+	// by the pipe. Here it is opt-in, and newCommand is what turns it around.
 	It("offers the environment selection as an opt-in", func() {
-		command := app.New(nil, "test", app.Options{})
+		command := newCommand(nil, "test", options{})
 
 		build := commandNamed(command, "build")
 		Expect(build).NotTo(BeNil())
@@ -127,7 +148,7 @@ var _ = Describe("New", func() {
 
 		runner := fixtures.Runner()
 
-		Expect(run(runner, "run", "migrate", "up")).To(Succeed())
+		Expect(runPipe(runner, "run", "migrate", "up")).To(Succeed())
 
 		Expect(formatted(runner)).To(ContainElement(ContainSubstring("run migrate")))
 	})

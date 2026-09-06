@@ -1,8 +1,9 @@
-package app_test
+package main
 
 import (
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
@@ -10,9 +11,27 @@ import (
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
-	"gitlab.kilic.dev/devops/pipes/select-env/app"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Select Env Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	Unprefixed: true,
+	LegacyEnvAliases: map[string][]string{
+		"git.branch": {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
+		"git.tag":    {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
+	},
+})
 
 // The reference and the output file are passed as arguments rather than through
 // the environment, since the flags are package level and urfave only reads an
@@ -22,11 +41,11 @@ func run(args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", app.Options{})
+		return newCommand(p, "test", options{})
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})
 
-	return fixture.RunCli(append([]string{"select-env"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 var _ = Describe("New", func() {

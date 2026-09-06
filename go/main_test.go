@@ -1,15 +1,35 @@
-package app_test
+package main
 
 import (
+	"testing"
+
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/go/app"
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Go Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	LegacyEnvAliases: map[string][]string{
+		"go.build.enable-cgo":   {"GO_BUILD_ENABLE_CGO", "CGO_ENABLED"},
+		"go.build.linker-flags": {"GO_BUILD_LINKER", "GO_BUILD_LINKER_FLAGS"},
+		"go.workspace":          {"GO_LINT_WORKSPACE", "GO_WORKSPACE"},
+	},
+})
 
 // Everything a spec needs is passed as an argument rather than through the
 // environment, since the flags are package level and urfave only reads an env
@@ -19,11 +39,11 @@ func run(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", app.Options{})
+		return newCommand(p, "test", options{})
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
-	return fixture.RunCli(append([]string{"pipe-go"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 // answer lets the runner reply to one invocation of the given command. Seeding

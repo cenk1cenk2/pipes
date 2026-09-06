@@ -1,15 +1,35 @@
-package app_test
+package main
 
 import (
+	"testing"
+
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
-	"gitlab.kilic.dev/devops/pipes/semantic-release/app"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Semantic Release Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	LegacyEnvAliases: map[string][]string{
+		"git.branch":                           {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
+		"git.tag":                              {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
+		"semantic-release.ci.commit-reference": {"CI_COMMIT_REF_NAME", "SEMANTIC_RELEASE_CI_COMMIT_REFERENCE"},
+	},
+})
 
 // Everything a spec needs is passed as an argument rather than through the
 // environment, since the flags are package level and urfave only reads an env
@@ -19,11 +39,11 @@ func run(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", app.Options{})
+		return newCommand(p, "test", options{})
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
-	return fixture.RunCli(append([]string{"pipe-semantic-release"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 func environmentEnable(flags []ucli.Flag) *ucli.BoolFlag {
@@ -61,9 +81,9 @@ var _ = Describe("New", func() {
 	})
 
 	// The environment feature is hidden and on by default everywhere it is owned
-	// by the pipe. Here it is opt-in, and app.New is what turns it around.
+	// by the pipe. Here it is opt-in, and newCommand is what turns it around.
 	It("offers the environment selection as an opt-in", func() {
-		command := app.New(nil, "test", app.Options{})
+		command := newCommand(nil, "test", options{})
 
 		flag := environmentEnable(command.Flags)
 		Expect(flag).NotTo(BeNil())

@@ -1,10 +1,11 @@
-package app_test
+package main
 
 import (
 	"context"
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
@@ -13,25 +14,46 @@ import (
 	"github.com/stretchr/testify/mock"
 	ucli "github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
-	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/app"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 	mockhub "gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/test/mocks/hub"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Update Docker Hub Readme Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	LegacyEnvAliases: map[string][]string{
+		"docker-hub.password":           {"DOCKER_PASSWORD", "DOCKER_HUB_PASSWORD"},
+		"docker-hub.readme.description": {"README_SHORT_DESCRIPTION", "DOCKER_HUB_README_DESCRIPTION"},
+		"docker-hub.readme.file":        {"README_FILE", "DOCKER_HUB_README_FILE"},
+		"docker-hub.readme.matrix":      {"README_MATRIX", "DOCKER_HUB_README_MATRIX"},
+		"docker-hub.readme.repository":  {"DOCKER_IMAGE_NAME", "CONTAINER_IMAGE_NAME", "README_REPOSITORY", "DOCKER_HUB_README_REPOSITORY"},
+		"docker-hub.username":           {"DOCKER_USERNAME", "DOCKER_HUB_USERNAME"},
+	},
+})
 
 // Everything a spec needs is passed as an argument rather than through the
 // environment, since the flags are package level and urfave only reads an env
 // source on the first parse of a flag instance: driving values in through the
 // environment would make the specs depend on the order Ginkgo runs them in.
-func run(opts app.Options, args ...string) error {
+func run(opts options, args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", opts)
+		return newCommand(p, "test", opts)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})
 
-	return fixture.RunCli(append([]string{"pipe-update-docker-hub-readme"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 var _ = Describe("New", func() {
@@ -61,7 +83,7 @@ var _ = Describe("New", func() {
 		var dialed []string
 
 		Expect(run(
-			app.Options{Hub: func(address, userAgent string) hub.Client {
+			options{Hub: func(address, userAgent string) hub.Client {
 				dialed = []string{address, userAgent}
 
 				return client

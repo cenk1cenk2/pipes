@@ -1,8 +1,9 @@
-package app_test
+package main
 
 import (
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
@@ -10,9 +11,41 @@ import (
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/helm/app"
+	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 )
+
+func TestPipe(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Helm Pipe Suite")
+}
+
+var _ = conformance.Verify(conformance.Pipe{
+	Name:        name,
+	Description: description,
+	New: func(p *plumber.Plumber) *ucli.Command {
+		return newCommand(p, "test", options{})
+	},
+	UncategorizedFlags: []string{
+		"helm.lint.kubernetes.version",
+		"helm.lint.should-template",
+	},
+	LegacyEnvAliases: map[string][]string{
+		"git.branch":                           {"CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"},
+		"git.tag":                              {"CI_COMMIT_TAG", "BITBUCKET_TAG"},
+		"helm.cwd":                             {"HELM_ROOT", "HELM_CWD"},
+		"helm.lint.kubernetes.version":         {"KUBERNETES_VERSION", "HELM_LINT_KUBERNETES_VERSION"},
+		"helm.login.registry.password":         {"HELM_REGISTRY_PASSWORD", "HELM_LOGIN_REGISTRY_PASSWORD"},
+		"helm.login.registry.uri":              {"HELM_REGISTRY_URI", "HELM_LOGIN_REGISTRY_URI"},
+		"helm.login.registry.username":         {"HELM_REGISTRY_USERNAME", "HELM_LOGIN_REGISTRY_USERNAME"},
+		"helm.publish.chart.app-version":       {"HELM_CHART_APP_VERSION", "HELM_PUBLISH_CHART_APP_VERSION"},
+		"helm.publish.chart.destination":       {"HELM_CHART_DESTINATION", "HELM_PUBLISH_CHART_DESTINATION"},
+		"helm.publish.chart.target":            {"HELM_CHART_TARGET", "HELM_PUBLISH_CHART_TARGET"},
+		"helm.publish.chart.versions":          {"HELM_CHART_VERSIONS", "HELM_PUBLISH_CHART_VERSIONS"},
+		"helm.publish.chart.versions-sanitize": {"HELM_CHART_SANITIZE_VERSIONS", "HELM_PUBLISH_CHART_VERSIONS_SANITIZE"},
+		"helm.publish.chart.versions-template": {"HELM_CHART_VERSIONS_TEMPLATE", "HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"},
+	},
+})
 
 // Everything a spec needs is passed as an argument rather than through the
 // environment, since the flags are package level and urfave only reads an env
@@ -22,11 +55,11 @@ func run(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
 	fixture := fixtures.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
-		return app.New(p, "test", app.Options{})
+		return newCommand(p, "test", options{})
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
 
-	return fixture.RunCli(append([]string{"pipe-helm"}, args...)...)
+	return fixture.RunCli(append([]string{name}, args...)...)
 }
 
 func formatted(runner *tests.TestingCommandRunner) []string {

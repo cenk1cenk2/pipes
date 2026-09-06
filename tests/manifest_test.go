@@ -25,36 +25,32 @@ var _ = Describe("Manifest", func() {
 			names[i] = entry.Name
 		}
 
-		expected := make([]string, len(pipes))
-		for i, p := range pipes {
-			expected[i] = p.Dir
-		}
-
-		Expect(names).To(Equal(expected))
+		Expect(names).To(Equal(Pipes()), "add the module to pipes.yaml, or to Excluded with the reason it is not a pipe")
 	})
 
-	for _, p := range pipes {
-		Describe(p.Dir, func() {
+	for _, dir := range Pipes() {
+		Describe(dir, func() {
 			var entry ManifestEntry
 
 			BeforeEach(func() {
 				for _, candidate := range manifest.Pipes {
-					if candidate.Name == p.Dir {
+					if candidate.Name == dir {
 						entry = candidate
 
 						return
 					}
 				}
 
-				Fail(fmt.Sprintf("%s has no entry in pipes.yaml", p.Dir))
+				Fail(fmt.Sprintf("%s has no entry in pipes.yaml", dir))
 			})
 
+			// Every pipe is prefixed, including the one whose command is not.
 			It("publishes to the image the directory names", func() {
-				Expect(entry.Image).To(Equal(p.Image()))
+				Expect(entry.Image).To(Equal("cenk1cenk2/pipe-" + dir))
 			})
 
 			It("points at a readme that is there", func() {
-				Expect(entry.Readme).To(Equal("./" + p.Dir + "/README.md"))
+				Expect(entry.Readme).To(Equal("./" + dir + "/README.md"))
 				Expect(filepath.Join(Root(), entry.Readme)).To(BeAnExistingFile())
 			})
 
@@ -91,8 +87,17 @@ var _ = Describe("Manifest", func() {
 				Expect(entry.Name).NotTo(Equal(dir))
 			}
 
-			_, err := os.Stat(filepath.Join(Root(), dir, "app", "app.go"))
-			Expect(err).To(HaveOccurred(), fmt.Sprintf("%s builds a command tree, so it is a pipe and not an exclusion", dir))
+			_, err := os.Stat(filepath.Join(Root(), dir, "main_test.go"))
+			Expect(err).To(HaveOccurred(), fmt.Sprintf("%s runs a conformance suite, so it is a pipe and not an exclusion", dir))
+		}
+	})
+
+	It("excludes only directories that are there", func() {
+		dirs, err := ModuleDirs()
+		Expect(err).NotTo(HaveOccurred())
+
+		for _, dir := range Excluded {
+			Expect(dirs).To(ContainElement(dir), "the exclusion outlived the directory it was written for")
 		}
 	})
 })
