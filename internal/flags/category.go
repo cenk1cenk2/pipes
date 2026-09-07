@@ -1,4 +1,4 @@
-package cli
+package flags
 
 // Categories that more than one pipe registers flags under. A category that
 // belongs to a single feature lives with that feature instead.

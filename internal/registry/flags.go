@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 const DEFAULT_URI = "docker.io"
@@ -29,9 +29,9 @@ type Spec struct {
 	Command string
 }
 
-func NewFlags(spec Spec, dst *Credentials) []ucli.Flag {
-	return []ucli.Flag{
-		&ucli.StringFlag{
+func NewFlags(spec Spec, dst *Credentials) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
 			Category:    spec.Category,
 			Name:        spec.name("uri"),
 			Sources:     spec.envs("URI"),
@@ -41,7 +41,7 @@ func NewFlags(spec Spec, dst *Credentials) []ucli.Flag {
 			Destination: &dst.Uri,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    spec.Category,
 			Name:        spec.name("username"),
 			Sources:     spec.envs("USERNAME"),
@@ -50,7 +50,7 @@ func NewFlags(spec Spec, dst *Credentials) []ucli.Flag {
 			Destination: &dst.Username,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    spec.Category,
 			Name:        spec.name("password"),
 			Sources:     spec.envs("PASSWORD"),
@@ -65,6 +65,6 @@ func (s Spec) name(key string) string {
 	return fmt.Sprintf("%s.%s.registry.%s", s.Prefix, s.Command, key)
 }
 
-func (s Spec) envs(key string) ucli.ValueSourceChain {
-	return cli.EnvVars(strings.ToUpper(fmt.Sprintf("%s_%s_REGISTRY_%s", s.Prefix, s.Command, key)))
+func (s Spec) envs(key string) cli.ValueSourceChain {
+	return flags.EnvVars(strings.ToUpper(fmt.Sprintf("%s_%s_REGISTRY_%s", s.Prefix, s.Command, key)))
 }

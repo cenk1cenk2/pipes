@@ -7,8 +7,8 @@ import (
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/nochso/gomd/eol"
-	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -32,31 +32,31 @@ type (
 	}
 )
 
-func NewLoginFlags(cfg *Login) []ucli.Flag {
-	return []ucli.Flag{
-		cli.JSONFlag(&ucli.StringFlag{
+func NewLoginFlags(cfg *Login) []cli.Flag {
+	return []cli.Flag{
+		flags.JSONFlag(&cli.StringFlag{
 			Category: CATEGORY_LOGIN,
 			Name:     "npm.login",
-			Sources:  cli.EnvVars("NPM_LOGIN"),
+			Sources:  flags.EnvVars("NPM_LOGIN"),
 			Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
 			Required: false,
 			Value:    "",
 		}, &cfg.Entries),
 
-		&ucli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Category:    CATEGORY_LOGIN,
 			Name:        "npm.npmrc-file",
-			Sources:     cli.EnvVars("NPM_NPMRC_FILE"),
+			Sources:     flags.EnvVars("NPM_NPMRC_FILE"),
 			Usage:       ".npmrc file to use.",
 			Required:    false,
 			Value:       []string{".npmrc"},
 			Destination: &cfg.NpmRcFiles,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_LOGIN,
 			Name:        "npm.npmrc",
-			Sources:     cli.EnvVars("NPM_NPMRC"),
+			Sources:     flags.EnvVars("NPM_NPMRC"),
 			Usage:       "Direct contents of .npmrc file.",
 			Required:    false,
 			Value:       "",

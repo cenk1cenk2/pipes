@@ -6,7 +6,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
@@ -21,7 +21,7 @@ var buildah = registry.Spec{
 var _ = Describe("NewFlags", func() {
 	var (
 		creds *registry.Credentials
-		flags []ucli.Flag
+		flags []cli.Flag
 	)
 
 	BeforeEach(func() {
@@ -29,8 +29,8 @@ var _ = Describe("NewFlags", func() {
 		flags = registry.NewFlags(buildah, creds)
 	})
 
-	flag := func(index int) *ucli.StringFlag {
-		return flags[index].(*ucli.StringFlag)
+	flag := func(index int) *cli.StringFlag {
+		return flags[index].(*cli.StringFlag)
 	}
 
 	It("declares the uri, the username and the password", func() {
@@ -79,8 +79,8 @@ var _ = Describe("LoginTaskList", func() {
 	)
 
 	BeforeEach(func() {
-		p = plumber.NewPlumber(func(_ *plumber.Plumber) *ucli.Command {
-			return &ucli.Command{Name: "test"}
+		p = plumber.NewPlumber(func(_ *plumber.Plumber) *cli.Command {
+			return &cli.Command{Name: "test"}
 		})
 
 		output = &bytes.Buffer{}
@@ -118,8 +118,8 @@ var _ = Describe("LoginTask", func() {
 	)
 
 	BeforeEach(func() {
-		p = plumber.NewPlumber(func(_ *plumber.Plumber) *ucli.Command {
-			return &ucli.Command{Name: "test"}
+		p = plumber.NewPlumber(func(_ *plumber.Plumber) *cli.Command {
+			return &cli.Command{Name: "test"}
 		})
 		p.Log.SetOutput(GinkgoWriter)
 

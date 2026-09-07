@@ -3,15 +3,15 @@ package ci_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 var _ = Describe("NewFlags", func() {
-	names := func(flags []ucli.Flag) []string {
+	names := func(flags []cli.Flag) []string {
 		found := []string{}
 		for _, flag := range flags {
 			found = append(found, flag.Names()...)
@@ -37,7 +37,7 @@ var _ = Describe("NewFlags", func() {
 		metadata := iac.Metadata{}
 
 		for _, flag := range ci.NewFlags(&metadata) {
-			Expect(flag.(ucli.CategorizableFlag).GetCategory()).To(Equal(cli.CATEGORY_CI))
+			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(flags.CATEGORY_CI))
 		}
 	})
 
@@ -48,8 +48,8 @@ var _ = Describe("NewFlags", func() {
 		flags := ci.NewFlags(&metadata)
 
 		//nolint:errcheck
-		Expect(flags[0].(*ucli.StringFlag).Destination).To(BeIdenticalTo(&metadata.JobName))
+		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&metadata.JobName))
 		//nolint:errcheck
-		Expect(flags[5].(*ucli.StringFlag).Destination).To(BeIdenticalTo(&metadata.CommitShortSha))
+		Expect(flags[5].(*cli.StringFlag).Destination).To(BeIdenticalTo(&metadata.CommitShortSha))
 	})
 })

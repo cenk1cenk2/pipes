@@ -1,4 +1,4 @@
-package cli_test
+package flags_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCli(t *testing.T) {
+func TestFlags(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "CLI Suite")
+	RunSpecs(t, "Flags Suite")
 }

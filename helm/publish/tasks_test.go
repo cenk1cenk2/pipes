@@ -5,7 +5,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 	helmv2 "helm.sh/helm/v4/pkg/chart/v2"
 
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
@@ -43,7 +43,7 @@ func run(
 		AppName:     "pipe-helm",
 		CommandName: "publish",
 		TaskLists: []tests.TaskListFactory{
-			func(p *plumber.Plumber, _ *ucli.Command) *plumber.TaskList {
+			func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
 				tl := &plumber.TaskList{}
 
 				return tl.New(p).

@@ -5,13 +5,13 @@ import (
 	"context"
 
 	"github.com/cenk1cenk2/plumber/v6"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/template/pipe"
 )
 
-func newCommand(p *plumber.Plumber) *ucli.Command {
-	return &ucli.Command{
+func newCommand(p *plumber.Plumber) *cli.Command {
+	return &cli.Command{
 		Name:        CLI_NAME,
 		Version:     VERSION,
 		Usage:       DESCRIPTION,
@@ -19,7 +19,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		Flags:       plumber.CombineFlags(pipe.Flags),
 		// The task lists are built in here rather than alongside the flags, since a
 		// stage reads the parsed flag values as it constructs.
-		Action: func(_ context.Context, _ *ucli.Command) error {
+		Action: func(_ context.Context, _ *cli.Command) error {
 			return p.RunJobs(plumber.CombineTaskLists(
 				pipe.New(p),
 			))

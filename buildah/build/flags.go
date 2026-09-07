@@ -3,8 +3,8 @@ package build
 import (
 	"strings"
 
-	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 
@@ -27,42 +27,42 @@ const (
 var Flags = CombineFlags(
 	git.NewFlags(&P.Git),
 	tagsfile.NewFlags(&P.Image.TagsFile, "", &P.Image.TagsFileStrict, false),
-	[]ucli.Flag{
+	[]cli.Flag{
 
 		// CATEGORY_CONTAINER_IMAGE
 
-		&ucli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.platforms",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_PLATFORMS"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_PLATFORMS"),
 			Usage:       "Container image platforms to be built.",
 			Required:    false,
 			Value:       []string{},
 			Destination: &P.Image.Platforms,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.name",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_NAME"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_NAME"),
 			Usage:       "Image name for the container image to be built.",
 			Required:    true,
 			Destination: &P.Image.Name,
 		},
 
-		&ucli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.tags",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_TAGS"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_TAGS"),
 			Usage:       "Image tags for the container image to be built.",
 			Required:    true,
 			Destination: &P.Image.Tags,
 		},
 
-		cli.YAMLFlag(&ucli.StringFlag{
+		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.tags-template",
-			Sources:  cli.EnvVars("BUILDAH_BUILD_IMAGE_TAGS_TEMPLATE"),
+			Sources:  flags.EnvVars("BUILDAH_BUILD_IMAGE_TAGS_TEMPLATE"),
 			Usage: strings.TrimSpace(`
     Modifies every tag that matches a certain condition.
     Template is interpolated with the given matches in the regular expression.
@@ -73,10 +73,10 @@ var Flags = CombineFlags(
 			Value:    "[]",
 		}, &P.Image.TagsTemplate),
 
-		cli.YAMLFlag(&ucli.StringFlag{
+		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.tags-sanitize",
-			Sources:  cli.EnvVars("BUILDAH_BUILD_IMAGE_TAGS_SANITIZE"),
+			Sources:  flags.EnvVars("BUILDAH_BUILD_IMAGE_TAGS_SANITIZE"),
 			Usage: strings.TrimSpace(`
     Sanitizes the given regex pattern out of tag name.
     Template is interpolated with the given matches in the regular expression.
@@ -87,10 +87,10 @@ var Flags = CombineFlags(
 			Value:    DEFAULT_SANITIZE_TAGS,
 		}, &P.Image.TagsSanitize),
 
-		cli.YAMLFlag(&ucli.StringFlag{
+		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.tag-as-latest",
-			Sources:  cli.EnvVars("BUILDAH_BUILD_IMAGE_TAG_AS_LATEST"),
+			Sources:  flags.EnvVars("BUILDAH_BUILD_IMAGE_TAG_AS_LATEST"),
 			Usage: strings.TrimSpace(`
     Regex pattern to tag the image as latest.
     Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
@@ -101,30 +101,30 @@ var Flags = CombineFlags(
 			Value:    DEFAULT_TAG_AS_LATEST,
 		}, &P.Image.TagAsLatest),
 
-		&ucli.BoolFlag{
+		&cli.BoolFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.pull",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_PULL"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_PULL"),
 			Usage:       "Pull before building the image.",
 			Required:    false,
 			Value:       true,
 			Destination: &P.Image.Pull,
 		},
 
-		&ucli.BoolFlag{
+		&cli.BoolFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.push",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_PUSH"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_PUSH"),
 			Usage:       "Push the image after building.",
 			Required:    false,
 			Value:       true,
 			Destination: &P.Image.Push,
 		},
 
-		cli.YAMLFlag(&ucli.StringFlag{
+		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.build-args",
-			Sources:  cli.EnvVars("BUILDAH_BUILD_IMAGE_BUILD_ARGS"),
+			Sources:  flags.EnvVars("BUILDAH_BUILD_IMAGE_BUILD_ARGS"),
 			Usage: strings.TrimSpace(`
     Pass in extra build arguments for image.
     You can use it as a template with environment variables as the context.
@@ -135,40 +135,40 @@ var Flags = CombineFlags(
 			Value:    "",
 		}, &P.Image.BuildArgs),
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.latest-tag",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_LATEST_TAG"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_LATEST_TAG"),
 			Usage:       "Latest tag for the container image where it is marked as latest.",
 			Required:    false,
 			Value:       "latest",
 			Destination: &P.Image.LatestTag,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.cache",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_CACHE"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_CACHE"),
 			Usage:       "Specify the cache for the container image.",
 			Required:    false,
 			Value:       "",
 			Destination: &P.Image.Cache,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.format",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_FORMAT"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_FORMAT"),
 			Usage:       "Specify the format for Container Image.",
 			Required:    false,
 			Value:       "oci",
 			Destination: &P.Image.Format,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_IMAGE,
 			Name:        "buildah.build.image.storage-driver",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_IMAGE_STORAGE_DRIVER"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_IMAGE_STORAGE_DRIVER"),
 			Usage:       "Specify the storage driver for Buildah.",
 			Required:    false,
 			Value:       "vfs",
@@ -177,20 +177,20 @@ var Flags = CombineFlags(
 
 		// CATEGORY_CONTAINER_FILE
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_FILE,
 			Name:        "buildah.build.file.context",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_FILE_CONTEXT"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_FILE_CONTEXT"),
 			Usage:       "Containerfile context argument for build operation.",
 			Required:    false,
 			Value:       ".",
 			Destination: &P.File.Context,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_FILE,
 			Name:        "buildah.build.file.name",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_FILE_NAME"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_FILE_NAME"),
 			Usage:       "Containerfile path for the build operation",
 			Required:    false,
 			Value:       "Dockerfile",
@@ -199,19 +199,19 @@ var Flags = CombineFlags(
 
 		// CATEGORY_CONTAINER_MANIFEST
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_MANIFEST,
 			Name:        "buildah.build.manifest.target",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_MANIFEST_TARGET"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_MANIFEST_TARGET"),
 			Usage:       "Target image names for patching the manifest. format(Template([]string))",
 			Required:    false,
 			Destination: &P.Manifest.Target,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_CONTAINER_MANIFEST,
 			Name:        "buildah.build.manifest.file",
-			Sources:     cli.EnvVars("BUILDAH_BUILD_MANIFEST_FILE"),
+			Sources:     flags.EnvVars("BUILDAH_BUILD_MANIFEST_FILE"),
 			Usage:       "Write all the images that are published in to a file for later use. format(Template([]string))",
 			Value:       `.published-container-images_{{ $ | join "," | sha256sum }}`,
 			Destination: &P.Manifest.File,

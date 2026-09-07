@@ -7,7 +7,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
@@ -31,7 +31,7 @@ var _ = Describe("Go lint", func() {
 			AppName:     "pipe-go",
 			CommandName: "lint",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *ucli.Command) *plumber.TaskList {
+				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
 					tl := &plumber.TaskList{}
 
 					return tl.New(p).

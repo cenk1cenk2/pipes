@@ -8,7 +8,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
@@ -22,7 +22,7 @@ func TestPipe(t *testing.T) {
 var _ = conformance.Verify(conformance.Pipe{
 	Name:        CLI_NAME,
 	Description: DESCRIPTION,
-	New: func(p *plumber.Plumber) *ucli.Command {
+	New: func(p *plumber.Plumber) *cli.Command {
 		return newCommand(p)
 	},
 })
@@ -34,7 +34,7 @@ var _ = conformance.Verify(conformance.Pipe{
 func runPipe(runner *tests.TestingCommandRunner, args ...string) error {
 	GinkgoHelper()
 
-	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *cli.Command {
 		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: runner.Runner()})
@@ -55,7 +55,7 @@ func formatted(runner *tests.TestingCommandRunner) []string {
 	return commands
 }
 
-func commandNamed(command *ucli.Command, name string) *ucli.Command {
+func commandNamed(command *cli.Command, name string) *cli.Command {
 	GinkgoHelper()
 
 	for _, sub := range command.Commands {
@@ -67,11 +67,11 @@ func commandNamed(command *ucli.Command, name string) *ucli.Command {
 	return nil
 }
 
-func environmentEnable(flags []ucli.Flag) *ucli.BoolFlag {
+func environmentEnable(flags []cli.Flag) *cli.BoolFlag {
 	GinkgoHelper()
 
 	for _, flag := range flags {
-		if converted, ok := flag.(*ucli.BoolFlag); ok && converted.Name == "environment.enable" {
+		if converted, ok := flag.(*cli.BoolFlag); ok && converted.Name == "environment.enable" {
 			return converted
 		}
 	}

@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 )
@@ -24,7 +24,7 @@ var _ = Describe("Semantic release", func() {
 			AppName:     "pipe-semantic-release",
 			CommandName: "release",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *ucli.Command) *plumber.TaskList {
+				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
 					tl := &plumber.TaskList{}
 
 					return tl.New(p).

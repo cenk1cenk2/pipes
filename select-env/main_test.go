@@ -9,7 +9,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/test/conformance"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
@@ -23,7 +23,7 @@ func TestPipe(t *testing.T) {
 var _ = conformance.Verify(conformance.Pipe{
 	Name:        CLI_NAME,
 	Description: DESCRIPTION,
-	New: func(p *plumber.Plumber) *ucli.Command {
+	New: func(p *plumber.Plumber) *cli.Command {
 		return newCommand(p)
 	},
 	Unprefixed: true,
@@ -36,7 +36,7 @@ var _ = conformance.Verify(conformance.Pipe{
 func run(args ...string) error {
 	GinkgoHelper()
 
-	fixture := tests.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+	fixture := tests.NewPlumber(func(p *plumber.Plumber) *cli.Command {
 		return newCommand(p)
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})

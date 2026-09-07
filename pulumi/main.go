@@ -5,7 +5,7 @@ import (
 	"context"
 
 	"github.com/cenk1cenk2/plumber/v6"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/pulumi/preview"
@@ -28,20 +28,20 @@ func (o options) defaults() options {
 	return o
 }
 
-func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
+func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 	opts = opts.defaults()
 
-	return &ucli.Command{
+	return &cli.Command{
 		Name:        CLI_NAME,
 		Version:     VERSION,
 		Usage:       DESCRIPTION,
 		Description: DESCRIPTION,
-		Commands: []*ucli.Command{
+		Commands: []*cli.Command{
 			{
 				Name:        "preview",
 				Description: "Preview the Pulumi changes.",
 				Flags:       plumber.CombineFlags(setup.Flags, stack.Flags, preview.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						stack.New(p, stack.Deps{Tool: setup.C}),
@@ -53,7 +53,7 @@ func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 				Name:        "up",
 				Description: "Apply the Pulumi changes.",
 				Flags:       plumber.CombineFlags(setup.Flags, stack.Flags, up.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						stack.New(p, stack.Deps{Tool: setup.C}),
@@ -66,7 +66,7 @@ func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *ucli.Command {
+	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
 		return newCommand(p, options{})
 	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{

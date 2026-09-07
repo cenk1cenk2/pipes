@@ -2,8 +2,8 @@ package node
 
 import (
 	"github.com/cenk1cenk2/plumber/v6"
-	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -26,12 +26,12 @@ type Ctx struct {
 	PackageManager
 }
 
-func NewFlags(cfg *Config) []ucli.Flag {
-	return []ucli.Flag{
-		&ucli.StringFlag{
+func NewFlags(cfg *Config) []cli.Flag {
+	return []cli.Flag{
+		&cli.StringFlag{
 			Category:    CATEGORY_PACKAGE_MANAGER,
 			Name:        "node.package-manager",
-			Sources:     cli.EnvVars("NODE_PACKAGE_MANAGER"),
+			Sources:     flags.EnvVars("NODE_PACKAGE_MANAGER"),
 			Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
 			Required:    false,
 			Value:       DEFAULT_PACKAGE_MANAGER,

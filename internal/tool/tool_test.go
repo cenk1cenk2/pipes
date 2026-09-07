@@ -5,7 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
@@ -20,11 +20,11 @@ var terraform = tool.Spec{
 }
 
 var _ = Describe("NewFlags", func() {
-	flag := func(spec tool.Spec, cfg *tool.Config) *ucli.StringFlag {
+	flag := func(spec tool.Spec, cfg *tool.Config) *cli.StringFlag {
 		flags := tool.NewFlags(spec, cfg)
 		Expect(flags).To(HaveLen(1))
 
-		return flags[0].(*ucli.StringFlag)
+		return flags[0].(*cli.StringFlag)
 	}
 
 	It("names the flag after the pipe and defaults to the current directory", func() {

@@ -5,7 +5,7 @@ import (
 	"context"
 
 	"github.com/cenk1cenk2/plumber/v6"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/go/build"
 	"gitlab.kilic.dev/devops/pipes/go/install"
@@ -14,18 +14,18 @@ import (
 	gotool "gitlab.kilic.dev/devops/pipes/go/tool"
 )
 
-func newCommand(p *plumber.Plumber) *ucli.Command {
-	return &ucli.Command{
+func newCommand(p *plumber.Plumber) *cli.Command {
+	return &cli.Command{
 		Name:        CLI_NAME,
 		Version:     VERSION,
 		Usage:       DESCRIPTION,
 		Description: DESCRIPTION,
-		Commands: []*ucli.Command{
+		Commands: []*cli.Command{
 			{
 				Name:        "install",
 				Description: "Vendor go modules.",
 				Flags:       plumber.CombineFlags(setup.Flags, install.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						install.New(p, install.Deps{Tool: setup.C}),
@@ -36,7 +36,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 				Name:        "build",
 				Description: "Build an application.",
 				Flags:       plumber.CombineFlags(setup.Flags, build.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						build.New(p, build.Deps{Tool: setup.C.Ctx}),
@@ -47,7 +47,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 				Name:        "lint",
 				Description: "Run golangci-lint on the project.",
 				Flags:       plumber.CombineFlags(setup.Flags, lint.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						lint.New(p, lint.Deps{Tool: setup.C}),
@@ -59,7 +59,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 				Description: "Run a specified go tool.",
 				Flags:       plumber.CombineFlags(setup.Flags, gotool.Flags),
 				Arguments:   gotool.Arguments,
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						gotool.New(p, gotool.Deps{Tool: setup.C.Ctx}),

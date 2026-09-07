@@ -6,7 +6,7 @@ import (
 	"context"
 
 	"github.com/cenk1cenk2/plumber/v6"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/node/build"
 	"gitlab.kilic.dev/devops/pipes/node/install"
@@ -14,30 +14,30 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func newCommand(p *plumber.Plumber) *ucli.Command {
+func newCommand(p *plumber.Plumber) *cli.Command {
 	// The environment feature is opt-in for this pipe, unlike the pipes that own
 	// their environment. The flags are shared package level values, so this runs
 	// before the command tree reads them.
-	plumber.OverwriteCliFlag(setup.EnvironmentFlags, func(f *ucli.BoolFlag) bool {
+	plumber.OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
 		return f.Name == "environment.enable"
-	}, func(f *ucli.BoolFlag) *ucli.BoolFlag {
+	}, func(f *cli.BoolFlag) *cli.BoolFlag {
 		f.Hidden = false
 		f.Value = false
 
 		return f
 	})
 
-	return &ucli.Command{
+	return &cli.Command{
 		Name:        CLI_NAME,
 		Version:     VERSION,
 		Usage:       DESCRIPTION,
 		Description: DESCRIPTION,
-		Commands: []*ucli.Command{
+		Commands: []*cli.Command{
 			{
 				Name:        "login",
 				Description: "Login to the given NPM registries.",
 				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.LoginFlags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewLogin(p),
@@ -48,7 +48,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 				Name:        "install",
 				Description: "Install node.js dependencies with the given package manager.",
 				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.LoginFlags, install.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewLogin(p),
@@ -60,7 +60,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 				Name:        "build",
 				Description: "",
 				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, build.Flags),
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewEnvironment(p),
@@ -73,7 +73,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 				Description: "",
 				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, run.Flags),
 				Arguments:   run.Arguments,
-				Action: func(_ context.Context, _ *ucli.Command) error {
+				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewEnvironment(p),

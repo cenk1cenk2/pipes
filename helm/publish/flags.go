@@ -3,8 +3,8 @@ package publish
 import (
 	"strings"
 
-	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 
@@ -24,29 +24,29 @@ const (
 var Flags = CombineFlags(
 	git.NewFlags(&P.Git),
 	tagsfile.NewFlags(&P.Chart.VersionFile, "", &P.Chart.VersionFileStrict, false),
-	[]ucli.Flag{
-		&ucli.StringFlag{
+	[]cli.Flag{
+		&cli.StringFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.target",
-			Sources:     cli.EnvVars("HELM_PUBLISH_CHART_TARGET"),
+			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_TARGET"),
 			Usage:       "Helm chart repository target to publish to.",
 			Required:    true,
 			Destination: &P.Chart.Target,
 		},
 
-		&ucli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.versions",
-			Sources:     cli.EnvVars("HELM_PUBLISH_CHART_VERSIONS"),
+			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_VERSIONS"),
 			Usage:       "Versions for the helm chart to be published.",
 			Required:    false,
 			Destination: &P.Chart.Versions,
 		},
 
-		cli.YAMLFlag(&ucli.StringFlag{
+		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-template",
-			Sources:  cli.EnvVars("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"),
+			Sources:  flags.EnvVars("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"),
 			Usage: strings.TrimSpace(`
     Modifies every version that matches a certain condition.
     Template is interpolated with the given matches in the regular expression.
@@ -57,10 +57,10 @@ var Flags = CombineFlags(
 			Value:    "[]",
 		}, &P.Chart.VersionsTemplate),
 
-		cli.YAMLFlag(&ucli.StringFlag{
+		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-sanitize",
-			Sources:  cli.EnvVars("HELM_PUBLISH_CHART_VERSIONS_SANITIZE"),
+			Sources:  flags.EnvVars("HELM_PUBLISH_CHART_VERSIONS_SANITIZE"),
 			Usage: strings.TrimSpace(`
     Sanitizes the given regex pattern out of version name.
     Template is interpolated with the given matches in the regular expression.
@@ -71,20 +71,20 @@ var Flags = CombineFlags(
 			Value:    DEFAULT_SANITIZE_VERSIONS,
 		}, &P.Chart.VersionsSanitize),
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.destination",
-			Sources:     cli.EnvVars("HELM_PUBLISH_CHART_DESTINATION"),
+			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_DESTINATION"),
 			Usage:       "Destination directory for the packaged helm chart.",
 			Required:    false,
 			Value:       "./dist/",
 			Destination: &P.Chart.Destination,
 		},
 
-		&ucli.StringFlag{
+		&cli.StringFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.app-version",
-			Sources:     cli.EnvVars("HELM_PUBLISH_CHART_APP_VERSION"),
+			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_APP_VERSION"),
 			Usage:       "Application version for the packaged helm chart.",
 			Required:    false,
 			Value:       "",

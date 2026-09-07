@@ -1,17 +1,17 @@
-package cli
+package flags
 
 import (
 	json "encoding/json/v2"
 	"fmt"
 
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 	"go.yaml.in/yaml/v4"
 )
 
 // JSONFlag makes the flag unmarshal its value into dst as part of validation, so
 // the pipe reads a struct where the user wrote a JSON string. Unknown members are
 // rejected, so a misspelled key fails the flag instead of being dropped silently.
-func JSONFlag[T any](flag *ucli.StringFlag, dst *T) *ucli.StringFlag {
+func JSONFlag[T any](flag *cli.StringFlag, dst *T) *cli.StringFlag {
 	return unmarshalFlag(flag, dst, func(data []byte, v any) error {
 		return json.Unmarshal(data, v, json.RejectUnknownMembers(true))
 	})
@@ -19,11 +19,11 @@ func JSONFlag[T any](flag *ucli.StringFlag, dst *T) *ucli.StringFlag {
 
 // YAMLFlag is JSONFlag for the flags documented as YAML. JSON parses as YAML, so
 // the two only differ in what the usage text promises.
-func YAMLFlag[T any](flag *ucli.StringFlag, dst *T) *ucli.StringFlag {
+func YAMLFlag[T any](flag *cli.StringFlag, dst *T) *cli.StringFlag {
 	return unmarshalFlag(flag, dst, yaml.Unmarshal)
 }
 
-func unmarshalFlag[T any](flag *ucli.StringFlag, dst *T, unmarshal func([]byte, any) error) *ucli.StringFlag {
+func unmarshalFlag[T any](flag *cli.StringFlag, dst *T, unmarshal func([]byte, any) error) *cli.StringFlag {
 	flag.ValidateDefaults = true
 	flag.Validator = func(v string) error {
 		// An unset flag leaves the destination at its zero value rather than
@@ -45,12 +45,12 @@ func unmarshalFlag[T any](flag *ucli.StringFlag, dst *T, unmarshal func([]byte, 
 // EnvVars builds a value source chain out of environment variable names. The
 // chain is read in order, so the first name a pipeline sets is the one that
 // wins.
-func EnvVars(names ...string) ucli.ValueSourceChain {
-	sources := make([]ucli.ValueSource, 0, len(names))
+func EnvVars(names ...string) cli.ValueSourceChain {
+	sources := make([]cli.ValueSource, 0, len(names))
 
 	for _, name := range names {
-		sources = append(sources, ucli.EnvVar(name))
+		sources = append(sources, cli.EnvVar(name))
 	}
 
-	return ucli.NewValueSourceChain(sources...)
+	return cli.NewValueSourceChain(sources...)
 }

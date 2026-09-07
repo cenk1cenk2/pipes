@@ -15,7 +15,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 )
 
 // Pipe is everything a pipe has to state about itself for the contract to be
@@ -25,7 +25,7 @@ type Pipe struct {
 	Description string
 	// New builds the tree. A nil plumber is enough for the shape, since a step
 	// only reaches for one once the command runs.
-	New func(p *plumber.Plumber) *ucli.Command
+	New func(p *plumber.Plumber) *cli.Command
 	// Unprefixed drops the pipe- prefix the command name is otherwise held to.
 	// Only select-env sets it, since the pipelines that call it were written
 	// before the convention.
@@ -118,7 +118,7 @@ func Verify(pipe Pipe) bool {
 // failure names the subcommand a reader has to open.
 type flagRef struct {
 	Command string
-	Flag    ucli.Flag
+	Flag    cli.Flag
 }
 
 func (f flagRef) Name() string {
@@ -126,7 +126,7 @@ func (f flagRef) Name() string {
 }
 
 func (f flagRef) Category() string {
-	if c, ok := f.Flag.(ucli.CategorizableFlag); ok {
+	if c, ok := f.Flag.(cli.CategorizableFlag); ok {
 		return c.GetCategory()
 	}
 
@@ -134,7 +134,7 @@ func (f flagRef) Category() string {
 }
 
 func (f flagRef) EnvVars() []string {
-	if d, ok := f.Flag.(ucli.DocGenerationFlag); ok {
+	if d, ok := f.Flag.(cli.DocGenerationFlag); ok {
 		return d.GetEnvVars()
 	}
 
@@ -142,7 +142,7 @@ func (f flagRef) EnvVars() []string {
 }
 
 func (f flagRef) Visible() bool {
-	if v, ok := f.Flag.(ucli.VisibleFlag); ok {
+	if v, ok := f.Flag.(cli.VisibleFlag); ok {
 		return v.IsVisible()
 	}
 
@@ -155,9 +155,9 @@ func (f flagRef) Visible() bool {
 func (p Pipe) visibleFlags() []flagRef {
 	refs := []flagRef{}
 
-	var walk func(path string, c *ucli.Command)
+	var walk func(path string, c *cli.Command)
 
-	walk = func(path string, c *ucli.Command) {
+	walk = func(path string, c *cli.Command) {
 		for _, f := range c.Flags {
 			ref := flagRef{Command: path, Flag: f}
 

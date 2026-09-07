@@ -1,8 +1,8 @@
 package tagsfile
 
 import (
-	ucli "github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 const (
@@ -11,12 +11,12 @@ const (
 
 // NewFlags builds the tags file flags. A nil strict destination leaves the strict
 // flag out, for the pipes that only ever read the file leniently.
-func NewFlags(dst *string, value string, strict *bool, required bool) []ucli.Flag {
-	flags := []ucli.Flag{
-		&ucli.StringFlag{
+func NewFlags(dst *string, value string, strict *bool, required bool) []cli.Flag {
+	list := []cli.Flag{
+		&cli.StringFlag{
 			Category:    CATEGORY_TAGS_FILE,
 			Name:        "tags-file",
-			Sources:     cli.EnvVars("TAGS_FILE"),
+			Sources:     flags.EnvVars("TAGS_FILE"),
 			Usage:       "Read tags from a file.",
 			Required:    required,
 			Value:       value,
@@ -25,13 +25,13 @@ func NewFlags(dst *string, value string, strict *bool, required bool) []ucli.Fla
 	}
 
 	if strict == nil {
-		return flags
+		return list
 	}
 
-	return append(flags, &ucli.BoolFlag{
+	return append(list, &cli.BoolFlag{
 		Category:    CATEGORY_TAGS_FILE,
 		Name:        "tags-file.strict",
-		Sources:     cli.EnvVars("TAGS_FILE_STRICT"),
+		Sources:     flags.EnvVars("TAGS_FILE_STRICT"),
 		Usage:       "Fail on missing tags file.",
 		Required:    false,
 		Value:       false,

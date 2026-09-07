@@ -5,7 +5,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
@@ -112,7 +112,7 @@ var _ = Describe("Fetch", func() {
 })
 
 var _ = Describe("NewFlags", func() {
-	names := func(flags []ucli.Flag) []string {
+	names := func(flags []cli.Flag) []string {
 		found := []string{}
 		for _, flag := range flags {
 			found = append(found, flag.Names()...)
@@ -143,13 +143,13 @@ var _ = Describe("NewFlags", func() {
 		flags := environment.NewFlags(&cfg)
 
 		//nolint:errcheck
-		Expect(flags[0].(*ucli.StringFlag).Destination).To(BeIdenticalTo(&cfg.Git.Branch))
+		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.Git.Branch))
 		//nolint:errcheck
-		Expect(flags[2].(*ucli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.Enable))
+		Expect(flags[2].(*cli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.Enable))
 		//nolint:errcheck
-		Expect(flags[4].(*ucli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.FailOnNoReference))
+		Expect(flags[4].(*cli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.FailOnNoReference))
 		//nolint:errcheck
-		Expect(flags[5].(*ucli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.Strict))
+		Expect(flags[5].(*cli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.Strict))
 	})
 
 	// The conditions flag is a JSON string the pipe reads back as a struct, and its
@@ -159,7 +159,7 @@ var _ = Describe("NewFlags", func() {
 		flags := environment.NewFlags(&cfg)
 
 		//nolint:errcheck
-		Expect(flags[3].(*ucli.StringFlag).Validator(environment.DEFAULT_CONDITIONS)).To(Succeed())
+		Expect(flags[3].(*cli.StringFlag).Validator(environment.DEFAULT_CONDITIONS)).To(Succeed())
 		Expect(cfg.Conditions).To(HaveLen(4))
 		Expect(cfg.Conditions[0].Environment).To(Equal("production"))
 	})
@@ -170,7 +170,7 @@ var _ = Describe("NewFlags", func() {
 		first, second := environment.Config{}, environment.Config{}
 
 		//nolint:errcheck
-		Expect(environment.NewFlags(&first)[2].(*ucli.BoolFlag).Destination).
-			NotTo(BeIdenticalTo(environment.NewFlags(&second)[2].(*ucli.BoolFlag).Destination))
+		Expect(environment.NewFlags(&first)[2].(*cli.BoolFlag).Destination).
+			NotTo(BeIdenticalTo(environment.NewFlags(&second)[2].(*cli.BoolFlag).Destination))
 	})
 })

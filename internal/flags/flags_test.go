@@ -1,11 +1,11 @@
-package cli_test
+package flags_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 type condition struct {
@@ -16,7 +16,7 @@ type condition struct {
 var _ = Describe("JSONFlag", func() {
 	It("unmarshals the value into the destination", func() {
 		dst := []condition{}
-		flag := cli.JSONFlag(&ucli.StringFlag{Name: "conditions"}, &dst)
+		flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
 
 		Expect(flag.Validator(`[{ "match": "^heads/main$", "environment": "develop" }]`)).To(Succeed())
 		Expect(dst).To(Equal([]condition{{Match: "^heads/main$", Environment: "develop"}}))
@@ -26,7 +26,7 @@ var _ = Describe("JSONFlag", func() {
 	// value rather than failing before the pipe has a chance to default it.
 	It("leaves the destination alone for an empty value", func() {
 		dst := []condition{{Match: "kept"}}
-		flag := cli.JSONFlag(&ucli.StringFlag{Name: "conditions"}, &dst)
+		flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
 
 		Expect(flag.Validator("")).To(Succeed())
 		Expect(dst).To(Equal([]condition{{Match: "kept"}}))
@@ -34,7 +34,7 @@ var _ = Describe("JSONFlag", func() {
 
 	It("names the flag in the error so the message points at the input", func() {
 		dst := []condition{}
-		flag := cli.JSONFlag(&ucli.StringFlag{Name: "conditions"}, &dst)
+		flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
 
 		err := flag.Validator("{not json")
 		Expect(err).To(HaveOccurred())
@@ -45,7 +45,7 @@ var _ = Describe("JSONFlag", func() {
 	// a typo in one would only surface once a user overrode something else.
 	It("makes the flag validate its own default", func() {
 		dst := []condition{}
-		flag := cli.JSONFlag(&ucli.StringFlag{Name: "conditions"}, &dst)
+		flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
 
 		Expect(flag.ValidateDefaults).To(BeTrue())
 	})
@@ -54,7 +54,7 @@ var _ = Describe("JSONFlag", func() {
 var _ = Describe("YAMLFlag", func() {
 	It("unmarshals the value into the destination", func() {
 		dst := []condition{}
-		flag := cli.YAMLFlag(&ucli.StringFlag{Name: "sanitize-tags"}, &dst)
+		flag := flags.YAMLFlag(&cli.StringFlag{Name: "sanitize-tags"}, &dst)
 
 		Expect(flag.Validator("- match: \"^tags/\"\n  environment: production\n")).To(Succeed())
 		Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
@@ -64,7 +64,7 @@ var _ = Describe("YAMLFlag", func() {
 	// because YAML is a superset of it.
 	It("accepts the JSON the defaults are written in", func() {
 		dst := []condition{}
-		flag := cli.YAMLFlag(&ucli.StringFlag{Name: "sanitize-tags"}, &dst)
+		flag := flags.YAMLFlag(&cli.StringFlag{Name: "sanitize-tags"}, &dst)
 
 		Expect(flag.Validator(`[{ "match": "^tags/", "environment": "production" }]`)).To(Succeed())
 		Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
@@ -72,7 +72,7 @@ var _ = Describe("YAMLFlag", func() {
 
 	It("names the flag in the error", func() {
 		dst := []condition{}
-		flag := cli.YAMLFlag(&ucli.StringFlag{Name: "sanitize-tags"}, &dst)
+		flag := flags.YAMLFlag(&cli.StringFlag{Name: "sanitize-tags"}, &dst)
 
 		err := flag.Validator("\t- broken")
 		Expect(err).To(HaveOccurred())
@@ -84,7 +84,7 @@ var _ = Describe("EnvVars", func() {
 	// The chain is read in order, so a flag that answers to more than one name
 	// resolves to the first of them a pipeline has set.
 	It("builds one source per name, in the order they were given", func() {
-		chain := cli.EnvVars("CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH")
+		chain := flags.EnvVars("CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH")
 
 		Expect(chain.Chain).To(HaveLen(2))
 		Expect(chain.Chain[0].String()).To(ContainSubstring("CI_COMMIT_REF_NAME"))

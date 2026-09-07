@@ -3,7 +3,7 @@ package node_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
@@ -60,14 +60,14 @@ var _ = Describe("NewFlags", func() {
 		flags := node.NewFlags(&cfg)
 
 		//nolint:errcheck
-		Expect(flags[0].(*ucli.StringFlag).Destination).To(BeIdenticalTo(&cfg.PackageManager))
+		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.PackageManager))
 		//nolint:errcheck
-		Expect(flags[0].(*ucli.StringFlag).Value).To(Equal(node.DEFAULT_PACKAGE_MANAGER))
+		Expect(flags[0].(*cli.StringFlag).Value).To(Equal(node.DEFAULT_PACKAGE_MANAGER))
 	})
 })
 
 var _ = Describe("NewLoginFlags", func() {
-	names := func(flags []ucli.Flag) []string {
+	names := func(flags []cli.Flag) []string {
 		found := []string{}
 		for _, flag := range flags {
 			found = append(found, flag.Names()...)
@@ -91,7 +91,7 @@ var _ = Describe("NewLoginFlags", func() {
 		flags := node.NewLoginFlags(&cfg)
 
 		//nolint:errcheck
-		Expect(flags[0].(*ucli.StringFlag).Validator(
+		Expect(flags[0].(*cli.StringFlag).Validator(
 			`[{ "username": "ci", "token": "npm-token", "registry": "registry.example.com" }]`,
 		)).To(Succeed())
 
@@ -106,7 +106,7 @@ var _ = Describe("NewLoginFlags", func() {
 		cfg := node.Login{}
 
 		//nolint:errcheck
-		Expect(node.NewLoginFlags(&cfg)[0].(*ucli.StringFlag).Validator("")).To(Succeed())
+		Expect(node.NewLoginFlags(&cfg)[0].(*cli.StringFlag).Validator("")).To(Succeed())
 		Expect(cfg.Entries).To(BeNil())
 	})
 
@@ -117,10 +117,10 @@ var _ = Describe("NewLoginFlags", func() {
 		flags := node.NewLoginFlags(&cfg)
 
 		//nolint:errcheck
-		Expect(flags[1].(*ucli.StringSliceFlag).Destination).To(BeIdenticalTo(&cfg.NpmRcFiles))
+		Expect(flags[1].(*cli.StringSliceFlag).Destination).To(BeIdenticalTo(&cfg.NpmRcFiles))
 		//nolint:errcheck
-		Expect(flags[1].(*ucli.StringSliceFlag).Value).To(Equal([]string{".npmrc"}))
+		Expect(flags[1].(*cli.StringSliceFlag).Value).To(Equal([]string{".npmrc"}))
 		//nolint:errcheck
-		Expect(flags[2].(*ucli.StringFlag).Destination).To(BeIdenticalTo(&cfg.NpmRc))
+		Expect(flags[2].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.NpmRc))
 	})
 })

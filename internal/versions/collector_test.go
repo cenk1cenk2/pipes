@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
@@ -147,8 +147,8 @@ var _ = Describe("Tasks", func() {
 	)
 
 	BeforeEach(func() {
-		p = plumber.NewPlumber(func(_ *plumber.Plumber) *ucli.Command {
-			return &ucli.Command{Name: "test"}
+		p = plumber.NewPlumber(func(_ *plumber.Plumber) *cli.Command {
+			return &cli.Command{Name: "test"}
 		})
 		p.Log.SetOutput(GinkgoWriter)
 

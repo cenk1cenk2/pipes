@@ -5,7 +5,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	ucli "github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
@@ -39,7 +39,7 @@ var _ = Describe("Node run", func() {
 			Args:        append([]string{"pipe-node", "run"}, args...),
 			Arguments:   Arguments,
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *ucli.Command) *plumber.TaskList {
+				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
 					return New(p, deps)
 				},
 			},
