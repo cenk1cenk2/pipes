@@ -10,7 +10,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
-var _ = Describe("NewMetadataFlags", func() {
+var _ = Describe("NewFlags", func() {
 	names := func(flags []ucli.Flag) []string {
 		found := []string{}
 		for _, flag := range flags {
@@ -23,7 +23,7 @@ var _ = Describe("NewMetadataFlags", func() {
 	It("registers every coordinate the report renders", func() {
 		metadata := iac.Metadata{}
 
-		Expect(names(ci.NewMetadataFlags(&metadata))).To(Equal([]string{
+		Expect(names(ci.NewFlags(&metadata))).To(Equal([]string{
 			"ci.job-name",
 			"ci.job-url",
 			"ci.pipeline-id",
@@ -36,7 +36,7 @@ var _ = Describe("NewMetadataFlags", func() {
 	It("files them all under one category", func() {
 		metadata := iac.Metadata{}
 
-		for _, flag := range ci.NewMetadataFlags(&metadata) {
+		for _, flag := range ci.NewFlags(&metadata) {
 			Expect(flag.(ucli.CategorizableFlag).GetCategory()).To(Equal(cli.CATEGORY_CI))
 		}
 	})
@@ -45,7 +45,7 @@ var _ = Describe("NewMetadataFlags", func() {
 	// own field of the struct the caller passed rather than a copy of it.
 	It("binds each flag onto the given metadata", func() {
 		metadata := iac.Metadata{}
-		flags := ci.NewMetadataFlags(&metadata)
+		flags := ci.NewFlags(&metadata)
 
 		//nolint:errcheck
 		Expect(flags[0].(*ucli.StringFlag).Destination).To(BeIdenticalTo(&metadata.JobName))

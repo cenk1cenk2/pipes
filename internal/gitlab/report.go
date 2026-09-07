@@ -52,7 +52,7 @@ func (r MergeRequestReportResult) Action() string {
 	return "updated"
 }
 
-func NewMergeRequestReportFlags(config *MergeRequestReportConfig) []cli.Flag {
+func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,

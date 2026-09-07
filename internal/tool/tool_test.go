@@ -19,9 +19,9 @@ var terraform = tool.Spec{
 	VersionPattern: regexp.MustCompile(`Terraform (v\d+\.\d+\.\d+)`),
 }
 
-var _ = Describe("Flags", func() {
+var _ = Describe("NewFlags", func() {
 	flag := func(spec tool.Spec, cfg *tool.Config) *ucli.StringFlag {
-		flags := tool.Flags(spec, cfg)
+		flags := tool.NewFlags(spec, cfg)
 		Expect(flags).To(HaveLen(1))
 
 		return flags[0].(*ucli.StringFlag)

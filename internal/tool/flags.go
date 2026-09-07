@@ -7,8 +7,8 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/cli"
 )
 
-// Flags builds the working directory flag shared by every tool pipe.
-func Flags(spec Spec, cfg *Config) []ucli.Flag {
+// NewFlags builds the working directory flag shared by every tool pipe.
+func NewFlags(spec Spec, cfg *Config) []ucli.Flag {
 	return []ucli.Flag{
 		&ucli.StringFlag{
 			Category:    spec.Category,

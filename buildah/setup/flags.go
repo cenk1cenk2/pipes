@@ -19,4 +19,4 @@ var Spec = tool.Spec{
 	VersionArgs: []string{"--version"},
 }
 
-var Flags = []cli.Flag(tool.Flags(Spec, P))
+var Flags = []cli.Flag(tool.NewFlags(Spec, P))

@@ -28,7 +28,7 @@ var Spec = tool.Spec{
 }
 
 var Flags = CombineFlags(
-	tool.Flags(Spec, &P.Config),
+	tool.NewFlags(Spec, &P.Config),
 	[]ucli.Flag{
 		// CATEGORY_CONFIG
 		&ucli.StringFlag{

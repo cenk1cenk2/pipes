@@ -8,9 +8,9 @@ import (
 
 //revive:disable:line-length-limit
 
-// NewMetadataFlags reads the job and commit coordinates the CI runner exports, so
+// NewFlags reads the job and commit coordinates the CI runner exports, so
 // a report can point back at the pipeline that produced it.
-func NewMetadataFlags(dst *iac.Metadata) []ucli.Flag {
+func NewFlags(dst *iac.Metadata) []ucli.Flag {
 	return []ucli.Flag{
 		&ucli.StringFlag{
 			Category:    cli.CATEGORY_CI,

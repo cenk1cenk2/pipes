@@ -23,7 +23,7 @@ var Spec = tool.Spec{
 }
 
 var Flags = CombineFlags(
-	tool.Flags(Spec, &P.Config),
+	tool.NewFlags(Spec, &P.Config),
 	[]ucli.Flag{
 		&ucli.StringFlag{
 			Category:    CATEGORY_SETUP,
