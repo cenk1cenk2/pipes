@@ -77,13 +77,13 @@ func LoginTaskList(p *plumber.Plumber, cfg *Login) *plumber.TaskList {
 		}).
 		Set(func(tl *plumber.TaskList) plumber.Job {
 			return plumber.JobSequence(
-				generateNpmRc(tl, cfg).Job(),
-				verifyNpmLogin(tl, cfg).Job(),
+				GenerateNpmRc(tl, cfg).Job(),
+				VerifyNpmLogin(tl, cfg).Job(),
 			)
 		})
 }
 
-func generateNpmRc(tl *plumber.TaskList, cfg *Login) *plumber.Task {
+func GenerateNpmRc(tl *plumber.TaskList, cfg *Login) *plumber.Task {
 	return tl.CreateTask("npmrc").
 		ShouldDisable(func(_ *plumber.Task) bool {
 			return cfg.Entries == nil && cfg.NpmRc == ""
@@ -148,7 +148,7 @@ func generateNpmRc(tl *plumber.TaskList, cfg *Login) *plumber.Task {
 		})
 }
 
-func verifyNpmLogin(tl *plumber.TaskList, cfg *Login) *plumber.Task {
+func VerifyNpmLogin(tl *plumber.TaskList, cfg *Login) *plumber.Task {
 	return tl.CreateTask("login").
 		// Without an npmrc file there is nothing holding the credentials for npm
 		// to read back, so there is nothing to verify either.

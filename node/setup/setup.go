@@ -15,8 +15,6 @@ var (
 
 	NodeConfig = &node.Config{}
 	NodeCtx    = &node.Ctx{}
-
-	Login = &node.Login{}
 )
 
 // The flags are built once, since main unhides the environment enable flag on
@@ -24,18 +22,11 @@ var (
 var (
 	EnvironmentFlags = environment.NewFlags(Environment)
 	NodeFlags        = node.NewFlags(NodeConfig)
-	LoginFlags       = node.NewLoginFlags(Login)
 )
 
 // New resolves the package manager every node command runs through.
 func New(p *plumber.Plumber) *plumber.TaskList {
 	return node.SetupTaskList(p, NodeConfig, NodeCtx)
-}
-
-// NewLogin writes the npmrc the package manager reads its credentials back
-// from, so the commands that reach a registry compose it after New.
-func NewLogin(p *plumber.Plumber) *plumber.TaskList {
-	return node.LoginTaskList(p, Login)
 }
 
 // NewEnvironment selects the environment the scripts are templated against and

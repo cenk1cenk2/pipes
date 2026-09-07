@@ -10,6 +10,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/node/build"
 	"gitlab.kilic.dev/devops/pipes/node/install"
+	"gitlab.kilic.dev/devops/pipes/node/login"
 	"gitlab.kilic.dev/devops/pipes/node/run"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
@@ -37,22 +38,22 @@ func main() {
 				{
 					Name:        "login",
 					Description: "Login to the given NPM registries.",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, setup.LoginFlags),
+					Flags:       plumber.CombineFlags(setup.NodeFlags, login.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(plumber.CombineTaskLists(
 							setup.New(p),
-							setup.NewLogin(p),
+							login.New(p),
 						))
 					},
 				},
 				{
 					Name:        "install",
 					Description: "Install node.js dependencies with the given package manager.",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, setup.LoginFlags, install.Flags),
+					Flags:       plumber.CombineFlags(setup.NodeFlags, login.Flags, install.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(plumber.CombineTaskLists(
 							setup.New(p),
-							setup.NewLogin(p),
+							login.New(p),
 							install.New(p),
 						))
 					},
