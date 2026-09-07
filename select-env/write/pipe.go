@@ -21,6 +21,9 @@ var P = &Pipe{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
+		ShouldRunBefore(func(tl *TaskList) error {
+			return p.Validate(P)
+		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				WriteEnvironmentFile(tl).Job(),

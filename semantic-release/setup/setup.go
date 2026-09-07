@@ -19,14 +19,6 @@ var (
 	Login = &node.Login{}
 )
 
-// The flags are built once, since main unhides the environment enable flag on
-// the slice it hands to the command and a second slice would not carry it.
-var (
-	EnvironmentFlags = environment.NewFlags(environment.Options{Destination: Environment})
-	NodeFlags        = node.NewFlags(node.Options{Destination: NodeConfig})
-	LoginFlags       = node.NewLoginFlags(node.LoginOptions{Destination: Login})
-)
-
 // NewEnvironment selects the environment the release runs against.
 func NewEnvironment(p *Plumber) *TaskList {
 	return environment.SetupTaskList(p, Environment, EnvironmentCtx)

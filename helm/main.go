@@ -25,7 +25,7 @@ func main() {
 				{
 					Name:        "install",
 					Description: "Install Helm chart dependencies.",
-					Flags:       CombineFlags(setup.Flags, login.Flags),
+					Flags:       CombineFlags(setup.Flags, login.Flags, install.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),

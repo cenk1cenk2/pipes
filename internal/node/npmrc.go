@@ -7,8 +7,6 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/nochso/gomd/eol"
-	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -29,44 +27,6 @@ type (
 		NpmRc      string
 	}
 )
-
-// LoginOptions is what the npm login flags are built onto.
-type LoginOptions struct {
-	Destination *Login
-}
-
-func NewLoginFlags(opts LoginOptions) []cli.Flag {
-	return []cli.Flag{
-		flags.JSONFlag(&cli.StringFlag{
-			Category: "Login",
-			Name:     "npm.login",
-			Sources:  cli.NewValueSourceChain(cli.EnvVar("NPM_LOGIN")),
-			Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
-			Required: false,
-			Value:    "",
-		}, &opts.Destination.Entries),
-
-		&cli.StringSliceFlag{
-			Category:    "Login",
-			Name:        "npm.npmrc-file",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("NPM_NPMRC_FILE")),
-			Usage:       ".npmrc file to use.",
-			Required:    false,
-			Value:       []string{".npmrc"},
-			Destination: &opts.Destination.NpmRcFiles,
-		},
-
-		&cli.StringFlag{
-			Category:    "Login",
-			Name:        "npm.npmrc",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("NPM_NPMRC")),
-			Usage:       "Direct contents of .npmrc file.",
-			Required:    false,
-			Value:       "",
-			Destination: &opts.Destination.NpmRc,
-		},
-	}
-}
 
 // LoginTaskList writes the configured credentials into the npmrc files and
 // checks that the registries accept them.

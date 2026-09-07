@@ -17,13 +17,6 @@ var (
 	NodeCtx    = &node.Ctx{}
 )
 
-// The flags are built once, since main unhides the environment enable flag on
-// the slice it hands to the subcommands and a second slice would not carry it.
-var (
-	EnvironmentFlags = environment.NewFlags(environment.Options{Destination: Environment})
-	NodeFlags        = node.NewFlags(node.Options{Destination: NodeConfig})
-)
-
 // New resolves the package manager every node command runs through.
 func New(p *Plumber) *TaskList {
 	return node.SetupTaskList(p, NodeConfig, NodeCtx)

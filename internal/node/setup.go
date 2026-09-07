@@ -2,7 +2,6 @@ package node
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"github.com/urfave/cli/v3"
 )
 
 //revive:disable:line-length-limit
@@ -23,25 +22,6 @@ type Config struct {
 // carries anything once that list has run.
 type Ctx struct {
 	PackageManager
-}
-
-// Options is what the package manager flags are built onto.
-type Options struct {
-	Destination *Config
-}
-
-func NewFlags(opts Options) []cli.Flag {
-	return []cli.Flag{
-		&cli.StringFlag{
-			Category:    CATEGORY_PACKAGE_MANAGER,
-			Name:        "node.package-manager",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("NODE_PACKAGE_MANAGER")),
-			Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
-			Required:    false,
-			Value:       DEFAULT_PACKAGE_MANAGER,
-			Destination: &opts.Destination.PackageManager,
-		},
-	}
 }
 
 // SetupTaskList resolves the configured package manager into ctx and reports
