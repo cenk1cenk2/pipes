@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
@@ -70,21 +69,44 @@ var _ = Describe("NewFlags", func() {
 		Expect(flag(1).Destination).To(BeIdenticalTo(&creds.Username))
 		Expect(flag(2).Destination).To(BeIdenticalTo(&creds.Password))
 	})
+})
 
-	// The password is the one value that must never reach a log line, and marking
-	// it here is what keeps a new pipe from having to remember to.
-	It("marks the password as a secret", func() {
-		p := plumber.NewPlumber(func(_ *plumber.Plumber) *ucli.Command {
+var _ = Describe("LoginTaskList", func() {
+	var (
+		p      *plumber.Plumber
+		output *bytes.Buffer
+		creds  *registry.Credentials
+	)
+
+	BeforeEach(func() {
+		p = plumber.NewPlumber(func(_ *plumber.Plumber) *ucli.Command {
 			return &ucli.Command{Name: "test"}
 		})
-		output := &bytes.Buffer{}
+
+		output = &bytes.Buffer{}
 		p.Log.SetOutput(output)
 
+		creds = &registry.Credentials{Uri: "docker.io", Username: "user"}
+	})
+
+	// The password is the one value that must never reach a log line, and masking
+	// it here is what keeps a new pipe from having to remember to.
+	It("keeps the password out of the log", func() {
 		creds.Password = "not-in-the-log"
-		Expect(cli.Validated(p, creds)).To(Succeed())
+
+		Expect(registry.LoginTaskList(p, creds, "buildah", "login").RunBefore()).To(Succeed())
 
 		p.Log.Infof("logging in with %s", creds.Password)
 		Expect(output.String()).NotTo(ContainSubstring("not-in-the-log"))
+	})
+
+	// An unset password would otherwise register the empty string, which masks
+	// every message rather than none of them.
+	It("does not mask on an empty password", func() {
+		Expect(registry.LoginTaskList(p, creds, "buildah", "login").RunBefore()).To(Succeed())
+
+		p.Log.Infoln("nothing sensitive here")
+		Expect(output.String()).NotTo(ContainSubstring("[REDACTED]"))
 	})
 })
 

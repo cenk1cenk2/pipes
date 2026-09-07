@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
 	itool "gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
@@ -40,7 +39,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 				}
 			}
 
-			return icli.Validated(p, P)
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(

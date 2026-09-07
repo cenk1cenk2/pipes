@@ -4,7 +4,6 @@ import (
 	"time"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
@@ -54,7 +53,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 				P.MergeRequestReport.MergeRequestIid = 0
 			}
 
-			return icli.Validated(p, P)
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			source := TerraformReportSource(deps)

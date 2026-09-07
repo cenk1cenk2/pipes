@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 )
 
@@ -49,7 +48,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := icli.Validated(p, P); err != nil {
+			if err := p.Validate(P); err != nil {
 				return err
 			}
 

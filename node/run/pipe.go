@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
@@ -49,7 +48,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 				C.Script, C.ScriptArgs, _ = strings.Cut(P.Run.Script, " ")
 			}
 
-			return icli.Validated(p, P)
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(

@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 )
 
 // Setup resolves the working directory and probes the tool version into ctx. The
@@ -22,7 +21,7 @@ func Setup(
 	return tl.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(_ *plumber.TaskList) error {
-			return cli.Validated(p, cfg)
+			return p.Validate(cfg)
 		}).
 		Set(func(tl *plumber.TaskList) plumber.Job {
 			jobs := []plumber.Job{

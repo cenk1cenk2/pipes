@@ -56,7 +56,7 @@ func NewFlags(spec Spec, dst *Credentials) []ucli.Flag {
 			Sources:     spec.envs("PASSWORD"),
 			Usage:       fmt.Sprintf("%s password for the given registry.", spec.Label),
 			Required:    false,
-			Destination: cli.MarkSecret(&dst.Password),
+			Destination: &dst.Password,
 		},
 	}
 }

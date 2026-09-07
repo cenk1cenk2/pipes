@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 )
 
 // LoginTaskList logs in to the registry with the given binary, which is invoked
@@ -17,7 +16,17 @@ func LoginTaskList(p *plumber.Plumber, creds *Credentials, binary string, args .
 	return tl.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(_ *plumber.TaskList) error {
-			return cli.Validated(p, creds)
+			if err := p.Validate(creds); err != nil {
+				return err
+			}
+
+			// An empty password would register the empty string as a secret, which
+			// masks every message rather than none of them.
+			if creds.Password != "" {
+				p.AppendSecrets(creds.Password)
+			}
+
+			return nil
 		}).
 		Set(func(tl *plumber.TaskList) plumber.Job {
 			return plumber.JobSequence(

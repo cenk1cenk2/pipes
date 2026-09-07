@@ -4,7 +4,6 @@ import (
 	"regexp"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
@@ -56,7 +55,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 				P.Module.Name = regexp.MustCompile(`[_ ]`).ReplaceAllString(P.Module.Name, "-")
 			}
 
-			if err := icli.Validated(p, P); err != nil {
+			if err := p.Validate(P); err != nil {
 				return err
 			}
 
