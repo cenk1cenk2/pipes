@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 var _ = Describe("NewFlags", func() {
@@ -20,7 +20,7 @@ var _ = Describe("NewFlags", func() {
 	}
 
 	It("registers every coordinate the report renders", func() {
-		metadata := iac.Metadata{}
+		metadata := terraform.Metadata{}
 
 		Expect(names(ci.NewFlags(ci.Options{Destination: &metadata}))).To(Equal([]string{
 			"ci.job-name",
@@ -33,7 +33,7 @@ var _ = Describe("NewFlags", func() {
 	})
 
 	It("files them all under one category", func() {
-		metadata := iac.Metadata{}
+		metadata := terraform.Metadata{}
 
 		for _, flag := range ci.NewFlags(ci.Options{Destination: &metadata}) {
 			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(ci.CATEGORY_CI))
@@ -43,7 +43,7 @@ var _ = Describe("NewFlags", func() {
 	// The flags exist to fill the report metadata, so each one has to land on its
 	// own field of the struct the caller passed rather than a copy of it.
 	It("binds each flag onto the given metadata", func() {
-		metadata := iac.Metadata{}
+		metadata := terraform.Metadata{}
 		flags := ci.NewFlags(ci.Options{Destination: &metadata})
 
 		//nolint:errcheck

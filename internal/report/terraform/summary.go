@@ -1,4 +1,4 @@
-package iac
+package terraform
 
 import (
 	"encoding/json/jsontext"

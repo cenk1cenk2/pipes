@@ -1,4 +1,4 @@
-package iac_test
+package terraform_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestIac(t *testing.T) {
+func TestTerraform(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "IaC Report Suite")
+	RunSpecs(t, "Terraform Report Suite")
 }

@@ -3,7 +3,7 @@ package preview
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 type (
@@ -15,11 +15,11 @@ type (
 		Plan string
 		Summary
 		MergeRequestReport gitlab.MergeRequestReportConfig
-		ReportMetadata     iac.Metadata
+		ReportMetadata     terraform.Metadata
 	}
 
 	Ctx struct {
-		Report iac.Source
+		Report terraform.Source
 	}
 )
 
@@ -47,8 +47,8 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				PulumiPlan(tl).Job(),
-				iac.SummaryTask(tl, &C.Report).Job(),
-				iac.MergeRequestReportTask(tl, &C.Report).Job(),
+				terraform.SummaryTask(tl, &C.Report).Job(),
+				terraform.MergeRequestReportTask(tl, &C.Report).Job(),
 			)
 		})
 }

@@ -8,7 +8,7 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
@@ -40,7 +40,7 @@ func terraformReportDiscriminators() []string {
 	return discriminators
 }
 
-func TerraformReportSource() iac.Source {
+func TerraformReportSource() terraform.Source {
 	metadata := P.ReportMetadata
 	metadata.Target = terraformStateName()
 	metadata.Cwd = setup.C.Cwd
@@ -52,10 +52,10 @@ func TerraformReportSource() iac.Source {
 		summaryOutput = ""
 	}
 
-	return iac.Source{
-		Read: func(t *Task) (iac.Report, error) {
+	return terraform.Source{
+		Read: func(t *Task) (terraform.Report, error) {
 			if P.Plan.Output == "" {
-				return iac.Report{}, fmt.Errorf("terraform plan output is required for the plan report")
+				return terraform.Report{}, fmt.Errorf("terraform plan output is required for the plan report")
 			}
 
 			show := t.CreateCommand(
@@ -70,12 +70,12 @@ func TerraformReportSource() iac.Source {
 				EnableStreamRecording()
 
 			if err := show.Run(); err != nil {
-				return iac.Report{}, err
+				return terraform.Report{}, err
 			}
 
 			return parseTerraformShowPlan([]byte(strings.Join(show.GetStdoutStream(), "")), metadata)
 		},
-		Summary:        iac.Summarize,
+		Summary:        terraform.Summarize,
 		SummaryOutput:  summaryOutput,
 		Cwd:            setup.C.Cwd,
 		MergeRequest:   P.MergeRequestReport,

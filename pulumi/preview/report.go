@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 type (
 	actionAccumulator struct {
 		Action      string
-		Resources   map[string]iac.Resource
+		Resources   map[string]terraform.Resource
 		OutputNames map[string][]string
 	}
 )
@@ -37,10 +37,10 @@ var pulumiPlanActionOrder = []string{
 	"remove-pending-replace",
 }
 
-func parsePulumiPlanReport(data []byte, metadata iac.Metadata) (iac.Report, error) {
+func parsePulumiPlanReport(data []byte, metadata terraform.Metadata) (terraform.Report, error) {
 	plan, planVersion, err := parsePulumiPlan(data)
 	if err != nil {
-		return iac.Report{}, err
+		return terraform.Report{}, err
 	}
 
 	metadata.ToolVersion = plan.Manifest.Version
@@ -68,7 +68,7 @@ func parsePulumiPlanReport(data []byte, metadata iac.Metadata) (iac.Report, erro
 			if accumulator == nil {
 				accumulator = &actionAccumulator{
 					Action:      action,
-					Resources:   map[string]iac.Resource{},
+					Resources:   map[string]terraform.Resource{},
 					OutputNames: map[string][]string{},
 				}
 				accumulators[action] = accumulator
@@ -82,9 +82,9 @@ func parsePulumiPlanReport(data []byte, metadata iac.Metadata) (iac.Report, erro
 		}
 	}
 
-	return iac.Report{
+	return terraform.Report{
 		Title: "Pulumi preview report",
-		Labels: iac.Labels{
+		Labels: terraform.Labels{
 			Target:      "Stack",
 			Outputs:     "Output properties",
 			ToolVersion: "Pulumi version",
@@ -148,7 +148,7 @@ func resourceActions(resource apitype.ResourcePlanV1) []string {
 	return actions
 }
 
-func resourceSummary(urn string, plan apitype.ResourcePlanV1) iac.Resource {
+func resourceSummary(urn string, plan apitype.ResourcePlanV1) terraform.Resource {
 	resourceType := ""
 	name := ""
 
@@ -168,7 +168,7 @@ func resourceSummary(urn string, plan apitype.ResourcePlanV1) iac.Resource {
 		}
 	}
 
-	return iac.Resource{
+	return terraform.Resource{
 		Name: pulumiResourceName(resourceType, name),
 		Id:   urn,
 	}
@@ -201,31 +201,31 @@ func resourceOutputNames(resource apitype.ResourcePlanV1) []string {
 	))
 }
 
-func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []iac.Action {
-	actions := make([]iac.Action, 0, len(accumulators))
+func buildPulumiPlanActions(accumulators map[string]*actionAccumulator) []terraform.Action {
+	actions := make([]terraform.Action, 0, len(accumulators))
 
 	for _, accumulator := range accumulators {
 		resources := slices.Collect(maps.Values(accumulator.Resources))
-		slices.SortFunc(resources, func(left, right iac.Resource) int {
+		slices.SortFunc(resources, func(left, right terraform.Resource) int {
 			return strings.Compare(left.Id, right.Id)
 		})
 
-		outputs := make([]iac.Output, 0, len(accumulator.OutputNames))
+		outputs := make([]terraform.Output, 0, len(accumulator.OutputNames))
 		for _, urn := range slices.Sorted(maps.Keys(accumulator.OutputNames)) {
-			outputs = append(outputs, iac.Output{
+			outputs = append(outputs, terraform.Output{
 				Name:   accumulator.Resources[urn].Name,
 				Fields: sortedUniqueStrings(accumulator.OutputNames[urn]),
 			})
 		}
 
-		actions = append(actions, iac.Action{
+		actions = append(actions, terraform.Action{
 			Action:    accumulator.Action,
 			Resources: resources,
 			Outputs:   outputs,
 		})
 	}
 
-	iac.SortActions(actions, pulumiPlanActionOrder)
+	terraform.SortActions(actions, pulumiPlanActionOrder)
 
 	return actions
 }

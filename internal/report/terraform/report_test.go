@@ -1,4 +1,4 @@
-package iac_test
+package terraform_test
 
 import (
 	"strings"
@@ -6,15 +6,15 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
-var _ = Describe("IaC merge request report", func() {
-	report := func(labels iac.Labels) iac.Report {
-		return iac.Report{
+var _ = Describe("Terraform merge request report", func() {
+	report := func(labels terraform.Labels) terraform.Report {
+		return terraform.Report{
 			Title:  "Example report",
 			Labels: labels,
-			Metadata: iac.Metadata{
+			Metadata: terraform.Metadata{
 				Target:         "example",
 				JobName:        "plan",
 				JobUrl:         "https://gitlab.example.test/project/-/jobs/1",
@@ -23,22 +23,22 @@ var _ = Describe("IaC merge request report", func() {
 				CommitShortSha: "01234567",
 				ToolVersion:    "1.0.0",
 			},
-			Actions: []iac.Action{
+			Actions: []terraform.Action{
 				{
 					Action:    "create",
-					Resources: []iac.Resource{{Name: "one"}},
-					Outputs:   []iac.Output{{Name: "first"}},
+					Resources: []terraform.Resource{{Name: "one"}},
+					Outputs:   []terraform.Output{{Name: "first"}},
 				},
 				{
 					Action:    "move",
-					Resources: []iac.Resource{{Name: "two", PreviousName: "old-two"}},
+					Resources: []terraform.Resource{{Name: "two", PreviousName: "old-two"}},
 				},
 			},
 		}
 	}
 
-	terraformLabels := iac.Labels{Target: "State", Outputs: "Outputs", ToolVersion: "Terraform version"}
-	pulumiLabels := iac.Labels{Target: "Stack", Outputs: "Output properties", ToolVersion: "Pulumi version"}
+	terraformLabels := terraform.Labels{Target: "State", Outputs: "Outputs", ToolVersion: "Terraform version"}
+	pulumiLabels := terraform.Labels{Target: "Stack", Outputs: "Output properties", ToolVersion: "Pulumi version"}
 
 	headings := func(body string) []string {
 		found := []string{}
@@ -54,18 +54,18 @@ var _ = Describe("IaC merge request report", func() {
 	// Both pipes render through this template, so the section skeleton is the
 	// contract that keeps their reports readable side by side on one merge request.
 	It("keeps one structure whichever labels it renders", func() {
-		terraform, err := iac.RenderMergeRequestReport(report(terraformLabels))
+		terraformBody, err := terraform.RenderMergeRequestReport(report(terraformLabels))
 		Expect(err).NotTo(HaveOccurred())
 
-		pulumi, err := iac.RenderMergeRequestReport(report(pulumiLabels))
+		pulumiBody, err := terraform.RenderMergeRequestReport(report(pulumiLabels))
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(headings(terraform)).To(Equal(headings(pulumi)))
-		Expect(headings(terraform)).To(Equal([]string{"##", "###", "###", "###", "####", "####", "###", "####"}))
+		Expect(headings(terraformBody)).To(Equal(headings(pulumiBody)))
+		Expect(headings(terraformBody)).To(Equal([]string{"##", "###", "###", "###", "####", "####", "###", "####"}))
 	})
 
 	It("names the tool specific concepts from the labels", func() {
-		body, err := iac.RenderMergeRequestReport(report(pulumiLabels))
+		body, err := terraform.RenderMergeRequestReport(report(pulumiLabels))
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("## Example report"))
@@ -78,7 +78,7 @@ var _ = Describe("IaC merge request report", func() {
 	})
 
 	It("says so when there is nothing to report", func() {
-		body, err := iac.RenderMergeRequestReport(iac.Report{Title: "Example report"})
+		body, err := terraform.RenderMergeRequestReport(terraform.Report{Title: "Example report"})
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("No changes detected."))

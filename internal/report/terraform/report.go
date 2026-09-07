@@ -1,4 +1,8 @@
-package iac
+// Package terraform writes the GitLab artifacts:reports:terraform JSON and the
+// merge request note that goes with it. Pulumi previews are reported through it
+// too, since GitLab has no report kind of their own and the terraform one
+// renders what a preview has to say.
+package terraform
 
 import (
 	"bytes"

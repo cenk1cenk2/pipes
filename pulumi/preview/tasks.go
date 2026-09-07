@@ -7,7 +7,7 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
@@ -25,13 +25,13 @@ func pulumiReportDiscriminators() []string {
 	return discriminators
 }
 
-func PulumiReportSource() iac.Source {
+func PulumiReportSource() terraform.Source {
 	metadata := P.ReportMetadata
 	metadata.Target = stack.P.Stack
 	metadata.Cwd = setup.C.Cwd
 
-	return iac.Source{
-		Read: func(_ *Task) (iac.Report, error) {
+	return terraform.Source{
+		Read: func(_ *Task) (terraform.Report, error) {
 			planPath := P.Plan
 			if !filepath.IsAbs(planPath) {
 				planPath = filepath.Join(setup.C.Cwd, planPath)
@@ -39,12 +39,12 @@ func PulumiReportSource() iac.Source {
 
 			data, err := os.ReadFile(planPath)
 			if err != nil {
-				return iac.Report{}, fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
+				return terraform.Report{}, fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
 			}
 
 			return parsePulumiPlanReport(data, metadata)
 		},
-		Summary:        iac.Summarize,
+		Summary:        terraform.Summarize,
 		SummaryOutput:  P.Summary.Output,
 		Cwd:            setup.C.Cwd,
 		MergeRequest:   P.MergeRequestReport,

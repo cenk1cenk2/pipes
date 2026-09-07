@@ -2,7 +2,7 @@ package ci
 
 import (
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 //revive:disable:line-length-limit
@@ -13,7 +13,7 @@ const (
 
 // Options is what the CI flags are built onto.
 type Options struct {
-	Destination *iac.Metadata
+	Destination *terraform.Metadata
 }
 
 // NewFlags reads the job and commit coordinates the CI runner exports, so
