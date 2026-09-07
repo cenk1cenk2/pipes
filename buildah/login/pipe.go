@@ -1,21 +1,33 @@
 package login
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/registry"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
+
+type Pipe struct {
+	Uri      string
+	Username string
+	Password string
+}
 
 // P is the registry the pipe authenticates against. The build and the manifest
 // commands read its uri back, since that is what they prefix every image they
 // publish with.
-var P = &registry.Credentials{}
-
-// Flags are declared once for the whole pipe, so every command that logs in
-// registers the same flags rather than its own copy of them.
-var Flags = registry.NewFlags(Spec, P)
+var P = &Pipe{}
 
 // New is the login stage of every buildah command, since an image that can not
 // be pushed is not worth the time it takes to build.
-func New(p *plumber.Plumber) *plumber.TaskList {
-	return registry.LoginTaskList(p, P, "buildah", "login")
+func New(p *Plumber) *TaskList {
+	tl := &TaskList{}
+
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
+		}).
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
+				ContainerRegistryLoginParent(tl).Job(),
+			)
+		})
 }

@@ -1,4 +1,4 @@
-package registry_test
+package login
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestRegistry(t *testing.T) {
+func TestLogin(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Registry Suite")
+	RunSpecs(t, "Helm Login Suite")
 }
