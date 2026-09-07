@@ -69,7 +69,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_NAME"),
 				cli.EnvVar("TF_MODULE_REGISTRY"),
 			),
-			Usage:       "Registry of the module that will be published.",
+			Usage:       `Registry of the module that will be published. format(enum("gitlab"))`,
 			Required:    false,
 			Value:       TF_REGISTRY_GITLAB,
 			Destination: &P.Registry.Name,

@@ -57,11 +57,11 @@ var Flags = CombineFlags(
 				cli.EnvVar("HELM_CHART_VERSIONS_TEMPLATE"),
 			),
 			Usage: strings.TrimSpace(`
-    Modifies every version that matches a certain condition.
-    Template is interpolated with the given matches in the regular expression.
+Modifies every version that matches a certain condition.
+Template is interpolated with the given matches in the regular expression.
 
-    format(yaml([]struct{ match: RegExp, template: Template(match) }))
-    `),
+format(yaml([]struct{ match: RegExp, template: Template(match) }))
+`),
 			Required: false,
 			Value:    "[]",
 		}, &P.Chart.VersionsTemplate),
@@ -74,11 +74,11 @@ var Flags = CombineFlags(
 				cli.EnvVar("HELM_CHART_SANITIZE_VERSIONS"),
 			),
 			Usage: strings.TrimSpace(`
-    Sanitizes the given regex pattern out of version name.
-    Template is interpolated with the given matches in the regular expression.
+Sanitizes the given regex pattern out of version name.
+Template is interpolated with the given matches in the regular expression.
 
-    format(yaml([]struct{ match: RegExp, template: Template(match) }))
-    `),
+format(yaml([]struct{ match: RegExp, template: Template(match) }))
+`),
 			Required: false,
 			Value:    DEFAULT_SANITIZE_VERSIONS,
 		}, &P.Chart.VersionsSanitize),

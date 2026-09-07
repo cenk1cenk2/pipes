@@ -24,7 +24,7 @@ func NewFlags(opts Options) []cli.Flag {
 			Category:    CATEGORY_TAGS_FILE,
 			Name:        "tags-file",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("TAGS_FILE")),
-			Usage:       "Read tags from a file.",
+			Usage:       "Read tags from a comma separated file.",
 			Required:    opts.Required,
 			Value:       opts.Value,
 			Destination: opts.Destination,

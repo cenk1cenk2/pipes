@@ -54,7 +54,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_BINARY_TEMPLATE"),
 		),
-		Usage:       "Binary naming for the build artifact. format(Template(map[string]))",
+		Usage:       "Binary naming for the build artifact. format(Template(map[string]string))",
 		Required:    false,
 		Value:       "{{ .name }}{{ if .os }}-{{ .os }}{{ end }}{{ if .arch }}-{{ .arch }}{{ end }}",
 		Destination: &P.BinaryTemplate,
@@ -92,7 +92,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_TARGETS"),
 		),
-		Usage:    "Build targets for the build process. format(yaml([]struct{ os: string?, arch: string? }))",
+		Usage:    "Build targets for the build process. format(yaml([]struct{ os?: string, arch?: string }))",
 		Required: false,
 		Value:    `[]`,
 	}, &P.BuildTargets),

@@ -95,7 +95,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("DOCKER_HUB_README_MATRIX"),
 			cli.EnvVar("README_MATRIX"),
 		),
-		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
+		Usage:    "Matrix of multiple README files to update. format(json([]struct{ repository: string, file: string, description?: string }))",
 		Required: false,
 	}, &P.Readme.Matrix),
 }

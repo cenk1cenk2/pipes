@@ -10,7 +10,7 @@ Releases applications through the semantic-release library.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$SEMANTIC_RELEASE_CI_COMMIT_REFERENCE`<br />`$CI_COMMIT_REF_NAME` | Current commit reference that can be branch or tag name of the project.. | `string` | `false` | <code></code> |
+| `$SEMANTIC_RELEASE_CI_COMMIT_REFERENCE`<br />`$CI_COMMIT_REF_NAME` | Current commit reference that can be branch or tag name of the project. | `string` | `false` | <code></code> |
 
 **CLI**
 
@@ -24,7 +24,7 @@ Releases applications through the semantic-release library.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$ENVIRONMENT_ENABLE` | Enable environment injection. | `bool` | `false` | <code>false</code> |
-| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br />      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `string`<br/>`json([]struct{ match: RegExp, environment: string })` | `false` | <code>"[\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+$\", \"environment\": \"production\" },\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+-.*\\\\.\\\\d+$\", \"environment\": \"stage\" },\n    { \"match\" :\"^heads/main$\", \"environment\": \"develop\" },\n    { \"match\": \"^heads/master$\", \"environment\": \"develop\" }\n]"</code> |
+| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br />Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `string`<br/>`format(json([]struct{ match: RegExp, environment: string }))` | `false` | <code>"[\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+$\", \"environment\": \"production\" },\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+-.*\\\\.\\\\d+$\", \"environment\": \"stage\" },\n    { \"match\" :\"^heads/main$\", \"environment\": \"develop\" },\n    { \"match\": \"^heads/master$\", \"environment\": \"develop\" }\n]"</code> |
 | `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `bool` | `false` | <code>true</code> |
 | `$ENVIRONMENT_STRICT` | Fail on no environment selected. | `bool` | `false` | <code>true</code> |
 
@@ -39,7 +39,7 @@ Releases applications through the semantic-release library.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NPM_LOGIN` | NPM registries to login. | `string`<br/>`json([]struct { username: string, password: string, registry?: string, useHttps?: bool })` | `false` | <code></code> |
+| `$NPM_LOGIN` | NPM registries to login. | `string`<br/>`format(json([]struct{ username: string, token: string, registry?: string, useHttps?: bool }))` | `false` | <code></code> |
 | `$NPM_NPMRC_FILE` | .npmrc file to use. | `string[]` | `false` | <code>".npmrc"</code> |
 | `$NPM_NPMRC` | Direct contents of .npmrc file. | `string` | `false` | <code></code> |
 
@@ -47,7 +47,7 @@ Releases applications through the semantic-release library.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `string`<br/>`enum("npm", "yarn", "pnpm")` | `false` | <code>"pnpm"</code> |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `string`<br/>`format(enum("npm", "yarn", "pnpm"))` | `false` | <code>"pnpm"</code> |
 
 **Semantic Release**
 

@@ -79,8 +79,8 @@ Publish Helm chart templates.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$HELM_PUBLISH_CHART_TARGET`<br />`$HELM_CHART_TARGET` | Helm chart repository target to publish to. | `string` | `true` | <code></code> |
 | `$HELM_PUBLISH_CHART_VERSIONS`<br />`$HELM_CHART_VERSIONS` | Versions for the helm chart to be published. | `string[]` | `false` | <code></code> |
-| `$HELM_PUBLISH_CHART_VERSIONS_TEMPLATE`<br />`$HELM_CHART_VERSIONS_TEMPLATE` | Modifies every version that matches a certain condition.<br />    Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `false` | <code>"[]"</code> |
-| `$HELM_PUBLISH_CHART_VERSIONS_SANITIZE`<br />`$HELM_CHART_SANITIZE_VERSIONS` | Sanitizes the given regex pattern out of version name.<br />    Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `false` | <code>"[\n    { \"match\": \"([^/]*)/(.*)\", \"template\": \"{{ index $ 1 | upper }}_{{ index $ 2 }}\" }\n]"</code> |
+| `$HELM_PUBLISH_CHART_VERSIONS_TEMPLATE`<br />`$HELM_CHART_VERSIONS_TEMPLATE` | Modifies every version that matches a certain condition.<br />Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `false` | <code>"[]"</code> |
+| `$HELM_PUBLISH_CHART_VERSIONS_SANITIZE`<br />`$HELM_CHART_SANITIZE_VERSIONS` | Sanitizes the given regex pattern out of version name.<br />Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `false` | <code>"[\n    { \"match\": \"([^/]*)/(.*)\", \"template\": \"{{ index $ 1 | upper }}_{{ index $ 2 }}\" }\n]"</code> |
 | `$HELM_PUBLISH_CHART_DESTINATION`<br />`$HELM_CHART_DESTINATION` | Destination directory for the packaged helm chart. | `string` | `false` | <code>"./dist/"</code> |
 | `$HELM_PUBLISH_CHART_APP_VERSION`<br />`$HELM_CHART_APP_VERSION` | Application version for the packaged helm chart. | `string` | `false` | <code></code> |
 
@@ -96,5 +96,5 @@ Publish Helm chart templates.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TAGS_FILE` | Read tags from a file. | `string` | `false` | <code></code> |
+| `$TAGS_FILE` | Read tags from a comma separated file. | `string` | `false` | <code></code> |
 | `$TAGS_FILE_STRICT` | Fail on missing tags file. | `bool` | `false` | <code>false</code> |

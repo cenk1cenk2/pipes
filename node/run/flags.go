@@ -51,7 +51,7 @@ var Arguments = []cli.Argument{
 		Name:        "arg",
 		Min:         0,
 		Max:         -1,
-		UsageText:   "Tool to run.",
+		UsageText:   "Arguments appended to the script.",
 		Destination: &P.Run.Command,
 	},
 }

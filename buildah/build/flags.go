@@ -76,11 +76,11 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_TAGS_TEMPLATE"),
 			),
 			Usage: strings.TrimSpace(`
-    Modifies every tag that matches a certain condition.
-    Template is interpolated with the given matches in the regular expression.
+Modifies every tag that matches a certain condition.
+Template is interpolated with the given matches in the regular expression.
 
-    format(yaml([]struct{ match: RegExp, template: Template(match) }))
-    `),
+format(yaml([]struct{ match: RegExp, template: Template(match) }))
+`),
 			Required: false,
 			Value:    "[]",
 		}, &P.Image.TagsTemplate),
@@ -93,11 +93,11 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_SANITIZE_TAGS"),
 			),
 			Usage: strings.TrimSpace(`
-    Sanitizes the given regex pattern out of tag name.
-    Template is interpolated with the given matches in the regular expression.
+Sanitizes the given regex pattern out of tag name.
+Template is interpolated with the given matches in the regular expression.
 
-    format(yaml([]struct{ match: RegExp, template: Template(match) }))
-    `),
+format(yaml([]struct{ match: RegExp, template: Template(match) }))
+`),
 			Required: false,
 			Value:    DEFAULT_SANITIZE_TAGS,
 		}, &P.Image.TagsSanitize),
@@ -110,11 +110,11 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_TAGS_AS_LATEST"),
 			),
 			Usage: strings.TrimSpace(`
-    Regex pattern to tag the image as latest.
-    Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
+Regex pattern to tag the image as latest.
+Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
 
-    format(yaml([]RegExp))
-    `),
+format(yaml([]RegExp))
+`),
 			Required: false,
 			Value:    DEFAULT_TAG_AS_LATEST,
 		}, &P.Image.TagAsLatest),
@@ -153,11 +153,11 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_BUILD_ARGS"),
 			),
 			Usage: strings.TrimSpace(`
-    Pass in extra build arguments for image.
-    You can use it as a template with environment variables as the context.
+Pass in extra build arguments for image.
+You can use it as a template with environment variables as the context.
 
-    format(yaml(map[string]Template()))
-    `),
+format(yaml(map[string]Template()))
+`),
 			Required: false,
 			Value:    "",
 		}, &P.Image.BuildArgs),
@@ -195,7 +195,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_FORMAT"),
 				cli.EnvVar("CONTAINER_IMAGE_FORMAT"),
 			),
-			Usage:       "Specify the format for Container Image.",
+			Usage:       `Specify the format for Container Image. format(enum("oci", "docker"))`,
 			Required:    false,
 			Value:       "oci",
 			Destination: &P.Image.Format,
@@ -209,7 +209,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_STORAGE_DRIVER"),
 				cli.EnvVar("BUILDAH_STORAGE_DRIVER"),
 			),
-			Usage:       "Specify the storage driver for Buildah.",
+			Usage:       `Specify the storage driver for Buildah. format(enum("overlay", "overlay2", "vfs"))`,
 			Required:    false,
 			Value:       "vfs",
 			Destination: &P.Image.StorageDriver,

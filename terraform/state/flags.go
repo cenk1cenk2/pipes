@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("TERRAFORM_STATE_TYPE"),
 			cli.EnvVar("TF_STATE_TYPE"),
 		),
-		Usage:       `Terraform state type. enum("gitlab-http")`,
+		Usage:       `Terraform state type. format(enum("gitlab-http"))`,
 		Required:    false,
 		Value:       "",
 		Destination: &P.State.Type,
@@ -145,7 +145,7 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_STATE,
 		Name:     "terraform.state.gitlab-http.http-retry-wait-min",
-		Usage:    "State configuration for terraform: http-retry-wait-min",
+		Usage:    "State configuration for terraform: http-retry-wait-min, in seconds",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN"),
 			cli.EnvVar("TF_HTTP_RETRY_WAIT_MIN"),

@@ -50,7 +50,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("KUSTOMIZE_BUILD_LOAD_RESTRICTOR"),
 			cli.EnvVar("KUSTOMIZE_LOAD_RESTRICTOR"),
 		),
-		Usage:       "Load restrictor for Kustomize file access. \"rootOnly\" restricts loads to the overlay root, \"none\" allows loading files outside the overlay directory (matches ArgoCD). format(enum(\"rootOnly\", \"none\"))",
+		Usage:       `Restricts which files Kustomize may load, where lifting the restriction matches the behaviour of ArgoCD. format(enum("rootOnly", "none"))`,
 		Required:    false,
 		Value:       string(LoadRestrictorNone),
 		Destination: &P.LoadRestrictor,

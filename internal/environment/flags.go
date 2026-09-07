@@ -1,6 +1,8 @@
 package environment
 
 import (
+	"strings"
+
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
@@ -47,9 +49,12 @@ func NewFlags(opts Options) []cli.Flag {
 			Category: CATEGORY_ENVIRONMENT,
 			Name:     "environment.conditions",
 			Sources:  cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_CONDITIONS")),
-			Usage: `Regex pattern to select an environment.
-      Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
-      json([]struct{ match: RegExp, environment: string })`,
+			Usage: strings.TrimSpace(`
+Regex pattern to select an environment.
+Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
+
+format(json([]struct{ match: RegExp, environment: string }))
+`),
 			Required: false,
 			Value:    DEFAULT_CONDITIONS,
 		}, &opts.Destination.Conditions),

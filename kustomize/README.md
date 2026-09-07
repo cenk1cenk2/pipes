@@ -34,6 +34,6 @@ Build and validate Kustomize overlays.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$KUSTOMIZE_BUILD_ENABLE_HELM`<br />`$KUSTOMIZE_ENABLE_HELM` | Enable the Helm chart inflation generator while building overlays. | `bool` | `false` | <code>true</code> |
 | `$KUSTOMIZE_BUILD_HELM_COMMAND`<br />`$KUSTOMIZE_HELM_COMMAND` | Helm binary to use for the Helm chart inflation generator. | `string` | `false` | <code>"helm"</code> |
-| `$KUSTOMIZE_BUILD_LOAD_RESTRICTOR`<br />`$KUSTOMIZE_LOAD_RESTRICTOR` | Load restrictor for Kustomize file access. "rootOnly" restricts loads to the overlay root, "none" allows loading files outside the overlay directory (matches ArgoCD). | `string`<br/>`format(enum("rootOnly", "none"))` | `false` | <code>"none"</code> |
+| `$KUSTOMIZE_BUILD_LOAD_RESTRICTOR`<br />`$KUSTOMIZE_LOAD_RESTRICTOR` | Restricts which files Kustomize may load, where lifting the restriction matches the behaviour of ArgoCD. | `string`<br/>`format(enum("rootOnly", "none"))` | `false` | <code>"none"</code> |
 | `$KUSTOMIZE_BUILD_KUBE_VERSION`<br />`$KUSTOMIZE_KUBE_VERSION`<br />`$KUBERNETES_VERSION` | Kubernetes version passed to the Helm chart inflation generator. | `string` | `false` | <code></code> |
 | `$KUSTOMIZE_BUILD_OUTPUT` | Output directory to write the rendered manifests per overlay. Leave empty to skip writing. | `string` | `false` | <code></code> |

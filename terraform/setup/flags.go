@@ -39,7 +39,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("TF_LOG_LEVEL"),
 			cli.EnvVar("TF_LOG"),
 		),
-		Usage:       `Terraform log level. enum("trace", "debug", "info", "warn", "error")`,
+		Usage:       `Terraform log level. format(enum("trace", "debug", "info", "warn", "error"))`,
 		Required:    false,
 		Value:       "",
 		Destination: &P.LogLevel,

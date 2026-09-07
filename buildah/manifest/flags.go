@@ -59,7 +59,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("BUILDAH_MANIFEST_MATRIX"),
 			cli.EnvVar("CONTAINER_MANIFEST_MATRIX"),
 		),
-		Usage:    "Matrix of all the images that should be manifested. format(yaml([]struct { target: string, images: []string }))",
+		Usage:    "Matrix of all the images that should be manifested. format(yaml([]struct{ target: string, images: []string }))",
 		Required: false,
 	}, &P.Manifest.Matrix),
 }

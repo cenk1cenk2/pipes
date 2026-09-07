@@ -17,7 +17,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("TERRAFORM_LOGIN_REGISTRY_CREDENTIALS"),
 			cli.EnvVar("TF_REGISTRY_CREDENTIALS"),
 		),
-		Usage:    "Terraform registry credentials. json([]struct { registry: string, token: string })",
+		Usage:    "Terraform registry credentials. format(json([]struct{ registry: string, token: string }))",
 		Required: false,
 	}, &P.Registry.Credentials),
 }
