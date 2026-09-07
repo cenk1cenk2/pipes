@@ -3,7 +3,6 @@ package node
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -31,7 +30,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 		&cli.StringFlag{
 			Category:    CATEGORY_PACKAGE_MANAGER,
 			Name:        "node.package-manager",
-			Sources:     flags.EnvVars("NODE_PACKAGE_MANAGER"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("NODE_PACKAGE_MANAGER")),
 			Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
 			Required:    false,
 			Value:       DEFAULT_PACKAGE_MANAGER,

@@ -13,8 +13,6 @@ import (
 
 //revive:disable:line-length-limit
 
-const CATEGORY_LOGIN = "Login"
-
 type (
 	// LoginEntry is one registry the pipe authenticates against.
 	LoginEntry struct {
@@ -35,18 +33,18 @@ type (
 func NewLoginFlags(cfg *Login) []cli.Flag {
 	return []cli.Flag{
 		flags.JSONFlag(&cli.StringFlag{
-			Category: CATEGORY_LOGIN,
+			Category: "Login",
 			Name:     "npm.login",
-			Sources:  flags.EnvVars("NPM_LOGIN"),
+			Sources:  cli.NewValueSourceChain(cli.EnvVar("NPM_LOGIN")),
 			Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
 			Required: false,
 			Value:    "",
 		}, &cfg.Entries),
 
 		&cli.StringSliceFlag{
-			Category:    CATEGORY_LOGIN,
+			Category:    "Login",
 			Name:        "npm.npmrc-file",
-			Sources:     flags.EnvVars("NPM_NPMRC_FILE"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("NPM_NPMRC_FILE")),
 			Usage:       ".npmrc file to use.",
 			Required:    false,
 			Value:       []string{".npmrc"},
@@ -54,9 +52,9 @@ func NewLoginFlags(cfg *Login) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_LOGIN,
+			Category:    "Login",
 			Name:        "npm.npmrc",
-			Sources:     flags.EnvVars("NPM_NPMRC"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("NPM_NPMRC")),
 			Usage:       "Direct contents of .npmrc file.",
 			Required:    false,
 			Value:       "",

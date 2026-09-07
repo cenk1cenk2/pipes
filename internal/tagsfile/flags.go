@@ -2,7 +2,6 @@ package tagsfile
 
 import (
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 const (
@@ -16,7 +15,7 @@ func NewFlags(dst *string, value string, strict *bool, required bool) []cli.Flag
 		&cli.StringFlag{
 			Category:    CATEGORY_TAGS_FILE,
 			Name:        "tags-file",
-			Sources:     flags.EnvVars("TAGS_FILE"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("TAGS_FILE")),
 			Usage:       "Read tags from a file.",
 			Required:    required,
 			Value:       value,
@@ -31,7 +30,7 @@ func NewFlags(dst *string, value string, strict *bool, required bool) []cli.Flag
 	return append(list, &cli.BoolFlag{
 		Category:    CATEGORY_TAGS_FILE,
 		Name:        "tags-file.strict",
-		Sources:     flags.EnvVars("TAGS_FILE_STRICT"),
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("TAGS_FILE_STRICT")),
 		Usage:       "Fail on missing tags file.",
 		Required:    false,
 		Value:       false,

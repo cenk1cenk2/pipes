@@ -2,20 +2,23 @@ package ci
 
 import (
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
 //revive:disable:line-length-limit
+
+const (
+	CATEGORY_CI = "Gitlab Pipeline"
+)
 
 // NewFlags reads the job and commit coordinates the CI runner exports, so
 // a report can point back at the pipeline that produced it.
 func NewFlags(dst *iac.Metadata) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_CI,
+			Category:    CATEGORY_CI,
 			Name:        "ci.job-name",
-			Sources:     flags.EnvVars("CI_JOB_NAME"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_JOB_NAME")),
 			Usage:       "GitLab CI job name to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
@@ -23,9 +26,9 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_CI,
+			Category:    CATEGORY_CI,
 			Name:        "ci.job-url",
-			Sources:     flags.EnvVars("CI_JOB_URL"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_JOB_URL")),
 			Usage:       "GitLab CI job URL to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
@@ -33,9 +36,9 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_CI,
+			Category:    CATEGORY_CI,
 			Name:        "ci.pipeline-id",
-			Sources:     flags.EnvVars("CI_PIPELINE_ID"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_PIPELINE_ID")),
 			Usage:       "GitLab CI pipeline id to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
@@ -43,9 +46,9 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_CI,
+			Category:    CATEGORY_CI,
 			Name:        "ci.pipeline-url",
-			Sources:     flags.EnvVars("CI_PIPELINE_URL"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_PIPELINE_URL")),
 			Usage:       "GitLab CI pipeline URL to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
@@ -53,9 +56,9 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_CI,
+			Category:    CATEGORY_CI,
 			Name:        "ci.commit-sha",
-			Sources:     flags.EnvVars("CI_COMMIT_SHA"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_COMMIT_SHA")),
 			Usage:       "Git commit sha to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
@@ -63,9 +66,9 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_CI,
+			Category:    CATEGORY_CI,
 			Name:        "ci.commit-short-sha",
-			Sources:     flags.EnvVars("CI_COMMIT_SHORT_SHA"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_COMMIT_SHORT_SHA")),
 			Usage:       "Short git commit sha to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",

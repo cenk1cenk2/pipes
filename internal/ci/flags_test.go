@@ -6,7 +6,6 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
-	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
 )
 
@@ -37,7 +36,7 @@ var _ = Describe("NewFlags", func() {
 		metadata := iac.Metadata{}
 
 		for _, flag := range ci.NewFlags(&metadata) {
-			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(flags.CATEGORY_CI))
+			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(ci.CATEGORY_CI))
 		}
 	})
 

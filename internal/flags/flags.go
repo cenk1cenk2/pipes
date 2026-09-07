@@ -41,16 +41,3 @@ func unmarshalFlag[T any](flag *cli.StringFlag, dst *T, unmarshal func([]byte, a
 
 	return flag
 }
-
-// EnvVars builds a value source chain out of environment variable names. The
-// chain is read in order, so the first name a pipeline sets is the one that
-// wins.
-func EnvVars(names ...string) cli.ValueSourceChain {
-	sources := make([]cli.ValueSource, 0, len(names))
-
-	for _, name := range names {
-		sources = append(sources, cli.EnvVar(name))
-	}
-
-	return cli.NewValueSourceChain(sources...)
-}

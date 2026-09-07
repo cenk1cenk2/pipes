@@ -28,7 +28,7 @@ var Flags = CombineFlags(
 		&cli.StringFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.target",
-			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_TARGET"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_TARGET")),
 			Usage:       "Helm chart repository target to publish to.",
 			Required:    true,
 			Destination: &P.Chart.Target,
@@ -37,7 +37,7 @@ var Flags = CombineFlags(
 		&cli.StringSliceFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.versions",
-			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_VERSIONS"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS")),
 			Usage:       "Versions for the helm chart to be published.",
 			Required:    false,
 			Destination: &P.Chart.Versions,
@@ -46,7 +46,7 @@ var Flags = CombineFlags(
 		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-template",
-			Sources:  flags.EnvVars("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"),
+			Sources:  cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE")),
 			Usage: strings.TrimSpace(`
     Modifies every version that matches a certain condition.
     Template is interpolated with the given matches in the regular expression.
@@ -60,7 +60,7 @@ var Flags = CombineFlags(
 		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-sanitize",
-			Sources:  flags.EnvVars("HELM_PUBLISH_CHART_VERSIONS_SANITIZE"),
+			Sources:  cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_SANITIZE")),
 			Usage: strings.TrimSpace(`
     Sanitizes the given regex pattern out of version name.
     Template is interpolated with the given matches in the regular expression.
@@ -74,7 +74,7 @@ var Flags = CombineFlags(
 		&cli.StringFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.destination",
-			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_DESTINATION"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_DESTINATION")),
 			Usage:       "Destination directory for the packaged helm chart.",
 			Required:    false,
 			Value:       "./dist/",
@@ -84,7 +84,7 @@ var Flags = CombineFlags(
 		&cli.StringFlag{
 			Category:    CATEGORY_HELM_CHART,
 			Name:        "helm.publish.chart.app-version",
-			Sources:     flags.EnvVars("HELM_PUBLISH_CHART_APP_VERSION"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_APP_VERSION")),
 			Usage:       "Application version for the packaged helm chart.",
 			Required:    false,
 			Value:       "",

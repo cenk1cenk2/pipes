@@ -1,7 +1,6 @@
 package tagsfile
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -10,13 +9,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var newline = regexp.MustCompile(`\r?\n`)
-
 // Parse reads the comma separated tags out of the file at path. A path that does
 // not exist yields no tags and no error, since the file is usually written by an
-// earlier job that may legitimately not have run.
+// earlier job that may legitimately not have run. A pipe that can not go on
+// without the tags asks for strict and gets an error instead.
 func Parse(log *logrus.Entry, path string, strict bool) ([]string, error) {
 	if _, err := os.Stat(path); err != nil {
+		if strict && path != "" {
+			return nil, fmt.Errorf("Tags file is set but does not exists: %s", path)
+		}
+
 		return nil, nil
 	}
 
@@ -27,9 +29,7 @@ func Parse(log *logrus.Entry, path string, strict bool) ([]string, error) {
 
 	content, err := os.ReadFile(path)
 
-	if strict && errors.Is(err, os.ErrNotExist) && path != "" {
-		return nil, fmt.Errorf("Tags file is set but does not exists: %s", path)
-	} else if err != nil {
+	if err != nil {
 		return nil, fmt.Errorf("Can not read the tags file: %s -> %+v", path, err.Error())
 	}
 
@@ -39,6 +39,7 @@ func Parse(log *logrus.Entry, path string, strict bool) ([]string, error) {
 		return nil, fmt.Errorf("Tags file does not contain any tags: %s", path)
 	}
 
+	newline := regexp.MustCompile(`\r?\n`)
 	parsed := []string{}
 
 	for _, tag := range tags {

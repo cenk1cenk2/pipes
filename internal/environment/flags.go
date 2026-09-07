@@ -30,7 +30,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.enable",
-			Sources:     flags.EnvVars("ENVIRONMENT_ENABLE"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_ENABLE")),
 			Usage:       "Enable environment injection.",
 			Required:    false,
 			Hidden:      true,
@@ -41,7 +41,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 		flags.JSONFlag(&cli.StringFlag{
 			Category: CATEGORY_ENVIRONMENT,
 			Name:     "environment.conditions",
-			Sources:  flags.EnvVars("ENVIRONMENT_CONDITIONS"),
+			Sources:  cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_CONDITIONS")),
 			Usage: `Regex pattern to select an environment.
       Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags.
       json([]struct{ match: RegExp, environment: string })`,
@@ -52,7 +52,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.fail-on-no-reference",
-			Sources:     flags.EnvVars("ENVIRONMENT_FAIL_ON_NO_REFERENCE"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_FAIL_ON_NO_REFERENCE")),
 			Usage:       "Fail on missing environment references.",
 			Required:    false,
 			Value:       true,
@@ -62,7 +62,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.strict",
-			Sources:     flags.EnvVars("ENVIRONMENT_STRICT"),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_STRICT")),
 			Usage:       "Fail on no environment selected.",
 			Required:    false,
 			Value:       true,

@@ -57,14 +57,24 @@ var _ = Describe("Parse", func() {
 		Expect(tags).To(BeNil())
 	})
 
-	It("yields nothing for an absent file even under strict", func() {
+	// Strict is for the pipes that would otherwise publish something untagged, so
+	// there the absence of a configured file is the failure itself.
+	It("fails on an absent file under strict", func() {
 		tags, err := tagsfile.Parse(log, filepath.Join(dir, "absent"), true)
-		Expect(err).NotTo(HaveOccurred())
+		Expect(err).To(MatchError(ContainSubstring("Tags file is set but does not exists")))
 		Expect(tags).To(BeNil())
 	})
 
 	It("yields nothing when no path was configured", func() {
 		tags, err := tagsfile.Parse(log, "", false)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(tags).To(BeNil())
+	})
+
+	// Strict says the configured file has to be there, and no path is not a
+	// configured file.
+	It("yields nothing when no path was configured even under strict", func() {
+		tags, err := tagsfile.Parse(log, "", true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(BeNil())
 	})

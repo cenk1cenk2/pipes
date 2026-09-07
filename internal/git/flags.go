@@ -2,15 +2,21 @@ package git
 
 import (
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/flags"
+)
+
+const (
+	CATEGORY_GIT = "GIT"
 )
 
 func NewFlags(dst *Refs) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_GIT,
-			Name:        "git.branch",
-			Sources:     flags.EnvVars("CI_COMMIT_REF_NAME", "BITBUCKET_BRANCH"),
+			Category: CATEGORY_GIT,
+			Name:     "git.branch",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("CI_COMMIT_REF_NAME"),
+				cli.EnvVar("BITBUCKET_BRANCH"),
+			),
 			Usage:       "Source control branch.",
 			Required:    false,
 			Value:       "",
@@ -18,9 +24,12 @@ func NewFlags(dst *Refs) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    flags.CATEGORY_GIT,
-			Name:        "git.tag",
-			Sources:     flags.EnvVars("CI_COMMIT_TAG", "BITBUCKET_TAG"),
+			Category: CATEGORY_GIT,
+			Name:     "git.tag",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("CI_COMMIT_TAG"),
+				cli.EnvVar("BITBUCKET_TAG"),
+			),
 			Usage:       "Source control tag.",
 			Required:    false,
 			Value:       "",
