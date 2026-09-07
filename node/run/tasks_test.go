@@ -13,21 +13,21 @@ import (
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
-// The tasks read the package manager and the environment of the pipe around
-// them off their package level instances, so a spec seeds those the same way it
-// seeds its own.
-func seed(packageManager string) {
-	*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
-		Exe:      packageManager,
-		Commands: node.PackageManagers[packageManager],
-	}}
-	*setup.EnvironmentCtx = environment.Ctx{
-		Environment: "production",
-		EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-	}
-}
-
 var _ = Describe("Node run", func() {
+	// The tasks read the package manager and the environment of the pipe around
+	// them off their package level instances, so a spec seeds those the same way it
+	// seeds its own.
+	seed := func(packageManager string) {
+		*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
+			Exe:      packageManager,
+			Commands: node.PackageManagers[packageManager],
+		}}
+		*setup.EnvironmentCtx = environment.Ctx{
+			Environment: "production",
+			EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
+		}
+	}
+
 	// The whole task list runs rather than the task alone, since what the script
 	// resolves to is decided before the tasks are built. The arguments are
 	// registered because the command line is what fills them.

@@ -13,21 +13,21 @@ import (
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
-// The tasks read the package manager and the environment of the pipe around
-// them off their package level instances, so a spec seeds those the same way it
-// seeds its own.
-func seed(packageManager string) {
-	*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
-		Exe:      packageManager,
-		Commands: node.PackageManagers[packageManager],
-	}}
-	*setup.EnvironmentCtx = environment.Ctx{
-		Environment: "production",
-		EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-	}
-}
-
 var _ = Describe("Node build", func() {
+	// The tasks read the package manager and the environment of the pipe around
+	// them off their package level instances, so a spec seeds those the same way it
+	// seeds its own.
+	seed := func(packageManager string) {
+		*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
+			Exe:      packageManager,
+			Commands: node.PackageManagers[packageManager],
+		}}
+		*setup.EnvironmentCtx = environment.Ctx{
+			Environment: "production",
+			EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
+		}
+	}
+
 	// The flags are not registered with the spec command, since the pipe is seeded
 	// directly and a package level flag only reads its environment on first parse.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe, packageManager string) error {

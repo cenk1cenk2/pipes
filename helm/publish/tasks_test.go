@@ -12,130 +12,132 @@ import (
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
-// The tasks read the chart the setup resolved off its package level instance, so
-// a spec seeds that the same way it seeds its own.
-func seed(cwd, name string) {
-	*setup.C = setup.Ctx{
-		Cwd:   cwd,
-		Env:   map[string]string{},
-		Chart: &helmv2.Chart{Metadata: &helmv2.Metadata{Name: name}},
+var _ = Describe("Helm publish tasks", func() {
+	// The tasks read the chart the setup resolved off its package level instance, so
+	// a spec seeds that the same way it seeds its own.
+	seed := func(cwd, name string) {
+		*setup.C = setup.Ctx{
+			Cwd:   cwd,
+			Env:   map[string]string{},
+			Chart: &helmv2.Chart{Metadata: &helmv2.Metadata{Name: name}},
+		}
 	}
-}
 
-// The pipe is seeded rather than parsed out of the flags: a package level flag
-// only reads its environment sources on the first parse of a process, so a suite
-// that drove them would depend on the order the specs happen to run in. The
-// versions are seeded for the same reason the pipe is, since collecting them
-// reads the git references of whatever checkout the specs run in.
-func run(
-	runner *tests.TestingCommandRunner,
-	pipe Pipe,
-	versions []string,
-	task func(*TaskList) *Task,
-) error {
-	GinkgoHelper()
+	// The pipe is seeded rather than parsed out of the flags: a package level flag
+	// only reads its environment sources on the first parse of a process, so a suite
+	// that drove them would depend on the order the specs happen to run in. The
+	// versions are seeded for the same reason the pipe is, since collecting them
+	// reads the git references of whatever checkout the specs run in.
+	run := func(
+		runner *tests.TestingCommandRunner,
+		pipe Pipe,
+		versions []string,
+		task func(*TaskList) *Task,
+	) error {
+		GinkgoHelper()
 
-	seed("charts/app", "app")
-	*P = pipe
-	C.Versions = versions
+		seed("charts/app", "app")
+		*P = pipe
+		C.Versions = versions
 
-	return fixtures.Cli(runner, tests.TaskListCli{
-		AppName:     "pipe-helm",
-		CommandName: "publish",
-		TaskLists: []tests.TaskListFactory{
-			func(p *Plumber, _ *cli.Command) *TaskList {
-				tl := &TaskList{}
+		return fixtures.Cli(runner, tests.TaskListCli{
+			AppName:     "pipe-helm",
+			CommandName: "publish",
+			TaskLists: []tests.TaskListFactory{
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
 
-				return tl.New(p).
-					SetRuntimeDepth(3).
-					Set(func(tl *TaskList) Job {
-						return JobSequence(task(tl).Job())
-					})
+					return tl.New(p).
+						SetRuntimeDepth(3).
+						Set(func(tl *TaskList) Job {
+							return JobSequence(task(tl).Job())
+						})
+				},
 			},
-		},
-	}).Run()
-}
+		}).Run()
+	}
 
-func pipe() Pipe {
-	return Pipe{Chart: Chart{
-		Target:      "oci://registry.example.com/charts",
-		Destination: "./dist/",
-	}}
-}
+	pipe := func() Pipe {
+		return Pipe{Chart: Chart{
+			Target:      "oci://registry.example.com/charts",
+			Destination: "./dist/",
+		}}
+	}
 
-var _ = Describe("Helm package", func() {
-	It("packages the chart in the directory the setup step resolved", func() {
-		runner := fixtures.Runner()
+	Describe("Helm package", func() {
+		It("packages the chart in the directory the setup step resolved", func() {
+			runner := fixtures.Runner()
 
-		Expect(run(runner, pipe(), []string{"1.0.0"}, HelmPackage)).To(Succeed())
+			Expect(run(runner, pipe(), []string{"1.0.0"}, HelmPackage)).To(Succeed())
 
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Name).To(Equal("helm"))
-		Expect(invocation.Args).To(Equal([]string{"package", "-d", "./dist/", ".", "--version", "1.0.0"}))
-		Expect(invocation.Dir).To(Equal("charts/app"))
+			invocation, ok := runner.LastInvocation()
+			Expect(ok).To(BeTrue())
+			Expect(invocation.Name).To(Equal("helm"))
+			Expect(invocation.Args).To(Equal([]string{"package", "-d", "./dist/", ".", "--version", "1.0.0"}))
+			Expect(invocation.Dir).To(Equal("charts/app"))
+		})
+
+		// The application version is what the chart reports as the version of the thing
+		// it deploys, which most charts leave to whatever is committed in Chart.yaml.
+		It("carries the application version only when one was given", func() {
+			runner := fixtures.Runner()
+
+			p := pipe()
+			p.Chart.AppVersion = "2.3.4"
+
+			Expect(run(runner, p, []string{"1.0.0"}, HelmPackage)).To(Succeed())
+
+			invocation, _ := runner.LastInvocation()
+			Expect(invocation.Args).To(ContainElements("--app-version", "2.3.4"))
+		})
+
+		It("packages every version it was given", func() {
+			runner := fixtures.Runner()
+
+			Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, HelmPackage)).To(Succeed())
+
+			Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
+		})
+
+		// Nothing to package is a pipeline whose version conditions selected nothing,
+		// not a failure, so the task disables itself rather than running helm on it.
+		It("runs nothing without a version", func() {
+			runner := fixtures.Runner()
+
+			Expect(run(runner, pipe(), []string{}, HelmPackage)).To(Succeed())
+
+			Expect(runner.InvocationNames()).To(BeEmpty())
+		})
 	})
 
-	// The application version is what the chart reports as the version of the thing
-	// it deploys, which most charts leave to whatever is committed in Chart.yaml.
-	It("carries the application version only when one was given", func() {
-		runner := fixtures.Runner()
+	Describe("Helm publish", func() {
+		It("pushes the archive the package task wrote, named after the chart", func() {
+			runner := fixtures.Runner()
 
-		p := pipe()
-		p.Chart.AppVersion = "2.3.4"
+			Expect(run(runner, pipe(), []string{"1.0.0"}, HelmPublish)).To(Succeed())
 
-		Expect(run(runner, p, []string{"1.0.0"}, HelmPackage)).To(Succeed())
+			invocation, ok := runner.LastInvocation()
+			Expect(ok).To(BeTrue())
+			Expect(invocation.Name).To(Equal("helm"))
+			Expect(invocation.Args).
+				To(Equal([]string{"push", "dist/app-1.0.0.tgz", "oci://registry.example.com/charts"}))
+			Expect(invocation.Dir).To(Equal("charts/app"))
+		})
 
-		invocation, _ := runner.LastInvocation()
-		Expect(invocation.Args).To(ContainElements("--app-version", "2.3.4"))
-	})
+		It("pushes one archive per version", func() {
+			runner := fixtures.Runner()
 
-	It("packages every version it was given", func() {
-		runner := fixtures.Runner()
+			Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, HelmPublish)).To(Succeed())
 
-		Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, HelmPackage)).To(Succeed())
+			Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
+		})
 
-		Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
-	})
+		It("runs nothing without a version", func() {
+			runner := fixtures.Runner()
 
-	// Nothing to package is a pipeline whose version conditions selected nothing,
-	// not a failure, so the task disables itself rather than running helm on it.
-	It("runs nothing without a version", func() {
-		runner := fixtures.Runner()
+			Expect(run(runner, pipe(), []string{}, HelmPublish)).To(Succeed())
 
-		Expect(run(runner, pipe(), []string{}, HelmPackage)).To(Succeed())
-
-		Expect(runner.InvocationNames()).To(BeEmpty())
-	})
-})
-
-var _ = Describe("Helm publish", func() {
-	It("pushes the archive the package task wrote, named after the chart", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, pipe(), []string{"1.0.0"}, HelmPublish)).To(Succeed())
-
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Name).To(Equal("helm"))
-		Expect(invocation.Args).
-			To(Equal([]string{"push", "dist/app-1.0.0.tgz", "oci://registry.example.com/charts"}))
-		Expect(invocation.Dir).To(Equal("charts/app"))
-	})
-
-	It("pushes one archive per version", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, HelmPublish)).To(Succeed())
-
-		Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
-	})
-
-	It("runs nothing without a version", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, pipe(), []string{}, HelmPublish)).To(Succeed())
-
-		Expect(runner.InvocationNames()).To(BeEmpty())
+			Expect(runner.InvocationNames()).To(BeEmpty())
+		})
 	})
 })
