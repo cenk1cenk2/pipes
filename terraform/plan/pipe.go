@@ -6,8 +6,6 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
-	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
 type (
@@ -31,21 +29,17 @@ type (
 		ReportMetadata     iac.Metadata
 	}
 
-	// Deps is everything the plan reads from the pipe around it: the resolved
-	// terraform tool it runs with, the state whose name tells concurrent plan jobs
-	// on one merge request apart, and the notes the report is written through.
-	Deps struct {
-		Tool  *tool.Ctx
-		State *state.Pipe
-		Notes gitlab.NotesFactory
+	Ctx struct {
+		Report iac.Source
 	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
+var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -53,16 +47,20 @@ func New(p *Plumber, deps Deps) *TaskList {
 				P.MergeRequestReport.MergeRequestIid = 0
 			}
 
-			return p.Validate(P)
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			C.Report = TerraformReportSource()
+
+			return nil
 		}).
 		Set(func(tl *TaskList) Job {
-			source := TerraformReportSource(deps)
-
 			return JobSequence(
-				TerraformPlan(tl, deps).Job(),
-				iac.SummaryTask(tl, source).Job(),
-				iac.MergeRequestReportTask(tl, source).Job(),
-				TerraformPlanCleanup(tl, deps).Job(),
+				TerraformPlan(tl).Job(),
+				iac.SummaryTask(tl, &C.Report).Job(),
+				iac.MergeRequestReportTask(tl, &C.Report).Job(),
+				TerraformPlanCleanup(tl).Job(),
 			)
 		})
 }

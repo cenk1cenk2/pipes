@@ -39,7 +39,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						login.New(p),
-						build.New(p, build.Deps{Registry: login.P}),
+						build.New(p),
 					))
 				},
 			},
@@ -51,7 +51,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						login.New(p),
-						manifest.New(p, manifest.Deps{Registry: login.P}),
+						manifest.New(p),
 					))
 				},
 			},

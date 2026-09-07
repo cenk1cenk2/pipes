@@ -2,9 +2,10 @@ package apply
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformApply(tl *TaskList, deps Deps) *Task {
+func TerraformApply(tl *TaskList) *Task {
 	return tl.CreateTask("apply").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -23,8 +24,8 @@ func TerraformApply(tl *TaskList, deps Deps) *Task {
 
 					return nil
 				}).
-				SetDir(deps.Tool.Cwd).
-				AppendEnvironment(deps.Tool.Env).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil

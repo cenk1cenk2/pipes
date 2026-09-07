@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoLint(tl *TaskList, deps Deps) *Task {
+func GoLint(tl *TaskList) *Task {
 	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
-			if deps.Tool.Workspace {
+			if setup.C.Workspace {
 				t.CreateCommand(
 					"go",
 					"list",
@@ -19,9 +20,9 @@ func GoLint(tl *TaskList, deps Deps) *Task {
 					"-f",
 					"{{.Dir}}",
 				).
-					AppendEnvironment(deps.Tool.Env).
+					AppendEnvironment(setup.C.Env).
 					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-					SetDir(deps.Tool.Cwd).
+					SetDir(setup.C.Cwd).
 					EnableStreamRecording().
 					ShouldRunAfter(func(c *Command) error {
 						C.Modules = nil
@@ -57,9 +58,9 @@ func GoLint(tl *TaskList, deps Deps) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(deps.Tool.Env).
+				AppendEnvironment(setup.C.Env).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-				SetDir(deps.Tool.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

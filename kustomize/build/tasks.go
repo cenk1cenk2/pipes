@@ -7,12 +7,13 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/kustomize/setup"
 )
 
-func RenderOverlays(tl *TaskList, deps Deps) *Task {
+func RenderOverlays(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		ShouldDisable(func(t *Task) bool {
-			return len(deps.Tool.Overlays) == 0
+			return len(setup.C.Overlays) == 0
 		}).
 		Set(func(t *Task) error {
 			if P.Output != "" {
@@ -21,7 +22,7 @@ func RenderOverlays(tl *TaskList, deps Deps) *Task {
 				}
 			}
 
-			for _, overlay := range deps.Tool.Overlays {
+			for _, overlay := range setup.C.Overlays {
 				t.CreateSubtask(overlay).
 					Set(func(t *Task) error {
 						result := renderOverlay(overlay, P)

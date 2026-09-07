@@ -10,15 +10,31 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
+	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
+
+// The tasks read the package manager and the environment of the pipe around
+// them off their package level instances, so a spec seeds those the same way it
+// seeds its own.
+func seed(packageManager string) {
+	*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
+		Exe:      packageManager,
+		Commands: node.PackageManagers[packageManager],
+	}}
+	*setup.EnvironmentCtx = environment.Ctx{
+		Environment: "production",
+		EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
+	}
+}
 
 var _ = Describe("Node build", func() {
 	// The flags are not registered with the spec command, since the pipe is seeded
 	// directly and a package level flag only reads its environment on first parse.
-	run := func(runner *tests.TestingCommandRunner, pipe Pipe, deps Deps) error {
+	run := func(runner *tests.TestingCommandRunner, pipe Pipe, packageManager string) error {
 		GinkgoHelper()
 
 		*P = pipe
+		seed(packageManager)
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-node",
@@ -30,24 +46,11 @@ var _ = Describe("Node build", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(BuildNodeApplication(tl, deps).Job())
+							return plumber.JobSequence(BuildNodeApplication(tl).Job())
 						})
 				},
 			},
 		}).Run()
-	}
-
-	deps := func(packageManager string) Deps {
-		return Deps{
-			Node: &node.Ctx{PackageManager: node.PackageManager{
-				Exe:      packageManager,
-				Commands: node.PackageManagers[packageManager],
-			}},
-			Environment: &environment.Ctx{
-				Environment: "production",
-				EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-			},
-		}
 	}
 
 	pipe := func() Pipe {
@@ -57,7 +60,7 @@ var _ = Describe("Node build", func() {
 	It("runs the build script through the resolved package manager", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, pipe(), deps("pnpm"))).To(Succeed())
+		Expect(run(runner, pipe(), "pnpm")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -74,7 +77,7 @@ var _ = Describe("Node build", func() {
 		p := pipe()
 		p.Build.ScriptArgs = "--verbose"
 
-		Expect(run(runner, p, deps("npm"))).To(Succeed())
+		Expect(run(runner, p, "npm")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -88,7 +91,7 @@ var _ = Describe("Node build", func() {
 		p.Build.Script = "build:{{ .Environment }}"
 		p.Build.ScriptArgs = "--url {{ index .EnvVars \"API_URL\" }}"
 
-		Expect(run(runner, p, deps("pnpm"))).To(Succeed())
+		Expect(run(runner, p, "pnpm")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -99,7 +102,7 @@ var _ = Describe("Node build", func() {
 	It("hands the environment variables to the build process", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, pipe(), deps("pnpm"))).To(Succeed())
+		Expect(run(runner, pipe(), "pnpm")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())

@@ -10,20 +10,24 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
+	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-var _ = Describe("Node run", func() {
-	deps := Deps{
-		Node: &node.Ctx{PackageManager: node.PackageManager{
-			Exe:      "pnpm",
-			Commands: node.PackageManagers["pnpm"],
-		}},
-		Environment: &environment.Ctx{
-			Environment: "production",
-			EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-		},
+// The tasks read the package manager and the environment of the pipe around
+// them off their package level instances, so a spec seeds those the same way it
+// seeds its own.
+func seed(packageManager string) {
+	*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
+		Exe:      packageManager,
+		Commands: node.PackageManagers[packageManager],
+	}}
+	*setup.EnvironmentCtx = environment.Ctx{
+		Environment: "production",
+		EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
 	}
+}
 
+var _ = Describe("Node run", func() {
 	// The whole task list runs rather than the task alone, since what the script
 	// resolves to is decided before the tasks are built. The arguments are
 	// registered because the command line is what fills them.
@@ -32,6 +36,7 @@ var _ = Describe("Node run", func() {
 
 		*P = pipe
 		*C = Ctx{}
+		seed("pnpm")
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-node",
@@ -40,7 +45,7 @@ var _ = Describe("Node run", func() {
 			Arguments:   Arguments,
 			TaskLists: []tests.TaskListFactory{
 				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
-					return New(p, deps)
+					return New(p)
 				},
 			},
 		}).Run()

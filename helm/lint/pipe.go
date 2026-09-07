@@ -2,7 +2,6 @@ package lint
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 type (
@@ -14,19 +13,13 @@ type (
 		ShouldTemplate bool
 		Kubernetes
 	}
-
-	// Deps is the resolved helm tool: the chart directory the lint and the template
-	// run in.
-	Deps struct {
-		Tool *tool.Ctx
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -34,8 +27,8 @@ func New(p *Plumber, deps Deps) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobParallel(
-				HelmLint(tl, deps).Job(),
-				HelmTemplate(tl, deps).Job(),
+				HelmLint(tl).Job(),
+				HelmTemplate(tl).Job(),
 			)
 		})
 }

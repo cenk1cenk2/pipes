@@ -22,7 +22,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 		Action: func(_ context.Context, _ *cli.Command) error {
 			return p.RunJobs(plumber.CombineTaskLists(
 				setup.New(p),
-				write.New(p, write.Deps{Environment: setup.EnvironmentCtx}),
+				write.New(p),
 			))
 		},
 	}

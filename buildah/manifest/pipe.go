@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/registry"
+	"gitlab.kilic.dev/devops/pipes/buildah/login"
 )
 
 type (
@@ -28,13 +28,6 @@ type (
 		ManifestedImages map[string][]string
 		Matches          []string
 	}
-
-	// Deps is the registry the login step authenticated against, whose uri the
-	// target manifest is prefixed with so it is created under the name the images
-	// beneath it were pushed to.
-	Deps struct {
-		Registry *registry.Credentials
-	}
 )
 
 var TL = TaskList{}
@@ -42,12 +35,12 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if deps.Registry.Uri != "" {
-				P.Manifest.Target = fmt.Sprintf("%s/%s", deps.Registry.Uri, P.Manifest.Target)
+			if login.P.Uri != "" {
+				P.Manifest.Target = fmt.Sprintf("%s/%s", login.P.Uri, P.Manifest.Target)
 
 				tl.Log.Infof("Using default manifest target: %s", P.Manifest.Target)
 			}

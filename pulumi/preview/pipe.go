@@ -4,8 +4,6 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
-	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
 
 type (
@@ -20,21 +18,17 @@ type (
 		ReportMetadata     iac.Metadata
 	}
 
-	// Deps is everything the preview reads from the pipe around it: the resolved
-	// pulumi tool it runs with, the stack whose name tells concurrent preview jobs
-	// on one merge request apart, and the notes the report is written through.
-	Deps struct {
-		Tool  *tool.Ctx
-		Stack *stack.Pipe
-		Notes gitlab.NotesFactory
+	Ctx struct {
+		Report iac.Source
 	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
+var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -42,15 +36,19 @@ func New(p *Plumber, deps Deps) *TaskList {
 				P.MergeRequestReport.MergeRequestIid = 0
 			}
 
-			return p.Validate(P)
+			if err := p.Validate(P); err != nil {
+				return err
+			}
+
+			C.Report = PulumiReportSource()
+
+			return nil
 		}).
 		Set(func(tl *TaskList) Job {
-			source := PulumiReportSource(deps)
-
 			return JobSequence(
-				PulumiPlan(tl, deps).Job(),
-				iac.SummaryTask(tl, source).Job(),
-				iac.MergeRequestReportTask(tl, source).Job(),
+				PulumiPlan(tl).Job(),
+				iac.SummaryTask(tl, &C.Report).Job(),
+				iac.MergeRequestReportTask(tl, &C.Report).Job(),
 			)
 		})
 }

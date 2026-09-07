@@ -4,9 +4,10 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func GenerateTerraformRegistryCredentialsEnvVars(tl *TaskList, deps Deps) *Task {
+func GenerateTerraformRegistryCredentialsEnvVars(tl *TaskList) *Task {
 	return tl.CreateTask("environment", "credentials").
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Registry.Credentials) == 0
@@ -18,7 +19,7 @@ func GenerateTerraformRegistryCredentialsEnvVars(tl *TaskList, deps Deps) *Task 
 				sanitized := strings.ReplaceAll(c.Registry, ".", "_")
 				sanitized = strings.ReplaceAll(sanitized, "-", "__")
 
-				deps.Tool.Env["TF_TOKEN_"+sanitized] = c.Token
+				setup.C.Env["TF_TOKEN_"+sanitized] = c.Token
 			}
 
 			return nil

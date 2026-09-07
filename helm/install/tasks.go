@@ -2,9 +2,10 @@ package install
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmInstall(tl *TaskList, deps Deps) *Task {
+func HelmInstall(tl *TaskList) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -12,7 +13,7 @@ func HelmInstall(tl *TaskList, deps Deps) *Task {
 				"dependency",
 				"update",
 			).
-				SetDir(deps.Tool.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

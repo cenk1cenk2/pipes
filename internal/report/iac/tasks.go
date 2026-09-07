@@ -13,6 +13,9 @@ import (
 // Everything a plan report needs that differs between the tools. Read is what
 // actually reaches for the plan -- a command for one pipe, a file for the other --
 // so the two tasks below stay the same shape whichever tool produced it.
+//
+// The tasks are handed the pipe's own instance rather than a copy, since it is
+// only filled once the flags the pipe builds it out of have been parsed.
 type Source struct {
 	Read          func(t *plumber.Task) (Report, error)
 	Summary       func(Report) Summary
@@ -26,7 +29,7 @@ type Source struct {
 	Metadata       Metadata
 }
 
-func SummaryTask(tl *plumber.TaskList, src Source) *plumber.Task {
+func SummaryTask(tl *plumber.TaskList, src *Source) *plumber.Task {
 	return tl.CreateTask("summary").
 		ShouldDisable(func(t *plumber.Task) bool {
 			if src.SummaryOutput == "" {
@@ -58,7 +61,7 @@ func SummaryTask(tl *plumber.TaskList, src Source) *plumber.Task {
 		})
 }
 
-func MergeRequestReportTask(tl *plumber.TaskList, src Source) *plumber.Task {
+func MergeRequestReportTask(tl *plumber.TaskList, src *Source) *plumber.Task {
 	return tl.CreateTask("merge-request-report").
 		ShouldDisable(func(t *plumber.Task) bool {
 			if !src.MergeRequest.Enabled {

@@ -3,7 +3,6 @@ package build
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
-	"gitlab.kilic.dev/devops/pipes/internal/registry"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
@@ -46,12 +45,6 @@ type (
 	Ctx struct {
 		Tags []string
 	}
-
-	// Deps is the registry the login step authenticated against, whose uri every
-	// tag is prefixed with so the image is built under the name it is pushed to.
-	Deps struct {
-		Registry *registry.Credentials
-	}
 )
 
 var TL = TaskList{}
@@ -59,18 +52,15 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
 			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
-			collector := ContainerImageTags(deps)
-
 			return JobSequence(
-				collector.Tasks(tl, &C.Tags).Job(),
-				ContainerManifestFileWrite(tl, collector).Job(),
+				ContainerImageTagsParent(tl).Job(),
 				ContainerBuild(tl).Job(),
 				ContainerPush(tl).Job(),
 			)

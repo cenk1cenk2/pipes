@@ -29,7 +29,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						login.New(p),
-						install.New(p, install.Deps{Tool: setup.C.Ctx}),
+						install.New(p),
 					))
 				},
 			},
@@ -40,7 +40,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						lint.New(p, lint.Deps{Tool: setup.C.Ctx}),
+						lint.New(p),
 					))
 				},
 			},
@@ -52,7 +52,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						login.New(p),
-						publish.New(p, publish.Deps{Tool: setup.C}),
+						publish.New(p),
 					))
 				},
 			},

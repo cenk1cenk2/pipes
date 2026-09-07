@@ -19,10 +19,12 @@ var _ = Describe("Go install", func() {
 		GinkgoHelper()
 
 		*P = pipe
-		deps := Deps{Tool: &setup.Ctx{
+		// The tasks read the tool the setup resolved off its package level
+		// instance, so a spec seeds that the same way it seeds its own.
+		*setup.C = setup.Ctx{
 			Ctx:       &tool.Ctx{Cwd: "projects/api", Env: map[string]string{"GOPATH": "/cache"}},
 			Workspace: workspace,
-		}}
+		}
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
@@ -35,8 +37,8 @@ var _ = Describe("Go install", func() {
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
 							return plumber.JobSequence(
-								GoModVendor(tl, deps).Job(),
-								GoModVerify(tl, deps).Job(),
+								GoModVendor(tl).Job(),
+								GoModVerify(tl).Job(),
 							)
 						})
 				},

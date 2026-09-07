@@ -4,25 +4,26 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoModVendor(tl *TaskList, deps Deps) *Task {
+func GoModVendor(tl *TaskList) *Task {
 	return tl.CreateTask("vendor").
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"go",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(deps.Tool.Cwd).
+				SetDir(setup.C.Cwd).
 				Set(func(c *Command) error {
-					if deps.Tool.Workspace {
+					if setup.C.Workspace {
 						c.AppendArgs("work", "vendor")
 
-						t.Log.Infof("Vendoring workspace: in %s", deps.Tool.Cwd)
+						t.Log.Infof("Vendoring workspace: in %s", setup.C.Cwd)
 					} else {
 						c.AppendArgs("mod", "vendor")
 
-						t.Log.Infof("Vendoring: in %s", deps.Tool.Cwd)
+						t.Log.Infof("Vendoring: in %s", setup.C.Cwd)
 					}
 
 					if P.Args != "" {
@@ -31,7 +32,7 @@ func GoModVendor(tl *TaskList, deps Deps) *Task {
 
 					return nil
 				}).
-				AppendEnvironment(deps.Tool.Env).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil
@@ -41,7 +42,7 @@ func GoModVendor(tl *TaskList, deps Deps) *Task {
 		})
 }
 
-func GoModVerify(tl *TaskList, deps Deps) *Task {
+func GoModVerify(tl *TaskList) *Task {
 	return tl.CreateTask("verify").
 		ShouldDisable(func(t *Task) bool {
 			return !P.Verify
@@ -53,9 +54,9 @@ func GoModVerify(tl *TaskList, deps Deps) *Task {
 				"verify",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				SetDir(deps.Tool.Cwd).
+				SetDir(setup.C.Cwd).
 				Set(func(c *Command) error {
-					t.Log.Infof("Verifying modules: in %s", deps.Tool.Cwd)
+					t.Log.Infof("Verifying modules: in %s", setup.C.Cwd)
 
 					return nil
 				}).

@@ -12,37 +12,48 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
+	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
-func deps(name, cwd string) Deps {
-	return Deps{
-		Tool:  &tool.Ctx{Cwd: cwd, Env: map[string]string{}},
-		State: &state.Pipe{State: state.State{Name: name}},
-	}
+// The tasks read the setup and the state of the pipe around them off their
+// package level instances, so a spec seeds those the same way it seeds its own.
+func seed(name, cwd string) {
+	*setup.C = tool.Ctx{Cwd: cwd, Env: map[string]string{}}
+	*state.P = state.Pipe{State: state.State{Name: name}}
 }
 
 var _ = Describe("Terraform report discriminators", func() {
 	It("holds nothing back when neither value has moved off its default", func() {
-		Expect(terraformReportDiscriminators(deps("default", "."))).To(BeEmpty())
+		seed("default", ".")
+
+		Expect(terraformReportDiscriminators()).To(BeEmpty())
 	})
 
 	It("carries a named state", func() {
-		Expect(terraformReportDiscriminators(deps("production", "."))).To(Equal([]string{"production"}))
+		seed("production", ".")
+
+		Expect(terraformReportDiscriminators()).To(Equal([]string{"production"}))
 	})
 
 	It("carries a root module other than the working directory", func() {
-		Expect(terraformReportDiscriminators(deps("default", ".deploy/sun"))).To(Equal([]string{".deploy/sun"}))
+		seed("default", ".deploy/sun")
+
+		Expect(terraformReportDiscriminators()).To(Equal([]string{".deploy/sun"}))
 	})
 
 	It("carries both, state first", func() {
-		Expect(terraformReportDiscriminators(deps("production", ".deploy/sun"))).
-			To(Equal([]string{"production", ".deploy/sun"}))
+		seed("production", ".deploy/sun")
+
+		Expect(terraformReportDiscriminators()).To(Equal([]string{"production", ".deploy/sun"}))
 	})
 
 	It("reports the state name only once it has been named", func() {
-		Expect(terraformStateName(deps("default", "."))).To(BeEmpty())
-		Expect(terraformStateName(deps("production", "."))).To(Equal("production"))
+		seed("default", ".")
+		Expect(terraformStateName()).To(BeEmpty())
+
+		seed("production", ".")
+		Expect(terraformStateName()).To(Equal("production"))
 	})
 })
 
@@ -52,7 +63,7 @@ var _ = Describe("Terraform plan", func() {
 	run := func(runner *tests.TestingCommandRunner, environment map[string]string) error {
 		GinkgoHelper()
 
-		deps := deps("production", ".deploy/sun")
+		seed("production", ".deploy/sun")
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-terraform",
@@ -73,7 +84,7 @@ var _ = Describe("Terraform plan", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(TerraformPlan(tl, deps).Job())
+							return plumber.JobSequence(TerraformPlan(tl).Job())
 						})
 				},
 			},
@@ -113,7 +124,7 @@ var _ = Describe("Terraform plan cleanup", func() {
 		GinkgoHelper()
 
 		*P = pipe
-		deps := deps("production", cwd)
+		seed("production", cwd)
 
 		return fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
 			AppName:     "pipe-terraform",
@@ -125,7 +136,7 @@ var _ = Describe("Terraform plan cleanup", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(TerraformPlanCleanup(tl, deps).Job())
+							return plumber.JobSequence(TerraformPlanCleanup(tl).Job())
 						})
 				},
 			},

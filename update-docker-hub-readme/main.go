@@ -7,27 +7,10 @@ import (
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
 )
 
-// options are the services the pipe reaches outside the machine for. A zero
-// value is the production wiring, so only a spec ever fills one in.
-type options struct {
-	Hub hub.ClientFactory
-}
-
-func (o options) defaults() options {
-	if o.Hub == nil {
-		o.Hub = hub.NewClient
-	}
-
-	return o
-}
-
-func newCommand(p *plumber.Plumber, opts options) *cli.Command {
-	opts = opts.defaults()
-
+func newCommand(p *plumber.Plumber) *cli.Command {
 	return &cli.Command{
 		Name:        CLI_NAME,
 		Version:     VERSION,
@@ -36,16 +19,14 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 		Flags:       plumber.CombineFlags(update.Flags),
 		Action: func(_ context.Context, _ *cli.Command) error {
 			return p.RunJobs(plumber.CombineTaskLists(
-				update.New(p, update.Deps{Hub: opts.Hub}),
+				update.New(p),
 			))
 		},
 	}
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
-		return newCommand(p, options{})
-	}).
+	plumber.NewPlumber(newCommand).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

@@ -3,8 +3,11 @@ package build
 import (
 	"fmt"
 	"os"
+	"slices"
+	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	"gitlab.kilic.dev/devops/pipes/buildah/manifest"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 	"go.yaml.in/yaml/v4"
@@ -12,10 +15,9 @@ import (
 
 // The collector reads the parsed flags, so it is only built from inside a task
 // list, never at package level.
-func ContainerImageTags(deps Deps) *versions.Collector {
+func ContainerImageTags() *versions.Collector {
 	return &versions.Collector{
-		Name:  "tags",
-		Label: "Image tags",
+		Name: "tags",
 
 		FromUser: P.Image.Tags,
 
@@ -31,13 +33,39 @@ func ContainerImageTags(deps Deps) *versions.Collector {
 		Sanitize:  P.Image.TagsSanitize,
 
 		Format: func(tag string) string {
-			if deps.Registry.Uri == "" {
+			if login.P.Uri == "" {
 				return fmt.Sprintf("%s:%s", P.Image.Name, tag)
 			}
 
-			return fmt.Sprintf("%s/%s:%s", deps.Registry.Uri, P.Image.Name, tag)
+			return fmt.Sprintf("%s/%s:%s", login.P.Uri, P.Image.Name, tag)
 		},
 	}
+}
+
+// The manifest write hangs off the parent rather than the sequence around it, so
+// it only ever sees a tag list every source has already been collected into.
+func ContainerImageTagsParent(tl *TaskList) *Task {
+	collector := ContainerImageTags()
+
+	return tl.CreateTask("tags").
+		SetJobWrapper(func(job Job, t *Task) Job {
+			return JobSequence(
+				JobParallel(
+					collector.UserTask(tl, &C.Tags).Job(),
+					collector.FileTask(tl, &C.Tags).Job(),
+				),
+				collector.LatestTask(tl, &C.Tags).Job(),
+				job,
+				ContainerManifestFileWrite(tl, collector).Job(),
+			)
+		}).
+		Set(func(t *Task) error {
+			C.Tags = slices.Compact(C.Tags)
+
+			t.Log.Infof("Image tags: %s", strings.Join(C.Tags, ", "))
+
+			return nil
+		})
 }
 
 func ContainerManifestFileWrite(tl *TaskList, collector *versions.Collector) *Task {

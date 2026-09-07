@@ -12,15 +12,19 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
+	"gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
 var _ = Describe("Environment file", func() {
 	// The flags are not registered with the spec command, since the pipe is seeded
 	// directly and a package level flag only reads its environment on first parse.
-	run := func(pipe Pipe, deps Deps) error {
+	// The task reads the selection of the pipe around it off its package level
+	// instance, so a spec seeds that the same way it seeds its own.
+	run := func(pipe Pipe, selected environment.Ctx) error {
 		GinkgoHelper()
 
 		*P = pipe
+		*setup.EnvironmentCtx = selected
 
 		return fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
 			AppName:     "select-env",
@@ -32,7 +36,7 @@ var _ = Describe("Environment file", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(WriteEnvironmentFile(tl, deps).Job())
+							return plumber.JobSequence(WriteEnvironmentFile(tl).Job())
 						})
 				},
 			},
@@ -48,10 +52,10 @@ var _ = Describe("Environment file", func() {
 	It("writes the variables of the selected environment as a dotenv file", func() {
 		Expect(run(
 			Pipe{Environment: Environment{File: file}},
-			Deps{Environment: &environment.Ctx{
+			environment.Ctx{
 				Environment: "production",
 				EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-			}},
+			},
 		)).To(Succeed())
 
 		Expect(os.ReadFile(file)).To(BeEquivalentTo("API_URL=\"https://api.example.com\"\n"))
@@ -62,7 +66,7 @@ var _ = Describe("Environment file", func() {
 	It("writes the file even when the selection carries no variables", func() {
 		Expect(run(
 			Pipe{Environment: Environment{File: file}},
-			Deps{Environment: &environment.Ctx{}},
+			environment.Ctx{},
 		)).To(Succeed())
 
 		Expect(os.ReadFile(file)).To(BeEquivalentTo("\n"))

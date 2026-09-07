@@ -2,8 +2,6 @@ package state
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
-	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
 type (
@@ -34,21 +32,13 @@ type (
 		Credentials
 		GitlabHttpState
 	}
-
-	// Deps is the environment the state configuration is written into, plus the CI
-	// coordinates the default GitLab state address is built out of when none was
-	// configured.
-	Deps struct {
-		Tool *tool.Ctx
-		CI   *setup.CiVariables
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -56,7 +46,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GenerateTerraformEnvVarsState(tl, deps).Job(),
+				GenerateTerraformEnvVarsState(tl).Job(),
 			)
 		})
 }

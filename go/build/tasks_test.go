@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
@@ -23,7 +24,9 @@ var _ = Describe("Go build", func() {
 		tests.WithoutEnvironment("CGO_ENABLED")
 
 		*P = pipe
-		deps := Deps{Tool: &tool.Ctx{Cwd: "projects/api", Env: map[string]string{}}}
+		// The task reads the tool the setup resolved off its package level
+		// instance, so a spec seeds that the same way it seeds its own.
+		*setup.C = setup.Ctx{Ctx: &tool.Ctx{Cwd: "projects/api", Env: map[string]string{}}}
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
@@ -35,7 +38,7 @@ var _ = Describe("Go build", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(GoBuild(tl, deps).Job())
+							return plumber.JobSequence(GoBuild(tl).Job())
 						})
 				},
 			},

@@ -2,7 +2,6 @@ package publish
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/helm/setup"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
@@ -27,12 +26,6 @@ type (
 	Ctx struct {
 		Versions []string
 	}
-
-	// Deps is what the setup step resolved: the directory the chart is packaged in
-	// and the chart itself, whose name every archive is written and pushed under.
-	Deps struct {
-		Tool *setup.Ctx
-	}
 )
 
 var TL = TaskList{}
@@ -40,7 +33,7 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -48,9 +41,9 @@ func New(p *Plumber, deps Deps) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmChartVersions(deps).Tasks(tl, &C.Versions).Job(),
-				HelmPackage(tl, deps).Job(),
-				HelmPublish(tl, deps).Job(),
+				HelmChartVersionsParent(tl).Job(),
+				HelmPackage(tl).Job(),
+				HelmPublish(tl).Job(),
 			)
 		})
 }

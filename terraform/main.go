@@ -7,7 +7,6 @@ import (
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/terraform/apply"
 	"gitlab.kilic.dev/devops/pipes/terraform/install"
 	"gitlab.kilic.dev/devops/pipes/terraform/lint"
@@ -18,28 +17,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
-// options are the services the pipe reaches outside the machine for. A zero
-// value is the production wiring, so only a spec ever fills one in.
-type options struct {
-	Notes    gitlab.NotesFactory
-	Registry func(apiUrl, projectId, token string) gitlab.ModuleRegistry
-}
-
-func (o options) defaults() options {
-	if o.Notes == nil {
-		o.Notes = gitlab.NewNotes
-	}
-
-	if o.Registry == nil {
-		o.Registry = gitlab.NewModuleRegistry
-	}
-
-	return o
-}
-
-func newCommand(p *plumber.Plumber, opts options) *cli.Command {
-	opts = opts.defaults()
-
+func newCommand(p *plumber.Plumber) *cli.Command {
 	return &cli.Command{
 		Name:        CLI_NAME,
 		Version:     VERSION,
@@ -53,9 +31,9 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						login.New(p, login.Deps{Tool: setup.C}),
-						state.New(p, state.Deps{Tool: setup.C, CI: &setup.P.CiVariables}),
-						install.New(p, install.Deps{Tool: setup.C}),
+						login.New(p),
+						state.New(p),
+						install.New(p),
 					))
 				},
 			},
@@ -66,7 +44,7 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						lint.New(p, lint.Deps{Tool: setup.C}),
+						lint.New(p),
 					))
 				},
 			},
@@ -77,9 +55,9 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						login.New(p, login.Deps{Tool: setup.C}),
-						state.New(p, state.Deps{Tool: setup.C, CI: &setup.P.CiVariables}),
-						plan.New(p, plan.Deps{Tool: setup.C, State: state.P, Notes: opts.Notes}),
+						login.New(p),
+						state.New(p),
+						plan.New(p),
 					))
 				},
 			},
@@ -90,9 +68,9 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						login.New(p, login.Deps{Tool: setup.C}),
-						state.New(p, state.Deps{Tool: setup.C, CI: &setup.P.CiVariables}),
-						apply.New(p, apply.Deps{Tool: setup.C}),
+						login.New(p),
+						state.New(p),
+						apply.New(p),
 					))
 				},
 			},
@@ -102,7 +80,7 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 				Flags:       plumber.CombineFlags(publish.Flags),
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
-						publish.New(p, publish.Deps{Registry: opts.Registry}),
+						publish.New(p),
 					))
 				},
 			},
@@ -111,9 +89,7 @@ func newCommand(p *plumber.Plumber, opts options) *cli.Command {
 }
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
-		return newCommand(p, options{})
-	}).
+	plumber.NewPlumber(newCommand).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

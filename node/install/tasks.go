@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func InstallNodeDependencies(tl *TaskList, deps Deps) *Task {
+func InstallNodeDependencies(tl *TaskList) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
-			packageManager := deps.Node.PackageManager
+			packageManager := setup.NodeCtx.PackageManager
 
 			t.CreateCommand(
 				packageManager.Exe,
@@ -40,7 +41,7 @@ func InstallNodeDependencies(tl *TaskList, deps Deps) *Task {
 					c.SetDir(P.Install.Cwd)
 
 					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(deps.Environment.EnvVars)
+						AppendEnvironment(setup.EnvironmentCtx.EnvVars)
 
 					return nil
 				}).

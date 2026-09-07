@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"gitlab.kilic.dev/devops/pipes/internal/registry"
+	"gitlab.kilic.dev/devops/pipes/buildah/login"
 )
 
 var _ = Describe("Container image tags", func() {
@@ -12,8 +12,9 @@ var _ = Describe("Container image tags", func() {
 		GinkgoHelper()
 
 		P.Image.Name = name
+		login.P.Uri = uri
 
-		return ContainerImageTags(Deps{Registry: &registry.Credentials{Uri: uri}}).Format(tag)
+		return ContainerImageTags().Format(tag)
 	}
 
 	It("prefixes the image with the registry the login step authenticated against", func() {

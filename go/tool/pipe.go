@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	itool "gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 type (
@@ -14,19 +13,13 @@ type (
 		Args    string
 		Command []string
 	}
-
-	// Deps is the resolved go tool: the directory the tool runs in and the
-	// environment the cache setup has written into.
-	Deps struct {
-		Tool *itool.Ctx
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -43,7 +36,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoTool(tl, deps).Job(),
+				GoTool(tl).Job(),
 			)
 		})
 }

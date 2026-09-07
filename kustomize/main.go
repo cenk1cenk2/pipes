@@ -25,7 +25,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						build.New(p, build.Deps{Tool: setup.C}),
+						build.New(p),
 					))
 				},
 			},

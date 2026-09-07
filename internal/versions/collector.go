@@ -5,7 +5,6 @@ import (
 	"path"
 	"regexp"
 	"slices"
-	"strings"
 
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/sirupsen/logrus"
@@ -16,12 +15,13 @@ import (
 // Collector gathers the tags or the versions a pipe publishes under. Every source
 // is optional: a pipe leaves the fields of a source it does not have at their zero
 // value and the task for that source disables itself.
+//
+// The sources are composed by the pipe rather than by the collector, since the
+// parent task that reports the result is also where the pipe hangs whatever else
+// has to run once the values are in.
 type Collector struct {
-	// Name prefixes every task the collector creates and Label opens the line the
-	// result is logged on, since a pipe publishing images and one publishing charts
-	// read very differently in a job log.
-	Name  string
-	Label string
+	// Name prefixes every task the collector creates.
+	Name string
 
 	FromUser []string
 
@@ -45,31 +45,8 @@ type Collector struct {
 	Format func(string) string
 }
 
-// Tasks builds the collection task tree and appends what it gathers to out. The
-// returned task is the parent, which reports the result once its children are
-// done, so a pipe sequences it ahead of whatever consumes out.
-func (c *Collector) Tasks(tl *plumber.TaskList, out *[]string) *plumber.Task {
-	return tl.CreateTask(c.Name).
-		SetJobWrapper(func(job plumber.Job, t *plumber.Task) plumber.Job {
-			return plumber.JobSequence(
-				plumber.JobParallel(
-					c.fromUser(tl, out).Job(),
-					c.fromFile(tl, out).Job(),
-				),
-				c.fromLatest(tl, out).Job(),
-				job,
-			)
-		}).
-		Set(func(t *plumber.Task) error {
-			*out = slices.Compact(*out)
-
-			t.Log.Infof("%s: %s", c.Label, strings.Join(*out, ", "))
-
-			return nil
-		})
-}
-
-func (c *Collector) fromUser(tl *plumber.TaskList, out *[]string) *plumber.Task {
+// UserTask collects what the pipeline named on the command line.
+func (c *Collector) UserTask(tl *plumber.TaskList, out *[]string) *plumber.Task {
 	return tl.CreateTask(c.Name, "user").
 		ShouldDisable(func(_ *plumber.Task) bool {
 			return len(c.FromUser) == 0
@@ -85,7 +62,9 @@ func (c *Collector) fromUser(tl *plumber.TaskList, out *[]string) *plumber.Task 
 		})
 }
 
-func (c *Collector) fromFile(tl *plumber.TaskList, out *[]string) *plumber.Task {
+// FileTask collects what the file the pipeline pointed at names, which is how a
+// job passes values to the one after it.
+func (c *Collector) FileTask(tl *plumber.TaskList, out *[]string) *plumber.Task {
 	return tl.CreateTask(c.Name, "file").
 		ShouldDisable(func(_ *plumber.Task) bool {
 			return c.File == ""
@@ -112,7 +91,9 @@ func (c *Collector) fromFile(tl *plumber.TaskList, out *[]string) *plumber.Task 
 		})
 }
 
-func (c *Collector) fromLatest(tl *plumber.TaskList, out *[]string) *plumber.Task {
+// LatestTask adds the latest value when a source control reference matches, and
+// leaves itself out for a pipe that has no notion of one.
+func (c *Collector) LatestTask(tl *plumber.TaskList, out *[]string) *plumber.Task {
 	return tl.CreateTask(c.Name, "latest").
 		ShouldDisable(func(_ *plumber.Task) bool {
 			return c.LatestWhen == nil

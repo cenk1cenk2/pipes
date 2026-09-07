@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoBuild(tl *TaskList, deps Deps) *Task {
+func GoBuild(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		Set(func(t *Task) error {
 			if len(P.BuildTargets) == 0 {
@@ -41,9 +42,9 @@ func GoBuild(tl *TaskList, deps Deps) *Task {
 							"-mod=vendor",
 							"-v",
 						).
-							SetDir(deps.Tool.Cwd).
+							SetDir(setup.C.Cwd).
 							Set(func(c *Command) error {
-								t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, deps.Tool.Cwd, target.Os, target.Arch)
+								t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, setup.C.Cwd, target.Os, target.Arch)
 
 								if !P.EnableCGO {
 									c.AppendEnvironment(map[string]string{
@@ -79,7 +80,7 @@ func GoBuild(tl *TaskList, deps Deps) *Task {
 
 								return nil
 							}).
-							AppendEnvironment(deps.Tool.Env).
+							AppendEnvironment(setup.C.Env).
 							AddSelfToTheTask()
 
 						return nil

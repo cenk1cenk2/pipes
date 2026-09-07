@@ -2,9 +2,7 @@ package build
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
-	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
 
 type (
@@ -20,20 +18,13 @@ type (
 		Git
 		Build
 	}
-
-	// Deps is the package manager the script is run through and the environment
-	// it is templated against and handed to the process.
-	Deps struct {
-		Node        *node.Ctx
-		Environment *environment.Ctx
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -41,7 +32,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				BuildNodeApplication(tl, deps).Job(),
+				BuildNodeApplication(tl).Job(),
 			)
 		})
 }

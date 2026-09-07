@@ -13,12 +13,12 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
-func deps(cwd, name string) Deps {
-	return Deps{
-		Tool: &setup.Ctx{
-			Ctx:   &tool.Ctx{Cwd: cwd, Env: map[string]string{}},
-			Chart: &helmv2.Chart{Metadata: &helmv2.Metadata{Name: name}},
-		},
+// The tasks read the chart the setup resolved off its package level instance, so
+// a spec seeds that the same way it seeds its own.
+func seed(cwd, name string) {
+	*setup.C = setup.Ctx{
+		Ctx:   &tool.Ctx{Cwd: cwd, Env: map[string]string{}},
+		Chart: &helmv2.Chart{Metadata: &helmv2.Metadata{Name: name}},
 	}
 }
 
@@ -31,11 +31,11 @@ func run(
 	runner *tests.TestingCommandRunner,
 	pipe Pipe,
 	versions []string,
-	task func(*plumber.TaskList, Deps) *plumber.Task,
+	task func(*plumber.TaskList) *plumber.Task,
 ) error {
 	GinkgoHelper()
 
-	deps := deps("charts/app", "app")
+	seed("charts/app", "app")
 	*P = pipe
 	C.Versions = versions
 
@@ -49,7 +49,7 @@ func run(
 				return tl.New(p).
 					SetRuntimeDepth(3).
 					Set(func(tl *plumber.TaskList) plumber.Job {
-						return plumber.JobSequence(task(tl, deps).Job())
+						return plumber.JobSequence(task(tl).Job())
 					})
 			},
 		},

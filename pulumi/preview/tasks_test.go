@@ -9,24 +9,28 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
+	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
 
-func deps(name, cwd string) Deps {
-	return Deps{
-		Tool:  &tool.Ctx{Cwd: cwd, Env: map[string]string{}},
-		Stack: &stack.Pipe{Stack: name},
-	}
+// The tasks read the setup and the stack of the pipe around them off their
+// package level instances, so a spec seeds those the same way it seeds its own.
+func seed(name, cwd string) {
+	*setup.C = tool.Ctx{Cwd: cwd, Env: map[string]string{}}
+	*stack.P = stack.Pipe{Stack: name}
 }
 
 var _ = Describe("Pulumi report discriminators", func() {
 	It("carries the stack on its own from the working directory", func() {
-		Expect(pulumiReportDiscriminators(deps("main", "."))).To(Equal([]string{"main"}))
+		seed("main", ".")
+
+		Expect(pulumiReportDiscriminators()).To(Equal([]string{"main"}))
 	})
 
 	It("carries a project directory alongside the stack", func() {
-		Expect(pulumiReportDiscriminators(deps("main", "projects/warehouse"))).
-			To(Equal([]string{"main", "projects/warehouse"}))
+		seed("main", "projects/warehouse")
+
+		Expect(pulumiReportDiscriminators()).To(Equal([]string{"main", "projects/warehouse"}))
 	})
 })
 
@@ -36,7 +40,7 @@ var _ = Describe("Pulumi preview", func() {
 	run := func(runner *tests.TestingCommandRunner, environment map[string]string) error {
 		GinkgoHelper()
 
-		deps := deps("main", "projects/warehouse")
+		seed("main", "projects/warehouse")
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-pulumi",
@@ -54,7 +58,7 @@ var _ = Describe("Pulumi preview", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(PulumiPlan(tl, deps).Job())
+							return plumber.JobSequence(PulumiPlan(tl).Job())
 						})
 				},
 			},

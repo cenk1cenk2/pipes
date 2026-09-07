@@ -28,7 +28,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						install.New(p, install.Deps{Tool: setup.C}),
+						install.New(p),
 					))
 				},
 			},
@@ -39,7 +39,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						build.New(p, build.Deps{Tool: setup.C.Ctx}),
+						build.New(p),
 					))
 				},
 			},
@@ -50,7 +50,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						lint.New(p, lint.Deps{Tool: setup.C}),
+						lint.New(p),
 					))
 				},
 			},
@@ -62,7 +62,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 				Action: func(_ context.Context, _ *cli.Command) error {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
-						gotool.New(p, gotool.Deps{Tool: setup.C.Ctx}),
+						gotool.New(p),
 					))
 				},
 			},

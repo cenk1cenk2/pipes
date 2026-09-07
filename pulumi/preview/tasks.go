@@ -6,32 +6,35 @@ import (
 	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/iac"
+	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
+	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
 )
 
 // Only the values that actually vary between concurrent preview jobs on one merge
 // request belong in the marker, since anything else changes the identifier for every
 // consumer without disambiguating anything.
-func pulumiReportDiscriminators(deps Deps) []string {
-	discriminators := []string{deps.Stack.Stack}
+func pulumiReportDiscriminators() []string {
+	discriminators := []string{stack.P.Stack}
 
-	if cwd := deps.Tool.Cwd; cwd != "" && cwd != "." {
+	if cwd := setup.C.Cwd; cwd != "" && cwd != "." {
 		discriminators = append(discriminators, cwd)
 	}
 
 	return discriminators
 }
 
-func PulumiReportSource(deps Deps) iac.Source {
+func PulumiReportSource() iac.Source {
 	metadata := P.ReportMetadata
-	metadata.Target = deps.Stack.Stack
-	metadata.Cwd = deps.Tool.Cwd
+	metadata.Target = stack.P.Stack
+	metadata.Cwd = setup.C.Cwd
 
 	return iac.Source{
 		Read: func(_ *Task) (iac.Report, error) {
 			planPath := P.Plan
 			if !filepath.IsAbs(planPath) {
-				planPath = filepath.Join(deps.Tool.Cwd, planPath)
+				planPath = filepath.Join(setup.C.Cwd, planPath)
 			}
 
 			data, err := os.ReadFile(planPath)
@@ -43,15 +46,15 @@ func PulumiReportSource(deps Deps) iac.Source {
 		},
 		Summary:        iac.Summarize,
 		SummaryOutput:  P.Summary.Output,
-		Cwd:            deps.Tool.Cwd,
+		Cwd:            setup.C.Cwd,
 		MergeRequest:   P.MergeRequestReport,
-		Notes:          deps.Notes,
-		Discriminators: func() []string { return pulumiReportDiscriminators(deps) },
+		Notes:          gitlab.NewNotes,
+		Discriminators: pulumiReportDiscriminators,
 		Metadata:       metadata,
 	}
 }
 
-func PulumiPlan(tl *TaskList, deps Deps) *Task {
+func PulumiPlan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -62,7 +65,7 @@ func PulumiPlan(tl *TaskList, deps Deps) *Task {
 				"--save-plan",
 				P.Plan,
 			).
-				SetDir(deps.Tool.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

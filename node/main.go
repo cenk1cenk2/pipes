@@ -52,7 +52,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewLogin(p),
-						install.New(p, install.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
+						install.New(p),
 					))
 				},
 			},
@@ -64,7 +64,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewEnvironment(p),
-						build.New(p, build.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
+						build.New(p),
 					))
 				},
 			},
@@ -77,7 +77,7 @@ func newCommand(p *plumber.Plumber) *cli.Command {
 					return p.RunJobs(plumber.CombineTaskLists(
 						setup.New(p),
 						setup.NewEnvironment(p),
-						run.New(p, run.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
+						run.New(p),
 					))
 				},
 			},

@@ -2,19 +2,20 @@ package lint
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformLint(tl *TaskList, deps Deps) *Task {
+func TerraformLint(tl *TaskList) *Task {
 	return tl.CreateTask().
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
-				TerraformFmtCheck(t.TL, deps).Job(),
-				TerraformValidate(t.TL, deps).Job(),
+				TerraformFmtCheck(t.TL).Job(),
+				TerraformValidate(t.TL).Job(),
 			)
 		})
 }
 
-func TerraformFmtCheck(tl *TaskList, deps Deps) *Task {
+func TerraformFmtCheck(tl *TaskList) *Task {
 	return tl.CreateTask("fmt", "check").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -31,8 +32,8 @@ func TerraformFmtCheck(tl *TaskList, deps Deps) *Task {
 
 					return nil
 				}).
-				SetDir(deps.Tool.Cwd).
-				AppendEnvironment(deps.Tool.Env).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil
@@ -42,7 +43,7 @@ func TerraformFmtCheck(tl *TaskList, deps Deps) *Task {
 		})
 }
 
-func TerraformValidate(tl *TaskList, deps Deps) *Task {
+func TerraformValidate(tl *TaskList) *Task {
 	return tl.CreateTask("validate").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -56,8 +57,8 @@ func TerraformValidate(tl *TaskList, deps Deps) *Task {
 
 					return nil
 				}).
-				SetDir(deps.Tool.Cwd).
-				AppendEnvironment(deps.Tool.Env).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil

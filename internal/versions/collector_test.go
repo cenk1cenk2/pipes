@@ -139,7 +139,9 @@ var _ = Describe("Process", func() {
 	})
 })
 
-var _ = Describe("Tasks", func() {
+// A pipe composes the sources under a parent task of its own, which is where it
+// compacts and reports what they collected; these specs stand in for that parent.
+var _ = Describe("Sources", func() {
 	var (
 		p   *plumber.Plumber
 		tl  *plumber.TaskList
@@ -160,7 +162,14 @@ var _ = Describe("Tasks", func() {
 
 	collect := func(collector *versions.Collector) []string {
 		out := []string{}
-		Expect(p.RunJobs(collector.Tasks(tl, &out).Job())).To(Succeed())
+
+		Expect(p.RunJobs(plumber.JobSequence(
+			plumber.JobParallel(
+				collector.UserTask(tl, &out).Job(),
+				collector.FileTask(tl, &out).Job(),
+			),
+			collector.LatestTask(tl, &out).Job(),
+		))).To(Succeed())
 
 		return out
 	}
@@ -168,7 +177,6 @@ var _ = Describe("Tasks", func() {
 	It("collects what the user gave, in order, without the duplicates", func() {
 		out := collect(&versions.Collector{
 			Name:     "tags",
-			Label:    "Image tags",
 			FromUser: []string{"v1.2.3", "v1.2.3", "main"},
 			Sanitize: defaultSanitize,
 		})

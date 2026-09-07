@@ -2,7 +2,6 @@ package install
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
 type (
@@ -10,20 +9,13 @@ type (
 		Verify bool
 		Args   string
 	}
-
-	// Deps is the resolved go tool: the directory the modules are vendored in,
-	// whether they are a workspace and the environment the cache setup has
-	// written into.
-	Deps struct {
-		Tool *setup.Ctx
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -31,8 +23,8 @@ func New(p *Plumber, deps Deps) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoModVendor(tl, deps).Job(),
-				GoModVerify(tl, deps).Job(),
+				GoModVendor(tl).Job(),
+				GoModVerify(tl).Job(),
 			)
 		})
 }

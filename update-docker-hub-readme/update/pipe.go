@@ -26,16 +26,12 @@ type (
 		Readme
 	}
 
+	// Hub is dialled only once the flags carrying its address have been parsed,
+	// which is why the connection lives in the context rather than the pipe.
 	Ctx struct {
 		Token  string
 		Readme map[string]ParsedReadme
 		Hub    hub.Client
-	}
-
-	// Deps dials the service only once the flags carrying its address have been
-	// parsed, so the pipe carries the way to reach one rather than a connection.
-	Deps struct {
-		Hub hub.ClientFactory
 	}
 )
 
@@ -44,7 +40,7 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -64,7 +60,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 			}
 
 			C.Readme = make(map[string]ParsedReadme)
-			C.Hub = deps.Hub(P.DockerHub.Address, p.Cli.Name)
+			C.Hub = hub.NewClient(P.DockerHub.Address, p.Cli.Name)
 
 			return nil
 		}).

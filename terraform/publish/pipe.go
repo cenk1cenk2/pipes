@@ -34,12 +34,6 @@ type (
 		Packages []PublishablePackage
 		Registry gitlab.ModuleRegistry
 	}
-
-	// Deps dials the registry only once the flags have been parsed, so the pipe
-	// carries the way to reach one rather than a connection to it.
-	Deps struct {
-		Registry func(apiUrl, projectId, token string) gitlab.ModuleRegistry
-	}
 )
 
 var TL = TaskList{}
@@ -47,7 +41,7 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
-func New(p *Plumber, deps Deps) *TaskList {
+func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
@@ -59,7 +53,7 @@ func New(p *Plumber, deps Deps) *TaskList {
 				return err
 			}
 
-			C.Registry = deps.Registry(
+			C.Registry = gitlab.NewModuleRegistry(
 				P.Registry.Gitlab.ApiUrl,
 				P.Registry.Gitlab.ProjectId,
 				P.Registry.Gitlab.Token,
