@@ -21,11 +21,19 @@ type (
 		Os   string `json:"os,omitempty"   yaml:"os,omitempty"`
 		Arch string `json:"arch,omitempty" yaml:"arch,omitempty"`
 	}
+
+	// Ctx holds the directories a binary is actually built out of. A workspace
+	// carries library modules next to the commands, and those have nothing to
+	// build.
+	Ctx struct {
+		Packages []string
+	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
+var C = &Ctx{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
@@ -35,6 +43,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
+				GoBuildPackages(tl).Job(),
 				GoBuild(tl).Job(),
 			)
 		})

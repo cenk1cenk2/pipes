@@ -1,6 +1,9 @@
 package build
 
 import (
+	"fmt"
+	"strings"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,8 +27,10 @@ var _ = Describe("Go build", func() {
 
 		*P = pipe
 		// The task reads the tool the setup resolved off its package level
-		// instance, so a spec seeds that the same way it seeds its own.
+		// instances, so a spec seeds those the same way it seeds its own.
+		*setup.P = setup.Pipe{}
 		*setup.C = setup.Ctx{Cwd: "projects/api", Env: map[string]string{}}
+		*C = Ctx{}
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
@@ -38,6 +43,42 @@ var _ = Describe("Go build", func() {
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
 							return JobSequence(GoBuild(tl).Job())
+						})
+				},
+			},
+		}).Run()
+	}
+
+	commands := func(dirs ...string) tests.TestingCommandResponse {
+		return tests.TestingCommandResponse{Name: "go", Stdout: strings.Join(dirs, "\n") + "\n"}
+	}
+
+	runWorkspace := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool, modules ...string) error {
+		GinkgoHelper()
+
+		tests.WithoutEnvironment("CGO_ENABLED")
+
+		*P = pipe
+		*setup.P = setup.Pipe{Workspace: workspace}
+		*setup.C = setup.Ctx{
+			Cwd:       "projects/api",
+			Env:       map[string]string{},
+			Workspace: true,
+			Modules:   modules,
+		}
+		*C = Ctx{}
+
+		return fixtures.Cli(runner, tests.TaskListCli{
+			AppName:     "pipe-go",
+			CommandName: "build",
+			TaskLists: []tests.TaskListFactory{
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
+
+					return tl.New(p).
+						SetRuntimeDepth(3).
+						Set(func(tl *TaskList) Job {
+							return JobSequence(GoBuildPackages(tl).Job(), GoBuild(tl).Job())
 						})
 				},
 			},
@@ -128,5 +169,88 @@ var _ = Describe("Go build", func() {
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
 		Expect(invocation.Args).To(ContainElements("-tags", "netgo,osusergo"))
+	})
+
+	// The workspace build follows the flag rather than what the setup resolved:
+	// the probe behind setup.C.Workspace is on for any invocation that merely sits
+	// inside a workspace, and a child pipeline building one module must not start
+	// building all of them.
+	builds := func(runner *tests.TestingCommandRunner) []CommandInvocation {
+		found := []CommandInvocation{}
+		for _, invocation := range runner.Invocations() {
+			if len(invocation.Args) > 0 && invocation.Args[0] == "build" {
+				found = append(found, invocation)
+			}
+		}
+
+		return found
+	}
+
+	It("builds every command of the workspace when the flag asked for it", func() {
+		runner := fixtures.Runner(
+			commands("/repository/_template"),
+			commands("/repository/api"),
+		)
+
+		Expect(runWorkspace(runner, pipe(), true, "/repository/_template", "/repository/api")).To(Succeed())
+
+		dirs := []string{}
+		for _, invocation := range builds(runner) {
+			dirs = append(dirs, invocation.Dir)
+			Expect(invocation.Args).
+				To(Equal([]string{"build", "-mod=vendor", "-v", "-ldflags=", "-o", "dist/bin-linux-amd64"}))
+		}
+
+		Expect(dirs).To(ConsistOf("/repository/_template", "/repository/api"))
+	})
+
+	// A workspace carries library modules next to the commands, and asking the go
+	// tool what each module holds is what keeps those out of the build.
+	It("leaves out a module that holds no command", func() {
+		runner := fixtures.Runner(
+			commands(""),
+			commands("/repository/api"),
+		)
+
+		Expect(runWorkspace(runner, pipe(), true, "/repository/internal", "/repository/api")).To(Succeed())
+
+		Expect(builds(runner)).To(HaveLen(1))
+		Expect(builds(runner)[0].Dir).To(Equal("/repository/api"))
+	})
+
+	It("builds only the working directory when the workspace was merely detected", func() {
+		runner := fixtures.Runner()
+
+		Expect(runWorkspace(runner, pipe(), false, "/repository/_template", "/repository/api")).To(Succeed())
+
+		Expect(runner.Invocations()).To(HaveLen(1))
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Dir).To(Equal("projects/api"))
+	})
+
+	It("builds every command for every target it was asked for", func() {
+		runner := fixtures.Runner(
+			commands("/repository/api"),
+			commands("/repository/worker"),
+		)
+
+		p := pipe()
+		p.BuildTargets = []GoBuildTarget{{Os: "linux", Arch: "amd64"}, {Os: "darwin", Arch: "arm64"}}
+
+		Expect(runWorkspace(runner, p, true, "/repository/api", "/repository/worker")).To(Succeed())
+
+		built := []string{}
+		for _, invocation := range builds(runner) {
+			built = append(built, fmt.Sprintf("%s %s", invocation.Dir, invocation.Args[len(invocation.Args)-1]))
+		}
+
+		Expect(built).To(ConsistOf(
+			"/repository/api dist/bin-linux-amd64",
+			"/repository/api dist/bin-darwin-arm64",
+			"/repository/worker dist/bin-linux-amd64",
+			"/repository/worker dist/bin-darwin-arm64",
+		))
 	})
 })
