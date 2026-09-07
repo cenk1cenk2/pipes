@@ -1,10 +1,8 @@
 package build
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v3"
-	"go.yaml.in/yaml/v4"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -88,28 +86,16 @@ var Flags = []cli.Flag{
 		Destination: &P.EnableCGO,
 	},
 
-	&cli.StringFlag{
+	flags.YAMLFlag(&cli.StringFlag{
 		Category: CATEGORY_BUILD,
 		Name:     "go.build.targets",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_TARGETS"),
 		),
-		Usage:            "Build targets for the build process. format(yaml([]struct{ os: string?, arch: string? }))",
-		Required:         false,
-		Value:            `[]`,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
-
-			if err := yaml.Unmarshal([]byte(v), &P.BuildTargets); err != nil {
-				return fmt.Errorf("Cannot unmarshal build targets: %w", err)
-			}
-
-			return nil
-		},
-	},
+		Usage:    "Build targets for the build process. format(yaml([]struct{ os: string?, arch: string? }))",
+		Required: false,
+		Value:    `[]`,
+	}, &P.BuildTargets),
 
 	&cli.StringSliceFlag{
 		Category: CATEGORY_BUILD,
@@ -123,26 +109,14 @@ var Flags = []cli.Flag{
 		Destination: &P.BuildTags,
 	},
 
-	&cli.StringFlag{
+	flags.YAMLFlag(&cli.StringFlag{
 		Category: CATEGORY_BUILD,
 		Name:     "go.build.variables",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_VARIABLES"),
 		),
-		Usage:            "Build variables for the build process. format(yaml(map[string]string))",
-		Required:         false,
-		Value:            `{}`,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
-
-			if err := yaml.Unmarshal([]byte(v), &P.BuildVariables); err != nil {
-				return fmt.Errorf("Cannot unmarshal build variables: %w", err)
-			}
-
-			return nil
-		},
-	},
+		Usage:    "Build variables for the build process. format(yaml(map[string]string))",
+		Required: false,
+		Value:    `{}`,
+	}, &P.BuildVariables),
 }

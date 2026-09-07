@@ -1,10 +1,8 @@
 package manifest
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v3"
-	"go.yaml.in/yaml/v4"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -54,26 +52,14 @@ var Flags = []cli.Flag{
 		Destination: &P.Manifest.Images,
 	},
 
-	&cli.StringFlag{
+	flags.YAMLFlag(&cli.StringFlag{
 		Category: CATEGORY_CONTAINER_MANIFEST,
 		Name:     "buildah.manifest.matrix",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("BUILDAH_MANIFEST_MATRIX"),
 			cli.EnvVar("CONTAINER_MANIFEST_MATRIX"),
 		),
-		Usage:            "Matrix of all the images that should be manifested. format(yaml([]struct { target: string, images: []string }))",
-		Required:         false,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
-
-			if err := yaml.Unmarshal([]byte(v), &P.Manifest.Matrix); err != nil {
-				return fmt.Errorf("Cannot unmarshal container manifest matrix: %w", err)
-			}
-
-			return nil
-		},
-	},
+		Usage:    "Matrix of all the images that should be manifested. format(yaml([]struct { target: string, images: []string }))",
+		Required: false,
+	}, &P.Manifest.Matrix),
 }

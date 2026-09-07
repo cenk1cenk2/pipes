@@ -1,10 +1,8 @@
 package update
 
 import (
-	json "encoding/json/v2"
-	"fmt"
-
 	"github.com/urfave/cli/v3"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
@@ -90,26 +88,14 @@ var Flags = []cli.Flag{
 		Required:    false,
 	},
 
-	&cli.StringFlag{
+	flags.JSONFlag(&cli.StringFlag{
 		Category: CATEGORY_README,
 		Name:     "docker-hub.readme.matrix",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_README_MATRIX"),
 			cli.EnvVar("README_MATRIX"),
 		),
-		Usage:            "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
-		Required:         false,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
-
-			if err := json.Unmarshal([]byte(v), &P.Readme.Matrix, json.RejectUnknownMembers(true)); err != nil {
-				return fmt.Errorf("Can not unmarshal Readme matrix: %w", err)
-			}
-
-			return nil
-		},
-	},
+		Usage:    "Matrix of multiple README files to update. json([]struct { repository: string, file: string, description?: string })",
+		Required: false,
+	}, &P.Readme.Matrix),
 }
