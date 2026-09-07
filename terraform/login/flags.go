@@ -13,9 +13,12 @@ const CATEGORY_LOGIN = "Login"
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:         CATEGORY_LOGIN,
-		Name:             "terraform.login.registry.credentials",
-		Sources:          cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_LOGIN_REGISTRY_CREDENTIALS")),
+		Category: CATEGORY_LOGIN,
+		Name:     "terraform.login.registry.credentials",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TERRAFORM_LOGIN_REGISTRY_CREDENTIALS"),
+			cli.EnvVar("TF_REGISTRY_CREDENTIALS"),
+		),
 		Usage:            "Terraform registry credentials. json([]struct { registry: string, token: string })",
 		Required:         false,
 		ValidateDefaults: false,

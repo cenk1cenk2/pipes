@@ -20,7 +20,10 @@ var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_NODE_COMMAND,
 		Name:     "node.run.script",
-		Sources:  cli.NewValueSourceChain(cli.EnvVar("NODE_RUN_SCRIPT")),
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_RUN_SCRIPT"),
+			cli.EnvVar("NODE_COMMAND_SCRIPT"),
+		),
 		Usage: fmt.Sprintf(
 			"package.json script for given command operation. %s",
 			environment.HELP_FORMAT_TEMPLATE,
@@ -30,9 +33,12 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_NODE_COMMAND,
-		Name:        "node.run.cwd",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("NODE_RUN_CWD")),
+		Category: CATEGORY_NODE_COMMAND,
+		Name:     "node.run.cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_RUN_CWD"),
+			cli.EnvVar("NODE_COMMAND_CWD"),
+		),
 		Usage:       "Working directory for the given command operation.",
 		Required:    false,
 		Value:       ".",

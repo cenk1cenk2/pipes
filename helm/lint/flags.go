@@ -10,10 +10,13 @@ const CATEGORY_HELM_LINT = "Helm Lint"
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_HELM_LINT,
-		Name:        "helm.lint.kubernetes.version",
-		Usage:       "Kubernetes version to use for linting charts.",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_LINT_KUBERNETES_VERSION")),
+		Category: CATEGORY_HELM_LINT,
+		Name:     "helm.lint.kubernetes.version",
+		Usage:    "Kubernetes version to use for linting charts.",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_LINT_KUBERNETES_VERSION"),
+			cli.EnvVar("KUBERNETES_VERSION"),
+		),
 		Required:    false,
 		Value:       "",
 		Destination: &P.Kubernetes.Version,

@@ -47,8 +47,8 @@ Preview the Pulumi changes.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$PULUMI_PREVIEW_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
-| `$PULUMI_PREVIEW_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
+| `$PULUMI_PREVIEW_PLAN`<br />`$PULUMI_PLAN` | Output file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+| `$PULUMI_PREVIEW_SUMMARY_OUTPUT`<br />`$PULUMI_SUMMARY_OUTPUT` | Output file for Pulumi preview summary. Leave empty to skip summary generation. | `string` | `false` | <code>"pulumi-summary.json"</code> |
 
 **Stack**
 
@@ -78,7 +78,7 @@ Apply the Pulumi changes.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$PULUMI_UP_PLAN` | Input file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
+| `$PULUMI_UP_PLAN`<br />`$PULUMI_PLAN` | Input file for pulumi plan. | `string` | `false` | <code>"plan.json"</code> |
 
 **pulumi**
 

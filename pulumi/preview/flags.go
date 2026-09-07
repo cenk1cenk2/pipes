@@ -14,9 +14,12 @@ const CATEGORY_PULUMI_PREVIEW = "Preview"
 var Flags = CombineFlags(
 	[]cli.Flag{
 		&cli.StringFlag{
-			Category:    CATEGORY_PULUMI_PREVIEW,
-			Name:        "pulumi.preview.plan",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("PULUMI_PREVIEW_PLAN")),
+			Category: CATEGORY_PULUMI_PREVIEW,
+			Name:     "pulumi.preview.plan",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("PULUMI_PREVIEW_PLAN"),
+				cli.EnvVar("PULUMI_PLAN"),
+			),
 			Usage:       "Output file for pulumi plan.",
 			Required:    false,
 			Value:       "plan.json",
@@ -24,9 +27,12 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_PULUMI_PREVIEW,
-			Name:        "pulumi.preview.summary.output",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("PULUMI_PREVIEW_SUMMARY_OUTPUT")),
+			Category: CATEGORY_PULUMI_PREVIEW,
+			Name:     "pulumi.preview.summary.output",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("PULUMI_PREVIEW_SUMMARY_OUTPUT"),
+				cli.EnvVar("PULUMI_SUMMARY_OUTPUT"),
+			),
 			Usage:       "Output file for Pulumi preview summary. Leave empty to skip summary generation.",
 			Required:    false,
 			Value:       "pulumi-summary.json",

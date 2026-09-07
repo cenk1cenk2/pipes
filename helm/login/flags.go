@@ -14,9 +14,12 @@ const (
 // registers the same flags rather than its own copy of them.
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_HELM_REGISTRY,
-		Name:        "helm.login.registry.uri",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_LOGIN_REGISTRY_URI")),
+		Category: CATEGORY_HELM_REGISTRY,
+		Name:     "helm.login.registry.uri",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_LOGIN_REGISTRY_URI"),
+			cli.EnvVar("HELM_REGISTRY_URI"),
+		),
 		Usage:       "Helm registry url to login to.",
 		Required:    false,
 		Value:       "docker.io",
@@ -24,18 +27,24 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_HELM_REGISTRY,
-		Name:        "helm.login.registry.username",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_LOGIN_REGISTRY_USERNAME")),
+		Category: CATEGORY_HELM_REGISTRY,
+		Name:     "helm.login.registry.username",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_LOGIN_REGISTRY_USERNAME"),
+			cli.EnvVar("HELM_REGISTRY_USERNAME"),
+		),
 		Usage:       "Helm registry username for the given registry.",
 		Required:    false,
 		Destination: &P.Username,
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_HELM_REGISTRY,
-		Name:        "helm.login.registry.password",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_LOGIN_REGISTRY_PASSWORD")),
+		Category: CATEGORY_HELM_REGISTRY,
+		Name:     "helm.login.registry.password",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_LOGIN_REGISTRY_PASSWORD"),
+			cli.EnvVar("HELM_REGISTRY_PASSWORD"),
+		),
 		Usage:       "Helm registry password for the given registry.",
 		Required:    false,
 		Destination: &P.Password,

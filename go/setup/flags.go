@@ -32,9 +32,12 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category:    CATEGORY_SETUP,
-		Name:        "go.workspace",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("GO_WORKSPACE")),
+		Category: CATEGORY_SETUP,
+		Name:     "go.workspace",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_WORKSPACE"),
+			cli.EnvVar("GO_LINT_WORKSPACE"),
+		),
 		Usage:       "Drive the modules as a Go workspace instead of the single module in the working directory.",
 		Required:    false,
 		Value:       false,

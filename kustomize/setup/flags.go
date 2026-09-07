@@ -12,9 +12,12 @@ const (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_KUSTOMIZE,
-		Name:        "kustomize.cwd",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("KUSTOMIZE_CWD")),
+		Category: CATEGORY_KUSTOMIZE,
+		Name:     "kustomize.cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("KUSTOMIZE_CWD"),
+			cli.EnvVar("KUSTOMIZE_ROOT"),
+		),
 		Usage:       "Working directory for kustomize commands.",
 		Required:    false,
 		Value:       ".",

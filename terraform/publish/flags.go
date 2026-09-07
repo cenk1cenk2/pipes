@@ -24,6 +24,7 @@ var Flags = CombineFlags(
 			Name:     "terraform.publish.module.name",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_NAME"),
+				cli.EnvVar("TF_MODULE_NAME"),
 				cli.EnvVar("CI_PROJECT_NAME"),
 			),
 			Usage:       "Name for the module that will be published.",
@@ -33,9 +34,13 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_MODULE,
-			Name:        "terraform.publish.module.cwd",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PUBLISH_MODULE_CWD")),
+			Category: CATEGORY_MODULE,
+			Name:     "terraform.publish.module.cwd",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_CWD"),
+				cli.EnvVar("TF_MODULE_CWD"),
+				cli.EnvVar("TF_ROOT"),
+			),
 			Usage:       "Directory for the module that will be published.",
 			Required:    false,
 			Value:       ".",
@@ -43,9 +48,12 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_MODULE,
-			Name:        "terraform.publish.module.system",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PUBLISH_MODULE_SYSTEM")),
+			Category: CATEGORY_MODULE,
+			Name:     "terraform.publish.module.system",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_SYSTEM"),
+				cli.EnvVar("TF_MODULE_SYSTEM"),
+			),
 			Usage:       "Module system for the module that will be published.",
 			Required:    false,
 			Value:       "local",
@@ -55,9 +63,12 @@ var Flags = CombineFlags(
 		// CATEGORY_REGISTRY
 
 		&cli.StringFlag{
-			Category:    CATEGORY_REGISTRY,
-			Name:        "terraform.publish.registry.name",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_NAME")),
+			Category: CATEGORY_REGISTRY,
+			Name:     "terraform.publish.registry.name",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_NAME"),
+				cli.EnvVar("TF_MODULE_REGISTRY"),
+			),
 			Usage:       "Registry of the module that will be published.",
 			Required:    false,
 			Value:       TF_REGISTRY_GITLAB,

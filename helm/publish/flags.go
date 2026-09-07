@@ -26,18 +26,24 @@ var Flags = CombineFlags(
 	tagsfile.NewFlags(&P.Chart.VersionFile, "", &P.Chart.VersionFileStrict, false),
 	[]cli.Flag{
 		&cli.StringFlag{
-			Category:    CATEGORY_HELM_CHART,
-			Name:        "helm.publish.chart.target",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_TARGET")),
+			Category: CATEGORY_HELM_CHART,
+			Name:     "helm.publish.chart.target",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("HELM_PUBLISH_CHART_TARGET"),
+				cli.EnvVar("HELM_CHART_TARGET"),
+			),
 			Usage:       "Helm chart repository target to publish to.",
 			Required:    true,
 			Destination: &P.Chart.Target,
 		},
 
 		&cli.StringSliceFlag{
-			Category:    CATEGORY_HELM_CHART,
-			Name:        "helm.publish.chart.versions",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS")),
+			Category: CATEGORY_HELM_CHART,
+			Name:     "helm.publish.chart.versions",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS"),
+				cli.EnvVar("HELM_CHART_VERSIONS"),
+			),
 			Usage:       "Versions for the helm chart to be published.",
 			Required:    false,
 			Destination: &P.Chart.Versions,
@@ -46,7 +52,10 @@ var Flags = CombineFlags(
 		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-template",
-			Sources:  cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE")),
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"),
+				cli.EnvVar("HELM_CHART_VERSIONS_TEMPLATE"),
+			),
 			Usage: strings.TrimSpace(`
     Modifies every version that matches a certain condition.
     Template is interpolated with the given matches in the regular expression.
@@ -60,7 +69,10 @@ var Flags = CombineFlags(
 		flags.YAMLFlag(&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-sanitize",
-			Sources:  cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_SANITIZE")),
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_SANITIZE"),
+				cli.EnvVar("HELM_CHART_SANITIZE_VERSIONS"),
+			),
 			Usage: strings.TrimSpace(`
     Sanitizes the given regex pattern out of version name.
     Template is interpolated with the given matches in the regular expression.
@@ -72,9 +84,12 @@ var Flags = CombineFlags(
 		}, &P.Chart.VersionsSanitize),
 
 		&cli.StringFlag{
-			Category:    CATEGORY_HELM_CHART,
-			Name:        "helm.publish.chart.destination",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_DESTINATION")),
+			Category: CATEGORY_HELM_CHART,
+			Name:     "helm.publish.chart.destination",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("HELM_PUBLISH_CHART_DESTINATION"),
+				cli.EnvVar("HELM_CHART_DESTINATION"),
+			),
 			Usage:       "Destination directory for the packaged helm chart.",
 			Required:    false,
 			Value:       "./dist/",
@@ -82,9 +97,12 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_HELM_CHART,
-			Name:        "helm.publish.chart.app-version",
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("HELM_PUBLISH_CHART_APP_VERSION")),
+			Category: CATEGORY_HELM_CHART,
+			Name:     "helm.publish.chart.app-version",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("HELM_PUBLISH_CHART_APP_VERSION"),
+				cli.EnvVar("HELM_CHART_APP_VERSION"),
+			),
 			Usage:       "Application version for the packaged helm chart.",
 			Required:    false,
 			Value:       "",

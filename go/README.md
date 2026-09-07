@@ -34,7 +34,7 @@ Vendor go modules.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
+| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go build`
 
@@ -50,7 +50,7 @@ Build an application.
 | `$GO_BUILD_OUTPUT` | Output location for the build artifacts. | `string` | `false` | <code>"./dist/"</code> |
 | `$GO_BUILD_BINARY_NAME` | Name of the binary to output during build. | `string` | `false` | <code>"bin"</code> |
 | `$GO_BUILD_BINARY_TEMPLATE` | Binary naming for the build artifact. | `string`<br/>`format(Template(map[string]))` | `false` | <code>"{{ .name }}{{ if .os }}-{{ .os }}{{ end }}{{ if .arch }}-{{ .arch }}{{ end }}"</code> |
-| `$GO_BUILD_LINKER_FLAGS` | Arguments for the linker during the build process. | `string`<br/>`format(Template())` | `false` | <code></code> |
+| `$GO_BUILD_LINKER_FLAGS`<br />`$GO_BUILD_LINKER` | Arguments for the linker during the build process. | `string`<br/>`format(Template())` | `false` | <code></code> |
 | `$GO_BUILD_ENABLE_CGO`<br />`$CGO_ENABLED` | Enable CGO during the build process. | `bool` | `false` | <code>false</code> |
 | `$GO_BUILD_TARGETS` | Build targets for the build process. | `string`<br/>`format(yaml([]struct{ os: string?, arch: string? }))` | `false` | <code>"[]"</code> |
 | `$GO_BUILD_TAGS` | Build tags for the build process. | `string[]` | `false` | <code></code> |
@@ -62,7 +62,7 @@ Build an application.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
+| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go lint`
 
@@ -84,7 +84,7 @@ Run golangci-lint on the project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
+| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go tool`
 
@@ -98,7 +98,7 @@ Run a specified go tool.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
+| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 **Tool**
 

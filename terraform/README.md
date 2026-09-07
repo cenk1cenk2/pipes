@@ -25,50 +25,50 @@ Install terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
+| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
 **Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CI_API_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TERRAFORM_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_API_URL`<br />`$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_PROJECT_ID`<br />`$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
 
 **Install**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_INSTALL_RECONFIGURE` | Reconfigure flag for terraform init. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_INSTALL_USE_LOCKFILE` | Use lockfile for terraform init. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_INSTALL_ARGS` | Additional arguments for terraform init. | `string` | `false` | <code></code> |
+| `$TERRAFORM_INSTALL_RECONFIGURE`<br />`$TF_INSTALL_RECONFIGURE` | Reconfigure flag for terraform init. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_INSTALL_USE_LOCKFILE`<br />`$TF_INSTALL_USE_LOCKFILE` | Use lockfile for terraform init. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_INSTALL_ARGS`<br />`$TF_INSTALL_ARGS` | Additional arguments for terraform init. | `string` | `false` | <code></code> |
 
 **Login**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
+| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS`<br />`$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
 
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
+| `$TERRAFORM_CWD`<br />`$TF_ROOT` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 **State**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_STATE_TYPE` | Terraform state type. | `string`<br/>`enum("gitlab-http")` | `false` | <code></code> |
-| `$TERRAFORM_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
-| `$TERRAFORM_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `string` | `false` | <code>"5"</code> |
+| `$TERRAFORM_STATE_TYPE`<br />`$TF_STATE_TYPE` | Terraform state type. | `string`<br/>`enum("gitlab-http")` | `false` | <code></code> |
+| `$TERRAFORM_STATE_NAME`<br />`$TF_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
+| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `string` | `false` | <code>"5"</code> |
 
 ### `pipe-terraform lint`
 
@@ -80,29 +80,29 @@ Lint terraform project with terraform.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
+| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
 **Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CI_API_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TERRAFORM_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_API_URL`<br />`$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_PROJECT_ID`<br />`$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
 
 **Lint**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LINT_FORMAT_CHECK_ENABLE` | Enable terraform fmt. | `bool` | `false` | <code>true</code> |
-| `$TERRAFORM_LINT_FORMAT_CHECK_ARGS` | Additional arguments for terraform fmt. | `string` | `false` | <code></code> |
-| `$TERRAFORM_LINT_VALIDATE_ENABLE` | Enable terraform validate. | `bool` | `false` | <code>true</code> |
-| `$TERRAFORM_LINT_VALIDATE_ARGS` | Additional arguments for terraform validate. | `string` | `false` | <code></code> |
+| `$TERRAFORM_LINT_FORMAT_CHECK_ENABLE`<br />`$TF_LINT_FMT_CHECK_ENABLE` | Enable terraform fmt. | `bool` | `false` | <code>true</code> |
+| `$TERRAFORM_LINT_FORMAT_CHECK_ARGS`<br />`$TF_LINT_FMT_CHECK_ARGS` | Additional arguments for terraform fmt. | `string` | `false` | <code></code> |
+| `$TERRAFORM_LINT_VALIDATE_ENABLE`<br />`$TF_LINT_VALIDATE_ENABLE` | Enable terraform validate. | `bool` | `false` | <code>true</code> |
+| `$TERRAFORM_LINT_VALIDATE_ARGS`<br />`$TF_LINT_VALIDATE_ARGS` | Additional arguments for terraform validate. | `string` | `false` | <code></code> |
 
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
+| `$TERRAFORM_CWD`<br />`$TF_ROOT` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 ### `pipe-terraform plan`
 
@@ -114,7 +114,7 @@ Plan terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
+| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
 **Gitlab Merge Request Report**
 
@@ -142,48 +142,48 @@ Plan terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CI_API_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TERRAFORM_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_API_URL`<br />`$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_PROJECT_ID`<br />`$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
 
 **Login**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
+| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS`<br />`$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
 
 **Plan**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_PLAN_OUTPUT` | Output file for terraform plan. | `string` | `false` | <code>"plan"</code> |
-| `$TERRAFORM_PLAN_ARGS` | Additional arguments for terraform plan. | `string` | `false` | <code></code> |
-| `$TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS` | Run merge request terraform plans as previews without state locking. | `bool` | `false` | <code>true</code> |
+| `$TERRAFORM_PLAN_OUTPUT`<br />`$TF_PLAN_CACHE`<br />`$TF_APPLY_OUTPUT`<br />`$TF_PLAN_OUTPUT` | Output file for terraform plan. | `string` | `false` | <code>"plan"</code> |
+| `$TERRAFORM_PLAN_ARGS`<br />`$TF_PLAN_ARGS` | Additional arguments for terraform plan. | `string` | `false` | <code></code> |
+| `$TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS`<br />`$TF_PLAN_PREVIEW_FOR_MRS` | Run merge request terraform plans as previews without state locking. | `bool` | `false` | <code>true</code> |
 | `$TERRAFORM_PLAN_PIPELINE_SOURCE`<br />`$CI_PIPELINE_SOURCE` | GitLab CI pipeline source used to detect merge request pipelines. | `string` | `false` | <code></code> |
-| `$TERRAFORM_PLAN_RETRY_TRIES` | Number of retries for terraform plan command. | `uint` | `false` | <code>5</code> |
-| `$TERRAFORM_PLAN_RETRY_DELAY` | Delay between retries for terraform plan command. | `duration` | `false` | <code>1m0s</code> |
-| `$TERRAFORM_PLAN_SUMMARY_OUTPUT` | Output file for terraform plan summary. Leave empty to skip summary generation. | `string` | `false` | <code>"terraform-summary.json"</code> |
+| `$TERRAFORM_PLAN_RETRY_TRIES`<br />`$TF_PLAN_RETRY_TRIES` | Number of retries for terraform plan command. | `uint` | `false` | <code>5</code> |
+| `$TERRAFORM_PLAN_RETRY_DELAY`<br />`$TF_PLAN_RETRY_DELAY` | Delay between retries for terraform plan command. | `duration` | `false` | <code>1m0s</code> |
+| `$TERRAFORM_PLAN_SUMMARY_OUTPUT`<br />`$TERRAFORM_SUMMARY_OUTPUT` | Output file for terraform plan summary. Leave empty to skip summary generation. | `string` | `false` | <code>"terraform-summary.json"</code> |
 
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
+| `$TERRAFORM_CWD`<br />`$TF_ROOT` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 **State**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_STATE_TYPE` | Terraform state type. | `string`<br/>`enum("gitlab-http")` | `false` | <code></code> |
-| `$TERRAFORM_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
-| `$TERRAFORM_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `string` | `false` | <code>"5"</code> |
+| `$TERRAFORM_STATE_TYPE`<br />`$TF_STATE_TYPE` | Terraform state type. | `string`<br/>`enum("gitlab-http")` | `false` | <code></code> |
+| `$TERRAFORM_STATE_NAME`<br />`$TF_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
+| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `string` | `false` | <code>"5"</code> |
 
 ### `pipe-terraform apply`
 
@@ -195,49 +195,49 @@ Apply terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_APPLY_OUTPUT` | Output file for terraform apply. | `string` | `false` | <code>"plan"</code> |
-| `$TERRAFORM_APPLY_ARGS` | Additional arguments for terraform apply. | `string` | `false` | <code></code> |
+| `$TERRAFORM_APPLY_OUTPUT`<br />`$TF_PLAN_CACHE`<br />`$TF_APPLY_OUTPUT`<br />`$TF_PLAN_OUTPUT` | Output file for terraform apply. | `string` | `false` | <code>"plan"</code> |
+| `$TERRAFORM_APPLY_ARGS`<br />`$TF_APPLY_ARGS` | Additional arguments for terraform apply. | `string` | `false` | <code></code> |
 
 **Config**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
+| `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`enum("trace", "debug", "info", "warn", "error")` | `false` | <code></code> |
 
 **Injected Variables**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CI_API_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
-| `$TERRAFORM_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_API_URL`<br />`$TF_VAR_CI_API_V4_URL`<br />`$CI_API_V4_URL` | Injected CI api-url variable to the deployment. | `string` | `false` | <code></code> |
+| `$TERRAFORM_CI_PROJECT_ID`<br />`$TF_VAR_CI_PROJECT_ID`<br />`$CI_PROJECT_ID` | Injected CI project-id variable to the deployment. | `string` | `false` | <code></code> |
 
 **Login**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
+| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS`<br />`$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`json([]struct { registry: string, token: string })` | `false` | <code></code> |
 
 **Project**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_CWD` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
+| `$TERRAFORM_CWD`<br />`$TF_ROOT` | Working directory for terraform commands. | `string` | `false` | <code>"."</code> |
 
 **State**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_STATE_TYPE` | Terraform state type. | `string`<br/>`enum("gitlab-http")` | `false` | <code></code> |
-| `$TERRAFORM_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
-| `$TERRAFORM_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `string` | `false` | <code>"5"</code> |
+| `$TERRAFORM_STATE_TYPE`<br />`$TF_STATE_TYPE` | Terraform state type. | `string`<br/>`enum("gitlab-http")` | `false` | <code></code> |
+| `$TERRAFORM_STATE_NAME`<br />`$TF_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
+| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min | `string` | `false` | <code>"5"</code> |
 
 ### `pipe-terraform publish`
 
@@ -249,15 +249,15 @@ Publish terraform project.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_PUBLISH_MODULE_NAME`<br />`$CI_PROJECT_NAME` | Name for the module that will be published. | `string` | `true` | <code></code> |
-| `$TERRAFORM_PUBLISH_MODULE_CWD` | Directory for the module that will be published. | `string` | `false` | <code>"."</code> |
-| `$TERRAFORM_PUBLISH_MODULE_SYSTEM` | Module system for the module that will be published. | `string` | `false` | <code>"local"</code> |
+| `$TERRAFORM_PUBLISH_MODULE_NAME`<br />`$TF_MODULE_NAME`<br />`$CI_PROJECT_NAME` | Name for the module that will be published. | `string` | `true` | <code></code> |
+| `$TERRAFORM_PUBLISH_MODULE_CWD`<br />`$TF_MODULE_CWD`<br />`$TF_ROOT` | Directory for the module that will be published. | `string` | `false` | <code>"."</code> |
+| `$TERRAFORM_PUBLISH_MODULE_SYSTEM`<br />`$TF_MODULE_SYSTEM` | Module system for the module that will be published. | `string` | `false` | <code>"local"</code> |
 
 **Registry**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_PUBLISH_REGISTRY_NAME` | Registry of the module that will be published. | `string` | `false` | <code>"gitlab"</code> |
+| `$TERRAFORM_PUBLISH_REGISTRY_NAME`<br />`$TF_MODULE_REGISTRY` | Registry of the module that will be published. | `string` | `false` | <code>"gitlab"</code> |
 
 **Registry - Gitlab**
 

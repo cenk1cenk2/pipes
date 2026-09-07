@@ -10,9 +10,12 @@ const CATEGORY_PULUMI_UP = "Up"
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_PULUMI_UP,
-		Name:        "pulumi.up.plan",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("PULUMI_UP_PLAN")),
+		Category: CATEGORY_PULUMI_UP,
+		Name:     "pulumi.up.plan",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PULUMI_UP_PLAN"),
+			cli.EnvVar("PULUMI_PLAN"),
+		),
 		Usage:       "Input file for pulumi plan.",
 		Required:    false,
 		Value:       "plan.json",
