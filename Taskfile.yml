@@ -18,7 +18,7 @@ includes:
     excludes:
       - test
   template:
-    dir: ./template
+    dir: ./_template
     taskfile: ./Taskfile.pipe.yml
     # The scaffold ships no specs of its own, and ginkgo fails a run that finds
     # no suites, so the pipe it seeds is the first thing with a test task.

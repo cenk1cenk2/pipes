@@ -133,9 +133,9 @@ func ModuleDirs() ([]string, error) {
 // here rather than skipped by a pattern, so adding one is a decision somebody
 // writes down.
 var Excluded = []string{
-	// template is the scaffold a new pipe is copied from. It ships no image, so
+	// _template is the scaffold a new pipe is copied from. It ships no image, so
 	// there is nothing to publish it under.
-	"template",
+	"_template",
 	// internal is the shared library the pipes are built out of.
 	"internal",
 	// tests is this module.

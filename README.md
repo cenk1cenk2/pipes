@@ -25,4 +25,4 @@ This repository still builds and publishes the pipe images used by `devops/pipel
 
 ## Methodology
 
-The `template` directory contains the scaffold for creating a pipe, and every pipe lives in its own directory at the repository root. Pipes use the [plumber](https://gitlab.kilic.dev/libraries/plumber) framework to create a CLI and execute commands in a specific order.
+The `_template` directory contains the scaffold for creating a pipe, and every pipe lives in its own directory at the repository root. Pipes use the [plumber](https://gitlab.kilic.dev/libraries/plumber) framework to create a CLI and execute commands in a specific order.
