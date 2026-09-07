@@ -8,7 +8,6 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/go/setup"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
@@ -22,7 +21,8 @@ var _ = Describe("Go install", func() {
 		// The tasks read the tool the setup resolved off its package level
 		// instance, so a spec seeds that the same way it seeds its own.
 		*setup.C = setup.Ctx{
-			Ctx:       &tool.Ctx{Cwd: "projects/api", Env: map[string]string{"GOPATH": "/cache"}},
+			Cwd:       "projects/api",
+			Env:       map[string]string{"GOPATH": "/cache"},
 			Workspace: workspace,
 		}
 

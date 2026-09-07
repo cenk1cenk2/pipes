@@ -3,13 +3,47 @@ package setup
 import (
 	"path/filepath"
 	"slices"
+	"strings"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func ResolveOverlays(tl *plumber.TaskList) *plumber.Task {
+func initialize(tl *TaskList) *Task {
+	return tl.CreateTask("init").
+		Set(func(t *Task) error {
+			C.Cwd = P.Cwd
+
+			t.Log.Debugf("Working directory: %s", C.Cwd)
+
+			return nil
+		})
+}
+
+func version(tl *TaskList) *Task {
+	return tl.CreateTask("version").
+		Set(func(t *Task) error {
+			t.CreateCommand("kustomize", "version").
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				ShouldRunAfter(func(c *Command) error {
+					C.Version = strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
+
+					c.Log.Infof("kustomize version: %s", C.Version)
+
+					return nil
+				}).
+				EnableStreamRecording().
+				AddSelfToTheTask()
+
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
+		})
+}
+
+func ResolveOverlays(tl *TaskList) *Task {
 	return tl.CreateTask("resolve").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			cwd := C.Cwd
 			if cwd == "" {
 				cwd = "."

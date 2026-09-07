@@ -1,32 +1,44 @@
 package setup
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
 	Pipe struct {
-		tool.Config
+		Cwd       string `validate:"omitempty,dir"`
 		Cache     string `validate:"omitempty,dirpath"`
 		Workspace bool
 	}
 
-	// Ctx carries whether the modules are driven as a workspace alongside what
-	// every tool pipe resolves, so the commands that have to tell the two apart
-	// read one context instead of probing the toolchain again.
+	// Ctx carries whether the modules are driven as a workspace alongside what the
+	// setup resolves, so the commands that have to tell the two apart read one
+	// context instead of probing the toolchain again.
 	Ctx struct {
-		*tool.Ctx
+		Cwd       string
+		Version   string
+		Env       map[string]string
 		Workspace bool
 	}
 )
 
 var P = &Pipe{}
-var C = &Ctx{Ctx: tool.NewCtx()}
+var C = &Ctx{Env: map[string]string{}}
 
-func New(p *plumber.Plumber) *plumber.TaskList {
-	return tool.Setup(p, Spec, &P.Config, C.Ctx, GoEnv, GoWorkspace).
-		ShouldRunBefore(func(_ *plumber.TaskList) error {
+func New(p *Plumber) *TaskList {
+	tl := &TaskList{}
+
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
 			return p.Validate(P)
+		}).
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
+				initialize(tl).Job(),
+				version(tl).Job(),
+				GoEnv(tl).Job(),
+				GoWorkspace(tl).Job(),
+			)
 		})
 }

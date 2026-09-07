@@ -5,12 +5,45 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func GoEnv(tl *plumber.TaskList) *plumber.Task {
+func initialize(tl *TaskList) *Task {
+	return tl.CreateTask("init").
+		Set(func(t *Task) error {
+			C.Cwd = P.Cwd
+
+			t.Log.Debugf("Working directory: %s", C.Cwd)
+
+			return nil
+		})
+}
+
+func version(tl *TaskList) *Task {
+	return tl.CreateTask("version").
+		Set(func(t *Task) error {
+			t.CreateCommand("go", "version").
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				ShouldRunAfter(func(c *Command) error {
+					C.Version = strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
+
+					c.Log.Infof("go version: %s", C.Version)
+
+					return nil
+				}).
+				EnableStreamRecording().
+				AddSelfToTheTask()
+
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
+		})
+}
+
+func GoEnv(tl *TaskList) *Task {
 	return tl.CreateTask("env").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			if P.Cache != "" {
 				cache, err := filepath.Abs(P.Cache)
 				if err != nil {
@@ -26,9 +59,9 @@ func GoEnv(tl *plumber.TaskList) *plumber.Task {
 		})
 }
 
-func GoWorkspace(tl *plumber.TaskList) *plumber.Task {
+func GoWorkspace(tl *TaskList) *Task {
 	return tl.CreateTask("workspace").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			C.Workspace = P.Workspace
 
 			if C.Workspace {
@@ -42,10 +75,10 @@ func GoWorkspace(tl *plumber.TaskList) *plumber.Task {
 				"env",
 				"GOWORK",
 			).
-				SetLogLevel(plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				SetDir(C.Cwd).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *plumber.Command) error {
+				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetStdoutStream()
 
 					if len(stream) == 0 {
@@ -66,7 +99,7 @@ func GoWorkspace(tl *plumber.TaskList) *plumber.Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *plumber.Task) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
 }

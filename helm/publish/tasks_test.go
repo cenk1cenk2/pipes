@@ -9,7 +9,6 @@ import (
 	helmv2 "helm.sh/helm/v4/pkg/chart/v2"
 
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
@@ -17,7 +16,8 @@ import (
 // a spec seeds that the same way it seeds its own.
 func seed(cwd, name string) {
 	*setup.C = setup.Ctx{
-		Ctx:   &tool.Ctx{Cwd: cwd, Env: map[string]string{}},
+		Cwd:   cwd,
+		Env:   map[string]string{},
 		Chart: &helmv2.Chart{Metadata: &helmv2.Metadata{Name: name}},
 	}
 }

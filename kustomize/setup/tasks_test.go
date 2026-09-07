@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
@@ -18,9 +17,7 @@ var _ = Describe("Resolve overlays", func() {
 		GinkgoHelper()
 
 		P.Paths = paths
-		C.Ctx = tool.NewCtx()
-		C.Cwd = cwd
-		C.Overlays = nil
+		*C = Ctx{Cwd: cwd, Env: map[string]string{}}
 
 		Expect(fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
 			AppName:     "pipe-kustomize",

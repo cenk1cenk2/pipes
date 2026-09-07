@@ -10,7 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -19,7 +18,7 @@ import (
 // The tasks read the setup and the state of the pipe around them off their
 // package level instances, so a spec seeds those the same way it seeds its own.
 func seed(name, cwd string) {
-	*setup.C = tool.Ctx{Cwd: cwd, Env: map[string]string{}}
+	*setup.C = setup.Ctx{Cwd: cwd, Env: map[string]string{}}
 	*state.P = state.Pipe{State: state.State{Name: name}}
 }
 

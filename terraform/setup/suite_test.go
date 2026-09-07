@@ -1,4 +1,4 @@
-package tool_test
+package setup
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestTool(t *testing.T) {
+func TestSetup(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Tool Suite")
+	RunSpecs(t, "Terraform Setup Suite")
 }

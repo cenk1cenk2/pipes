@@ -2,7 +2,6 @@ package setup
 
 import (
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 )
 
 //revive:disable:line-length-limit
@@ -11,12 +10,14 @@ const (
 	CATEGORY_BUILDAH = "Buildah"
 )
 
-var Spec = tool.Spec{
-	Name:        "buildah",
-	Category:    CATEGORY_BUILDAH,
-	FlagPrefix:  "buildah",
-	EnvPrefix:   "BUILDAH",
-	VersionArgs: []string{"--version"},
+var Flags = []cli.Flag{
+	&cli.StringFlag{
+		Category:    CATEGORY_BUILDAH,
+		Name:        "buildah.cwd",
+		Sources:     cli.NewValueSourceChain(cli.EnvVar("BUILDAH_CWD")),
+		Usage:       "Working directory for buildah commands.",
+		Required:    false,
+		Value:       ".",
+		Destination: &P.Cwd,
+	},
 }
-
-var Flags = []cli.Flag(tool.NewFlags(Spec, P))

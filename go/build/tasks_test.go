@@ -8,7 +8,6 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/go/setup"
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
@@ -26,7 +25,7 @@ var _ = Describe("Go build", func() {
 		*P = pipe
 		// The task reads the tool the setup resolved off its package level
 		// instance, so a spec seeds that the same way it seeds its own.
-		*setup.C = setup.Ctx{Ctx: &tool.Ctx{Cwd: "projects/api", Env: map[string]string{}}}
+		*setup.C = setup.Ctx{Cwd: "projects/api", Env: map[string]string{}}
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",

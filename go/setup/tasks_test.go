@@ -7,9 +7,40 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
+
+var _ = Describe("Go version", func() {
+	// The toolchain prints a banner no pattern narrows down, so what it answers is
+	// reported whole once the surrounding whitespace is off it.
+	It("reports the whole banner the toolchain printed", func() {
+		*C = Ctx{Env: map[string]string{}}
+
+		runner := fixtures.Runner(tests.TestingCommandResponse{
+			Name:   "go",
+			Args:   []string{"version"},
+			Stdout: "go version go1.27.0 linux/amd64\n",
+		})
+
+		Expect(fixtures.Cli(runner, tests.TaskListCli{
+			AppName:     "pipe-go",
+			CommandName: "setup",
+			TaskLists: []tests.TaskListFactory{
+				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
+					tl := &plumber.TaskList{}
+
+					return tl.New(p).
+						SetRuntimeDepth(3).
+						Set(func(tl *plumber.TaskList) plumber.Job {
+							return plumber.JobSequence(version(tl).Job())
+						})
+				},
+			},
+		}).Run()).To(Succeed())
+
+		Expect(C.Version).To(Equal("go version go1.27.0 linux/amd64"))
+	})
+})
 
 var _ = Describe("Go workspace", func() {
 	// The flags are not registered with the spec command, since the pipe is seeded
@@ -20,7 +51,8 @@ var _ = Describe("Go workspace", func() {
 		// Only the resolved tool is rebuilt, so what the previous run decided about
 		// the workspace is still there for the run under test to overwrite.
 		*P = pipe
-		C.Ctx = &tool.Ctx{Cwd: "projects/api", Env: map[string]string{}}
+		C.Cwd = "projects/api"
+		C.Env = map[string]string{}
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
