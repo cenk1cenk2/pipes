@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestConformance(t *testing.T) {
+func TestManifest(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Conformance Suite")
+	RunSpecs(t, "Manifest Suite")
 }

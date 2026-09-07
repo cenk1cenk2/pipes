@@ -7,10 +7,10 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 	"gitlab.kilic.dev/devops/pipes/pulumi/stack"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 // The tasks read the setup and the stack of the pipe around them off their

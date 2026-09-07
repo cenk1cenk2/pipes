@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 	mockhub "gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/test/mocks/hub"
 )

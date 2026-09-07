@@ -2,7 +2,6 @@ package tests
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -86,9 +85,6 @@ var _ = Describe("Manifest", func() {
 			for _, entry := range manifest.Pipes {
 				Expect(entry.Name).NotTo(Equal(dir))
 			}
-
-			_, err := os.Stat(filepath.Join(Root(), dir, "main_test.go"))
-			Expect(err).To(HaveOccurred(), fmt.Sprintf("%s runs a conformance suite, so it is a pipe and not an exclusion", dir))
 		}
 	})
 

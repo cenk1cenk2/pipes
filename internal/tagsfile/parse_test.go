@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("Parse", func() {
@@ -18,9 +19,7 @@ var _ = Describe("Parse", func() {
 	)
 
 	BeforeEach(func() {
-		logger := logrus.New()
-		logger.SetOutput(GinkgoWriter)
-		log = logrus.NewEntry(logger)
+		log = fixtures.Log()
 		dir = GinkgoT().TempDir()
 	})
 

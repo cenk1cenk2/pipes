@@ -12,6 +12,7 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 // The default the buildah and helm flags ship, which is what almost every
@@ -20,21 +21,13 @@ var defaultSanitize = []versions.Match{
 	{Match: "([^/]*)/(.*)", Template: "{{ index $ 1 | upper }}_{{ index $ 2 }}"},
 }
 
-func testLog() *logrus.Entry {
-	logger := logrus.New()
-	logger.SetOutput(GinkgoWriter)
-	logger.SetLevel(logrus.TraceLevel)
-
-	return logrus.NewEntry(logger)
-}
-
 // The expectations here are the output of the buildah and helm implementations
 // this collector replaced, captured before they were deleted.
 var _ = Describe("Process", func() {
 	var log *logrus.Entry
 
 	BeforeEach(func() {
-		log = testLog()
+		log = fixtures.Log()
 	})
 
 	Describe("as buildah publishes container image tags", func() {

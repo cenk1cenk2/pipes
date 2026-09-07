@@ -9,8 +9,8 @@ import (
 	helmv2 "helm.sh/helm/v4/pkg/chart/v2"
 
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
-	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/internal/tool"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 // The tasks read the chart the setup resolved off its package level instance, so

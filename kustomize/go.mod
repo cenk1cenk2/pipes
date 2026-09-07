@@ -8,6 +8,7 @@ require (
 	github.com/onsi/gomega v1.43.0
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
+	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	sigs.k8s.io/kustomize/api v0.21.1
 	sigs.k8s.io/kustomize/kyaml v0.21.1
 )
@@ -67,3 +68,5 @@ require (
 )
 
 replace gitlab.kilic.dev/devops/pipes/internal => ../internal
+
+replace gitlab.kilic.dev/devops/pipes/tests => ../tests

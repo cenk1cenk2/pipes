@@ -1,6 +1,5 @@
-// Package tests is the aggregate conformance suite: the checks that are about the
-// repository rather than about any one pipe. What a single pipe has to answer to
-// lives in internal/test/conformance and runs inside that pipe's own suite.
+// Package tests holds the checks that are about the repository rather than about
+// any one pipe, alongside the fixtures the pipes share in tests/fixtures.
 //
 // Nothing here imports a pipe, which is what lets a pipe keep its command tree
 // to itself.
@@ -134,8 +133,8 @@ func ModuleDirs() ([]string, error) {
 // here rather than skipped by a pattern, so adding one is a decision somebody
 // writes down.
 var Excluded = []string{
-	// template is the scaffold a new pipe is copied from. It ships no image and
-	// runs no conformance suite, so there is nothing to conform to.
+	// template is the scaffold a new pipe is copied from. It ships no image, so
+	// there is nothing to publish it under.
 	"template",
 	// internal is the shared library the pipes are built out of.
 	"internal",

@@ -9,6 +9,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
+	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 )
 
 require (
@@ -40,3 +41,5 @@ require (
 )
 
 replace gitlab.kilic.dev/devops/pipes/internal => ../internal
+
+replace gitlab.kilic.dev/devops/pipes/tests => ../tests

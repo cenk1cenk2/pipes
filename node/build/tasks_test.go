@@ -9,8 +9,8 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
-	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 // The tasks read the package manager and the environment of the pipe around

@@ -11,8 +11,8 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
-	"gitlab.kilic.dev/devops/pipes/internal/test/fixtures"
 	"gitlab.kilic.dev/devops/pipes/select-env/setup"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("Environment file", func() {

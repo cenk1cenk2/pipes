@@ -1,8 +1,12 @@
+// Package fixtures is the test scaffolding the pipes share: the stubs and the
+// loggers a spec needs whichever module it lives in.
 package fixtures
 
 import (
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
+	. "github.com/onsi/ginkgo/v2"
+	"github.com/sirupsen/logrus"
 )
 
 // Runner builds a command runner that answers the given responses instead of
@@ -19,4 +23,14 @@ func Cli(runner *tests.TestingCommandRunner, spec tests.TaskListCli) *tests.Task
 	spec.Runtime = plumber.Runtime{CommandRunner: runner.Runner()}
 
 	return tests.NewTaskListCli(spec)
+}
+
+// Log is a logger that writes into the spec output at the loudest level, for the
+// functions that take one rather than reaching for the task they run under.
+func Log() *logrus.Entry {
+	logger := logrus.New()
+	logger.SetOutput(GinkgoWriter)
+	logger.SetLevel(logrus.TraceLevel)
+
+	return logrus.NewEntry(logger)
 }
