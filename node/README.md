@@ -64,6 +64,27 @@ Install node.js dependencies with the given package manager.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `string`<br/>`enum("npm", "yarn", "pnpm")` | `false` | <code>"pnpm"</code> |
 
+### `pipe-node add`
+
+Install node packages with the given package manager.
+
+#### Flags
+
+**Package Manager**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$NODE_PACKAGE_MANAGER` | Preferred Package manager for nodejs. | `string`<br/>`enum("npm", "yarn", "pnpm")` | `false` | <code>"pnpm"</code> |
+
+**Packages**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$NODE_ADD_PACKAGES`<br />`$PACKAGES_NODE` | Install node packages before performing operations. | `string[]` | `true` | <code></code> |
+| `$NODE_ADD_GLOBAL`<br />`$PACKAGES_NODE_GLOBAL` | Install node packages globally. | `bool` | `false` | <code>true</code> |
+| `$NODE_ADD_SCRIPT_ARGS`<br />`$PACKAGES_NODE_SCRIPT_ARGS` | Script arguments to append to the install command. | `string` | `false` | <code></code> |
+| `$NODE_ADD_CWD`<br />`$PACKAGES_NODE_CWD` | Working directory for build operation. | `string` | `false` | <code>"."</code> |
+
 ### `pipe-node build`
 
 #### Flags

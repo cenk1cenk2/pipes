@@ -8,6 +8,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/node/add"
 	"gitlab.kilic.dev/devops/pipes/node/build"
 	"gitlab.kilic.dev/devops/pipes/node/install"
 	"gitlab.kilic.dev/devops/pipes/node/login"
@@ -55,6 +56,17 @@ func main() {
 							setup.New(p),
 							login.New(p),
 							install.New(p),
+						))
+					},
+				},
+				{
+					Name:        "add",
+					Description: "Install node packages with the given package manager.",
+					Flags:       plumber.CombineFlags(setup.NodeFlags, add.Flags),
+					Action: func(_ context.Context, _ *cli.Command) error {
+						return p.RunJobs(plumber.CombineTaskLists(
+							setup.New(p),
+							add.New(p),
 						))
 					},
 				},
