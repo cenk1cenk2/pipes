@@ -13,16 +13,10 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/cli"
 )
 
-const name = "pipe-go"
-
-const description = "Build Go applications with the CI pipe."
-
-var VERSION = "latest"
-
 func newCommand(p *plumber.Plumber) *ucli.Command {
 	// The setup step is not aliased the way the other pipes alias it, since this
 	// pipe already has a subcommand named after the tool.
-	return cli.App(name, description, VERSION,
+	return cli.App(CLI_NAME, DESCRIPTION, VERSION,
 		cli.Command(p, "install", "Vendor go modules.", setup.Step, install.Step(install.Deps{Tool: setup.C})),
 		cli.Command(p, "build", "Build an application.", setup.Step, build.Step(build.Deps{Tool: setup.C.Ctx})),
 		cli.Command(p, "lint", "Run golangci-lint on the project.", setup.Step, lint.Step(lint.Deps{Tool: setup.C})),

@@ -11,12 +11,6 @@ import (
 	"gitlab.kilic.dev/devops/pipes/semantic-release/setup"
 )
 
-const name = "pipe-semantic-release"
-
-const description = "Releases applications through the semantic-release library."
-
-var VERSION = "latest"
-
 func newCommand(p *plumber.Plumber) *ucli.Command {
 	// The environment feature is opt-in for this pipe, unlike the pipes that own
 	// their environment. The flags are shared package level values, so this runs
@@ -30,7 +24,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		return f
 	})
 
-	return cli.Root(p, name, description, VERSION,
+	return cli.Root(p, CLI_NAME, DESCRIPTION, VERSION,
 		setup.EnvironmentStep,
 		setup.Step,
 		setup.LoginStep,

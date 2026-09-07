@@ -10,12 +10,6 @@ import (
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
 )
 
-const name = "pipe-update-docker-hub-readme"
-
-const description = "Updates the readme file on DockerHub or any compatible API."
-
-var VERSION = "latest"
-
 // options are the services the pipe reaches outside the machine for. A zero
 // value is the production wiring, so only a spec ever fills one in.
 type options struct {
@@ -33,7 +27,7 @@ func (o options) defaults() options {
 func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 	opts = opts.defaults()
 
-	return cli.Root(p, name, description, VERSION,
+	return cli.Root(p, CLI_NAME, DESCRIPTION, VERSION,
 		update.Step(update.Deps{Hub: opts.Hub}),
 	)
 }

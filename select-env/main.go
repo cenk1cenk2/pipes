@@ -11,14 +11,8 @@ import (
 	"gitlab.kilic.dev/devops/pipes/select-env/write"
 )
 
-const name = "select-env"
-
-const description = "Selects an set of environment variable prefix depending on the condition."
-
-var VERSION = "latest"
-
 func newCommand(p *plumber.Plumber) *ucli.Command {
-	return cli.Root(p, name, description, VERSION,
+	return cli.Root(p, CLI_NAME, DESCRIPTION, VERSION,
 		setup.Step,
 		write.Step(write.Deps{Environment: setup.EnvironmentCtx}),
 	)

@@ -13,12 +13,6 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-const name = "pipe-node"
-
-const description = "Pipe for installing node.js dependencies and building node.js applications on CI/CD."
-
-var VERSION = "latest"
-
 func newCommand(p *plumber.Plumber) *ucli.Command {
 	// The environment feature is opt-in for this pipe, unlike the pipes that own
 	// their environment. The flags are shared package level values, so this runs
@@ -32,7 +26,7 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		return f
 	})
 
-	return cli.App(name, description, VERSION,
+	return cli.App(CLI_NAME, DESCRIPTION, VERSION,
 		cli.Command(p, "login", "Login to the given NPM registries.",
 			setup.Step,
 			setup.LoginStep,

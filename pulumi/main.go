@@ -13,12 +13,6 @@ import (
 	"gitlab.kilic.dev/devops/pipes/pulumi/up"
 )
 
-const name = "pipe-pulumi"
-
-const description = "Pulumi actions for CI pipelines."
-
-var VERSION = "latest"
-
 // options are the services the pipe reaches outside the machine for. A zero
 // value is the production wiring, so only a spec ever fills one in.
 type options struct {
@@ -39,7 +33,7 @@ func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 	tool := setup.Step
 	selected := stack.Step(stack.Deps{Tool: setup.C})
 
-	return cli.App(name, description, VERSION,
+	return cli.App(CLI_NAME, DESCRIPTION, VERSION,
 		cli.Command(p, "preview", "Preview the Pulumi changes.", tool, selected, preview.Step(preview.Deps{Tool: setup.C, Stack: stack.P, Notes: opts.Notes})),
 		cli.Command(p, "up", "Apply the Pulumi changes.", tool, selected, up.Step(up.Deps{Tool: setup.C})),
 	)

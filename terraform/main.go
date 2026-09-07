@@ -17,12 +17,6 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
-const name = "pipe-terraform"
-
-const description = "Running terraform inside the pipelines."
-
-var VERSION = "latest"
-
 // options are the services the pipe reaches outside the machine for. A zero
 // value is the production wiring, so only a spec ever fills one in.
 type options struct {
@@ -49,7 +43,7 @@ func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 	credentials := login.Step(login.Deps{Tool: setup.C})
 	backend := state.Step(state.Deps{Tool: setup.C, CI: &setup.P.CiVariables})
 
-	return cli.App(name, description, VERSION,
+	return cli.App(CLI_NAME, DESCRIPTION, VERSION,
 		cli.Command(p, "install", "Install terraform project.", tool, credentials, backend, install.Step(install.Deps{Tool: setup.C})),
 		cli.Command(p, "lint", "Lint terraform project with terraform.", tool, lint.Step(lint.Deps{Tool: setup.C})),
 		cli.Command(p, "plan", "Plan terraform project.", tool, credentials, backend, plan.Step(plan.Deps{Tool: setup.C, State: state.P, Notes: opts.Notes})),

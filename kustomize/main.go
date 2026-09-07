@@ -10,16 +10,10 @@ import (
 	"gitlab.kilic.dev/devops/pipes/kustomize/setup"
 )
 
-const name = "pipe-kustomize"
-
-const description = "Kustomize operations for CI pipelines."
-
-var VERSION = "latest"
-
 func newCommand(p *plumber.Plumber) *ucli.Command {
 	tool := setup.Step
 
-	return cli.App(name, description, VERSION,
+	return cli.App(CLI_NAME, DESCRIPTION, VERSION,
 		cli.Command(p, "build", "Build and validate Kustomize overlays.", tool, build.Step(build.Deps{Tool: setup.C})),
 	)
 }

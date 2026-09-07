@@ -10,18 +10,12 @@ import (
 	"gitlab.kilic.dev/devops/pipes/template/pipe"
 )
 
-const name = "pipe-template"
-
-const description = "template-cli"
-
-var VERSION = "latest"
-
 func newCommand(p *plumber.Plumber) *ucli.Command {
 	return &ucli.Command{
-		Name:        name,
+		Name:        CLI_NAME,
 		Version:     VERSION,
-		Usage:       description,
-		Description: description,
+		Usage:       DESCRIPTION,
+		Description: DESCRIPTION,
 		Flags:       plumber.CombineFlags(pipe.Flags),
 		Action: func(_ context.Context, _ *ucli.Command) error {
 			return p.RunJobs(

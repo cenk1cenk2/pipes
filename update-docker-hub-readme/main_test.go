@@ -26,8 +26,8 @@ func TestPipe(t *testing.T) {
 }
 
 var _ = conformance.Verify(conformance.Pipe{
-	Name:        name,
-	Description: description,
+	Name:        CLI_NAME,
+	Description: DESCRIPTION,
 	New: func(p *plumber.Plumber) *ucli.Command {
 		return newCommand(p, options{})
 	},
@@ -45,7 +45,7 @@ func run(opts options, args ...string) error {
 	})
 	fixture.Plumber.SetRuntime(plumber.Runtime{CommandRunner: fixtures.Runner().Runner()})
 
-	return fixture.RunCli(append([]string{name}, args...)...)
+	return fixture.RunCli(append([]string{CLI_NAME}, args...)...)
 }
 
 var _ = Describe("New", func() {
