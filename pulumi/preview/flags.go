@@ -39,6 +39,6 @@ var Flags = CombineFlags(
 			Destination: &P.Summary.Output,
 		},
 	},
-	gitlab.NewFlags(&P.MergeRequestReport),
-	ci.NewFlags(&P.ReportMetadata),
+	gitlab.NewFlags(gitlab.Options{Destination: &P.MergeRequestReport}),
+	ci.NewFlags(ci.Options{Destination: &P.ReportMetadata}),
 )

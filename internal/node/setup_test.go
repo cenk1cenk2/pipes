@@ -47,7 +47,7 @@ var _ = Describe("PackageManagers", func() {
 var _ = Describe("NewFlags", func() {
 	It("registers the package manager flag", func() {
 		cfg := node.Config{}
-		flags := node.NewFlags(&cfg)
+		flags := node.NewFlags(node.Options{Destination: &cfg})
 
 		Expect(flags).To(HaveLen(1))
 		Expect(flags[0].Names()).To(Equal([]string{"node.package-manager"}))
@@ -57,7 +57,7 @@ var _ = Describe("NewFlags", func() {
 	// landing on a copy would leave it on the zero value.
 	It("binds the flag onto the given configuration", func() {
 		cfg := node.Config{}
-		flags := node.NewFlags(&cfg)
+		flags := node.NewFlags(node.Options{Destination: &cfg})
 
 		//nolint:errcheck
 		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.PackageManager))
@@ -79,7 +79,7 @@ var _ = Describe("NewLoginFlags", func() {
 	It("registers every part of the npmrc the pipe writes", func() {
 		cfg := node.Login{}
 
-		Expect(names(node.NewLoginFlags(&cfg))).To(Equal([]string{
+		Expect(names(node.NewLoginFlags(node.LoginOptions{Destination: &cfg}))).To(Equal([]string{
 			"npm.login",
 			"npm.npmrc-file",
 			"npm.npmrc",
@@ -88,7 +88,7 @@ var _ = Describe("NewLoginFlags", func() {
 
 	It("unmarshals the credentials onto the given configuration", func() {
 		cfg := node.Login{}
-		flags := node.NewLoginFlags(&cfg)
+		flags := node.NewLoginFlags(node.LoginOptions{Destination: &cfg})
 
 		//nolint:errcheck
 		Expect(flags[0].(*cli.StringFlag).Validator(
@@ -106,7 +106,7 @@ var _ = Describe("NewLoginFlags", func() {
 		cfg := node.Login{}
 
 		//nolint:errcheck
-		Expect(node.NewLoginFlags(&cfg)[0].(*cli.StringFlag).Validator("")).To(Succeed())
+		Expect(node.NewLoginFlags(node.LoginOptions{Destination: &cfg})[0].(*cli.StringFlag).Validator("")).To(Succeed())
 		Expect(cfg.Entries).To(BeNil())
 	})
 
@@ -114,7 +114,7 @@ var _ = Describe("NewLoginFlags", func() {
 	// reach the configuration rather than sit unbound on the flag.
 	It("binds the npmrc files onto the given configuration", func() {
 		cfg := node.Login{}
-		flags := node.NewLoginFlags(&cfg)
+		flags := node.NewLoginFlags(node.LoginOptions{Destination: &cfg})
 
 		//nolint:errcheck
 		Expect(flags[1].(*cli.StringSliceFlag).Destination).To(BeIdenticalTo(&cfg.NpmRcFiles))

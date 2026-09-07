@@ -52,7 +52,12 @@ func (r MergeRequestReportResult) Action() string {
 	return "updated"
 }
 
-func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
+// Options is what the merge request report flags are built onto.
+type Options struct {
+	Destination *MergeRequestReportConfig
+}
+
+func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
 			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
@@ -63,7 +68,7 @@ func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 			Usage:       "Enable GitLab merge request report note on the given merge request.",
 			Required:    false,
 			Value:       false,
-			Destination: &config.Enabled,
+			Destination: &opts.Destination.Enabled,
 		},
 
 		&cli.StringFlag{
@@ -75,7 +80,7 @@ func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 			Usage:       "GitLab API token for merge request report notes.",
 			Required:    false,
 			Value:       "",
-			Destination: &config.Token,
+			Destination: &opts.Destination.Token,
 		},
 
 		&cli.StringFlag{
@@ -87,7 +92,7 @@ func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 			Usage:       "GitLab API URL for merge request report notes.",
 			Required:    false,
 			Value:       "",
-			Destination: &config.ApiUrl,
+			Destination: &opts.Destination.ApiUrl,
 		},
 
 		&cli.StringFlag{
@@ -99,7 +104,7 @@ func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 			Usage:       "GitLab project id for merge request report notes.",
 			Required:    false,
 			Value:       "",
-			Destination: &config.ProjectId,
+			Destination: &opts.Destination.ProjectId,
 		},
 
 		&cli.Int64Flag{
@@ -111,7 +116,7 @@ func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 			Usage:       "GitLab merge request iid for merge request report notes.",
 			Required:    false,
 			Value:       0,
-			Destination: &config.MergeRequestIid,
+			Destination: &opts.Destination.MergeRequestIid,
 		},
 
 		&cli.StringFlag{
@@ -123,7 +128,7 @@ func NewFlags(config *MergeRequestReportConfig) []cli.Flag {
 			Usage:       "Hidden marker identifier for merge request report notes. Defaults to the job name combined with the stack or state under report.",
 			Required:    false,
 			Value:       "",
-			Destination: &config.Identifier,
+			Destination: &opts.Destination.Identifier,
 		},
 	}
 }

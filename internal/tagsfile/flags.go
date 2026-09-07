@@ -8,22 +8,30 @@ const (
 	CATEGORY_TAGS_FILE = "Tags File"
 )
 
-// NewFlags builds the tags file flags. A nil strict destination leaves the strict
-// flag out, for the pipes that only ever read the file leniently.
-func NewFlags(dst *string, value string, strict *bool, required bool) []cli.Flag {
+// Options is what the tags file flags are built onto. A nil Strict destination
+// leaves the strict flag out, for the pipes that only ever read the file
+// leniently.
+type Options struct {
+	Destination *string
+	Value       string
+	Strict      *bool
+	Required    bool
+}
+
+func NewFlags(opts Options) []cli.Flag {
 	list := []cli.Flag{
 		&cli.StringFlag{
 			Category:    CATEGORY_TAGS_FILE,
 			Name:        "tags-file",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("TAGS_FILE")),
 			Usage:       "Read tags from a file.",
-			Required:    required,
-			Value:       value,
-			Destination: dst,
+			Required:    opts.Required,
+			Value:       opts.Value,
+			Destination: opts.Destination,
 		},
 	}
 
-	if strict == nil {
+	if opts.Strict == nil {
 		return list
 	}
 
@@ -34,6 +42,6 @@ func NewFlags(dst *string, value string, strict *bool, required bool) []cli.Flag
 		Usage:       "Fail on missing tags file.",
 		Required:    false,
 		Value:       false,
-		Destination: strict,
+		Destination: opts.Strict,
 	})
 }

@@ -8,7 +8,14 @@ const (
 	CATEGORY_GIT = "GIT"
 )
 
-func NewFlags(dst *Refs) []cli.Flag {
+// Options is what the git flags are built onto. Every flag constructor takes a
+// struct rather than positional arguments, so a new knob is a new field instead
+// of a signature change at every call site.
+type Options struct {
+	Destination *Refs
+}
+
+func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Category: CATEGORY_GIT,
@@ -20,7 +27,7 @@ func NewFlags(dst *Refs) []cli.Flag {
 			Usage:       "Source control branch.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.Branch,
+			Destination: &opts.Destination.Branch,
 		},
 
 		&cli.StringFlag{
@@ -33,7 +40,7 @@ func NewFlags(dst *Refs) []cli.Flag {
 			Usage:       "Source control tag.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.Tag,
+			Destination: &opts.Destination.Tag,
 		},
 	}
 }

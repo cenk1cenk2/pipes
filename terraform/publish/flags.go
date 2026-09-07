@@ -15,7 +15,7 @@ const (
 )
 
 var Flags = CombineFlags(
-	tagsfile.NewFlags(&P.Module.TagsFile, ".tags", nil, false),
+	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Module.TagsFile, Value: ".tags"}),
 	[]cli.Flag{
 		// CATEGORY_MODULE
 

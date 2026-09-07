@@ -22,8 +22,8 @@ const (
 )
 
 var Flags = CombineFlags(
-	git.NewFlags(&P.Git),
-	tagsfile.NewFlags(&P.Chart.VersionFile, "", &P.Chart.VersionFileStrict, false),
+	git.NewFlags(git.Options{Destination: &P.Git}),
+	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Chart.VersionFile, Strict: &P.Chart.VersionFileStrict}),
 	[]cli.Flag{
 		&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,

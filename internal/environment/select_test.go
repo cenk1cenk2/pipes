@@ -126,7 +126,7 @@ var _ = Describe("NewFlags", func() {
 	It("registers the git flags ahead of the environment ones", func() {
 		cfg := environment.Config{}
 
-		Expect(names(environment.NewFlags(&cfg))).To(Equal([]string{
+		Expect(names(environment.NewFlags(environment.Options{Destination: &cfg}))).To(Equal([]string{
 			"git.branch",
 			"git.tag",
 			"environment.enable",
@@ -140,7 +140,7 @@ var _ = Describe("NewFlags", func() {
 	// flag landing on a copy would leave it on the zero value.
 	It("binds each flag onto the given configuration", func() {
 		cfg := environment.Config{}
-		flags := environment.NewFlags(&cfg)
+		flags := environment.NewFlags(environment.Options{Destination: &cfg})
 
 		//nolint:errcheck
 		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.Git.Branch))
@@ -156,7 +156,7 @@ var _ = Describe("NewFlags", func() {
 	// own default is the value most pipelines end up running with.
 	It("unmarshals the conditions onto the given configuration", func() {
 		cfg := environment.Config{}
-		flags := environment.NewFlags(&cfg)
+		flags := environment.NewFlags(environment.Options{Destination: &cfg})
 
 		//nolint:errcheck
 		Expect(flags[3].(*cli.StringFlag).Validator(environment.DEFAULT_CONDITIONS)).To(Succeed())
@@ -170,7 +170,7 @@ var _ = Describe("NewFlags", func() {
 		first, second := environment.Config{}, environment.Config{}
 
 		//nolint:errcheck
-		Expect(environment.NewFlags(&first)[2].(*cli.BoolFlag).Destination).
-			NotTo(BeIdenticalTo(environment.NewFlags(&second)[2].(*cli.BoolFlag).Destination))
+		Expect(environment.NewFlags(environment.Options{Destination: &first})[2].(*cli.BoolFlag).Destination).
+			NotTo(BeIdenticalTo(environment.NewFlags(environment.Options{Destination: &second})[2].(*cli.BoolFlag).Destination))
 	})
 })

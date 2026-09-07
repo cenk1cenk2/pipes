@@ -80,7 +80,7 @@ var _ = Describe("MatchAny", func() {
 var _ = Describe("Flags", func() {
 	It("binds both destinations onto the same refs", func() {
 		refs := git.Refs{}
-		flags := git.NewFlags(&refs)
+		flags := git.NewFlags(git.Options{Destination: &refs})
 
 		Expect(flags).To(HaveLen(2))
 		Expect(flags[0].Names()).To(Equal([]string{"git.branch"}))

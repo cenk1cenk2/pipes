@@ -22,7 +22,7 @@ var _ = Describe("NewFlags", func() {
 	It("registers every coordinate the report renders", func() {
 		metadata := iac.Metadata{}
 
-		Expect(names(ci.NewFlags(&metadata))).To(Equal([]string{
+		Expect(names(ci.NewFlags(ci.Options{Destination: &metadata}))).To(Equal([]string{
 			"ci.job-name",
 			"ci.job-url",
 			"ci.pipeline-id",
@@ -35,7 +35,7 @@ var _ = Describe("NewFlags", func() {
 	It("files them all under one category", func() {
 		metadata := iac.Metadata{}
 
-		for _, flag := range ci.NewFlags(&metadata) {
+		for _, flag := range ci.NewFlags(ci.Options{Destination: &metadata}) {
 			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(ci.CATEGORY_CI))
 		}
 	})
@@ -44,7 +44,7 @@ var _ = Describe("NewFlags", func() {
 	// own field of the struct the caller passed rather than a copy of it.
 	It("binds each flag onto the given metadata", func() {
 		metadata := iac.Metadata{}
-		flags := ci.NewFlags(&metadata)
+		flags := ci.NewFlags(ci.Options{Destination: &metadata})
 
 		//nolint:errcheck
 		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&metadata.JobName))

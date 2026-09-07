@@ -25,8 +25,8 @@ const (
 //revive:disable:line-length-limit
 
 var Flags = CombineFlags(
-	git.NewFlags(&P.Git),
-	tagsfile.NewFlags(&P.Image.TagsFile, "", &P.Image.TagsFileStrict, false),
+	git.NewFlags(git.Options{Destination: &P.Git}),
+	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Image.TagsFile, Strict: &P.Image.TagsFileStrict}),
 	[]cli.Flag{
 
 		// CATEGORY_CONTAINER_IMAGE

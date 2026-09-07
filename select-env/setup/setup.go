@@ -15,7 +15,7 @@ var (
 
 // Flags are built once, so the command registers the same slice the task below
 // reads back.
-var Flags = environment.NewFlags(Environment)
+var Flags = environment.NewFlags(environment.Options{Destination: Environment})
 
 // New selects the environment out of the source control references and reads
 // its variables, which is everything the pipe does before writing them out.

@@ -11,9 +11,14 @@ const (
 	CATEGORY_CI = "Gitlab Pipeline"
 )
 
+// Options is what the CI flags are built onto.
+type Options struct {
+	Destination *iac.Metadata
+}
+
 // NewFlags reads the job and commit coordinates the CI runner exports, so
 // a report can point back at the pipeline that produced it.
-func NewFlags(dst *iac.Metadata) []cli.Flag {
+func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Category:    CATEGORY_CI,
@@ -22,7 +27,7 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 			Usage:       "GitLab CI job name to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.JobName,
+			Destination: &opts.Destination.JobName,
 		},
 
 		&cli.StringFlag{
@@ -32,7 +37,7 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 			Usage:       "GitLab CI job URL to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.JobUrl,
+			Destination: &opts.Destination.JobUrl,
 		},
 
 		&cli.StringFlag{
@@ -42,7 +47,7 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 			Usage:       "GitLab CI pipeline id to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.PipelineId,
+			Destination: &opts.Destination.PipelineId,
 		},
 
 		&cli.StringFlag{
@@ -52,7 +57,7 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 			Usage:       "GitLab CI pipeline URL to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.PipelineUrl,
+			Destination: &opts.Destination.PipelineUrl,
 		},
 
 		&cli.StringFlag{
@@ -62,7 +67,7 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 			Usage:       "Git commit sha to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.CommitSha,
+			Destination: &opts.Destination.CommitSha,
 		},
 
 		&cli.StringFlag{
@@ -72,7 +77,7 @@ func NewFlags(dst *iac.Metadata) []cli.Flag {
 			Usage:       "Short git commit sha to include in the plan report metadata.",
 			Required:    false,
 			Value:       "",
-			Destination: &dst.CommitShortSha,
+			Destination: &opts.Destination.CommitShortSha,
 		},
 	}
 }

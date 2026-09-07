@@ -30,7 +30,12 @@ type (
 	}
 )
 
-func NewLoginFlags(cfg *Login) []cli.Flag {
+// LoginOptions is what the npm login flags are built onto.
+type LoginOptions struct {
+	Destination *Login
+}
+
+func NewLoginFlags(opts LoginOptions) []cli.Flag {
 	return []cli.Flag{
 		flags.JSONFlag(&cli.StringFlag{
 			Category: "Login",
@@ -39,7 +44,7 @@ func NewLoginFlags(cfg *Login) []cli.Flag {
 			Usage:    "NPM registries to login. json([]struct { username: string, password: string, registry?: string, useHttps?: bool })",
 			Required: false,
 			Value:    "",
-		}, &cfg.Entries),
+		}, &opts.Destination.Entries),
 
 		&cli.StringSliceFlag{
 			Category:    "Login",
@@ -48,7 +53,7 @@ func NewLoginFlags(cfg *Login) []cli.Flag {
 			Usage:       ".npmrc file to use.",
 			Required:    false,
 			Value:       []string{".npmrc"},
-			Destination: &cfg.NpmRcFiles,
+			Destination: &opts.Destination.NpmRcFiles,
 		},
 
 		&cli.StringFlag{
@@ -58,7 +63,7 @@ func NewLoginFlags(cfg *Login) []cli.Flag {
 			Usage:       "Direct contents of .npmrc file.",
 			Required:    false,
 			Value:       "",
-			Destination: &cfg.NpmRc,
+			Destination: &opts.Destination.NpmRc,
 		},
 	}
 }

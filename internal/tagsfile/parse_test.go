@@ -87,7 +87,7 @@ var _ = Describe("Flags", func() {
 			strict bool
 		)
 
-		flags := tagsfile.NewFlags(&path, "", &strict, false)
+		flags := tagsfile.NewFlags(tagsfile.Options{Destination: &path, Strict: &strict})
 
 		Expect(flags).To(HaveLen(2))
 		Expect(flags[0].Names()).To(Equal([]string{"tags-file"}))
@@ -98,7 +98,7 @@ var _ = Describe("Flags", func() {
 	It("leaves the strict flag out for a nil destination", func() {
 		var path string
 
-		flags := tagsfile.NewFlags(&path, ".tags", nil, false)
+		flags := tagsfile.NewFlags(tagsfile.Options{Destination: &path, Value: ".tags"})
 
 		Expect(flags).To(HaveLen(1))
 		Expect(flags[0].Names()).To(Equal([]string{"tags-file"}))

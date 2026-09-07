@@ -4,4 +4,4 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
 
-var Flags = node.NewLoginFlags(Login)
+var Flags = node.NewLoginFlags(node.LoginOptions{Destination: Login})

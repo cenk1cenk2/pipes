@@ -10,6 +10,11 @@ import (
 
 const CATEGORY_ENVIRONMENT = "Environment"
 
+// Options is what the environment flags are built onto.
+type Options struct {
+	Destination *Config
+}
+
 // Config is the environment selection a pipe was configured with.
 type Config struct {
 	Enable            bool
@@ -25,8 +30,8 @@ type Config struct {
 // The pipes that only inject an environment on request unhide the enable flag
 // and flip its default with OverwriteCliFlag, so the flag stays hidden and on
 // here for the pipe whose whole job this is.
-func NewFlags(cfg *Config) []cli.Flag {
-	return append(git.NewFlags(&cfg.Git), []cli.Flag{
+func NewFlags(opts Options) []cli.Flag {
+	return append(git.NewFlags(git.Options{Destination: &opts.Destination.Git}), []cli.Flag{
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.enable",
@@ -35,7 +40,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 			Required:    false,
 			Hidden:      true,
 			Value:       true,
-			Destination: &cfg.Enable,
+			Destination: &opts.Destination.Enable,
 		},
 
 		flags.JSONFlag(&cli.StringFlag{
@@ -47,7 +52,7 @@ func NewFlags(cfg *Config) []cli.Flag {
       json([]struct{ match: RegExp, environment: string })`,
 			Required: false,
 			Value:    DEFAULT_CONDITIONS,
-		}, &cfg.Conditions),
+		}, &opts.Destination.Conditions),
 
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,
@@ -56,7 +61,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 			Usage:       "Fail on missing environment references.",
 			Required:    false,
 			Value:       true,
-			Destination: &cfg.FailOnNoReference,
+			Destination: &opts.Destination.FailOnNoReference,
 		},
 
 		&cli.BoolFlag{
@@ -66,7 +71,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 			Usage:       "Fail on no environment selected.",
 			Required:    false,
 			Value:       true,
-			Destination: &cfg.Strict,
+			Destination: &opts.Destination.Strict,
 		},
 	}...)
 }

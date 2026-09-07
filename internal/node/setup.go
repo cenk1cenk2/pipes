@@ -25,7 +25,12 @@ type Ctx struct {
 	PackageManager
 }
 
-func NewFlags(cfg *Config) []cli.Flag {
+// Options is what the package manager flags are built onto.
+type Options struct {
+	Destination *Config
+}
+
+func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Category:    CATEGORY_PACKAGE_MANAGER,
@@ -34,7 +39,7 @@ func NewFlags(cfg *Config) []cli.Flag {
 			Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
 			Required:    false,
 			Value:       DEFAULT_PACKAGE_MANAGER,
-			Destination: &cfg.PackageManager,
+			Destination: &opts.Destination.PackageManager,
 		},
 	}
 }
