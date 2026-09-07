@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/pulumi/preview"
@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
 			Name:        CLI_NAME,
 			Version:     VERSION,
@@ -24,9 +24,9 @@ func main() {
 				{
 					Name:        "preview",
 					Description: "Preview the Pulumi changes.",
-					Flags:       plumber.CombineFlags(setup.Flags, stack.Flags, preview.Flags),
+					Flags:       CombineFlags(setup.Flags, stack.Flags, preview.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							stack.New(p),
 							preview.New(p),
@@ -36,9 +36,9 @@ func main() {
 				{
 					Name:        "up",
 					Description: "Apply the Pulumi changes.",
-					Flags:       plumber.CombineFlags(setup.Flags, stack.Flags, up.Flags),
+					Flags:       CombineFlags(setup.Flags, stack.Flags, up.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							stack.New(p),
 							up.New(p),
@@ -48,7 +48,7 @@ func main() {
 			},
 		}
 	}).
-		SetDocumentationOptions(plumber.DocumentationOptions{
+		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
 		}).
 		Run()

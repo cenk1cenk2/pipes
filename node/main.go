@@ -5,7 +5,7 @@ package main
 import (
 	"context"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/node/add"
@@ -17,11 +17,11 @@ import (
 )
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+	NewPlumber(func(p *Plumber) *cli.Command {
 		// The environment feature is opt-in for this pipe, unlike the pipes that own
 		// their environment. The flags are shared package level values, so this runs
 		// before the command tree reads them.
-		plumber.OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
+		OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
 			return f.Name == "environment.enable"
 		}, func(f *cli.BoolFlag) *cli.BoolFlag {
 			f.Hidden = false
@@ -39,9 +39,9 @@ func main() {
 				{
 					Name:        "login",
 					Description: "Login to the given NPM registries.",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, login.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, login.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
 						))
@@ -50,9 +50,9 @@ func main() {
 				{
 					Name:        "install",
 					Description: "Install node.js dependencies with the given package manager.",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, login.Flags, install.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, login.Flags, install.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
 							install.New(p),
@@ -62,9 +62,9 @@ func main() {
 				{
 					Name:        "add",
 					Description: "Install node packages with the given package manager.",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, add.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, add.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							add.New(p),
 						))
@@ -73,9 +73,9 @@ func main() {
 				{
 					Name:        "build",
 					Description: "",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, build.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, build.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							setup.NewEnvironment(p),
 							build.New(p),
@@ -85,10 +85,10 @@ func main() {
 				{
 					Name:        "run",
 					Description: "",
-					Flags:       plumber.CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, run.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, run.Flags),
 					Arguments:   run.Arguments,
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							setup.NewEnvironment(p),
 							run.New(p),
@@ -98,7 +98,7 @@ func main() {
 			},
 		}
 	}).
-		SetDocumentationOptions(plumber.DocumentationOptions{
+		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
 		}).
 		Run()

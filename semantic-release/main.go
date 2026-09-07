@@ -5,7 +5,7 @@ package main
 import (
 	"context"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/semantic-release/release"
@@ -13,11 +13,11 @@ import (
 )
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+	NewPlumber(func(p *Plumber) *cli.Command {
 		// The environment feature is opt-in for this pipe, unlike the pipes that own
 		// their environment. The flags are shared package level values, so this runs
 		// before the command tree reads them.
-		plumber.OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
+		OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
 			return f.Name == "environment.enable"
 		}, func(f *cli.BoolFlag) *cli.BoolFlag {
 			f.Hidden = false
@@ -31,9 +31,9 @@ func main() {
 			Version:     VERSION,
 			Usage:       DESCRIPTION,
 			Description: DESCRIPTION,
-			Flags:       plumber.CombineFlags(setup.EnvironmentFlags, setup.NodeFlags, setup.LoginFlags, release.Flags),
+			Flags:       CombineFlags(setup.EnvironmentFlags, setup.NodeFlags, setup.LoginFlags, release.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
-				return p.RunJobs(plumber.CombineTaskLists(
+				return p.RunJobs(CombineTaskLists(
 					setup.NewEnvironment(p),
 					setup.New(p),
 					setup.NewLogin(p),
@@ -42,7 +42,7 @@ func main() {
 			},
 		}
 	}).
-		SetDocumentationOptions(plumber.DocumentationOptions{
+		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
 		}).
 		Run()

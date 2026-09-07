@@ -1,7 +1,7 @@
 package release
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -24,13 +24,13 @@ var _ = Describe("Semantic release", func() {
 			AppName:     "pipe-semantic-release",
 			CommandName: "release",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
-					tl := &plumber.TaskList{}
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
 
 					return tl.New(p).
 						SetRuntimeDepth(3).
-						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(RunSemanticRelease(tl).Job())
+						Set(func(tl *TaskList) Job {
+							return JobSequence(RunSemanticRelease(tl).Job())
 						})
 				},
 			},
@@ -70,7 +70,7 @@ var _ = Describe("Semantic release", func() {
 	// semantic-release detects the pipeline it runs in and refuses a dry run on a
 	// branch it was not released from, so a dry run has to hide the pipeline.
 	Describe("dry run", func() {
-		var invocation plumber.CommandInvocation
+		var invocation CommandInvocation
 
 		BeforeEach(func() {
 			runner := fixtures.Runner()

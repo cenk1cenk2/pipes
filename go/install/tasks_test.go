@@ -1,7 +1,7 @@
 package install
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -30,13 +30,13 @@ var _ = Describe("Go install", func() {
 			AppName:     "pipe-go",
 			CommandName: "install",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
-					tl := &plumber.TaskList{}
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
 
 					return tl.New(p).
 						SetRuntimeDepth(3).
-						Set(func(tl *plumber.TaskList) plumber.Job {
-							return plumber.JobSequence(
+						Set(func(tl *TaskList) Job {
+							return JobSequence(
 								GoModVendor(tl).Job(),
 								GoModVerify(tl).Job(),
 							)

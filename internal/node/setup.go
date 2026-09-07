@@ -1,7 +1,7 @@
 package node
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
@@ -42,25 +42,25 @@ func NewFlags(cfg *Config) []cli.Flag {
 
 // SetupTaskList resolves the configured package manager into ctx and reports
 // the versions the rest of the pipe is going to run against.
-func SetupTaskList(p *plumber.Plumber, cfg *Config, ctx *Ctx) *plumber.TaskList {
-	tl := &plumber.TaskList{}
+func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
+	tl := &TaskList{}
 
 	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(_ *plumber.TaskList) error {
+		ShouldRunBefore(func(_ *TaskList) error {
 			return p.Validate(cfg)
 		}).
-		Set(func(tl *plumber.TaskList) plumber.Job {
-			return plumber.JobSequence(
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
 				setupPackageManager(tl, cfg, ctx).Job(),
 				packageManagerVersion(tl, ctx).Job(),
 			)
 		})
 }
 
-func setupPackageManager(tl *plumber.TaskList, cfg *Config, ctx *Ctx) *plumber.Task {
+func setupPackageManager(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("init").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			ctx.PackageManager = PackageManager{
 				Exe:      cfg.PackageManager,
 				Commands: PackageManagers[cfg.PackageManager],
@@ -72,16 +72,16 @@ func setupPackageManager(tl *plumber.TaskList, cfg *Config, ctx *Ctx) *plumber.T
 		})
 }
 
-func packageManagerVersion(tl *plumber.TaskList, ctx *Ctx) *plumber.Task {
+func packageManagerVersion(tl *TaskList, ctx *Ctx) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			t.CreateCommand(
 				"node",
 				"--version",
 			).
-				SetLogLevel(plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *plumber.Command) error {
+				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetCombinedStream()
 
 					if len(stream) == 0 {
@@ -99,14 +99,14 @@ func packageManagerVersion(tl *plumber.TaskList, ctx *Ctx) *plumber.Task {
 			t.CreateCommand(
 				ctx.PackageManager.Exe,
 			).
-				Set(func(c *plumber.Command) error {
+				Set(func(c *Command) error {
 					c.AppendArgs(ctx.PackageManager.Commands.Version...)
 
 					return nil
 				}).
-				SetLogLevel(plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEBUG).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *plumber.Command) error {
+				ShouldRunAfter(func(c *Command) error {
 					stream := c.GetCombinedStream()
 
 					if len(stream) == 0 {
@@ -123,7 +123,7 @@ func packageManagerVersion(tl *plumber.TaskList, ctx *Ctx) *plumber.Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *plumber.Task) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }

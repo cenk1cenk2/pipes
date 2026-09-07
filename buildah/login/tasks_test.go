@@ -3,7 +3,7 @@ package login
 import (
 	"bytes"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,20 +25,20 @@ var _ = Describe("Container registry login", func() {
 			AppName:     "pipe-buildah",
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
+				func(p *Plumber, _ *cli.Command) *TaskList {
 					return New(p)
 				},
 			},
 		}).Run()
 	}
 
-	disabled := func(pipe Pipe, task func(*plumber.TaskList) *plumber.Task) bool {
+	disabled := func(pipe Pipe, task func(*TaskList) *Task) bool {
 		GinkgoHelper()
 
 		*P = pipe
 
-		tl := &plumber.TaskList{}
-		tl.New(plumber.NewPlumber(func(_ *plumber.Plumber) *cli.Command {
+		tl := &TaskList{}
+		tl.New(NewPlumber(func(_ *Plumber) *cli.Command {
 			return &cli.Command{Name: "test"}
 		}))
 
@@ -140,7 +140,7 @@ var _ = Describe("Container registry login", func() {
 			AppName:     "pipe-buildah",
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
+				func(p *Plumber, _ *cli.Command) *TaskList {
 					log = p.Log
 					log.SetOutput(output)
 

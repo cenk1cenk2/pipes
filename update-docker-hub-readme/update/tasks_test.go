@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -38,26 +38,26 @@ var _ = Describe("Docker Hub readme", func() {
 	// A failing task terminates the process through the plumber, so only what the
 	// pipe does on its way through is asserted here and the errors it answers with
 	// are asserted on VerifyReadme instead.
-	run := func(tasks ...func(*plumber.TaskList) *plumber.Task) error {
+	run := func(tasks ...func(*TaskList) *Task) error {
 		GinkgoHelper()
 
 		return fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
 			AppName:     "pipe-update-docker-hub-readme",
 			CommandName: "update",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
-					tl := &plumber.TaskList{}
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
 
 					return tl.New(p).
 						SetRuntimeDepth(3).
-						Set(func(tl *plumber.TaskList) plumber.Job {
-							jobs := make([]plumber.Job, 0, len(tasks))
+						Set(func(tl *TaskList) Job {
+							jobs := make([]Job, 0, len(tasks))
 
 							for _, task := range tasks {
 								jobs = append(jobs, task(tl).Job())
 							}
 
-							return plumber.JobSequence(jobs...)
+							return JobSequence(jobs...)
 						})
 				},
 			},

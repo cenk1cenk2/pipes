@@ -4,7 +4,7 @@
 package setup
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
@@ -28,17 +28,17 @@ var (
 )
 
 // NewEnvironment selects the environment the release runs against.
-func NewEnvironment(p *plumber.Plumber) *plumber.TaskList {
-	return environment.TaskList(p, Environment, EnvironmentCtx)
+func NewEnvironment(p *Plumber) *TaskList {
+	return environment.SetupTaskList(p, Environment, EnvironmentCtx)
 }
 
 // New resolves the package manager the release library is installed with.
-func New(p *plumber.Plumber) *plumber.TaskList {
+func New(p *Plumber) *TaskList {
 	return node.SetupTaskList(p, NodeConfig, NodeCtx)
 }
 
 // NewLogin writes the npmrc the package manager reads its credentials back
 // from, so it composes after New.
-func NewLogin(p *plumber.Plumber) *plumber.TaskList {
+func NewLogin(p *Plumber) *TaskList {
 	return node.LoginTaskList(p, Login)
 }

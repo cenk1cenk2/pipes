@@ -4,7 +4,7 @@
 package setup
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
@@ -19,6 +19,6 @@ var Flags = environment.NewFlags(Environment)
 
 // New selects the environment out of the source control references and reads
 // its variables, which is everything the pipe does before writing them out.
-func New(p *plumber.Plumber) *plumber.TaskList {
-	return environment.TaskList(p, Environment, EnvironmentCtx)
+func New(p *Plumber) *TaskList {
+	return environment.SetupTaskList(p, Environment, EnvironmentCtx)
 }

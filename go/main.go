@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/go/build"
@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
 			Name:        CLI_NAME,
 			Version:     VERSION,
@@ -25,9 +25,9 @@ func main() {
 				{
 					Name:        "install",
 					Description: "Vendor go modules.",
-					Flags:       plumber.CombineFlags(setup.Flags, install.Flags),
+					Flags:       CombineFlags(setup.Flags, install.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							install.New(p),
 						))
@@ -36,9 +36,9 @@ func main() {
 				{
 					Name:        "build",
 					Description: "Build an application.",
-					Flags:       plumber.CombineFlags(setup.Flags, build.Flags),
+					Flags:       CombineFlags(setup.Flags, build.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							build.New(p),
 						))
@@ -47,9 +47,9 @@ func main() {
 				{
 					Name:        "lint",
 					Description: "Run golangci-lint on the project.",
-					Flags:       plumber.CombineFlags(setup.Flags, lint.Flags),
+					Flags:       CombineFlags(setup.Flags, lint.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							lint.New(p),
 						))
@@ -58,10 +58,10 @@ func main() {
 				{
 					Name:        "tool",
 					Description: "Run a specified go tool.",
-					Flags:       plumber.CombineFlags(setup.Flags, gotool.Flags),
+					Flags:       CombineFlags(setup.Flags, gotool.Flags),
 					Arguments:   gotool.Arguments,
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							gotool.New(p),
 						))
@@ -70,7 +70,7 @@ func main() {
 			},
 		}
 	}).
-		SetDocumentationOptions(plumber.DocumentationOptions{
+		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
 		}).
 		Run()

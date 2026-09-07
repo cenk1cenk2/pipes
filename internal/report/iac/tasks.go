@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
@@ -17,7 +17,7 @@ import (
 // The tasks are handed the pipe's own instance rather than a copy, since it is
 // only filled once the flags the pipe builds it out of have been parsed.
 type Source struct {
-	Read          func(t *plumber.Task) (Report, error)
+	Read          func(t *Task) (Report, error)
 	Summary       func(Report) Summary
 	SummaryOutput string
 	Cwd           string
@@ -29,9 +29,9 @@ type Source struct {
 	Metadata       Metadata
 }
 
-func SummaryTask(tl *plumber.TaskList, src *Source) *plumber.Task {
+func SummaryTask(tl *TaskList, src *Source) *Task {
 	return tl.CreateTask("summary").
-		ShouldDisable(func(t *plumber.Task) bool {
+		ShouldDisable(func(t *Task) bool {
 			if src.SummaryOutput == "" {
 				t.Log.Debugln("Skipping plan summary because no summary output file is configured.")
 
@@ -40,7 +40,7 @@ func SummaryTask(tl *plumber.TaskList, src *Source) *plumber.Task {
 
 			return false
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			report, err := src.Read(t)
 			if err != nil {
 				return err
@@ -61,9 +61,9 @@ func SummaryTask(tl *plumber.TaskList, src *Source) *plumber.Task {
 		})
 }
 
-func MergeRequestReportTask(tl *plumber.TaskList, src *Source) *plumber.Task {
+func MergeRequestReportTask(tl *TaskList, src *Source) *Task {
 	return tl.CreateTask("merge-request-report").
-		ShouldDisable(func(t *plumber.Task) bool {
+		ShouldDisable(func(t *Task) bool {
 			if !src.MergeRequest.Enabled {
 				return true
 			}
@@ -76,7 +76,7 @@ func MergeRequestReportTask(tl *plumber.TaskList, src *Source) *plumber.Task {
 
 			return false
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			report, err := src.Read(t)
 			if err != nil {
 				return err

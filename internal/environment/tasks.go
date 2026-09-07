@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 // Ctx is what the environment task list resolves. A pipe that consumes the
-// selection holds on to the same instance it handed to TaskList, since the
+// selection holds on to the same instance it handed to SetupTaskList, since the
 // values only land once the tasks have run.
 type Ctx struct {
 	References  []string
@@ -16,21 +16,21 @@ type Ctx struct {
 	EnvVars     map[string]string
 }
 
-// TaskList selects an environment out of the source control references and
+// SetupTaskList selects an environment out of the source control references and
 // reads the variables belonging to it into ctx.
-func TaskList(p *plumber.Plumber, cfg *Config, ctx *Ctx) *plumber.TaskList {
-	tl := &plumber.TaskList{}
+func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
+	tl := &TaskList{}
 
 	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldDisable(func(_ *plumber.TaskList) bool {
+		ShouldDisable(func(_ *TaskList) bool {
 			return !cfg.Enable
 		}).
-		ShouldRunBefore(func(_ *plumber.TaskList) error {
+		ShouldRunBefore(func(_ *TaskList) error {
 			return p.Validate(cfg)
 		}).
-		Set(func(tl *plumber.TaskList) plumber.Job {
-			return plumber.JobSequence(
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
 				parseReferences(tl, cfg, ctx).Job(),
 
 				selectEnvironment(tl, cfg, ctx).Job(),
@@ -39,9 +39,9 @@ func TaskList(p *plumber.Plumber, cfg *Config, ctx *Ctx) *plumber.TaskList {
 		})
 }
 
-func parseReferences(tl *plumber.TaskList, cfg *Config, ctx *Ctx) *plumber.Task {
+func parseReferences(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("init", "references").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			ctx.References = cfg.Git.References()
 
 			if cfg.FailOnNoReference && len(ctx.References) == 0 {
@@ -54,9 +54,9 @@ func parseReferences(tl *plumber.TaskList, cfg *Config, ctx *Ctx) *plumber.Task 
 		})
 }
 
-func selectEnvironment(tl *plumber.TaskList, cfg *Config, ctx *Ctx) *plumber.Task {
+func selectEnvironment(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("environment", "select").
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			t.Log.Debugf("Conditions for environment variable selection: %+v", cfg.Conditions)
 
 			selected, err := Select(cfg.Conditions, ctx.References)
@@ -83,12 +83,12 @@ func selectEnvironment(tl *plumber.TaskList, cfg *Config, ctx *Ctx) *plumber.Tas
 		})
 }
 
-func fetchEnvironment(tl *plumber.TaskList, ctx *Ctx) *plumber.Task {
+func fetchEnvironment(tl *TaskList, ctx *Ctx) *Task {
 	return tl.CreateTask("environment", "fetch").
-		ShouldDisable(func(_ *plumber.Task) bool {
+		ShouldDisable(func(_ *Task) bool {
 			return ctx.Environment == ""
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			ctx.EnvVars = Fetch(os.Environ(), ctx.Environment)
 
 			t.Log.Infof("Environment variables that matches the current environment: %s -> %+v", ctx.Environment, ctx.EnvVars)

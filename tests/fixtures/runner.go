@@ -3,7 +3,7 @@
 package fixtures
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	"github.com/sirupsen/logrus"
@@ -20,7 +20,7 @@ func Runner(responses ...tests.TestingCommandResponse) *tests.TestingCommandRunn
 // stays available, since the pipes differ in command name, flags and arguments
 // and only agree on wanting their commands stubbed.
 func Cli(runner *tests.TestingCommandRunner, spec tests.TaskListCli) *tests.TaskListCliFixture {
-	spec.Runtime = plumber.Runtime{CommandRunner: runner.Runner()}
+	spec.Runtime = Runtime{CommandRunner: runner.Runner()}
 
 	return tests.NewTaskListCli(spec)
 }

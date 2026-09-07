@@ -3,7 +3,7 @@ package login
 import (
 	"bytes"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,7 +25,7 @@ var _ = Describe("Helm registry login", func() {
 			AppName:     "pipe-helm",
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
+				func(p *Plumber, _ *cli.Command) *TaskList {
 					return New(p)
 				},
 			},
@@ -101,7 +101,7 @@ var _ = Describe("Helm registry login", func() {
 			AppName:     "pipe-helm",
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
-				func(p *plumber.Plumber, _ *cli.Command) *plumber.TaskList {
+				func(p *Plumber, _ *cli.Command) *TaskList {
 					log = p.Log
 					log.SetOutput(output)
 

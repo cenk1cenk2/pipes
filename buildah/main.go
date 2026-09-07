@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/buildah/build"
@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
 			Name:        CLI_NAME,
 			Version:     VERSION,
@@ -24,9 +24,9 @@ func main() {
 				{
 					Name:        "login",
 					Description: "Login to the given container registries.",
-					Flags:       plumber.CombineFlags(setup.Flags, login.Flags),
+					Flags:       CombineFlags(setup.Flags, login.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
 						))
@@ -35,9 +35,9 @@ func main() {
 				{
 					Name:        "build",
 					Description: "Build container images.",
-					Flags:       plumber.CombineFlags(setup.Flags, login.Flags, build.Flags),
+					Flags:       CombineFlags(setup.Flags, login.Flags, build.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
 							build.New(p),
@@ -47,9 +47,9 @@ func main() {
 				{
 					Name:        "manifest",
 					Description: "Update manifests of the container images.",
-					Flags:       plumber.CombineFlags(setup.Flags, login.Flags, manifest.Flags),
+					Flags:       CombineFlags(setup.Flags, login.Flags, manifest.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
-						return p.RunJobs(plumber.CombineTaskLists(
+						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
 							manifest.New(p),
@@ -59,7 +59,7 @@ func main() {
 			},
 		}
 	}).
-		SetDocumentationOptions(plumber.DocumentationOptions{
+		SetDocumentationOptions(DocumentationOptions{
 			ExcludeFlags: true,
 		}).
 		Run()

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/sirupsen/logrus"
@@ -136,18 +136,18 @@ var _ = Describe("Process", func() {
 // compacts and reports what they collected; these specs stand in for that parent.
 var _ = Describe("Sources", func() {
 	var (
-		p   *plumber.Plumber
-		tl  *plumber.TaskList
+		p   *Plumber
+		tl  *TaskList
 		dir string
 	)
 
 	BeforeEach(func() {
-		p = plumber.NewPlumber(func(_ *plumber.Plumber) *cli.Command {
+		p = NewPlumber(func(_ *Plumber) *cli.Command {
 			return &cli.Command{Name: "test"}
 		})
 		p.Log.SetOutput(GinkgoWriter)
 
-		tl = &plumber.TaskList{}
+		tl = &TaskList{}
 		tl.New(p)
 
 		dir = GinkgoT().TempDir()
@@ -156,8 +156,8 @@ var _ = Describe("Sources", func() {
 	collect := func(collector *versions.Collector) []string {
 		out := []string{}
 
-		Expect(p.RunJobs(plumber.JobSequence(
-			plumber.JobParallel(
+		Expect(p.RunJobs(JobSequence(
+			JobParallel(
 				collector.UserTask(tl, &out).Job(),
 				collector.FileTask(tl, &out).Job(),
 			),

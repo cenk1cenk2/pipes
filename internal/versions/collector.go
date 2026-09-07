@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"slices"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/sirupsen/logrus"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
@@ -46,12 +46,12 @@ type Collector struct {
 }
 
 // UserTask collects what the pipeline named on the command line.
-func (c *Collector) UserTask(tl *plumber.TaskList, out *[]string) *plumber.Task {
+func (c *Collector) UserTask(tl *TaskList, out *[]string) *Task {
 	return tl.CreateTask(c.Name, "user").
-		ShouldDisable(func(_ *plumber.Task) bool {
+		ShouldDisable(func(_ *Task) bool {
 			return len(c.FromUser) == 0
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			for _, v := range slices.Compact(slices.Clone(c.FromUser)) {
 				if err := c.add(t, out, v); err != nil {
 					return err
@@ -64,12 +64,12 @@ func (c *Collector) UserTask(tl *plumber.TaskList, out *[]string) *plumber.Task 
 
 // FileTask collects what the file the pipeline pointed at names, which is how a
 // job passes values to the one after it.
-func (c *Collector) FileTask(tl *plumber.TaskList, out *[]string) *plumber.Task {
+func (c *Collector) FileTask(tl *TaskList, out *[]string) *Task {
 	return tl.CreateTask(c.Name, "file").
-		ShouldDisable(func(_ *plumber.Task) bool {
+		ShouldDisable(func(_ *Task) bool {
 			return c.File == ""
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			values, err := tagsfile.Parse(t.Log, path.Join(c.FileDir, c.File), c.FileStrict)
 
 			if err != nil {
@@ -78,7 +78,7 @@ func (c *Collector) FileTask(tl *plumber.TaskList, out *[]string) *plumber.Task 
 
 			for _, v := range values {
 				t.CreateSubtask(v).
-					Set(func(t *plumber.Task) error {
+					Set(func(t *Task) error {
 						return c.add(t, out, v)
 					}).
 					AddSelfToTheParentAsParallel()
@@ -86,19 +86,19 @@ func (c *Collector) FileTask(tl *plumber.TaskList, out *[]string) *plumber.Task 
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *plumber.Task) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }
 
 // LatestTask adds the latest value when a source control reference matches, and
 // leaves itself out for a pipe that has no notion of one.
-func (c *Collector) LatestTask(tl *plumber.TaskList, out *[]string) *plumber.Task {
+func (c *Collector) LatestTask(tl *TaskList, out *[]string) *Task {
 	return tl.CreateTask(c.Name, "latest").
-		ShouldDisable(func(_ *plumber.Task) bool {
+		ShouldDisable(func(_ *Task) bool {
 			return c.LatestWhen == nil
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			matched, err := git.MatchAny(c.LatestWhen, c.References)
 			if err != nil {
 				return fmt.Errorf("Can not process regular expression for latest tag: %w", err)
@@ -124,7 +124,7 @@ func (c *Collector) LatestTask(tl *plumber.TaskList, out *[]string) *plumber.Tas
 
 // The file source appends from parallel subtasks, which is why the append is
 // taken under the task list lock rather than a lock of the collector's own.
-func (c *Collector) add(t *plumber.Task, out *[]string, value string) error {
+func (c *Collector) add(t *Task, out *[]string, value string) error {
 	processed, err := c.Process(t.Log, value)
 
 	if err != nil {
@@ -184,10 +184,10 @@ func (c *Collector) template(log *logrus.Entry, value string) (string, error) {
 
 		log.Debugf("Applying template since condition matched for given tag: %s -> %s with %v", value, re.String(), matches)
 
-		return plumber.InlineTemplate(m.Template, matches)
+		return InlineTemplate(m.Template, matches)
 	}
 
-	return plumber.InlineTemplate[any](value, nil)
+	return InlineTemplate[any](value, nil)
 }
 
 func (c *Collector) sanitize(log *logrus.Entry, value string) (string, error) {
@@ -208,7 +208,7 @@ func (c *Collector) sanitize(log *logrus.Entry, value string) (string, error) {
 
 		log.Debugf("Sanitizing since condition matched for given tag: %s -> %s with %v", value, re.String(), matches)
 
-		return plumber.InlineTemplate(m.Template, matches)
+		return InlineTemplate(m.Template, matches)
 	}
 
 	return value, nil

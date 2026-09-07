@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/nochso/gomd/eol"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
@@ -67,28 +67,28 @@ func NewLoginFlags(cfg *Login) []cli.Flag {
 
 // LoginTaskList writes the configured credentials into the npmrc files and
 // checks that the registries accept them.
-func LoginTaskList(p *plumber.Plumber, cfg *Login) *plumber.TaskList {
-	tl := &plumber.TaskList{}
+func LoginTaskList(p *Plumber, cfg *Login) *TaskList {
+	tl := &TaskList{}
 
 	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(_ *plumber.TaskList) error {
+		ShouldRunBefore(func(_ *TaskList) error {
 			return p.Validate(cfg)
 		}).
-		Set(func(tl *plumber.TaskList) plumber.Job {
-			return plumber.JobSequence(
+		Set(func(tl *TaskList) Job {
+			return JobSequence(
 				GenerateNpmRc(tl, cfg).Job(),
 				VerifyNpmLogin(tl, cfg).Job(),
 			)
 		})
 }
 
-func GenerateNpmRc(tl *plumber.TaskList, cfg *Login) *plumber.Task {
+func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 	return tl.CreateTask("npmrc").
-		ShouldDisable(func(_ *plumber.Task) bool {
+		ShouldDisable(func(_ *Task) bool {
 			return cfg.Entries == nil && cfg.NpmRc == ""
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			t.Log.Debugf(
 				".npmrc file: %s", strings.Join(cfg.NpmRcFiles, ", "),
 			)
@@ -120,7 +120,7 @@ func GenerateNpmRc(tl *plumber.TaskList, cfg *Login) *plumber.Task {
 			for _, file := range cfg.NpmRcFiles {
 				t.CreateSubtask(file).
 					Set(
-						func(st *plumber.Task) error {
+						func(st *Task) error {
 							st.Log.Infof("Generating npmrc file: %s", file)
 
 							f, err := os.OpenFile(file,
@@ -143,26 +143,26 @@ func GenerateNpmRc(tl *plumber.TaskList, cfg *Login) *plumber.Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *plumber.Task) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunSubtasks()
 		})
 }
 
-func VerifyNpmLogin(tl *plumber.TaskList, cfg *Login) *plumber.Task {
+func VerifyNpmLogin(tl *TaskList, cfg *Login) *Task {
 	return tl.CreateTask("login").
 		// Without an npmrc file there is nothing holding the credentials for npm
 		// to read back, so there is nothing to verify either.
-		ShouldDisable(func(_ *plumber.Task) bool {
+		ShouldDisable(func(_ *Task) bool {
 			return cfg.Entries == nil || len(cfg.NpmRcFiles) == 0
 		}).
-		Set(func(t *plumber.Task) error {
+		Set(func(t *Task) error {
 			for _, v := range cfg.Entries {
 				t.CreateCommand(
 					"npm",
 					"whoami",
 				).
-					SetLogLevel(plumber.LOG_LEVEL_DEBUG, plumber.LOG_LEVEL_DEFAULT, plumber.LOG_LEVEL_DEBUG).
-					Set(func(c *plumber.Command) error {
+					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+					Set(func(c *Command) error {
 						c.Log.Infof(
 							"Checking login credentials for Npm registry: %s", v.Registry,
 						)
@@ -189,7 +189,7 @@ func VerifyNpmLogin(tl *plumber.TaskList, cfg *Login) *plumber.Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *plumber.Task) error {
+		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobParallel()
 		})
 }
