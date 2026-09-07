@@ -10,23 +10,21 @@ import (
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
 )
 
-func newCommand(p *plumber.Plumber) *cli.Command {
-	return &cli.Command{
-		Name:        CLI_NAME,
-		Version:     VERSION,
-		Usage:       DESCRIPTION,
-		Description: DESCRIPTION,
-		Flags:       plumber.CombineFlags(update.Flags),
-		Action: func(_ context.Context, _ *cli.Command) error {
-			return p.RunJobs(plumber.CombineTaskLists(
-				update.New(p),
-			))
-		},
-	}
-}
-
 func main() {
-	plumber.NewPlumber(newCommand).
+	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+		return &cli.Command{
+			Name:        CLI_NAME,
+			Version:     VERSION,
+			Usage:       DESCRIPTION,
+			Description: DESCRIPTION,
+			Flags:       plumber.CombineFlags(update.Flags),
+			Action: func(_ context.Context, _ *cli.Command) error {
+				return p.RunJobs(plumber.CombineTaskLists(
+					update.New(p),
+				))
+			},
+		}
+	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

@@ -12,38 +12,36 @@ import (
 	"gitlab.kilic.dev/devops/pipes/semantic-release/setup"
 )
 
-func newCommand(p *plumber.Plumber) *cli.Command {
-	// The environment feature is opt-in for this pipe, unlike the pipes that own
-	// their environment. The flags are shared package level values, so this runs
-	// before the command tree reads them.
-	plumber.OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
-		return f.Name == "environment.enable"
-	}, func(f *cli.BoolFlag) *cli.BoolFlag {
-		f.Hidden = false
-		f.Value = false
-
-		return f
-	})
-
-	return &cli.Command{
-		Name:        CLI_NAME,
-		Version:     VERSION,
-		Usage:       DESCRIPTION,
-		Description: DESCRIPTION,
-		Flags:       plumber.CombineFlags(setup.EnvironmentFlags, setup.NodeFlags, setup.LoginFlags, release.Flags),
-		Action: func(_ context.Context, _ *cli.Command) error {
-			return p.RunJobs(plumber.CombineTaskLists(
-				setup.NewEnvironment(p),
-				setup.New(p),
-				setup.NewLogin(p),
-				release.New(p),
-			))
-		},
-	}
-}
-
 func main() {
-	plumber.NewPlumber(newCommand).
+	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+		// The environment feature is opt-in for this pipe, unlike the pipes that own
+		// their environment. The flags are shared package level values, so this runs
+		// before the command tree reads them.
+		plumber.OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
+			return f.Name == "environment.enable"
+		}, func(f *cli.BoolFlag) *cli.BoolFlag {
+			f.Hidden = false
+			f.Value = false
+
+			return f
+		})
+
+		return &cli.Command{
+			Name:        CLI_NAME,
+			Version:     VERSION,
+			Usage:       DESCRIPTION,
+			Description: DESCRIPTION,
+			Flags:       plumber.CombineFlags(setup.EnvironmentFlags, setup.NodeFlags, setup.LoginFlags, release.Flags),
+			Action: func(_ context.Context, _ *cli.Command) error {
+				return p.RunJobs(plumber.CombineTaskLists(
+					setup.NewEnvironment(p),
+					setup.New(p),
+					setup.NewLogin(p),
+					release.New(p),
+				))
+			},
+		}
+	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

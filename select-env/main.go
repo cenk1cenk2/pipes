@@ -12,24 +12,22 @@ import (
 	"gitlab.kilic.dev/devops/pipes/select-env/write"
 )
 
-func newCommand(p *plumber.Plumber) *cli.Command {
-	return &cli.Command{
-		Name:        CLI_NAME,
-		Version:     VERSION,
-		Usage:       DESCRIPTION,
-		Description: DESCRIPTION,
-		Flags:       plumber.CombineFlags(setup.Flags, write.Flags),
-		Action: func(_ context.Context, _ *cli.Command) error {
-			return p.RunJobs(plumber.CombineTaskLists(
-				setup.New(p),
-				write.New(p),
-			))
-		},
-	}
-}
-
 func main() {
-	plumber.NewPlumber(newCommand).
+	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+		return &cli.Command{
+			Name:        CLI_NAME,
+			Version:     VERSION,
+			Usage:       DESCRIPTION,
+			Description: DESCRIPTION,
+			Flags:       plumber.CombineFlags(setup.Flags, write.Flags),
+			Action: func(_ context.Context, _ *cli.Command) error {
+				return p.RunJobs(plumber.CombineTaskLists(
+					setup.New(p),
+					write.New(p),
+				))
+			},
+		}
+	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).

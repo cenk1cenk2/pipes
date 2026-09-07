@@ -10,25 +10,23 @@ import (
 	"gitlab.kilic.dev/devops/pipes/template/pipe"
 )
 
-func newCommand(p *plumber.Plumber) *cli.Command {
-	return &cli.Command{
-		Name:        CLI_NAME,
-		Version:     VERSION,
-		Usage:       DESCRIPTION,
-		Description: DESCRIPTION,
-		Flags:       plumber.CombineFlags(pipe.Flags),
-		// The task lists are built in here rather than alongside the flags, since a
-		// stage reads the parsed flag values as it constructs.
-		Action: func(_ context.Context, _ *cli.Command) error {
-			return p.RunJobs(plumber.CombineTaskLists(
-				pipe.New(p),
-			))
-		},
-	}
-}
-
 func main() {
-	plumber.NewPlumber(newCommand).
+	plumber.NewPlumber(func(p *plumber.Plumber) *cli.Command {
+		return &cli.Command{
+			Name:        CLI_NAME,
+			Version:     VERSION,
+			Usage:       DESCRIPTION,
+			Description: DESCRIPTION,
+			Flags:       plumber.CombineFlags(pipe.Flags),
+			// The task lists are built in here rather than alongside the flags, since a
+			// stage reads the parsed flag values as it constructs.
+			Action: func(_ context.Context, _ *cli.Command) error {
+				return p.RunJobs(plumber.CombineTaskLists(
+					pipe.New(p),
+				))
+			},
+		}
+	}).
 		SetDocumentationOptions(plumber.DocumentationOptions{
 			ExcludeFlags: true,
 		}).
