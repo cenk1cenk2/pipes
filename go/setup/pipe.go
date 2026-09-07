@@ -19,6 +19,9 @@ type (
 		Version   string
 		Env       map[string]string
 		Workspace bool
+		// Modules are the directories of every module the workspace drives, resolved
+		// once here because lint and build both walk them.
+		Modules []string
 	}
 )
 
@@ -39,6 +42,7 @@ func New(p *Plumber) *TaskList {
 				version(tl).Job(),
 				GoEnv(tl).Job(),
 				GoWorkspace(tl).Job(),
+				GoModules(tl).Job(),
 			)
 		})
 }

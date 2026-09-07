@@ -1,10 +1,6 @@
 package lint
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
@@ -12,60 +8,38 @@ import (
 func GoLint(tl *TaskList) *Task {
 	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
-			if setup.C.Workspace {
-				t.CreateCommand(
-					"go",
-					"list",
-					"-m",
-					"-f",
-					"{{.Dir}}",
-				).
-					AppendEnvironment(setup.C.Env).
-					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-					SetDir(setup.C.Cwd).
-					EnableStreamRecording().
-					ShouldRunAfter(func(c *Command) error {
-						C.Modules = nil
-
-						for _, module := range c.GetStdoutStream() {
-							if module := strings.TrimSpace(module); module != "" {
-								C.Modules = append(C.Modules, module)
-							}
-						}
-
-						if len(C.Modules) == 0 {
-							return fmt.Errorf("Can not resolve any modules of the go workspace.")
-						}
-
-						t.Log.Infof("Linting modules of the workspace: %s", strings.Join(C.Modules, ", "))
-
-						return nil
-					}).
+			// A workspace is linted one module at a time from inside it. The go tool
+			// drops directories whose name starts with an underscore out of a package
+			// pattern, so a "<module>/..." argument resolves to nothing at all for the
+			// scaffold and it would go unlinted without a word from the linter.
+			for _, module := range setup.C.Modules {
+				lint(t).
+					SetDir(module).
+					AppendArgs("./...").
 					AddSelfToTheTask()
 			}
 
-			t.CreateCommand(
-				"golangci-lint",
-				"run",
-				"-v",
-				"--timeout",
-				P.Timeout.String(),
-			).
-				Set(func(c *Command) error {
-					for _, module := range C.Modules {
-						c.AppendArgs(filepath.Join(module, "..."))
-					}
-
-					return nil
-				}).
-				AppendEnvironment(setup.C.Env).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-				SetDir(setup.C.Cwd).
-				AddSelfToTheTask()
+			if len(setup.C.Modules) == 0 {
+				lint(t).
+					SetDir(setup.C.Cwd).
+					AddSelfToTheTask()
+			}
 
 			return nil
 		}).
 		ShouldRunAfter(func(t *Task) error {
 			return t.RunCommandJobAsJobSequence()
 		})
+}
+
+func lint(t *Task) *Command {
+	return t.CreateCommand(
+		"golangci-lint",
+		"run",
+		"-v",
+		"--timeout",
+		P.Timeout.String(),
+	).
+		AppendEnvironment(setup.C.Env).
+		SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG)
 }

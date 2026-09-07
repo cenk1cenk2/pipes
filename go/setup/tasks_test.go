@@ -124,3 +124,65 @@ var _ = Describe("Go workspace", func() {
 		Expect(C.Workspace).To(BeFalse())
 	})
 })
+
+var _ = Describe("Go modules", func() {
+	run := func(runner *tests.TestingCommandRunner, workspace bool) error {
+		GinkgoHelper()
+
+		*C = Ctx{Cwd: "projects/api", Env: map[string]string{"GOPATH": "/cache"}, Workspace: workspace}
+
+		return fixtures.Cli(runner, tests.TaskListCli{
+			AppName:     "pipe-go",
+			CommandName: "setup",
+			TaskLists: []tests.TaskListFactory{
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
+
+					return tl.New(p).
+						SetRuntimeDepth(3).
+						Set(func(tl *TaskList) Job {
+							return JobSequence(GoModules(tl).Job())
+						})
+				},
+			},
+		}).Run()
+	}
+
+	modules := func(stdout string) tests.TestingCommandResponse {
+		return tests.TestingCommandResponse{Name: "go", Stdout: stdout}
+	}
+
+	It("resolves every module the workspace drives", func() {
+		runner := fixtures.Runner(modules("/repository/api\n/repository/worker\n"))
+
+		Expect(run(runner, true)).To(Succeed())
+
+		Expect(C.Modules).To(Equal([]string{"/repository/api", "/repository/worker"}))
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Name).To(Equal("go"))
+		Expect(invocation.Args).To(Equal([]string{"list", "-m", "-f", "{{.Dir}}"}))
+		Expect(invocation.Dir).To(Equal("projects/api"))
+		Expect(invocation.Env).To(ContainElement("GOPATH=/cache"))
+	})
+
+	// The scaffold module lives under a directory the go tool drops out of package
+	// patterns, so it is kept here and linted from inside its own directory.
+	It("keeps the modules the go tool hides from package patterns", func() {
+		runner := fixtures.Runner(modules("/repository/_template\n/repository/api\n"))
+
+		Expect(run(runner, true)).To(Succeed())
+
+		Expect(C.Modules).To(Equal([]string{"/repository/_template", "/repository/api"}))
+	})
+
+	It("asks the toolchain for nothing outside workspace mode", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, false)).To(Succeed())
+
+		Expect(C.Modules).To(BeEmpty())
+		Expect(runner.Invocations()).To(BeEmpty())
+	})
+})

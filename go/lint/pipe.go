@@ -12,16 +12,11 @@ type (
 		Timeout time.Duration
 		Cache   string
 	}
-
-	Ctx struct {
-		Modules []string
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
-var C = &Ctx{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).

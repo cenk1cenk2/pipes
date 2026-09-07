@@ -103,3 +103,46 @@ func GoWorkspace(tl *TaskList) *Task {
 			return t.RunCommandJobAsJobSequence()
 		})
 }
+
+func GoModules(tl *TaskList) *Task {
+	return tl.CreateTask("modules").
+		ShouldDisable(func(_ *Task) bool {
+			return !C.Workspace
+		}).
+		Set(func(t *Task) error {
+			t.CreateCommand(
+				"go",
+				"list",
+				"-m",
+				"-f",
+				"{{.Dir}}",
+			).
+				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				SetDir(C.Cwd).
+				EnableStreamRecording().
+				ShouldRunAfter(func(c *Command) error {
+					C.Modules = nil
+
+					for _, module := range c.GetStdoutStream() {
+						if module := strings.TrimSpace(module); module != "" {
+							C.Modules = append(C.Modules, module)
+						}
+					}
+
+					if len(C.Modules) == 0 {
+						return fmt.Errorf("Can not resolve any modules of the go workspace.")
+					}
+
+					t.Log.Infof("Modules of the workspace: %s", strings.Join(C.Modules, ", "))
+
+					return nil
+				}).
+				AppendEnvironment(C.Env).
+				AddSelfToTheTask()
+
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
+		})
+}

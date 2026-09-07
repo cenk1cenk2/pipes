@@ -16,17 +16,16 @@ import (
 var _ = Describe("Go lint", func() {
 	// The flags are not registered with the spec command, since the pipe is seeded
 	// directly and a package level flag only reads its environment on first parse.
-	run := func(runner *tests.TestingCommandRunner, workspace bool) error {
+	run := func(runner *tests.TestingCommandRunner, modules ...string) error {
 		GinkgoHelper()
 
 		*P = Pipe{Timeout: 5 * time.Minute}
-		*C = Ctx{}
-		// The tasks read the tool the setup resolved off its package level
-		// instance, so a spec seeds that the same way it seeds its own.
+		// The tasks read what the setup resolved off its package level instance, so a
+		// spec seeds that the same way it seeds its own.
 		*setup.C = setup.Ctx{
-			Cwd:       "projects/api",
-			Env:       map[string]string{"GOPATH": "/cache"},
-			Workspace: workspace,
+			Cwd:     "projects/api",
+			Env:     map[string]string{"GOPATH": "/cache"},
+			Modules: modules,
 		}
 
 		return fixtures.Cli(runner, tests.TaskListCli{
@@ -46,14 +45,10 @@ var _ = Describe("Go lint", func() {
 		}).Run()
 	}
 
-	modules := func(stdout string) tests.TestingCommandResponse {
-		return tests.TestingCommandResponse{Name: "go", Stdout: stdout}
-	}
-
 	It("lints the working directory when the setup resolved no workspace", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, false)).To(Succeed())
+		Expect(run(runner)).To(Succeed())
 
 		Expect(runner.InvocationNames()).To(Equal([]string{"golangci-lint"}))
 
@@ -64,16 +59,31 @@ var _ = Describe("Go lint", func() {
 		Expect(invocation.Env).To(ContainElement("GOPATH=/cache"))
 	})
 
-	It("lints every module of the workspace by its own package pattern", func() {
-		runner := fixtures.Runner(modules("/repository/api\n/repository/worker\n"))
+	// Every module is linted from inside its own directory rather than through a
+	// "<module>/..." pattern, since the go tool resolves such a pattern to nothing
+	// for a module whose directory name starts with an underscore.
+	It("lints every module of the workspace from inside it", func() {
+		runner := fixtures.Runner()
 
-		Expect(run(runner, true)).To(Succeed())
+		Expect(run(runner, "/repository/_template", "/repository/api")).To(Succeed())
 
 		invocations := runner.Invocations()
 		Expect(invocations).To(HaveLen(2))
-		Expect(invocations[0].Args).To(Equal([]string{"list", "-m", "-f", "{{.Dir}}"}))
-		Expect(invocations[0].Dir).To(Equal("projects/api"))
-		Expect(invocations[1].Args).
-			To(Equal([]string{"run", "-v", "--timeout", "5m0s", "/repository/api/...", "/repository/worker/..."}))
+
+		Expect(invocations[0].Args).To(Equal([]string{"run", "-v", "--timeout", "5m0s", "./..."}))
+		Expect(invocations[0].Dir).To(Equal("/repository/_template"))
+
+		Expect(invocations[1].Args).To(Equal([]string{"run", "-v", "--timeout", "5m0s", "./..."}))
+		Expect(invocations[1].Dir).To(Equal("/repository/api"))
+	})
+
+	It("carries the resolved environment into every module", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, "/repository/api", "/repository/worker")).To(Succeed())
+
+		for _, invocation := range runner.Invocations() {
+			Expect(invocation.Env).To(ContainElement("GOPATH=/cache"))
+		}
 	})
 })
