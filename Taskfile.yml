@@ -80,10 +80,20 @@ tasks:
 
   docs:
     desc: Generates documentation for all applications.
+    # Eleven parallel `go run` compilations exhaust the memory of the CI runner,
+    # so the documentation is generated one pipe at a time.
     cmds:
-      - task: packages
-        vars:
-          command: docs
+      - task: template:docs
+      - task: buildah:docs
+      - task: go:docs
+      - task: helm:docs
+      - task: kustomize:docs
+      - task: node:docs
+      - task: pulumi:docs
+      - task: select-env:docs
+      - task: semantic-release:docs
+      - task: terraform:docs
+      - task: update-docker-hub-readme:docs
 
   test:
     desc: Tests every module in the workspace with ginkgo.
