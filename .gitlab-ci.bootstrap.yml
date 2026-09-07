@@ -14,7 +14,6 @@ init:
     GO_BUILD_LINKER_FLAGS: -w -s
     GO_BUILD_VARIABLES: |-
       main.VERSION: bootstrap.{{ now | date "2006-01-02T15:04:05Z0700" }}
-    GO_WORKSPACE: "true"
   parallel:
     matrix:
       - GO_CWD: go
@@ -28,7 +27,10 @@ init:
       done
     - go build -C go -mod=vendor -o dist/pipe-bootstrap
     - ./go/dist/pipe-bootstrap --version
-    - ./go/dist/pipe-bootstrap lint
+    # Workspace mode belongs to the lint run alone. Build reads the flag itself to
+    # decide whether it walks every module of the workspace, and this job only ever
+    # ships the one module its matrix entry points at.
+    - GO_WORKSPACE=true ./go/dist/pipe-bootstrap lint
     - ./go/dist/pipe-bootstrap build
   cache:
     - key: bootstrap-init
