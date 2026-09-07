@@ -3,7 +3,12 @@
 
 version: "3"
 
-vars: {}
+vars:
+  # Every pipe module the fan-out tasks iterate. The template comes first, so the
+  # scaffold breaks before the published pipes do. Space separated for the loops.
+  PACKAGES: >-
+    template buildah go helm kustomize node pulumi select-env
+    semantic-release terraform update-docker-hub-readme
 
 env:
   CGO_ENABLED: 0
@@ -24,6 +29,8 @@ includes:
     # no suites, so the pipe it seeds is the first thing with a test task.
     excludes:
       - test
+  # Include keys are static YAML and cannot be driven by a variable, so this is
+  # the one place the pipe list stays written out.
   buildah:
     dir: ./buildah
     taskfile: ./Taskfile.pipe.yml
@@ -56,44 +63,19 @@ includes:
     taskfile: ./Taskfile.pipe.yml
 
 tasks:
-  packages:
-    internal: true
-    deps:
-      - task: "template:{{ .command }}"
-      - task: "buildah:{{ .command }}"
-      - task: "go:{{ .command }}"
-      - task: "helm:{{ .command }}"
-      - task: "kustomize:{{ .command }}"
-      - task: "node:{{ .command }}"
-      - task: "pulumi:{{ .command }}"
-      - task: "select-env:{{ .command }}"
-      - task: "semantic-release:{{ .command }}"
-      - task: "terraform:{{ .command }}"
-      - task: "update-docker-hub-readme:{{ .command }}"
-
   build:
     desc: Builds all the applications.
-    cmds:
-      - task: packages
-        vars:
-          command: build
+    deps:
+      - for: { var: PACKAGES }
+        task: "{{ .ITEM }}:build"
 
   docs:
     desc: Generates documentation for all applications.
     # Eleven parallel `go run` compilations exhaust the memory of the CI runner,
     # so the documentation is generated one pipe at a time.
     cmds:
-      - task: template:docs
-      - task: buildah:docs
-      - task: go:docs
-      - task: helm:docs
-      - task: kustomize:docs
-      - task: node:docs
-      - task: pulumi:docs
-      - task: select-env:docs
-      - task: semantic-release:docs
-      - task: terraform:docs
-      - task: update-docker-hub-readme:docs
+      - for: { var: PACKAGES }
+        task: "{{ .ITEM }}:docs"
 
   test:
     desc: Tests every module in the workspace with ginkgo.

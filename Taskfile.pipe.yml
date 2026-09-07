@@ -71,6 +71,11 @@ tasks:
         {{ .CLI_ARGS }} \
         ./...
 
+  lint:
+    desc: Lints the application with golangci-lint.
+    cmds:
+      - golangci-lint run {{ .CLI_ARGS }}
+
   build.platform:
     internal: true
     vars:
