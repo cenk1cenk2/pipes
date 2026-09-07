@@ -17,6 +17,8 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		Usage:       DESCRIPTION,
 		Description: DESCRIPTION,
 		Flags:       plumber.CombineFlags(pipe.Flags),
+		// The task lists are built in here rather than alongside the flags, since a
+		// stage reads the parsed flag values as it constructs.
 		Action: func(_ context.Context, _ *ucli.Command) error {
 			return p.RunJobs(plumber.CombineTaskLists(
 				pipe.New(p),
