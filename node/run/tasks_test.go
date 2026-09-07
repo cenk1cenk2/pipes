@@ -46,11 +46,6 @@ var _ = Describe("Node run", func() {
 		}).Run()
 	}
 
-	It("exposes the arguments through its step so the command registers them", func() {
-		Expect(Step(deps).Arguments).To(Equal(Arguments))
-		Expect(Step(deps).Flags).To(Equal(Flags))
-	})
-
 	It("runs the arguments it was given as the script and its arguments", func() {
 		runner := fixtures.Runner()
 

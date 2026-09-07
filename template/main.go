@@ -18,11 +18,9 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		Description: DESCRIPTION,
 		Flags:       plumber.CombineFlags(pipe.Flags),
 		Action: func(_ context.Context, _ *ucli.Command) error {
-			return p.RunJobs(
-				plumber.CombineTaskLists(
-					pipe.New(p),
-				),
-			)
+			return p.RunJobs(plumber.CombineTaskLists(
+				pipe.New(p),
+			))
 		},
 	}
 }

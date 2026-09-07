@@ -2,10 +2,11 @@
 package main
 
 import (
+	"context"
+
 	"github.com/cenk1cenk2/plumber/v6"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
 )
@@ -27,9 +28,18 @@ func (o options) defaults() options {
 func newCommand(p *plumber.Plumber, opts options) *ucli.Command {
 	opts = opts.defaults()
 
-	return cli.Root(p, CLI_NAME, DESCRIPTION, VERSION,
-		update.Step(update.Deps{Hub: opts.Hub}),
-	)
+	return &ucli.Command{
+		Name:        CLI_NAME,
+		Version:     VERSION,
+		Usage:       DESCRIPTION,
+		Description: DESCRIPTION,
+		Flags:       plumber.CombineFlags(update.Flags),
+		Action: func(_ context.Context, _ *ucli.Command) error {
+			return p.RunJobs(plumber.CombineTaskLists(
+				update.New(p, update.Deps{Hub: opts.Hub}),
+			))
+		},
+	}
 }
 
 func main() {

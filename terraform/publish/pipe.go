@@ -76,10 +76,3 @@ func New(p *Plumber, deps Deps) *TaskList {
 			)
 		})
 }
-
-func Step(deps Deps) icli.Step {
-	return icli.Step{
-		Flags: Flags,
-		New:   func(p *Plumber) *TaskList { return New(p, deps) },
-	}
-}

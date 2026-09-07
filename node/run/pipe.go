@@ -57,13 +57,3 @@ func New(p *Plumber, deps Deps) *TaskList {
 			)
 		})
 }
-
-// Step carries the arguments as well, since the script this pipe runs is the
-// argument list when no script flag was given.
-func Step(deps Deps) icli.Step {
-	return icli.Step{
-		Flags:     Flags,
-		Arguments: Arguments,
-		New:       func(p *Plumber) *TaskList { return New(p, deps) },
-	}
-}

@@ -3,10 +3,11 @@
 package main
 
 import (
+	"context"
+
 	"github.com/cenk1cenk2/plumber/v6"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/release"
 	"gitlab.kilic.dev/devops/pipes/semantic-release/setup"
 )
@@ -24,12 +25,21 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		return f
 	})
 
-	return cli.Root(p, CLI_NAME, DESCRIPTION, VERSION,
-		setup.EnvironmentStep,
-		setup.Step,
-		setup.LoginStep,
-		release.Step,
-	)
+	return &ucli.Command{
+		Name:        CLI_NAME,
+		Version:     VERSION,
+		Usage:       DESCRIPTION,
+		Description: DESCRIPTION,
+		Flags:       plumber.CombineFlags(setup.EnvironmentFlags, setup.NodeFlags, setup.LoginFlags, release.Flags),
+		Action: func(_ context.Context, _ *ucli.Command) error {
+			return p.RunJobs(plumber.CombineTaskLists(
+				setup.NewEnvironment(p),
+				setup.New(p),
+				setup.NewLogin(p),
+				release.New(p),
+			))
+		},
+	}
 }
 
 func main() {

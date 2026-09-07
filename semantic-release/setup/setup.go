@@ -5,7 +5,6 @@ package setup
 
 import (
 	"github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
@@ -28,22 +27,18 @@ var (
 	LoginFlags       = node.NewLoginFlags(Login)
 )
 
-// The steps are values rather than factories for the same reason: the command
-// composes the one above instead of registering a second copy of it.
-var (
-	// EnvironmentStep selects the environment the release runs against.
-	EnvironmentStep = cli.Step{Flags: EnvironmentFlags, New: func(p *plumber.Plumber) *plumber.TaskList {
-		return environment.TaskList(p, Environment, EnvironmentCtx)
-	}}
+// NewEnvironment selects the environment the release runs against.
+func NewEnvironment(p *plumber.Plumber) *plumber.TaskList {
+	return environment.TaskList(p, Environment, EnvironmentCtx)
+}
 
-	// Step resolves the package manager the release library is installed with.
-	Step = cli.Step{Flags: NodeFlags, New: func(p *plumber.Plumber) *plumber.TaskList {
-		return node.SetupTaskList(p, NodeConfig, NodeCtx)
-	}}
+// New resolves the package manager the release library is installed with.
+func New(p *plumber.Plumber) *plumber.TaskList {
+	return node.SetupTaskList(p, NodeConfig, NodeCtx)
+}
 
-	// LoginStep writes the npmrc the package manager reads its credentials back
-	// from, so it composes after Step.
-	LoginStep = cli.Step{Flags: LoginFlags, New: func(p *plumber.Plumber) *plumber.TaskList {
-		return node.LoginTaskList(p, Login)
-	}}
-)
+// NewLogin writes the npmrc the package manager reads its credentials back
+// from, so it composes after New.
+func NewLogin(p *plumber.Plumber) *plumber.TaskList {
+	return node.LoginTaskList(p, Login)
+}

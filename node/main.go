@@ -3,10 +3,11 @@
 package main
 
 import (
+	"context"
+
 	"github.com/cenk1cenk2/plumber/v6"
 	ucli "github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/node/build"
 	"gitlab.kilic.dev/devops/pipes/node/install"
 	"gitlab.kilic.dev/devops/pipes/node/run"
@@ -26,30 +27,62 @@ func newCommand(p *plumber.Plumber) *ucli.Command {
 		return f
 	})
 
-	return cli.App(CLI_NAME, DESCRIPTION, VERSION,
-		cli.Command(p, "login", "Login to the given NPM registries.",
-			setup.Step,
-			setup.LoginStep,
-		),
-
-		cli.Command(p, "install", "Install node.js dependencies with the given package manager.",
-			setup.Step,
-			setup.LoginStep,
-			install.Step(install.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
-		),
-
-		cli.Command(p, "build", "",
-			setup.Step,
-			setup.EnvironmentStep,
-			build.Step(build.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
-		),
-
-		cli.Command(p, "run", "",
-			setup.Step,
-			setup.EnvironmentStep,
-			run.Step(run.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
-		),
-	)
+	return &ucli.Command{
+		Name:        CLI_NAME,
+		Version:     VERSION,
+		Usage:       DESCRIPTION,
+		Description: DESCRIPTION,
+		Commands: []*ucli.Command{
+			{
+				Name:        "login",
+				Description: "Login to the given NPM registries.",
+				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.LoginFlags),
+				Action: func(_ context.Context, _ *ucli.Command) error {
+					return p.RunJobs(plumber.CombineTaskLists(
+						setup.New(p),
+						setup.NewLogin(p),
+					))
+				},
+			},
+			{
+				Name:        "install",
+				Description: "Install node.js dependencies with the given package manager.",
+				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.LoginFlags, install.Flags),
+				Action: func(_ context.Context, _ *ucli.Command) error {
+					return p.RunJobs(plumber.CombineTaskLists(
+						setup.New(p),
+						setup.NewLogin(p),
+						install.New(p, install.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
+					))
+				},
+			},
+			{
+				Name:        "build",
+				Description: "",
+				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, build.Flags),
+				Action: func(_ context.Context, _ *ucli.Command) error {
+					return p.RunJobs(plumber.CombineTaskLists(
+						setup.New(p),
+						setup.NewEnvironment(p),
+						build.New(p, build.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
+					))
+				},
+			},
+			{
+				Name:        "run",
+				Description: "",
+				Flags:       plumber.CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, run.Flags),
+				Arguments:   run.Arguments,
+				Action: func(_ context.Context, _ *ucli.Command) error {
+					return p.RunJobs(plumber.CombineTaskLists(
+						setup.New(p),
+						setup.NewEnvironment(p),
+						run.New(p, run.Deps{Node: setup.NodeCtx, Environment: setup.EnvironmentCtx}),
+					))
+				},
+			},
+		},
+	}
 }
 
 func main() {

@@ -2,7 +2,6 @@ package write
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	icli "gitlab.kilic.dev/devops/pipes/internal/cli"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
@@ -33,11 +32,4 @@ func New(p *Plumber, deps Deps) *TaskList {
 				WriteEnvironmentFile(tl, deps).Job(),
 			)
 		})
-}
-
-func Step(deps Deps) icli.Step {
-	return icli.Step{
-		Flags: Flags,
-		New:   func(p *Plumber) *TaskList { return New(p, deps) },
-	}
 }
