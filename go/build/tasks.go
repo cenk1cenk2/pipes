@@ -10,7 +10,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoBuild(tl *TaskList) *Task {
+func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		Set(func(t *Task) error {
 			if len(P.BuildTargets) == 0 {
@@ -107,11 +107,11 @@ func GoBuild(tl *TaskList) *Task {
 		})
 }
 
-// GoBuildPackages resolves what the workspace has to build. It follows the flag
-// and not setup.C.Workspace, which is on for any invocation that merely sits
-// inside a workspace. Each module is asked from inside its own directory, since
-// the go tool drops an underscored directory out of a package pattern.
-func GoBuildPackages(tl *TaskList) *Task {
+// Resolves what the workspace has to build. It follows the flag and not
+// setup.C.Workspace, which is on for any invocation that merely sits inside a
+// workspace. Each module is asked from inside its own directory, since the go
+// tool drops an underscored directory out of a package pattern.
+func packages(tl *TaskList) *Task {
 	return tl.CreateTask("packages").
 		ShouldDisable(func(_ *Task) bool {
 			return !setup.P.Workspace || len(setup.C.Modules) == 0

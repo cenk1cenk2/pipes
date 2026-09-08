@@ -34,7 +34,7 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				initialize(tl).Job(),
 				version(tl).Job(),
-				HelmLoadChart(tl).Job(),
+				read(tl).Job(),
 			)
 		})
 }

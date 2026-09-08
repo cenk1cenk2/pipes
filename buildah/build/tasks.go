@@ -6,7 +6,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func ContainerBuild(tl *TaskList) *Task {
+func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		Set(func(t *Task) error {
 			t.Log.Infof(
@@ -72,7 +72,7 @@ func ContainerBuild(tl *TaskList) *Task {
 		})
 }
 
-func ContainerPush(tl *TaskList) *Task {
+func push(tl *TaskList) *Task {
 	return tl.CreateTask("push").
 		ShouldDisable(func(t *Task) bool {
 			return !P.Image.Push

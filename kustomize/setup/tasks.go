@@ -41,7 +41,7 @@ func version(tl *TaskList) *Task {
 		})
 }
 
-func ResolveOverlays(tl *TaskList) *Task {
+func resolve(tl *TaskList) *Task {
 	return tl.CreateTask("resolve").
 		Set(func(t *Task) error {
 			cwd := C.Cwd

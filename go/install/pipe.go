@@ -23,8 +23,8 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoModVendor(tl).Job(),
-				GoModVerify(tl).Job(),
+				vendor(tl).Job(),
+				verify(tl).Job(),
 			)
 		})
 }

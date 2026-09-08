@@ -27,8 +27,8 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobParallel(
-				HelmLint(tl).Job(),
-				HelmTemplate(tl).Job(),
+				lint(tl).Job(),
+				template(tl).Job(),
 			)
 		})
 }

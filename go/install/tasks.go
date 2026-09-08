@@ -7,7 +7,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoModVendor(tl *TaskList) *Task {
+func vendor(tl *TaskList) *Task {
 	return tl.CreateTask("vendor").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -42,7 +42,7 @@ func GoModVendor(tl *TaskList) *Task {
 		})
 }
 
-func GoModVerify(tl *TaskList) *Task {
+func verify(tl *TaskList) *Task {
 	return tl.CreateTask("verify").
 		ShouldDisable(func(t *Task) bool {
 			return !P.Verify

@@ -86,7 +86,7 @@ var _ = Describe("Container registry login", func() {
 			pipe.Username = username
 			pipe.Password = password
 
-			Expect(disabled(pipe, ContainerRegistryLogin)).To(Equal(expected))
+			Expect(disabled(pipe, login)).To(Equal(expected))
 		},
 		Entry("both set", "user", "secret", false),
 		Entry("no password", "user", "", true),
@@ -103,7 +103,7 @@ var _ = Describe("Container registry login", func() {
 			pipe.Username = username
 			pipe.Password = password
 
-			Expect(disabled(pipe, ContainerRegistryLoginVerify)).To(Equal(expected))
+			Expect(disabled(pipe, loginVerify)).To(Equal(expected))
 		},
 		Entry("both set", "user", "secret", true),
 		Entry("no password", "user", "", false),

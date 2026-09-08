@@ -41,7 +41,7 @@ func version(tl *TaskList) *Task {
 		})
 }
 
-func HelmLoadChart(tl *TaskList) *Task {
+func read(tl *TaskList) *Task {
 	return tl.CreateTask("read").
 		Set(func(t *Task) error {
 			chart, err := helmv2loader.Load(C.Cwd)

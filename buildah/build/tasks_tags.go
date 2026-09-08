@@ -14,7 +14,7 @@ import (
 )
 
 // The collector reads the parsed flags, so it is only built from inside a task list.
-func ContainerImageTags() *versions.Collector {
+func tagsCollector() *versions.Collector {
 	return &versions.Collector{
 		Name: "tags",
 
@@ -42,8 +42,8 @@ func ContainerImageTags() *versions.Collector {
 }
 
 // The manifest write hangs off the parent, so it only sees a fully collected tag list.
-func ContainerImageTagsParent(tl *TaskList) *Task {
-	collector := ContainerImageTags()
+func tags(tl *TaskList) *Task {
+	collector := tagsCollector()
 
 	return tl.CreateTask("tags").
 		SetJobWrapper(func(job Job, t *Task) Job {
@@ -54,7 +54,7 @@ func ContainerImageTagsParent(tl *TaskList) *Task {
 				),
 				collector.LatestTask(tl, &C.Tags).Job(),
 				job,
-				ContainerManifestFileWrite(tl, collector).Job(),
+				tagsManifest(tl, collector).Job(),
 			)
 		}).
 		Set(func(t *Task) error {
@@ -66,7 +66,7 @@ func ContainerImageTagsParent(tl *TaskList) *Task {
 		})
 }
 
-func ContainerManifestFileWrite(tl *TaskList, collector *versions.Collector) *Task {
+func tagsManifest(tl *TaskList, collector *versions.Collector) *Task {
 	return tl.CreateTask("tags", "manifest").
 		ShouldDisable(func(t *Task) bool {
 			return P.Manifest.File == "" || P.Manifest.Target == ""

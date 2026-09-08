@@ -57,12 +57,12 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				JobParallel(
 					JobSequence(
-						DiscoverPublishedImageFiles(tl).Job(),
-						FetchPublishedImagesFromFiles(tl).Job(),
+						discoverFile(tl).Job(),
+						fetchFile(tl).Job(),
 					),
-					FetchUserPublishedImages(tl).Job(),
+					fetchUser(tl).Job(),
 				),
-				UpdateManifests(tl).Job(),
+				manifest(tl).Job(),
 			)
 		})
 }

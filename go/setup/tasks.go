@@ -41,7 +41,7 @@ func version(tl *TaskList) *Task {
 		})
 }
 
-func GoEnv(tl *TaskList) *Task {
+func env(tl *TaskList) *Task {
 	return tl.CreateTask("env").
 		Set(func(t *Task) error {
 			if P.Cache != "" {
@@ -59,7 +59,7 @@ func GoEnv(tl *TaskList) *Task {
 		})
 }
 
-func GoWorkspace(tl *TaskList) *Task {
+func workspace(tl *TaskList) *Task {
 	return tl.CreateTask("workspace").
 		Set(func(t *Task) error {
 			C.Workspace = P.Workspace
@@ -104,7 +104,7 @@ func GoWorkspace(tl *TaskList) *Task {
 		})
 }
 
-func GoModules(tl *TaskList) *Task {
+func modules(tl *TaskList) *Task {
 	return tl.CreateTask("modules").
 		ShouldDisable(func(_ *Task) bool {
 			return !C.Workspace

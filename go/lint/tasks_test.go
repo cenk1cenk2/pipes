@@ -35,7 +35,7 @@ var _ = Describe("Go lint", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(GoLint(tl).Job())
+							return JobSequence(lint(tl).Job())
 						})
 				},
 			},

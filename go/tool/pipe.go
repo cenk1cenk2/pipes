@@ -36,7 +36,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoTool(tl).Job(),
+				tool(tl).Job(),
 			)
 		})
 }

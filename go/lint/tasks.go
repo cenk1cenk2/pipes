@@ -5,20 +5,20 @@ import (
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoLint(tl *TaskList) *Task {
+func lint(tl *TaskList) *Task {
 	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
 			// linted from inside each module, since the go tool resolves a "<module>/..."
 			// pattern to nothing for an underscored directory.
 			for _, module := range setup.C.Modules {
-				lint(t).
+				lintCommand(t).
 					SetDir(module).
 					AppendArgs("./...").
 					AddSelfToTheTask()
 			}
 
 			if len(setup.C.Modules) == 0 {
-				lint(t).
+				lintCommand(t).
 					SetDir(setup.C.Cwd).
 					AddSelfToTheTask()
 			}
@@ -30,7 +30,7 @@ func GoLint(tl *TaskList) *Task {
 		})
 }
 
-func lint(t *Task) *Command {
+func lintCommand(t *Task) *Command {
 	return t.CreateCommand(
 		"golangci-lint",
 		"run",

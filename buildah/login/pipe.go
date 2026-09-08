@@ -25,7 +25,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				ContainerRegistryLoginParent(tl).Job(),
+				loginParent(tl).Job(),
 			)
 		})
 }

@@ -7,17 +7,17 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func ContainerRegistryLoginParent(tl *TaskList) *Task {
+func loginParent(tl *TaskList) *Task {
 	return tl.CreateTask("login", "parent").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
-				ContainerRegistryLogin(tl).Job(),
-				ContainerRegistryLoginVerify(tl).Job(),
+				login(tl).Job(),
+				loginVerify(tl).Job(),
 			)
 		})
 }
 
-func ContainerRegistryLogin(tl *TaskList) *Task {
+func login(tl *TaskList) *Task {
 	return tl.CreateTask("login").
 		ShouldDisable(func(t *Task) bool {
 			return P.Username == "" ||
@@ -58,9 +58,9 @@ func ContainerRegistryLogin(tl *TaskList) *Task {
 		})
 }
 
-// ContainerRegistryLoginVerify proves that the ambient login a credential-less
-// pipeline relies on actually exists, before the build spends time on the image.
-func ContainerRegistryLoginVerify(tl *TaskList) *Task {
+// Proves that the ambient login a credential-less pipeline relies on actually
+// exists, before the build spends time on the image.
+func loginVerify(tl *TaskList) *Task {
 	return tl.CreateTask("login", "verify").
 		ShouldDisable(func(_ *Task) bool {
 			return P.Username != "" && P.Password != ""

@@ -39,7 +39,7 @@ var _ = Describe("Go build", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(GoBuild(tl).Job())
+							return JobSequence(build(tl).Job())
 						})
 				},
 			},
@@ -75,7 +75,7 @@ var _ = Describe("Go build", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(GoBuildPackages(tl).Job(), GoBuild(tl).Job())
+							return JobSequence(packages(tl).Job(), build(tl).Job())
 						})
 				},
 			},

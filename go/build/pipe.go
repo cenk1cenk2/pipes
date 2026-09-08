@@ -42,8 +42,8 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoBuildPackages(tl).Job(),
-				GoBuild(tl).Job(),
+				packages(tl).Job(),
+				build(tl).Job(),
 			)
 		})
 }

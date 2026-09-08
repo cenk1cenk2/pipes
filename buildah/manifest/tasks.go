@@ -11,7 +11,7 @@ import (
 	"go.yaml.in/yaml/v4"
 )
 
-func DiscoverPublishedImageFiles(tl *TaskList) *Task {
+func discoverFile(tl *TaskList) *Task {
 	return tl.CreateTask("discover", "file").
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Manifest.Files) == 0
@@ -56,7 +56,7 @@ func DiscoverPublishedImageFiles(tl *TaskList) *Task {
 		})
 }
 
-func FetchPublishedImagesFromFiles(tl *TaskList) *Task {
+func fetchFile(tl *TaskList) *Task {
 	return tl.CreateTask("fetch", "file").
 		ShouldDisable(func(t *Task) bool {
 			return len(C.Matches) == 0
@@ -96,7 +96,7 @@ func FetchPublishedImagesFromFiles(tl *TaskList) *Task {
 		})
 }
 
-func FetchUserPublishedImages(tl *TaskList) *Task {
+func fetchUser(tl *TaskList) *Task {
 	return tl.CreateTask("fetch", "user").
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Manifest.Images) == 0
@@ -115,19 +115,19 @@ func FetchUserPublishedImages(tl *TaskList) *Task {
 				t.Log.Debugf("Fetched direct image: %s -> %v", P.Manifest.Target, P.Manifest.Images)
 			}
 
-			for _, manifest := range P.Manifest.Matrix {
+			for _, entry := range P.Manifest.Matrix {
 				t.Lock.Lock()
-				C.ManifestedImages[manifest.Target] = append(C.ManifestedImages[manifest.Target], manifest.Images...)
+				C.ManifestedImages[entry.Target] = append(C.ManifestedImages[entry.Target], entry.Images...)
 				t.Lock.Unlock()
 
-				t.Log.Debugf("Fetched manifest from matrix: %s -> %v", manifest.Target, manifest.Images)
+				t.Log.Debugf("Fetched manifest from matrix: %s -> %v", entry.Target, entry.Images)
 			}
 
 			return nil
 		})
 }
 
-func UpdateManifests(tl *TaskList) *Task {
+func manifest(tl *TaskList) *Task {
 	return tl.CreateTask("manifest").
 		Set(func(t *Task) error {
 			for target, images := range C.ManifestedImages {

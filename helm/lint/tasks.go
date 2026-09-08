@@ -5,7 +5,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmLint(tl *TaskList) *Task {
+func lint(tl *TaskList) *Task {
 	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -31,7 +31,7 @@ func HelmLint(tl *TaskList) *Task {
 		})
 }
 
-func HelmTemplate(tl *TaskList) *Task {
+func template(tl *TaskList) *Task {
 	return tl.CreateTask("template").
 		ShouldDisable(func(t *Task) bool {
 			return !P.ShouldTemplate

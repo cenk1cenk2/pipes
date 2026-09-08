@@ -21,7 +21,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmInstall(tl).Job(),
+				install(tl).Job(),
 			)
 		})
 }

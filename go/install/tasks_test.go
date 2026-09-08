@@ -34,8 +34,8 @@ var _ = Describe("Go install", func() {
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
 							return JobSequence(
-								GoModVendor(tl).Job(),
-								GoModVerify(tl).Job(),
+								vendor(tl).Job(),
+								verify(tl).Job(),
 							)
 						})
 				},

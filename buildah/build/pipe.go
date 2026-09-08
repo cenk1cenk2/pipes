@@ -60,9 +60,9 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				ContainerImageTagsParent(tl).Job(),
-				ContainerBuild(tl).Job(),
-				ContainerPush(tl).Job(),
+				tags(tl).Job(),
+				build(tl).Job(),
+				push(tl).Job(),
 			)
 		})
 }

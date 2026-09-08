@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("Resolve overlays", func() {
 	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
-	resolve := func(cwd string, paths ...string) []string {
+	run := func(cwd string, paths ...string) []string {
 		GinkgoHelper()
 
 		P.Paths = paths
@@ -28,7 +28,7 @@ var _ = Describe("Resolve overlays", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(ResolveOverlays(tl).Job())
+							return JobSequence(resolve(tl).Job())
 						})
 				},
 			},
@@ -38,24 +38,24 @@ var _ = Describe("Resolve overlays", func() {
 	}
 
 	It("builds the working directory itself when no paths were given", func() {
-		Expect(resolve("overlays/production")).To(Equal([]string{"overlays/production"}))
+		Expect(run("overlays/production")).To(Equal([]string{"overlays/production"}))
 	})
 
 	// the working directory flag defaults to ".", but a pipeline that unsets it
 	// would otherwise resolve an empty overlay path that Kustomize cannot read.
 	It("falls back to the current directory", func() {
-		Expect(resolve("")).To(Equal([]string{"."}))
+		Expect(run("")).To(Equal([]string{"."}))
 	})
 
 	It("resolves the explicit paths against the working directory", func() {
-		Expect(resolve("clusters/prod", "apps/api", "apps/web")).
+		Expect(run("clusters/prod", "apps/api", "apps/web")).
 			To(Equal([]string{"clusters/prod/apps/api", "clusters/prod/apps/web"}))
 	})
 
 	// the same overlay reaching the build twice would render it twice and write the
 	// output file from two subtasks at once.
 	It("sorts the paths and drops the duplicates", func() {
-		Expect(resolve(".", "apps/web", "apps/api", "apps/web")).
+		Expect(run(".", "apps/web", "apps/api", "apps/web")).
 			To(Equal([]string{"apps/api", "apps/web"}))
 	})
 })

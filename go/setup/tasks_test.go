@@ -62,7 +62,7 @@ var _ = Describe("Go workspace", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(GoWorkspace(tl).Job())
+							return JobSequence(workspace(tl).Job())
 						})
 				},
 			},
@@ -139,19 +139,19 @@ var _ = Describe("Go modules", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(GoModules(tl).Job())
+							return JobSequence(modules(tl).Job())
 						})
 				},
 			},
 		}).Run()
 	}
 
-	modules := func(stdout string) tests.TestingCommandResponse {
+	golist := func(stdout string) tests.TestingCommandResponse {
 		return tests.TestingCommandResponse{Name: "go", Stdout: stdout}
 	}
 
 	It("resolves every module the workspace drives", func() {
-		runner := fixtures.Runner(modules("/repository/api\n/repository/worker\n"))
+		runner := fixtures.Runner(golist("/repository/api\n/repository/worker\n"))
 
 		Expect(run(runner, true)).To(Succeed())
 

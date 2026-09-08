@@ -8,7 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmPackage(tl *TaskList) *Task {
+func packageTask(tl *TaskList) *Task {
 	return tl.CreateTask("package").
 		ShouldDisable(func(t *Task) bool {
 			if len(C.Versions) == 0 {
@@ -60,7 +60,7 @@ func HelmPackage(tl *TaskList) *Task {
 		})
 }
 
-func HelmPublish(tl *TaskList) *Task {
+func publish(tl *TaskList) *Task {
 	return tl.CreateTask("publish").
 		ShouldDisable(func(t *Task) bool {
 			if len(C.Versions) == 0 {

@@ -7,7 +7,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func HelmLogin(tl *TaskList) *Task {
+func login(tl *TaskList) *Task {
 	return tl.CreateTask("login").
 		ShouldDisable(func(t *Task) bool {
 			return P.Username == "" ||

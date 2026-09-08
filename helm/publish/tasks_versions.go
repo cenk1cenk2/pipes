@@ -10,7 +10,7 @@ import (
 )
 
 // The collector reads the parsed flags and the resolved working directory, so it is only built from inside a task list.
-func HelmChartVersions() *versions.Collector {
+func versionsCollector() *versions.Collector {
 	return &versions.Collector{
 		Name: "versions",
 
@@ -26,8 +26,8 @@ func HelmChartVersions() *versions.Collector {
 }
 
 // A chart has no notion of a latest version, so the parent waits on the other two sources only.
-func HelmChartVersionsParent(tl *TaskList) *Task {
-	collector := HelmChartVersions()
+func versionsTask(tl *TaskList) *Task {
+	collector := versionsCollector()
 
 	return tl.CreateTask("versions").
 		SetJobWrapper(func(job Job, t *Task) Job {

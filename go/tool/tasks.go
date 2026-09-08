@@ -7,7 +7,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
-func GoTool(tl *TaskList) *Task {
+func tool(tl *TaskList) *Task {
 	return tl.CreateTask("tool", P.Tool).
 		Set(func(t *Task) error {
 			t.CreateCommand(

@@ -14,7 +14,7 @@ var _ = Describe("Container image tags", func() {
 		P.Image.Name = name
 		login.P.Uri = uri
 
-		return ContainerImageTags().Format(tag)
+		return tagsCollector().Format(tag)
 	}
 
 	It("prefixes the image with the registry the login step authenticated against", func() {

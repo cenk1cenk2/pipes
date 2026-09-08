@@ -63,7 +63,7 @@ var _ = Describe("Helm publish tasks", func() {
 		It("packages the chart in the directory the setup step resolved", func() {
 			runner := fixtures.Runner()
 
-			Expect(run(runner, pipe(), []string{"1.0.0"}, HelmPackage)).To(Succeed())
+			Expect(run(runner, pipe(), []string{"1.0.0"}, packageTask)).To(Succeed())
 
 			invocation, ok := runner.LastInvocation()
 			Expect(ok).To(BeTrue())
@@ -80,7 +80,7 @@ var _ = Describe("Helm publish tasks", func() {
 			p := pipe()
 			p.Chart.AppVersion = "2.3.4"
 
-			Expect(run(runner, p, []string{"1.0.0"}, HelmPackage)).To(Succeed())
+			Expect(run(runner, p, []string{"1.0.0"}, packageTask)).To(Succeed())
 
 			invocation, _ := runner.LastInvocation()
 			Expect(invocation.Args).To(ContainElements("--app-version", "2.3.4"))
@@ -89,7 +89,7 @@ var _ = Describe("Helm publish tasks", func() {
 		It("packages every version it was given", func() {
 			runner := fixtures.Runner()
 
-			Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, HelmPackage)).To(Succeed())
+			Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, packageTask)).To(Succeed())
 
 			Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
 		})
@@ -99,7 +99,7 @@ var _ = Describe("Helm publish tasks", func() {
 		It("runs nothing without a version", func() {
 			runner := fixtures.Runner()
 
-			Expect(run(runner, pipe(), []string{}, HelmPackage)).To(Succeed())
+			Expect(run(runner, pipe(), []string{}, packageTask)).To(Succeed())
 
 			Expect(runner.InvocationNames()).To(BeEmpty())
 		})
@@ -109,7 +109,7 @@ var _ = Describe("Helm publish tasks", func() {
 		It("pushes the archive the package task wrote, named after the chart", func() {
 			runner := fixtures.Runner()
 
-			Expect(run(runner, pipe(), []string{"1.0.0"}, HelmPublish)).To(Succeed())
+			Expect(run(runner, pipe(), []string{"1.0.0"}, publish)).To(Succeed())
 
 			invocation, ok := runner.LastInvocation()
 			Expect(ok).To(BeTrue())
@@ -122,7 +122,7 @@ var _ = Describe("Helm publish tasks", func() {
 		It("pushes one archive per version", func() {
 			runner := fixtures.Runner()
 
-			Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, HelmPublish)).To(Succeed())
+			Expect(run(runner, pipe(), []string{"1.0.0", "1.0"}, publish)).To(Succeed())
 
 			Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
 		})
@@ -130,7 +130,7 @@ var _ = Describe("Helm publish tasks", func() {
 		It("runs nothing without a version", func() {
 			runner := fixtures.Runner()
 
-			Expect(run(runner, pipe(), []string{}, HelmPublish)).To(Succeed())
+			Expect(run(runner, pipe(), []string{}, publish)).To(Succeed())
 
 			Expect(runner.InvocationNames()).To(BeEmpty())
 		})

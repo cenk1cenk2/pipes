@@ -41,9 +41,9 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmChartVersionsParent(tl).Job(),
-				HelmPackage(tl).Job(),
-				HelmPublish(tl).Job(),
+				versionsTask(tl).Job(),
+				packageTask(tl).Job(),
+				publish(tl).Job(),
 			)
 		})
 }

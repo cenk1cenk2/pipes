@@ -5,7 +5,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmInstall(tl *TaskList) *Task {
+func install(tl *TaskList) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
 			t.CreateCommand(

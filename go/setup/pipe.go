@@ -38,9 +38,9 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				initialize(tl).Job(),
 				version(tl).Job(),
-				GoEnv(tl).Job(),
-				GoWorkspace(tl).Job(),
-				GoModules(tl).Job(),
+				env(tl).Job(),
+				workspace(tl).Job(),
+				modules(tl).Job(),
 			)
 		})
 }
