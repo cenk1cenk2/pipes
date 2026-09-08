@@ -7,17 +7,17 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_CONFIG       = "Config"
-	CATEGORY_PROJECT      = "Project"
-	CATEGORY_CI_VARIABLES = "Injected Variables"
+	CategoryConfig      = "Config"
+	CategoryProject     = "Project"
+	CategoryCIVariables = "Injected Variables"
 )
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_PROJECT
+	// CategoryProject
 
 	&cli.StringFlag{
-		Category: CATEGORY_PROJECT,
+		Category: CategoryProject,
 		Name:     "terraform.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_CWD"),
@@ -29,10 +29,10 @@ var Flags = []cli.Flag{
 		Destination: &P.Cwd,
 	},
 
-	// CATEGORY_CONFIG
+	// CategoryConfig
 
 	&cli.StringFlag{
-		Category: CATEGORY_CONFIG,
+		Category: CategoryConfig,
 		Name:     "terraform.log-level",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_LOG_LEVEL"),
@@ -45,10 +45,10 @@ var Flags = []cli.Flag{
 		Destination: &P.LogLevel,
 	},
 
-	// CATEGORY_CI_VARIABLES
+	// CategoryCIVariables
 
 	&cli.StringFlag{
-		Category: CATEGORY_CI_VARIABLES,
+		Category: CategoryCIVariables,
 		Name:     "terraform.ci.api-url",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_CI_API_URL"),
@@ -62,7 +62,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_CI_VARIABLES,
+		Category: CategoryCIVariables,
 		Name:     "terraform.ci.project-id",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_CI_PROJECT_ID"),

@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-go"
+const CLIName = "pipe-go"
 
-const DESCRIPTION = "Build Go applications with the CI pipe."
+const Description = "Build Go applications with the CI pipe."
 
-var VERSION = "latest"
+var version = "latest"

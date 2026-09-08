@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	CATEGORY_CONTAINER_IMAGE    = "Container Image"
-	CATEGORY_CONTAINER_FILE     = "Containerfile"
-	CATEGORY_CONTAINER_MANIFEST = "Container Manifest"
+	CategoryContainerImage    = "Container Image"
+	CategoryContainerFile     = "Containerfile"
+	CategoryContainerManifest = "Container Manifest"
 
-	DEFAULT_TAG_AS_LATEST = `[ "^tags/v?\\d+.\\d+.\\d+$" ]`
-	DEFAULT_SANITIZE_TAGS = `[
+	DefaultTagAsLatest  = `[ "^tags/v?\\d+.\\d+.\\d+$" ]`
+	DefaultSanitizeTags = `[
     { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }
 ]`
 )
@@ -29,10 +29,10 @@ var Flags = CombineFlags(
 	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Image.TagsFile, Strict: &P.Image.TagsFileStrict}),
 	[]cli.Flag{
 
-		// CATEGORY_CONTAINER_IMAGE
+		// CategoryContainerImage
 
 		&cli.StringSliceFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.platforms",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_PLATFORMS"),
@@ -45,7 +45,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.name",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_NAME"),
@@ -57,7 +57,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringSliceFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.tags",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_TAGS"),
@@ -69,7 +69,7 @@ var Flags = CombineFlags(
 		},
 
 		flags.YAMLFlag(&P.Image.TagsTemplate, &cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.tags-template",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_TAGS_TEMPLATE"),
@@ -86,7 +86,7 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 		}),
 
 		flags.YAMLFlag(&P.Image.TagsSanitize, &cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.tags-sanitize",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_TAGS_SANITIZE"),
@@ -99,11 +99,11 @@ Template is interpolated with the given matches in the regular expression.
 format(yaml([]struct{ match: RegExp, template: Template(match) }))
 `),
 			Required: false,
-			Value:    DEFAULT_SANITIZE_TAGS,
+			Value:    DefaultSanitizeTags,
 		}),
 
 		flags.YAMLFlag(&P.Image.TagAsLatest, &cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.tag-as-latest",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_TAG_AS_LATEST"),
@@ -116,11 +116,11 @@ Use either "heads/" for narrowing the search to branches or "tags/" for narrowin
 format(yaml([]RegExp))
 `),
 			Required: false,
-			Value:    DEFAULT_TAG_AS_LATEST,
+			Value:    DefaultTagAsLatest,
 		}),
 
 		&cli.BoolFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.pull",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_PULL"),
@@ -133,7 +133,7 @@ format(yaml([]RegExp))
 		},
 
 		&cli.BoolFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.push",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_PUSH"),
@@ -146,7 +146,7 @@ format(yaml([]RegExp))
 		},
 
 		flags.YAMLFlag(&P.Image.BuildArgs, &cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.build-args",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_BUILD_ARGS"),
@@ -163,7 +163,7 @@ format(yaml(map[string]Template()))
 		}),
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.latest-tag",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_LATEST_TAG"),
@@ -176,7 +176,7 @@ format(yaml(map[string]Template()))
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.cache",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_CACHE"),
@@ -189,7 +189,7 @@ format(yaml(map[string]Template()))
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.format",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_FORMAT"),
@@ -202,7 +202,7 @@ format(yaml(map[string]Template()))
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_IMAGE,
+			Category: CategoryContainerImage,
 			Name:     "buildah.build.image.storage-driver",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_STORAGE_DRIVER"),
@@ -215,10 +215,10 @@ format(yaml(map[string]Template()))
 			Destination: &P.Image.StorageDriver,
 		},
 
-		// CATEGORY_CONTAINER_FILE
+		// CategoryContainerFile
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_FILE,
+			Category: CategoryContainerFile,
 			Name:     "buildah.build.file.context",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_FILE_CONTEXT"),
@@ -231,7 +231,7 @@ format(yaml(map[string]Template()))
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_FILE,
+			Category: CategoryContainerFile,
 			Name:     "buildah.build.file.name",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_FILE_NAME"),
@@ -243,10 +243,10 @@ format(yaml(map[string]Template()))
 			Destination: &P.File.Name,
 		},
 
-		// CATEGORY_CONTAINER_MANIFEST
+		// CategoryContainerManifest
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_MANIFEST,
+			Category: CategoryContainerManifest,
 			Name:     "buildah.build.manifest.target",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_MANIFEST_TARGET"),
@@ -258,7 +258,7 @@ format(yaml(map[string]Template()))
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_CONTAINER_MANIFEST,
+			Category: CategoryContainerManifest,
 			Name:     "buildah.build.manifest.file",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("BUILDAH_BUILD_MANIFEST_FILE"),

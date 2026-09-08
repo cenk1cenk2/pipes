@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-template"
+const CLIName = "pipe-template"
 
-const DESCRIPTION = "template-cli"
+const Description = "template-cli"
 
-var VERSION = "latest"
+var version = "latest"

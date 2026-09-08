@@ -4,13 +4,13 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-const CATEGORY_LINT = "Lint"
+const CategoryLint = "Lint"
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "terraform.lint.format-check.enable",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_LINT_FORMAT_CHECK_ENABLE"),
@@ -22,7 +22,7 @@ var Flags = []cli.Flag{
 		Destination: &P.Lint.FormatCheckEnable,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "terraform.lint.format-check.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_LINT_FORMAT_CHECK_ARGS"),
@@ -34,7 +34,7 @@ var Flags = []cli.Flag{
 		Destination: &P.Lint.FormatCheckArgs,
 	},
 	&cli.BoolFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "terraform.lint.validate.enable",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_LINT_VALIDATE_ENABLE"),
@@ -46,7 +46,7 @@ var Flags = []cli.Flag{
 		Destination: &P.Lint.ValidateEnable,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "terraform.lint.validate.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_LINT_VALIDATE_ARGS"),

@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	REFERENCE_HEADS = "heads"
-	REFERENCE_TAGS  = "tags"
+	ReferenceHeads = "heads"
+	ReferenceTags  = "tags"
 )
 
 // Refs is the source control position the pipe was triggered from.
@@ -24,11 +24,11 @@ func (r Refs) References() []string {
 	references := []string{}
 
 	if r.Tag != "" {
-		references = append(references, fmt.Sprintf("%s/%s", REFERENCE_TAGS, r.Tag))
+		references = append(references, fmt.Sprintf("%s/%s", ReferenceTags, r.Tag))
 	}
 
 	if r.Branch != "" {
-		references = append(references, fmt.Sprintf("%s/%s", REFERENCE_HEADS, r.Branch))
+		references = append(references, fmt.Sprintf("%s/%s", ReferenceHeads, r.Branch))
 	}
 
 	return references

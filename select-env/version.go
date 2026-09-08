@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "select-env"
+const CLIName = "select-env"
 
-const DESCRIPTION = "Selects an set of environment variable prefix depending on the condition."
+const Description = "Selects an set of environment variable prefix depending on the condition."
 
-var VERSION = "latest"
+var version = "latest"

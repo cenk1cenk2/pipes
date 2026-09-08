@@ -37,7 +37,7 @@ func packageTask(tl *TaskList) *Task {
 			for _, tag := range C.Tags {
 				t.CreateSubtask(tag).
 					Set(func(t *Task) error {
-						output := fmt.Sprintf("%s/%s-%s-%s.tar.gz", TF_MODULE_OUTPUT_DIR, P.Module.Name, P.Module.System, tag)
+						output := fmt.Sprintf("%s/%s-%s-%s.tar.gz", TFModuleOutputDir, P.Module.Name, P.Module.System, tag)
 
 						t.CreateCommand(
 							"tar",
@@ -90,9 +90,9 @@ func publish(tl *TaskList) *Task {
 }
 
 func publishGitlab(tl *TaskList) *Task {
-	return tl.CreateTask("publish", TF_REGISTRY_GITLAB, P.Module.Name, P.Module.System).
+	return tl.CreateTask("publish", TFRegistryGitLab, P.Module.Name, P.Module.System).
 		ShouldDisable(func(t *Task) bool {
-			return P.Registry.Name != TF_REGISTRY_GITLAB
+			return P.Registry.Name != TFRegistryGitLab
 		}).
 		Set(func(t *Task) error {
 			for _, p := range C.Packages {

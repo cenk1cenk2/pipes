@@ -9,14 +9,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
-const CATEGORY_PLAN = "Plan"
+const CategoryPlan = "Plan"
 
 //revive:disable:line-length-limit
 
 var Flags = CombineFlags(
 	[]cli.Flag{
 		&cli.StringFlag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.output",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_OUTPUT"),
@@ -31,7 +31,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.args",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_ARGS"),
@@ -44,7 +44,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.BoolFlag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.preview-for-merge-requests",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS"),
@@ -57,7 +57,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.pipeline-source",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_PIPELINE_SOURCE"),
@@ -70,7 +70,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.Uint32Flag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.retry-tries",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_RETRY_TRIES"),
@@ -83,7 +83,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.DurationFlag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.retry-delay",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_RETRY_DELAY"),
@@ -96,7 +96,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_PLAN,
+			Category: CategoryPlan,
 			Name:     "terraform.plan.summary.output",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PLAN_SUMMARY_OUTPUT"),

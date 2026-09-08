@@ -1,6 +1,6 @@
 package release
 
 const (
-	SEMANTIC_RELEASE_EXE       = "semantic-release"
-	MULTI_SEMANTIC_RELEASE_EXE = "multi-semantic-release"
+	SemanticReleaseExe      = "semantic-release"
+	MultiSemanticReleaseExe = "multi-semantic-release"
 )

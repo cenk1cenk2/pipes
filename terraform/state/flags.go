@@ -7,14 +7,14 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_STATE = "State"
+	CategoryState = "State"
 )
 
 var Flags = []cli.Flag{
-	// CATEGORY_STATE
+	// CategoryState
 
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.type",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_TYPE"),
@@ -27,7 +27,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.name",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_NAME"),
@@ -40,7 +40,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.strict",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_STRICT"),
@@ -55,7 +55,7 @@ var Flags = []cli.Flag{
 	// gitlab http state
 
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS"),
@@ -68,7 +68,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpAddress,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-lock-address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS"),
@@ -80,7 +80,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpLockAddress,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-lock-method",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD"),
@@ -92,7 +92,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpLockMethod,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-unlock-address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS"),
@@ -104,7 +104,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpUnlockAddress,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-unlock-method",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD"),
@@ -116,7 +116,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpUnlockMethod,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME"),
@@ -129,7 +129,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpUsername,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD"),
@@ -143,7 +143,7 @@ var Flags = []cli.Flag{
 		Destination: &P.GitlabHttpState.HttpPassword,
 	},
 	&cli.StringFlag{
-		Category: CATEGORY_STATE,
+		Category: CategoryState,
 		Name:     "terraform.state.gitlab-http.http-retry-wait-min",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN"),

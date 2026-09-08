@@ -15,12 +15,12 @@ type Options struct {
 func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Category:    CATEGORY_PACKAGE_MANAGER,
+			Category:    CategoryPackageManager,
 			Name:        "node.package-manager",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("NODE_PACKAGE_MANAGER")),
 			Usage:       `Preferred package manager for nodejs. format(enum("npm", "yarn", "pnpm"))`,
 			Required:    false,
-			Value:       DEFAULT_PACKAGE_MANAGER,
+			Value:       DefaultPackageManager,
 			Destination: &opts.Destination.PackageManager,
 		},
 	}

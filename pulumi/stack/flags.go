@@ -4,13 +4,13 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-const CATEGORY_PULUMI_STACK = "Stack"
+const CategoryPulumiStack = "Stack"
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_PULUMI_STACK,
+		Category: CategoryPulumiStack,
 		Name:     "pulumi.stack",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PULUMI_STACK"),

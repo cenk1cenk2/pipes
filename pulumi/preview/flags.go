@@ -7,14 +7,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
-const CATEGORY_PULUMI_PREVIEW = "Preview"
+const CategoryPulumiPreview = "Preview"
 
 //revive:disable:line-length-limit
 
 var Flags = CombineFlags(
 	[]cli.Flag{
 		&cli.StringFlag{
-			Category: CATEGORY_PULUMI_PREVIEW,
+			Category: CategoryPulumiPreview,
 			Name:     "pulumi.preview.plan",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("PULUMI_PREVIEW_PLAN"),
@@ -27,7 +27,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_PULUMI_PREVIEW,
+			Category: CategoryPulumiPreview,
 			Name:     "pulumi.preview.summary.output",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("PULUMI_PREVIEW_SUMMARY_OUTPUT"),

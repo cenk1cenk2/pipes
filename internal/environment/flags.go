@@ -10,7 +10,7 @@ import (
 
 //revive:disable:line-length-limit
 
-const CATEGORY_ENVIRONMENT = "Environment"
+const CategoryEnvironment = "Environment"
 
 // Options is what the environment flags are built onto.
 type Options struct {
@@ -33,7 +33,7 @@ type Config struct {
 func NewFlags(opts Options) []cli.Flag {
 	return append(git.NewFlags(git.Options{Destination: &opts.Destination.Git}), []cli.Flag{
 		&cli.BoolFlag{
-			Category:    CATEGORY_ENVIRONMENT,
+			Category:    CategoryEnvironment,
 			Name:        "environment.enable",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_ENABLE")),
 			Usage:       "Enable environment injection.",
@@ -44,7 +44,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		flags.JSONFlag(&opts.Destination.Conditions, &cli.StringFlag{
-			Category: CATEGORY_ENVIRONMENT,
+			Category: CategoryEnvironment,
 			Name:     "environment.conditions",
 			Sources:  cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_CONDITIONS")),
 			Usage: strings.TrimSpace(`
@@ -54,11 +54,11 @@ Use either "heads/" for narrowing the search to branches or "tags/" for narrowin
 format(json([]struct{ match: RegExp, environment: string }))
 `),
 			Required: false,
-			Value:    DEFAULT_CONDITIONS,
+			Value:    DefaultConditions,
 		}),
 
 		&cli.BoolFlag{
-			Category:    CATEGORY_ENVIRONMENT,
+			Category:    CategoryEnvironment,
 			Name:        "environment.fail-on-no-reference",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_FAIL_ON_NO_REFERENCE")),
 			Usage:       "Fail on missing environment references.",
@@ -68,7 +68,7 @@ format(json([]struct{ match: RegExp, environment: string }))
 		},
 
 		&cli.BoolFlag{
-			Category:    CATEGORY_ENVIRONMENT,
+			Category:    CategoryEnvironment,
 			Name:        "environment.strict",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_STRICT")),
 			Usage:       "Fail when no environment is selected.",

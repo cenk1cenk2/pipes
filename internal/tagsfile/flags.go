@@ -7,7 +7,7 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_TAGS_FILE = "Tags File"
+	CategoryTagsFile = "Tags File"
 )
 
 // Options is what the tags file flags are built onto. A nil Strict destination
@@ -23,7 +23,7 @@ type Options struct {
 func NewFlags(opts Options) []cli.Flag {
 	list := []cli.Flag{
 		&cli.StringFlag{
-			Category:    CATEGORY_TAGS_FILE,
+			Category:    CategoryTagsFile,
 			Name:        "tags-file",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("TAGS_FILE")),
 			Usage:       "Read tags from a comma separated file.",
@@ -38,7 +38,7 @@ func NewFlags(opts Options) []cli.Flag {
 	}
 
 	return append(list, &cli.BoolFlag{
-		Category:    CATEGORY_TAGS_FILE,
+		Category:    CategoryTagsFile,
 		Name:        "tags-file.strict",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("TAGS_FILE_STRICT")),
 		Usage:       "Fail on missing tags file.",

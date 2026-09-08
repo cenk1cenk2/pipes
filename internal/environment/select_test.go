@@ -51,7 +51,7 @@ var _ = Describe("Select", func() {
 	// surface on the pipeline that happened to need it.
 	It("selects through the shipped default conditions", func() {
 		defaults := []environment.Condition{}
-		Expect(json.Unmarshal([]byte(environment.DEFAULT_CONDITIONS), &defaults)).To(Succeed())
+		Expect(json.Unmarshal([]byte(environment.DefaultConditions), &defaults)).To(Succeed())
 
 		Expect(environment.Select(defaults, git.Refs{Tag: "v1.0.0"}.References())).To(Equal("production"))
 		Expect(environment.Select(defaults, git.Refs{Tag: "v1.0.0-rc.1"}.References())).To(Equal("stage"))
@@ -64,7 +64,7 @@ var _ = Describe("Select", func() {
 	// what decides the environment of a release.
 	It("selects the tag environment for a tagged pipeline on main", func() {
 		defaults := []environment.Condition{}
-		Expect(json.Unmarshal([]byte(environment.DEFAULT_CONDITIONS), &defaults)).To(Succeed())
+		Expect(json.Unmarshal([]byte(environment.DefaultConditions), &defaults)).To(Succeed())
 
 		Expect(environment.Select(defaults, git.Refs{Branch: "main", Tag: "v1.0.0"}.References())).
 			To(Equal("production"))
@@ -149,7 +149,7 @@ var _ = Describe("NewFlags", func() {
 		cfg := environment.Config{}
 
 		Expect(fixtures.Flag[*cli.StringFlag](flags(&cfg), "environment.conditions").
-			Validator(environment.DEFAULT_CONDITIONS)).To(Succeed())
+			Validator(environment.DefaultConditions)).To(Succeed())
 		Expect(cfg.Conditions).NotTo(BeEmpty())
 	})
 

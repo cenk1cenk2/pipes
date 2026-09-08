@@ -29,7 +29,7 @@ func state(tl *TaskList) *Task {
 func stateGitlabHttp(tl *TaskList) *Task {
 	return tl.CreateTask("state", "gitlab-http").
 		ShouldDisable(func(t *Task) bool {
-			return P.State.Type != TF_STATE_TYPE_GITLAB_HTTP
+			return P.State.Type != TFStateTypeGitLabHTTP
 		}).
 		Set(func(t *Task) error {
 			if P.GitlabHttpState.HttpAddress == "" {

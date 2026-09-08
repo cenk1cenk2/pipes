@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-terraform"
+const CLIName = "pipe-terraform"
 
-const DESCRIPTION = "Running terraform inside the pipelines."
+const Description = "Running terraform inside the pipelines."
 
-var VERSION = "latest"
+var version = "latest"

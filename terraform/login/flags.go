@@ -5,13 +5,13 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
-const CATEGORY_LOGIN = "Login"
+const CategoryLogin = "Login"
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	flags.JSONFlag(&P.Registry.Credentials, &cli.StringFlag{
-		Category: CATEGORY_LOGIN,
+		Category: CategoryLogin,
 		Name:     "terraform.login.registry.credentials",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_LOGIN_REGISTRY_CREDENTIALS"),

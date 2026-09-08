@@ -47,7 +47,7 @@ var _ = Describe("Login", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(request.Method).To(Equal(http.MethodPost))
-		Expect(request.Header.Get("Content-Type")).To(Equal(JSON_REQUEST))
+		Expect(request.Header.Get("Content-Type")).To(Equal(JSONRequest))
 		Expect(body).To(Equal(`{"username":"user","password":"password"}`))
 	})
 
@@ -130,7 +130,7 @@ var _ = Describe("UpdateReadme", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(request.Header.Get("Authorization")).To(Equal("JWT jwt-token"))
-		Expect(request.Header.Get("Content-Type")).To(Equal(JSON_REQUEST))
+		Expect(request.Header.Get("Content-Type")).To(Equal(JSONRequest))
 		Expect(request.Header.Get("User-Agent")).To(Equal("pipe-update-docker-hub-readme"))
 	})
 

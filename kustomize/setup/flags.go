@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_KUSTOMIZE = "Kustomize"
+	CategoryKustomize = "Kustomize"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE,
+		Category: CategoryKustomize,
 		Name:     "kustomize.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_CWD"),
@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
-		Category:    CATEGORY_KUSTOMIZE,
+		Category:    CategoryKustomize,
 		Name:        "kustomize.paths",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("KUSTOMIZE_PATHS")),
 		Usage:       "Explicit overlay paths to build relative to the working directory.",

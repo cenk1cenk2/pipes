@@ -13,10 +13,10 @@ import (
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLI_NAME,
-			Version:     VERSION,
-			Usage:       DESCRIPTION,
-			Description: DESCRIPTION,
+			Name:        CLIName,
+			Version:     version,
+			Usage:       Description,
+			Description: Description,
 			Flags:       CombineFlags(update.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(

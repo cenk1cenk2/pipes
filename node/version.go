@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-node"
+const CLIName = "pipe-node"
 
-const DESCRIPTION = "Pipe for installing node.js dependencies and building node.js applications on CI/CD."
+const Description = "Pipe for installing node.js dependencies and building node.js applications on CI/CD."
 
-var VERSION = "latest"
+var version = "latest"

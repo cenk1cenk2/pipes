@@ -9,18 +9,18 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_MODULE          = "Module"
-	CATEGORY_REGISTRY        = "Registry"
-	CATEGORY_REGISTRY_GITLAB = "Registry - GitLab"
+	CategoryModule         = "Module"
+	CategoryRegistry       = "Registry"
+	CategoryRegistryGitLab = "Registry - GitLab"
 )
 
 var Flags = CombineFlags(
 	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Module.TagsFile, Value: ".tags"}),
 	[]cli.Flag{
-		// CATEGORY_MODULE
+		// CategoryModule
 
 		&cli.StringFlag{
-			Category: CATEGORY_MODULE,
+			Category: CategoryModule,
 			Name:     "terraform.publish.module.name",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_NAME"),
@@ -34,7 +34,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_MODULE,
+			Category: CategoryModule,
 			Name:     "terraform.publish.module.cwd",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_CWD"),
@@ -48,7 +48,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_MODULE,
+			Category: CategoryModule,
 			Name:     "terraform.publish.module.system",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_SYSTEM"),
@@ -60,10 +60,10 @@ var Flags = CombineFlags(
 			Destination: &P.Module.System,
 		},
 
-		// CATEGORY_REGISTRY
+		// CategoryRegistry
 
 		&cli.StringFlag{
-			Category: CATEGORY_REGISTRY,
+			Category: CategoryRegistry,
 			Name:     "terraform.publish.registry.name",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_NAME"),
@@ -71,14 +71,14 @@ var Flags = CombineFlags(
 			),
 			Usage:       `Registry of the module that will be published. format(enum("gitlab"))`,
 			Required:    false,
-			Value:       TF_REGISTRY_GITLAB,
+			Value:       TFRegistryGitLab,
 			Destination: &P.Registry.Name,
 		},
 
-		// CATEGORY_REGISTRY_GITLAB
+		// CategoryRegistryGitLab
 
 		&cli.StringFlag{
-			Category: CATEGORY_REGISTRY_GITLAB,
+			Category: CategoryRegistryGitLab,
 			Name:     "terraform.publish.registry.gitlab.api-url",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_API_URL"),
@@ -90,7 +90,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_REGISTRY_GITLAB,
+			Category: CategoryRegistryGitLab,
 			Name:     "terraform.publish.registry.gitlab.project-id",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_PROJECT_ID"),
@@ -102,7 +102,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_REGISTRY_GITLAB,
+			Category: CategoryRegistryGitLab,
 			Name:     "terraform.publish.registry.gitlab.token",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_TOKEN"),

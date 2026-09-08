@@ -4,13 +4,13 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-const CATEGORY_INSTALL = "Install"
+const CategoryInstall = "Install"
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Category: CATEGORY_INSTALL,
+		Category: CategoryInstall,
 		Name:     "terraform.install.reconfigure",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_INSTALL_RECONFIGURE"),
@@ -23,7 +23,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_INSTALL,
+		Category: CategoryInstall,
 		Name:     "terraform.install.use-lockfile",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_INSTALL_USE_LOCKFILE"),
@@ -36,7 +36,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_INSTALL,
+		Category: CategoryInstall,
 		Name:     "terraform.install.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("TERRAFORM_INSTALL_ARGS"),

@@ -51,7 +51,7 @@ var _ = Describe("Semantic release", func() {
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
-		Expect(invocation.Name).To(Equal(SEMANTIC_RELEASE_EXE))
+		Expect(invocation.Name).To(Equal(SemanticReleaseExe))
 		Expect(invocation.Args).To(BeEmpty())
 	})
 
@@ -63,7 +63,7 @@ var _ = Describe("Semantic release", func() {
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
-		Expect(invocation.Name).To(Equal(MULTI_SEMANTIC_RELEASE_EXE))
+		Expect(invocation.Name).To(Equal(MultiSemanticReleaseExe))
 	})
 
 	// semantic-release detects the pipeline it runs in and refuses a dry run on a

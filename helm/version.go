@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-helm"
+const CLIName = "pipe-helm"
 
-const DESCRIPTION = "Helm charts for CI pipelines."
+const Description = "Helm charts for CI pipelines."
 
-var VERSION = "latest"
+var version = "latest"

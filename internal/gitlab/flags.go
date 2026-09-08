@@ -7,7 +7,7 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_GITLAB_MERGE_REQUEST_REPORT = "GitLab Merge Request Report"
+	CategoryGitLabMergeRequestReport = "GitLab Merge Request Report"
 )
 
 // Options is what the merge request report flags are built onto.
@@ -18,7 +18,7 @@ type Options struct {
 func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.BoolFlag{
-			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
+			Category: CategoryGitLabMergeRequestReport,
 			Name:     "gitlab-mr-report.enabled",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("GITLAB_MR_REPORT_ENABLED"),
@@ -30,7 +30,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
+			Category: CategoryGitLabMergeRequestReport,
 			Name:     "gitlab-mr-report.token",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("GL_PIPES_TOKEN"),
@@ -42,7 +42,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
+			Category: CategoryGitLabMergeRequestReport,
 			Name:     "gitlab-mr-report.api-url",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_API_V4_URL"),
@@ -54,7 +54,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
+			Category: CategoryGitLabMergeRequestReport,
 			Name:     "gitlab-mr-report.project-id",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_PROJECT_ID"),
@@ -66,7 +66,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.Int64Flag{
-			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
+			Category: CategoryGitLabMergeRequestReport,
 			Name:     "gitlab-mr-report.merge-request-iid",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_MERGE_REQUEST_IID"),
@@ -78,7 +78,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_GITLAB_MERGE_REQUEST_REPORT,
+			Category: CategoryGitLabMergeRequestReport,
 			Name:     "gitlab-mr-report.identifier",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("GITLAB_MR_REPORT_IDENTIFIER"),

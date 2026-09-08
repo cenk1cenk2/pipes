@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_HELM = "Helm"
+	CategoryHelm = "Helm"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_HELM,
+		Category: CategoryHelm,
 		Name:     "helm.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_CWD"),

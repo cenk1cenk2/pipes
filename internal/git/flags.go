@@ -7,7 +7,7 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_GIT = "GIT"
+	CategoryGit = "GIT"
 )
 
 // Options is what the git flags are built onto. Every flag constructor takes a
@@ -19,7 +19,7 @@ type Options struct {
 func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Category: CATEGORY_GIT,
+			Category: CategoryGit,
 			Name:     "git.branch",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_COMMIT_REF_NAME"),
@@ -32,7 +32,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_GIT,
+			Category: CategoryGit,
 			Name:     "git.tag",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("CI_COMMIT_TAG"),

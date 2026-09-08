@@ -10,38 +10,38 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_NODE_BUILD = "Build"
+	CategoryNodeBuild = "Build"
 )
 
 var Flags = []cli.Flag{
-	// CATEGORY_BUILD
+	// CategoryBuild
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_BUILD,
+		Category: CategoryNodeBuild,
 		Name:     "node.build.script",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_SCRIPT"),
 		),
-		Usage:       fmt.Sprintf("package.json script for the build operation. %s", environment.HELP_FORMAT_TEMPLATE),
+		Usage:       fmt.Sprintf("package.json script for the build operation. %s", environment.HelpFormatTemplate),
 		Required:    false,
 		Value:       "build",
 		Destination: &P.Build.Script,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_BUILD,
+		Category: CategoryNodeBuild,
 		Name:     "node.build.script-args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_SCRIPT_ARGS"),
 		),
-		Usage:       fmt.Sprintf("package.json script arguments for the build operation. %s", environment.HELP_FORMAT_TEMPLATE),
+		Usage:       fmt.Sprintf("package.json script arguments for the build operation. %s", environment.HelpFormatTemplate),
 		Required:    false,
 		Value:       "",
 		Destination: &P.Build.ScriptArgs,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_BUILD,
+		Category: CategoryNodeBuild,
 		Name:     "node.build.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_CWD"),

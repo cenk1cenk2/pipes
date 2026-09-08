@@ -7,13 +7,13 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_HELM_REGISTRY = "Helm Registry"
+	CategoryHelmRegistry = "Helm Registry"
 )
 
 // Flags are declared once for the whole pipe, so every command that logs in registers the same ones.
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_HELM_REGISTRY,
+		Category: CategoryHelmRegistry,
 		Name:     "helm.login.registry.uri",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LOGIN_REGISTRY_URI"),
@@ -26,7 +26,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_HELM_REGISTRY,
+		Category: CategoryHelmRegistry,
 		Name:     "helm.login.registry.username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LOGIN_REGISTRY_USERNAME"),
@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_HELM_REGISTRY,
+		Category: CategoryHelmRegistry,
 		Name:     "helm.login.registry.password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LOGIN_REGISTRY_PASSWORD"),

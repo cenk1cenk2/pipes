@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_PULUMI = "Pulumi"
+	CategoryPulumi = "Pulumi"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_PULUMI,
+		Category:    CategoryPulumi,
 		Name:        "pulumi.cwd",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("PULUMI_CWD")),
 		Usage:       "Working directory for pulumi commands.",

@@ -16,10 +16,10 @@ import (
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLI_NAME,
-			Version:     VERSION,
-			Usage:       DESCRIPTION,
-			Description: DESCRIPTION,
+			Name:        CLIName,
+			Version:     version,
+			Usage:       Description,
+			Description: Description,
 			Commands: []*cli.Command{
 				{
 					Name:        "preview",

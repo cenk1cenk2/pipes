@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-buildah"
+const CLIName = "pipe-buildah"
 
-const DESCRIPTION = "Builds and publishes container images from CI/CD with buildah.io"
+const Description = "Builds and publishes container images from CI/CD with buildah.io"
 
-var VERSION = "latest"
+var version = "latest"

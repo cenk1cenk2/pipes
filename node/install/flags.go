@@ -7,15 +7,15 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_NODE_INSTALL = "Install"
+	CategoryNodeInstall = "Install"
 )
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_NODE_INSTALL
+	// CategoryNodeInstall
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_INSTALL,
+		Category: CategoryNodeInstall,
 		Name:     "node.install.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_INSTALL_CWD"),
@@ -27,7 +27,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_NODE_INSTALL,
+		Category: CategoryNodeInstall,
 		Name:     "node.install.use-lock-file",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_INSTALL_USE_LOCK_FILE"),
@@ -39,7 +39,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_INSTALL,
+		Category: CategoryNodeInstall,
 		Name:     "node.install.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_INSTALL_ARGS"),
@@ -51,7 +51,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_NODE_INSTALL,
+		Category: CategoryNodeInstall,
 		Name:     "node.install.cache",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_INSTALL_CACHE"),

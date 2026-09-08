@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_BUILDAH = "Buildah"
+	CategoryBuildah = "Buildah"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_BUILDAH,
+		Category:    CategoryBuildah,
 		Name:        "buildah.cwd",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("BUILDAH_CWD")),
 		Usage:       "Working directory for buildah commands.",

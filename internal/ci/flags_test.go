@@ -15,7 +15,7 @@ var _ = Describe("NewFlags", func() {
 		metadata := terraform.Metadata{}
 
 		for _, flag := range ci.NewFlags(ci.Options{Destination: &metadata}) {
-			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(ci.CATEGORY_CI))
+			Expect(flag.(cli.CategorizableFlag).GetCategory()).To(Equal(ci.CategoryCI))
 		}
 	})
 

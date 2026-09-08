@@ -10,7 +10,7 @@ import (
 //revive:disable:line-length-limit
 
 // The conditions a pipe falls back to; the value is printed verbatim as the flag default in the generated documentation.
-const DEFAULT_CONDITIONS = `[
+const DefaultConditions = `[
     { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },
     { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },
     { "match" :"^heads/main$", "environment": "develop" },

@@ -10,15 +10,15 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_NODE_COMMAND = "Command"
+	CategoryNodeCommand = "Command"
 )
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_NODE_COMMAND
+	// CategoryNodeCommand
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_COMMAND,
+		Category: CategoryNodeCommand,
 		Name:     "node.run.script",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_RUN_SCRIPT"),
@@ -26,14 +26,14 @@ var Flags = []cli.Flag{
 		),
 		Usage: fmt.Sprintf(
 			"package.json script for the given command operation. %s",
-			environment.HELP_FORMAT_TEMPLATE,
+			environment.HelpFormatTemplate,
 		),
 		Required:    false,
 		Destination: &P.Run.Script,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_COMMAND,
+		Category: CategoryNodeCommand,
 		Name:     "node.run.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_RUN_CWD"),

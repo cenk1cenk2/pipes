@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-semantic-release"
+const CLIName = "pipe-semantic-release"
 
-const DESCRIPTION = "Releases applications through the semantic-release library."
+const Description = "Releases applications through the semantic-release library."
 
-var VERSION = "latest"
+var version = "latest"

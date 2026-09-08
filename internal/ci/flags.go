@@ -8,7 +8,7 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_CI = "GitLab Pipeline"
+	CategoryCI = "GitLab Pipeline"
 )
 
 // Options is what the CI flags are built onto.
@@ -21,7 +21,7 @@ type Options struct {
 func NewFlags(opts Options) []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
-			Category:    CATEGORY_CI,
+			Category:    CategoryCI,
 			Name:        "ci.job-name",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_JOB_NAME")),
 			Usage:       "GitLab CI job name to include in the plan report metadata.",
@@ -31,7 +31,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_CI,
+			Category:    CategoryCI,
 			Name:        "ci.job-url",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_JOB_URL")),
 			Usage:       "GitLab CI job URL to include in the plan report metadata.",
@@ -41,7 +41,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_CI,
+			Category:    CategoryCI,
 			Name:        "ci.pipeline-id",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_PIPELINE_ID")),
 			Usage:       "GitLab CI pipeline id to include in the plan report metadata.",
@@ -51,7 +51,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_CI,
+			Category:    CategoryCI,
 			Name:        "ci.pipeline-url",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_PIPELINE_URL")),
 			Usage:       "GitLab CI pipeline URL to include in the plan report metadata.",
@@ -61,7 +61,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_CI,
+			Category:    CategoryCI,
 			Name:        "ci.commit-sha",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_COMMIT_SHA")),
 			Usage:       "Git commit sha to include in the plan report metadata.",
@@ -71,7 +71,7 @@ func NewFlags(opts Options) []cli.Flag {
 		},
 
 		&cli.StringFlag{
-			Category:    CATEGORY_CI,
+			Category:    CategoryCI,
 			Name:        "ci.commit-short-sha",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_COMMIT_SHORT_SHA")),
 			Usage:       "Short git commit sha to include in the plan report metadata.",

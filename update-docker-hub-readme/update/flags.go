@@ -8,13 +8,13 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_DOCKER_HUB = "DockerHub"
-	CATEGORY_README     = "Readme"
+	CategoryDockerHub = "DockerHub"
+	CategoryReadme    = "Readme"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_DOCKER_HUB,
+		Category: CategoryDockerHub,
 		Name:     "docker-hub.username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_USERNAME"),
@@ -26,7 +26,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_DOCKER_HUB,
+		Category: CategoryDockerHub,
 		Name:     "docker-hub.password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_PASSWORD"),
@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_DOCKER_HUB,
+		Category: CategoryDockerHub,
 		Name:     "docker-hub.address",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_ADDRESS"),
@@ -49,7 +49,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_README,
+		Category: CategoryReadme,
 		Name:     "docker-hub.readme.repository",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_README_REPOSITORY"),
@@ -64,7 +64,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_README,
+		Category: CategoryReadme,
 		Name:     "docker-hub.readme.file",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_README_FILE"),
@@ -77,7 +77,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_README,
+		Category: CategoryReadme,
 		Name:     "docker-hub.readme.description",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_README_DESCRIPTION"),
@@ -89,7 +89,7 @@ var Flags = []cli.Flag{
 	},
 
 	flags.JSONFlag(&P.Readme.Matrix, &cli.StringFlag{
-		Category: CATEGORY_README,
+		Category: CategoryReadme,
 		Name:     "docker-hub.readme.matrix",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_README_MATRIX"),

@@ -8,12 +8,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_BUILD = "Build"
+	CategoryBuild = "Build"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_ARGS"),
@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.output",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_OUTPUT"),
@@ -37,7 +37,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.binary-name",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_BINARY_NAME"),
@@ -49,7 +49,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.binary-template",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_BINARY_TEMPLATE"),
@@ -61,7 +61,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.linker-flags",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_LINKER_FLAGS"),
@@ -74,7 +74,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.enable-cgo",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_ENABLE_CGO"),
@@ -87,7 +87,7 @@ var Flags = []cli.Flag{
 	},
 
 	flags.YAMLFlag(&P.BuildTargets, &cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.targets",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_TARGETS"),
@@ -98,7 +98,7 @@ var Flags = []cli.Flag{
 	}),
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.tags",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_TAGS"),
@@ -110,7 +110,7 @@ var Flags = []cli.Flag{
 	},
 
 	flags.YAMLFlag(&P.BuildVariables, &cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.variables",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_VARIABLES"),

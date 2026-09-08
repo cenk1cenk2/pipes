@@ -13,9 +13,9 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_HELM_CHART = "Helm Chart"
+	CategoryHelmChart = "Helm Chart"
 
-	DEFAULT_SANITIZE_VERSIONS = `[
+	DefaultSanitizeVersions = `[
     { "match": "([^/]*)/(.*)", "template": "{{ index $ 1 | upper }}_{{ index $ 2 }}" }
 ]`
 )
@@ -24,7 +24,7 @@ var Flags = CombineFlags(
 	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Chart.VersionFile, Strict: &P.Chart.VersionFileStrict}),
 	[]cli.Flag{
 		&cli.StringFlag{
-			Category: CATEGORY_HELM_CHART,
+			Category: CategoryHelmChart,
 			Name:     "helm.publish.chart.target",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("HELM_PUBLISH_CHART_TARGET"),
@@ -36,7 +36,7 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringSliceFlag{
-			Category: CATEGORY_HELM_CHART,
+			Category: CategoryHelmChart,
 			Name:     "helm.publish.chart.versions",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS"),
@@ -48,7 +48,7 @@ var Flags = CombineFlags(
 		},
 
 		flags.YAMLFlag(&P.Chart.VersionsTemplate, &cli.StringFlag{
-			Category: CATEGORY_HELM_CHART,
+			Category: CategoryHelmChart,
 			Name:     "helm.publish.chart.versions-template",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_TEMPLATE"),
@@ -65,7 +65,7 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 		}),
 
 		flags.YAMLFlag(&P.Chart.VersionsSanitize, &cli.StringFlag{
-			Category: CATEGORY_HELM_CHART,
+			Category: CategoryHelmChart,
 			Name:     "helm.publish.chart.versions-sanitize",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("HELM_PUBLISH_CHART_VERSIONS_SANITIZE"),
@@ -78,11 +78,11 @@ Template is interpolated with the given matches in the regular expression.
 format(yaml([]struct{ match: RegExp, template: Template(match) }))
 `),
 			Required: false,
-			Value:    DEFAULT_SANITIZE_VERSIONS,
+			Value:    DefaultSanitizeVersions,
 		}),
 
 		&cli.StringFlag{
-			Category: CATEGORY_HELM_CHART,
+			Category: CategoryHelmChart,
 			Name:     "helm.publish.chart.destination",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("HELM_PUBLISH_CHART_DESTINATION"),
@@ -95,7 +95,7 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 		},
 
 		&cli.StringFlag{
-			Category: CATEGORY_HELM_CHART,
+			Category: CategoryHelmChart,
 			Name:     "helm.publish.chart.app-version",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("HELM_PUBLISH_CHART_APP_VERSION"),

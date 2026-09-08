@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-pulumi"
+const CLIName = "pipe-pulumi"
 
-const DESCRIPTION = "Pulumi actions for CI pipelines."
+const Description = "Pulumi actions for CI pipelines."
 
-var VERSION = "latest"
+var version = "latest"

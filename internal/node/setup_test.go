@@ -12,7 +12,7 @@ import (
 var _ = Describe("PackageManagers", func() {
 	// the default is what every pipeline that never set the flag runs with.
 	It("knows the default package manager", func() {
-		Expect(node.PackageManagers).To(HaveKey(node.DEFAULT_PACKAGE_MANAGER))
+		Expect(node.PackageManagers).To(HaveKey(node.DefaultPackageManager))
 	})
 
 	// every command a task builds comes out of this table, so a package manager
@@ -52,7 +52,7 @@ var _ = Describe("NewFlags", func() {
 		flag := fixtures.Flag[*cli.StringFlag](node.NewFlags(node.Options{Destination: &cfg}), "node.package-manager")
 
 		Expect(flag.Destination).To(BeIdenticalTo(&cfg.PackageManager))
-		Expect(flag.Value).To(Equal(node.DEFAULT_PACKAGE_MANAGER))
+		Expect(flag.Value).To(Equal(node.DefaultPackageManager))
 	})
 })
 

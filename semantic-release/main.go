@@ -26,10 +26,10 @@ func main() {
 		})
 
 		return &cli.Command{
-			Name:        CLI_NAME,
-			Version:     VERSION,
-			Usage:       DESCRIPTION,
-			Description: DESCRIPTION,
+			Name:        CLIName,
+			Version:     version,
+			Usage:       Description,
+			Description: Description,
 			Flags:       CombineFlags(setup.Flags, release.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(

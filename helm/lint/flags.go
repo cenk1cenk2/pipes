@@ -4,13 +4,13 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-const CATEGORY_HELM_LINT = "Helm Lint"
+const CategoryHelmLint = "Helm Lint"
 
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_HELM_LINT,
+		Category: CategoryHelmLint,
 		Name:     "helm.lint.kubernetes.version",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LINT_KUBERNETES_VERSION"),
@@ -23,7 +23,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_HELM_LINT,
+		Category: CategoryHelmLint,
 		Name:     "helm.lint.should-template",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("HELM_LINT_SHOULD_TEMPLATE"),

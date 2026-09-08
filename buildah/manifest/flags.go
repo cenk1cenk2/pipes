@@ -8,15 +8,15 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_CONTAINER_MANIFEST = "Container Manifest"
+	CategoryContainerManifest = "Container Manifest"
 )
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_CONTAINER_MANIFEST
+	// CategoryContainerManifest
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_CONTAINER_MANIFEST,
+		Category: CategoryContainerManifest,
 		Name:     "buildah.manifest.files",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("BUILDAH_MANIFEST_FILES"),
@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_CONTAINER_MANIFEST,
+		Category: CategoryContainerManifest,
 		Name:     "buildah.manifest.target",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("BUILDAH_MANIFEST_TARGET"),
@@ -41,7 +41,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_CONTAINER_MANIFEST,
+		Category: CategoryContainerManifest,
 		Name:     "buildah.manifest.images",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("BUILDAH_MANIFEST_IMAGES"),
@@ -53,7 +53,7 @@ var Flags = []cli.Flag{
 	},
 
 	flags.YAMLFlag(&P.Manifest.Matrix, &cli.StringFlag{
-		Category: CATEGORY_CONTAINER_MANIFEST,
+		Category: CategoryContainerManifest,
 		Name:     "buildah.manifest.matrix",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("BUILDAH_MANIFEST_MATRIX"),

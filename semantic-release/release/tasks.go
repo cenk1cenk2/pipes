@@ -8,9 +8,9 @@ func release(tl *TaskList) *Task {
 	return tl.CreateTask("release").
 		Set(func(t *Task) error {
 			if P.Workspace {
-				C.Exe = MULTI_SEMANTIC_RELEASE_EXE
+				C.Exe = MultiSemanticReleaseExe
 			} else {
-				C.Exe = SEMANTIC_RELEASE_EXE
+				C.Exe = SemanticReleaseExe
 			}
 
 			t.CreateCommand(

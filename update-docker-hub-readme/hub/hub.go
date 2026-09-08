@@ -12,11 +12,11 @@ import (
 	"net/http"
 )
 
-const JSON_REQUEST = "application/json"
+const JSONRequest = "application/json"
 
 // The login endpoint belongs to the account API, while the configured address
 // points at the repositories the readme is pushed to.
-const LOGIN_ADDRESS = "https://hub.docker.com/v2/users/login/"
+const LoginAddress = "https://hub.docker.com/v2/users/login/"
 
 type (
 	// Readme is the pair of descriptions a repository page shows.
@@ -73,7 +73,7 @@ var _ ClientAdapter = (*client)(nil)
 func NewClient(address, userAgent string) ClientAdapter {
 	return &client{
 		address:      address,
-		loginAddress: LOGIN_ADDRESS,
+		loginAddress: LoginAddress,
 		userAgent:    userAgent,
 		client:       &http.Client{},
 	}
@@ -100,7 +100,7 @@ func (c *client) Login(ctx context.Context, username, password string) (string, 
 		return "", err
 	}
 
-	req.Header.Set("Content-Type", JSON_REQUEST)
+	req.Header.Set("Content-Type", JSONRequest)
 
 	res, err := c.client.Do(req)
 
@@ -150,7 +150,7 @@ func (c *client) UpdateReadme(
 	}
 
 	req.Header.Set("User-Agent", c.userAgent)
-	req.Header.Set("Content-Type", JSON_REQUEST)
+	req.Header.Set("Content-Type", JSONRequest)
 	req.Header.Set("Authorization", fmt.Sprintf("JWT %s", token))
 
 	res, err := c.client.Do(req)

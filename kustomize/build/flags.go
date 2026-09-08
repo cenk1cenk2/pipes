@@ -9,7 +9,7 @@ import (
 type LoadRestrictor string
 
 const (
-	CATEGORY_KUSTOMIZE_BUILD = "Kustomize Build"
+	CategoryKustomizeBuild = "Kustomize Build"
 
 	LoadRestrictorRootOnly LoadRestrictor = "rootOnly"
 	LoadRestrictorNone     LoadRestrictor = "none"
@@ -18,7 +18,7 @@ const (
 var Flags = []cli.Flag{
 
 	&cli.BoolFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
+		Category: CategoryKustomizeBuild,
 		Name:     "kustomize.build.enable-helm",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_BUILD_ENABLE_HELM"),
@@ -31,7 +31,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
+		Category: CategoryKustomizeBuild,
 		Name:     "kustomize.build.helm-command",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_BUILD_HELM_COMMAND"),
@@ -44,7 +44,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
+		Category: CategoryKustomizeBuild,
 		Name:     "kustomize.build.load-restrictor",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_BUILD_LOAD_RESTRICTOR"),
@@ -57,7 +57,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
+		Category: CategoryKustomizeBuild,
 		Name:     "kustomize.build.kube-version",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_BUILD_KUBE_VERSION"),
@@ -71,7 +71,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_KUSTOMIZE_BUILD,
+		Category: CategoryKustomizeBuild,
 		Name:     "kustomize.build.output",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("KUSTOMIZE_BUILD_OUTPUT"),

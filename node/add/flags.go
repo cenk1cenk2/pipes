@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_PACKAGES = "Packages"
+	CategoryPackages = "Packages"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringSliceFlag{
-		Category: CATEGORY_PACKAGES,
+		Category: CategoryPackages,
 		Name:     "node.add.packages",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_PACKAGES"),
@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_PACKAGES,
+		Category: CategoryPackages,
 		Name:     "node.add.global",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_GLOBAL"),
@@ -38,7 +38,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_PACKAGES,
+		Category: CategoryPackages,
 		Name:     "node.add.script-args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_SCRIPT_ARGS"),
@@ -51,7 +51,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_PACKAGES,
+		Category: CategoryPackages,
 		Name:     "node.add.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_CWD"),

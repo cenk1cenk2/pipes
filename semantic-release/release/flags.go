@@ -7,16 +7,16 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_SEMANTIC_RELEASE = "Semantic Release"
-	CATEGORY_CI_VARIABLES     = "CI Variables"
+	CategorySemanticRelease = "Semantic Release"
+	CategoryCIVariables     = "CI Variables"
 )
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_SEMANTIC_RELEASE
+	// CategorySemanticRelease
 
 	&cli.BoolFlag{
-		Category: CATEGORY_SEMANTIC_RELEASE,
+		Category: CategorySemanticRelease,
 		Name:     "semantic-release.dry-run",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_DRY_RUN"),
@@ -28,7 +28,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_SEMANTIC_RELEASE,
+		Category: CategorySemanticRelease,
 		Name:     "semantic-release.workspace",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_WORKSPACE"),
@@ -39,10 +39,10 @@ var Flags = []cli.Flag{
 		Destination: &P.SemanticRelease.Workspace,
 	},
 
-	// CATEGORY_CI_VARIABLES
+	// CategoryCIVariables
 
 	&cli.StringFlag{
-		Category: CATEGORY_CI_VARIABLES,
+		Category: CategoryCIVariables,
 		Name:     "semantic-release.ci.commit-reference",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_CI_COMMIT_REFERENCE"),

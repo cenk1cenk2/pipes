@@ -163,13 +163,13 @@ var _ = Describe("Go build", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.BuildVariables = map[string]string{"main.VERSION": "v1.0.0"}
+		p.BuildVariables = map[string]string{"main.version": "v1.0.0"}
 
 		Expect(run(runner, p)).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
-		Expect(invocation.Args).To(ContainElement("-ldflags=-X main.VERSION=v1.0.0"))
+		Expect(invocation.Args).To(ContainElement("-ldflags=-X main.version=v1.0.0"))
 	})
 
 	It("passes the build tags as a single comma separated argument", func() {

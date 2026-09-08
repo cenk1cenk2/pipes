@@ -7,9 +7,9 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_PACKAGE_MANAGER = "Package Manager"
+	CategoryPackageManager = "Package Manager"
 
-	DEFAULT_PACKAGE_MANAGER = "pnpm"
+	DefaultPackageManager = "pnpm"
 )
 
 // Config is the package manager a pipe was configured with.

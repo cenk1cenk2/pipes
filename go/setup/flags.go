@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_SETUP = "Setup"
+	CategorySetup = "Setup"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CATEGORY_SETUP,
+		Category:    CategorySetup,
 		Name:        "go.cwd",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("GO_CWD")),
 		Usage:       "Working directory for go commands.",
@@ -22,7 +22,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category:    CATEGORY_SETUP,
+		Category:    CategorySetup,
 		Name:        "go.cache",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("GO_CACHE")),
 		Usage:       "Cache directory for go commands. Leave empty to use the environment defaults.",

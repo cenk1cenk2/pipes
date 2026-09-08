@@ -9,12 +9,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_LINT = "Lint"
+	CategoryLint = "Lint"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "go.lint.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_LINT_ARGS"),
@@ -26,7 +26,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.DurationFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "go.lint.timeout",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_LINT_TIMEOUT"),

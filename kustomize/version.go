@@ -1,7 +1,7 @@
 package main
 
-const CLI_NAME = "pipe-kustomize"
+const CLIName = "pipe-kustomize"
 
-const DESCRIPTION = "Kustomize operations for CI pipelines."
+const Description = "Kustomize operations for CI pipelines."
 
-var VERSION = "latest"
+var version = "latest"
