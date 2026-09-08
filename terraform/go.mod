@@ -7,9 +7,7 @@ require (
 	github.com/hashicorp/terraform-json v0.28.0
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.43.0
-	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
-	gitlab.com/gitlab-org/api/client-go/v2 v2.64.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 )
@@ -35,8 +33,10 @@ require (
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.10.2 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
+	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	github.com/zclconf/go-cty v1.16.4 // indirect
+	gitlab.com/gitlab-org/api/client-go/v2 v2.64.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect
 	golang.org/x/crypto v0.55.0 // indirect

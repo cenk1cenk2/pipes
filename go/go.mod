@@ -9,7 +9,6 @@ require (
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
-	go.yaml.in/yaml/v4 v4.0.0-rc.6
 )
 
 require (
@@ -30,6 +29,7 @@ require (
 	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect
 	golang.org/x/crypto v0.55.0 // indirect
 	golang.org/x/mod v0.40.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
@@ -37,7 +37,6 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
 	golang.org/x/tools v0.49.0 // indirect
-	google.golang.org/protobuf v1.36.12 // indirect
 )
 
 replace gitlab.kilic.dev/devops/pipes/internal => ../internal
