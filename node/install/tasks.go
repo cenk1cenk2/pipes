@@ -40,8 +40,7 @@ func install(tl *TaskList) *Task {
 
 					c.SetDir(P.Install.Cwd)
 
-					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(setup.EnvironmentCtx.EnvVars)
+					c.AppendDirectEnvironment(os.Environ()...)
 
 					return nil
 				}).

@@ -2,7 +2,6 @@ package publish
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
@@ -19,7 +18,6 @@ type (
 	}
 
 	Pipe struct {
-		Git git.Refs
 		Chart
 	}
 

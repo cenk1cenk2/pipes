@@ -5,7 +5,6 @@ import (
 
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
-	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -22,7 +21,6 @@ const (
 )
 
 var Flags = CombineFlags(
-	git.NewFlags(git.Options{Destination: &P.Git}),
 	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Chart.VersionFile, Strict: &P.Chart.VersionFileStrict}),
 	[]cli.Flag{
 		&cli.StringFlag{

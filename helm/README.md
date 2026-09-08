@@ -60,13 +60,6 @@ Publish Helm chart templates.
 
 #### Flags
 
-**GIT**
-
-| Flag / Environment |  Description   |  Type    | Required | Default |
-|---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$CI_COMMIT_REF_NAME`<br />`$BITBUCKET_BRANCH` | Source control branch. | `string` | `false` | <code></code> |
-| `$CI_COMMIT_TAG`<br />`$BITBUCKET_TAG` | Source control tag. | `string` | `false` | <code></code> |
-
 **Helm**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |

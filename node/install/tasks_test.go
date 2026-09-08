@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -19,9 +18,6 @@ var _ = Describe("Node install", func() {
 			Exe:      packageManager,
 			Commands: node.PackageManagers[packageManager],
 		}}
-		*setup.EnvironmentCtx = environment.Ctx{
-			EnvVars: map[string]string{"NODE_AUTH_TOKEN": "npm-token"},
-		}
 	}
 
 	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
@@ -90,15 +86,5 @@ var _ = Describe("Node install", func() {
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
 		Expect(invocation.Args).To(Equal([]string{"install", "--foo", "--prefer-offline", "--cache-folder", ".yarn"}))
-	})
-
-	It("hands the environment variables to the package manager", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, pipe(), "pnpm")).To(Succeed())
-
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Env).To(ContainElement("NODE_AUTH_TOKEN=npm-token"))
 	})
 })
