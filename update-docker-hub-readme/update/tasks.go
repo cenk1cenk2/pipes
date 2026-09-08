@@ -10,7 +10,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 )
 
-func LoginToDockerHubRegistry(tl *TaskList) *Task {
+func login(tl *TaskList) *Task {
 	return tl.CreateTask("login").
 		Set(func(t *Task) error {
 			token, err := C.Hub.Login(
@@ -31,7 +31,7 @@ func LoginToDockerHubRegistry(tl *TaskList) *Task {
 		})
 }
 
-func DiscoverJobs(tl *TaskList) *Task {
+func discover(tl *TaskList) *Task {
 	return tl.CreateTask("discover").
 		Set(func(t *Task) error {
 			if P.Readme.Repository != "" {
@@ -54,9 +54,9 @@ func DiscoverJobs(tl *TaskList) *Task {
 		})
 }
 
-// VerifyReadme decides whether the readme actually landed. The service answers 200
+// verifyReadme decides whether the readme actually landed. The service answers 200
 // on a readme it did not take, so the response body and not the status proves it.
-func VerifyReadme(res hub.Result, repository string, readme ParsedReadme, content string) error {
+func verifyReadme(res hub.Result, repository string, readme ParsedReadme, content string) error {
 	switch res.StatusCode {
 	case http.StatusOK:
 		if res.FullDescription != content {
@@ -90,7 +90,7 @@ func VerifyReadme(res hub.Result, repository string, readme ParsedReadme, conten
 	}
 }
 
-func UpdateDockerReadme(tl *TaskList) *Task {
+func update(tl *TaskList) *Task {
 	return tl.CreateTask("update").
 		Set(func(t *Task) error {
 			for repository, readme := range C.Readme {
@@ -126,7 +126,7 @@ func UpdateDockerReadme(tl *TaskList) *Task {
 
 						t.Log.Debugf("Status Code: %d", res.StatusCode)
 
-						if err := VerifyReadme(res, repository, readme, string(content)); err != nil {
+						if err := verifyReadme(res, repository, readme, string(content)); err != nil {
 							return err
 						}
 

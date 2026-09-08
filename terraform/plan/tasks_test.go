@@ -82,7 +82,7 @@ var _ = Describe("Terraform plan tasks", func() {
 						return tl.New(p).
 							SetRuntimeDepth(3).
 							Set(func(tl *TaskList) Job {
-								return JobSequence(TerraformPlan(tl).Job())
+								return JobSequence(plan(tl).Job())
 							})
 					},
 				},
@@ -132,7 +132,7 @@ var _ = Describe("Terraform plan tasks", func() {
 						return tl.New(p).
 							SetRuntimeDepth(3).
 							Set(func(tl *TaskList) Job {
-								return JobSequence(TerraformPlanCleanup(tl).Job())
+								return JobSequence(cleanup(tl).Job())
 							})
 					},
 				},

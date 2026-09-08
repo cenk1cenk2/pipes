@@ -39,7 +39,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				RunSemanticRelease(tl).Job(),
+				release(tl).Job(),
 			)
 		})
 }

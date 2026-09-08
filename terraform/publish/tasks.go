@@ -10,16 +10,16 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
-func TerraformTagsFile(tl *TaskList) *Task {
+func tags(tl *TaskList) *Task {
 	return tl.CreateTask("tags").
 		Set(func(t *Task) error {
-			tags, err := tagsfile.Parse(t.Log, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
+			parsed, err := tagsfile.Parse(t.Log, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
 
 			if err != nil {
 				return err
 			}
 
-			C.Tags = tags
+			C.Tags = parsed
 
 			if len(C.Tags) > 0 {
 				t.Log.Infof("Tags file has been parsed: %+v", C.Tags)
@@ -31,7 +31,7 @@ func TerraformTagsFile(tl *TaskList) *Task {
 		})
 }
 
-func TerraformPackage(tl *TaskList) *Task {
+func packageTask(tl *TaskList) *Task {
 	return tl.CreateTask("package", P.Module.Name, P.Module.System).
 		Set(func(t *Task) error {
 			for _, tag := range C.Tags {
@@ -80,16 +80,16 @@ func TerraformPackage(tl *TaskList) *Task {
 		})
 }
 
-func TerraformPublish(tl *TaskList) *Task {
+func publish(tl *TaskList) *Task {
 	return tl.CreateTask("publish").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
-				TerraformPublishGitlab(tl).Job(),
+				publishGitlab(tl).Job(),
 			)
 		})
 }
 
-func TerraformPublishGitlab(tl *TaskList) *Task {
+func publishGitlab(tl *TaskList) *Task {
 	return tl.CreateTask("publish", TF_REGISTRY_GITLAB, P.Module.Name, P.Module.System).
 		ShouldDisable(func(t *Task) bool {
 			return P.Registry.Name != TF_REGISTRY_GITLAB

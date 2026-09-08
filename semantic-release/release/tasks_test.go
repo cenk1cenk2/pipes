@@ -29,7 +29,7 @@ var _ = Describe("Semantic release", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(RunSemanticRelease(tl).Job())
+							return JobSequence(release(tl).Job())
 						})
 				},
 			},

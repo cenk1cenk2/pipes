@@ -9,7 +9,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func InstallNodeDependencies(tl *TaskList) *Task {
+func install(tl *TaskList) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
 			packageManager := setup.NodeCtx.PackageManager

@@ -4,7 +4,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func DefaultTask(tl *TaskList) *Task {
+func defaultTask(tl *TaskList) *Task {
 	return tl.CreateTask("default").
 		Set(func(t *Task) error {
 			t.CreateCommand(

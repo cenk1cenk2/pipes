@@ -30,15 +30,15 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				parseReferences(tl, cfg, ctx).Job(),
+				initReferences(tl, cfg, ctx).Job(),
 
-				selectEnvironment(tl, cfg, ctx).Job(),
-				fetchEnvironment(tl, ctx).Job(),
+				environmentSelect(tl, cfg, ctx).Job(),
+				environmentFetch(tl, ctx).Job(),
 			)
 		})
 }
 
-func parseReferences(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
+func initReferences(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("init", "references").
 		Set(func(t *Task) error {
 			ctx.References = cfg.Git.References()
@@ -53,7 +53,7 @@ func parseReferences(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 		})
 }
 
-func selectEnvironment(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
+func environmentSelect(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("environment", "select").
 		Set(func(t *Task) error {
 			t.Log.Debugf("Conditions for environment variable selection: %+v", cfg.Conditions)
@@ -82,7 +82,7 @@ func selectEnvironment(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 		})
 }
 
-func fetchEnvironment(tl *TaskList, ctx *Ctx) *Task {
+func environmentFetch(tl *TaskList, ctx *Ctx) *Task {
 	return tl.CreateTask("environment", "fetch").
 		ShouldDisable(func(_ *Task) bool {
 			return ctx.Environment == ""

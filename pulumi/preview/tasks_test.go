@@ -56,7 +56,7 @@ var _ = Describe("Pulumi preview tasks", func() {
 						return tl.New(p).
 							SetRuntimeDepth(3).
 							Set(func(tl *TaskList) Job {
-								return JobSequence(PulumiPlan(tl).Job())
+								return JobSequence(plan(tl).Job())
 							})
 					},
 				},

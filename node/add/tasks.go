@@ -5,8 +5,8 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func AddNodeModules(tl *TaskList) *Task {
-	return tl.CreateTask("packages", "node").
+func add(tl *TaskList) *Task {
+	return tl.CreateTask("add").
 		Set(func(t *Task) error {
 			packageManager := setup.NodeCtx.PackageManager
 

@@ -29,7 +29,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				InstallNodeDependencies(tl).Job(),
+				install(tl).Job(),
 			)
 		})
 }

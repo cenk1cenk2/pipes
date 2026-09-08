@@ -43,7 +43,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				RunNodeScript(tl).Job(),
+				run(tl).Job(),
 			)
 		})
 }

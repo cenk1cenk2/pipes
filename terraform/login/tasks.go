@@ -7,7 +7,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func GenerateTerraformRegistryCredentialsEnvVars(tl *TaskList) *Task {
+func environmentCredentials(tl *TaskList) *Task {
 	return tl.CreateTask("environment", "credentials").
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Registry.Credentials) == 0

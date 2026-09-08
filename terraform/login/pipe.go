@@ -26,7 +26,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GenerateTerraformRegistryCredentialsEnvVars(tl).Job(),
+				environmentCredentials(tl).Job(),
 			)
 		})
 }

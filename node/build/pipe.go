@@ -32,7 +32,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				BuildNodeApplication(tl).Job(),
+				build(tl).Job(),
 			)
 		})
 }

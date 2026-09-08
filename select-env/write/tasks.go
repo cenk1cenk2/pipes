@@ -6,7 +6,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
-func WriteEnvironmentFile(tl *TaskList) *Task {
+func environmentFile(tl *TaskList) *Task {
 	return tl.CreateTask("environment", "file").
 		Set(func(t *Task) error {
 			return godotenv.Write(setup.EnvironmentCtx.EnvVars, P.Environment.File)

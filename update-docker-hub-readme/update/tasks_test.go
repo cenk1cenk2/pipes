@@ -34,7 +34,7 @@ var _ = Describe("Docker Hub readme", func() {
 
 	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	// a failing task terminates the process through the plumber, so the errors are
-	// asserted on VerifyReadme instead.
+	// asserted on verifyReadme instead.
 	run := func(tasks ...func(*TaskList) *Task) error {
 		GinkgoHelper()
 
@@ -76,7 +76,7 @@ var _ = Describe("Docker Hub readme", func() {
 		It("keeps the token the credentials bought", func() {
 			client.EXPECT().Login(mock.Anything, "user", "password").Return("jwt-token", nil)
 
-			Expect(run(LoginToDockerHubRegistry)).To(Succeed())
+			Expect(run(login)).To(Succeed())
 			Expect(C.Token).To(Equal("jwt-token"))
 		})
 	})
@@ -85,7 +85,7 @@ var _ = Describe("Docker Hub readme", func() {
 		It("takes the single repository the pipe was given", func() {
 			P.Readme = Readme{Repository: "kilic/pipe", File: "README.md", Description: "a pipe"}
 
-			Expect(run(DiscoverJobs)).To(Succeed())
+			Expect(run(discover)).To(Succeed())
 			Expect(C.Readme).To(Equal(map[string]ParsedReadme{
 				"kilic/pipe": {File: "README.md", Description: "a pipe"},
 			}))
@@ -97,7 +97,7 @@ var _ = Describe("Docker Hub readme", func() {
 				{Repository: "kilic/two", File: "two.md", Description: "the second"},
 			}}
 
-			Expect(run(DiscoverJobs)).To(Succeed())
+			Expect(run(discover)).To(Succeed())
 			Expect(C.Readme).To(Equal(map[string]ParsedReadme{
 				"kilic/one": {File: "one.md"},
 				"kilic/two": {File: "two.md", Description: "the second"},
@@ -113,7 +113,7 @@ var _ = Describe("Docker Hub readme", func() {
 				Matrix:     []ReadmeMatrixJson{{Repository: "kilic/one", File: "one.md"}},
 			}
 
-			Expect(run(DiscoverJobs)).To(Succeed())
+			Expect(run(discover)).To(Succeed())
 			Expect(C.Readme).To(HaveLen(2))
 		})
 	})
@@ -137,7 +137,7 @@ var _ = Describe("Docker Hub readme", func() {
 					FullDescription: "# Pipe",
 				}, nil)
 
-			Expect(run(UpdateDockerReadme)).To(Succeed())
+			Expect(run(update)).To(Succeed())
 		})
 
 		It("updates every discovered repository", func() {
@@ -154,12 +154,12 @@ var _ = Describe("Docker Hub readme", func() {
 				}).
 				Twice()
 
-			Expect(run(UpdateDockerReadme)).To(Succeed())
+			Expect(run(update)).To(Succeed())
 		})
 	})
 })
 
-var _ = Describe("VerifyReadme", func() {
+var _ = Describe("verifyReadme", func() {
 	BeforeEach(func() {
 		*P = Pipe{DockerHub: DockerHub{Address: "https://hub.docker.com/v2/repositories"}}
 	})
@@ -167,7 +167,7 @@ var _ = Describe("VerifyReadme", func() {
 	readme := ParsedReadme{File: "README.md", Description: "a pipe"}
 
 	It("accepts the readme the repository came back with", func() {
-		Expect(VerifyReadme(hub.Result{
+		Expect(verifyReadme(hub.Result{
 			StatusCode:      http.StatusOK,
 			Description:     "a pipe",
 			FullDescription: "# Pipe",
@@ -175,7 +175,7 @@ var _ = Describe("VerifyReadme", func() {
 	})
 
 	It("rejects a full description that is not what was pushed", func() {
-		Expect(VerifyReadme(hub.Result{
+		Expect(verifyReadme(hub.Result{
 			StatusCode:      http.StatusOK,
 			Description:     "a pipe",
 			FullDescription: "# Something else",
@@ -184,7 +184,7 @@ var _ = Describe("VerifyReadme", func() {
 	})
 
 	It("rejects a short description that is not what was pushed", func() {
-		Expect(VerifyReadme(hub.Result{
+		Expect(verifyReadme(hub.Result{
 			StatusCode:      http.StatusOK,
 			Description:     "something else",
 			FullDescription: "# Pipe",
@@ -195,7 +195,7 @@ var _ = Describe("VerifyReadme", func() {
 	// the pipe leaves the short description alone when it was not given one, so
 	// whatever the repository already carries is not a mismatch.
 	It("ignores the short description the pipe did not push", func() {
-		Expect(VerifyReadme(hub.Result{
+		Expect(verifyReadme(hub.Result{
 			StatusCode:      http.StatusOK,
 			Description:     "whatever was there",
 			FullDescription: "# Pipe",
@@ -203,14 +203,14 @@ var _ = Describe("VerifyReadme", func() {
 	})
 
 	It("names the repository that does not exist", func() {
-		Expect(VerifyReadme(hub.Result{StatusCode: http.StatusNotFound}, "kilic/pipe", readme, "# Pipe")).
+		Expect(verifyReadme(hub.Result{StatusCode: http.StatusNotFound}, "kilic/pipe", readme, "# Pipe")).
 			To(MatchError("Repository does not exists: https://hub.docker.com/v2/repositories/kilic/pipe"))
 	})
 
 	// a repository the user can not edit fails with a status that does not say
 	// which of the two went wrong, so the response is what points at the cause.
 	It("blames the credentials when the user can not edit the repository", func() {
-		Expect(VerifyReadme(
+		Expect(verifyReadme(
 			hub.Result{StatusCode: http.StatusForbidden},
 			"kilic/pipe",
 			readme,
@@ -220,7 +220,7 @@ var _ = Describe("VerifyReadme", func() {
 	})
 
 	It("reports the status code of a failure the credentials did not cause", func() {
-		Expect(VerifyReadme(
+		Expect(verifyReadme(
 			hub.Result{StatusCode: http.StatusInternalServerError, CanEdit: true},
 			"kilic/pipe",
 			readme,

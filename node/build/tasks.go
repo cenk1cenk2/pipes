@@ -8,7 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func BuildNodeApplication(tl *TaskList) *Task {
+func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		Set(func(t *Task) error {
 			t.CreateCommand(

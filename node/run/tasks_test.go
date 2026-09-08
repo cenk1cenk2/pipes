@@ -28,7 +28,7 @@ var _ = Describe("Node run", func() {
 	// the whole task list runs rather than the task alone, since what the script
 	// resolves to is decided before the tasks are built. The arguments are
 	// registered because the command line is what fills them.
-	run := func(runner *tests.TestingCommandRunner, pipe Pipe, args ...string) error {
+	runScript := func(runner *tests.TestingCommandRunner, pipe Pipe, args ...string) error {
 		GinkgoHelper()
 
 		*P = pipe
@@ -51,7 +51,7 @@ var _ = Describe("Node run", func() {
 	It("runs the arguments it was given as the script and its arguments", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, Pipe{Run: Run{Cwd: "."}}, "tsc", "src")).To(Succeed())
+		Expect(runScript(runner, Pipe{Run: Run{Cwd: "."}}, "tsc", "src")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -65,7 +65,7 @@ var _ = Describe("Node run", func() {
 	It("cuts the script flag into the script and its arguments", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, Pipe{Run: Run{Script: "lint --fix", Cwd: "."}})).To(Succeed())
+		Expect(runScript(runner, Pipe{Run: Run{Script: "lint --fix", Cwd: "."}})).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -77,7 +77,7 @@ var _ = Describe("Node run", func() {
 	It("templates the script against the selected environment", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, Pipe{
+		Expect(runScript(runner, Pipe{
 			Run: Run{Script: "deploy:{{.Environment}} {{ index .EnvVars \"API_URL\" }}", Cwd: "."},
 		})).To(Succeed())
 

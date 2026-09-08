@@ -40,13 +40,13 @@ func LoginTaskList(p *Plumber, cfg *Login) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GenerateNpmRc(tl, cfg).Job(),
-				VerifyNpmLogin(tl, cfg).Job(),
+				npmrc(tl, cfg).Job(),
+				login(tl, cfg).Job(),
 			)
 		})
 }
 
-func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
+func npmrc(tl *TaskList, cfg *Login) *Task {
 	return tl.CreateTask("npmrc").
 		ShouldDisable(func(_ *Task) bool {
 			return cfg.Entries == nil && cfg.NpmRc == ""
@@ -56,7 +56,7 @@ func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 				".npmrc file: %s", strings.Join(cfg.NpmRcFiles, ", "),
 			)
 
-			npmrc := []string{}
+			lines := []string{}
 
 			if cfg.Entries != nil {
 				t.Log.Infoln("Logging in to given registries with credentials.")
@@ -67,8 +67,8 @@ func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 						v.Registry,
 					)
 
-					npmrc = append(
-						npmrc,
+					lines = append(
+						lines,
 						fmt.Sprintf("//%s/:_authToken=%s", v.Registry, v.Token),
 					)
 				}
@@ -77,7 +77,7 @@ func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 			if cfg.NpmRc != "" {
 				t.Log.Infoln("Appending directly to the given npmrc file.")
 
-				npmrc = append(npmrc, strings.Split(cfg.NpmRc, eol.OSDefault().String())...)
+				lines = append(lines, strings.Split(cfg.NpmRc, eol.OSDefault().String())...)
 			}
 
 			for _, file := range cfg.NpmRcFiles {
@@ -95,7 +95,7 @@ func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 
 							defer f.Close()
 
-							if _, err := f.WriteString(strings.Join(npmrc, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
+							if _, err := f.WriteString(strings.Join(lines, eol.OSDefault().String()) + eol.OSDefault().String()); err != nil {
 								return err
 							}
 
@@ -111,7 +111,7 @@ func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 		})
 }
 
-func VerifyNpmLogin(tl *TaskList, cfg *Login) *Task {
+func login(tl *TaskList, cfg *Login) *Task {
 	return tl.CreateTask("login").
 		// without an npmrc file there is nothing holding the credentials for npm
 		// to read back, so there is nothing to verify either.

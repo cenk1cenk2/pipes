@@ -35,13 +35,13 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				setupPackageManager(tl, cfg, ctx).Job(),
-				packageManagerVersion(tl, ctx).Job(),
+				initialize(tl, cfg, ctx).Job(),
+				version(tl, ctx).Job(),
 			)
 		})
 }
 
-func setupPackageManager(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
+func initialize(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("init").
 		Set(func(t *Task) error {
 			ctx.PackageManager = PackageManager{
@@ -55,7 +55,7 @@ func setupPackageManager(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 		})
 }
 
-func packageManagerVersion(tl *TaskList, ctx *Ctx) *Task {
+func version(tl *TaskList, ctx *Ctx) *Task {
 	return tl.CreateTask("version").
 		Set(func(t *Task) error {
 			t.CreateCommand(

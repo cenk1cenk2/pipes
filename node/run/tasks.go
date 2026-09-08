@@ -6,7 +6,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
-func RunNodeScript(tl *TaskList) *Task {
+func run(tl *TaskList) *Task {
 	return tl.CreateTask("run", C.Script).
 		Set(func(t *Task) error {
 			t.CreateCommand(

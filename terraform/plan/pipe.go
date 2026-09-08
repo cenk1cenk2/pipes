@@ -51,16 +51,16 @@ func New(p *Plumber) *TaskList {
 				return err
 			}
 
-			C.Report = TerraformReportSource()
+			C.Report = reportSource()
 
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				TerraformPlan(tl).Job(),
+				plan(tl).Job(),
 				terraform.SummaryTask(tl, &C.Report).Job(),
 				terraform.MergeRequestReportTask(tl, &C.Report).Job(),
-				TerraformPlanCleanup(tl).Job(),
+				cleanup(tl).Job(),
 			)
 		})
 }

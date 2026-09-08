@@ -40,7 +40,7 @@ func terraformReportDiscriminators() []string {
 	return discriminators
 }
 
-func TerraformReportSource() terraform.Source {
+func reportSource() terraform.Source {
 	metadata := P.ReportMetadata
 	metadata.Target = terraformStateName()
 	metadata.Cwd = setup.C.Cwd
@@ -85,7 +85,7 @@ func TerraformReportSource() terraform.Source {
 	}
 }
 
-func TerraformPlan(tl *TaskList) *Task {
+func plan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -123,7 +123,7 @@ func TerraformPlan(tl *TaskList) *Task {
 		})
 }
 
-func TerraformPlanCleanup(tl *TaskList) *Task {
+func cleanup(tl *TaskList) *Task {
 	return tl.CreateTask("cleanup").
 		ShouldDisable(func(t *Task) bool {
 			if !P.Plan.PreviewForMergeRequests || P.Plan.PipelineSource != "merge_request_event" {

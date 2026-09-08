@@ -46,7 +46,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GenerateTerraformEnvVarsState(tl).Job(),
+				state(tl).Job(),
 			)
 		})
 }

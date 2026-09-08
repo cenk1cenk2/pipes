@@ -42,7 +42,7 @@ var _ = Describe("Node build", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(BuildNodeApplication(tl).Job())
+							return JobSequence(build(tl).Job())
 						})
 				},
 			},

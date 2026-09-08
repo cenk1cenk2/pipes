@@ -51,7 +51,7 @@ func version(tl *TaskList) *Task {
 		})
 }
 
-func GenerateTerraformEnvVars(tl *TaskList) *Task {
+func environment(tl *TaskList) *Task {
 	return tl.CreateTask("environment").
 		Set(func(t *Task) error {
 			C.Env["TF_IN_AUTOMATION"] = "true"

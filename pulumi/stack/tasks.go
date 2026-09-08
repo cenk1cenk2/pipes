@@ -5,7 +5,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 )
 
-func PulumiSelectStack(tl *TaskList) *Task {
+func stack(tl *TaskList) *Task {
 	return tl.CreateTask("stack").
 		Set(func(t *Task) error {
 			t.CreateCommand(

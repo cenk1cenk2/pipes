@@ -25,7 +25,7 @@ func pulumiReportDiscriminators() []string {
 	return discriminators
 }
 
-func PulumiReportSource() terraform.Source {
+func reportSource() terraform.Source {
 	metadata := P.ReportMetadata
 	metadata.Target = stack.P.Stack
 	metadata.Cwd = setup.C.Cwd
@@ -54,7 +54,7 @@ func PulumiReportSource() terraform.Source {
 	}
 }
 
-func PulumiPlan(tl *TaskList) *Task {
+func plan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
 		Set(func(t *Task) error {
 			t.CreateCommand(

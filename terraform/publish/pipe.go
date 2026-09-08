@@ -63,9 +63,9 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				TerraformTagsFile(tl).Job(),
-				TerraformPackage(tl).Job(),
-				TerraformPublish(tl).Job(),
+				tags(tl).Job(),
+				packageTask(tl).Job(),
+				publish(tl).Job(),
 			)
 		})
 }

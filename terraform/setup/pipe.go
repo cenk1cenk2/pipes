@@ -40,7 +40,7 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				initialize(tl).Job(),
 				version(tl).Job(),
-				GenerateTerraformEnvVars(tl).Job(),
+				environment(tl).Job(),
 			)
 		})
 }

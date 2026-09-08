@@ -41,7 +41,7 @@ var _ = Describe("Node install", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(InstallNodeDependencies(tl).Job())
+							return JobSequence(install(tl).Job())
 						})
 				},
 			},

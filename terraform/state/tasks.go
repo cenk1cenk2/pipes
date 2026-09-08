@@ -9,7 +9,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func GenerateTerraformEnvVarsState(tl *TaskList) *Task {
+func state(tl *TaskList) *Task {
 	return tl.CreateTask("state").
 		Set(func(t *Task) error {
 			if P.State.Strict && P.State.Type == "" {
@@ -21,12 +21,12 @@ func GenerateTerraformEnvVarsState(tl *TaskList) *Task {
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
 				job,
-				GenerateTerraformEnvVarsGitlabState(t.TL).Job(),
+				stateGitlabHttp(t.TL).Job(),
 			)
 		})
 }
 
-func GenerateTerraformEnvVarsGitlabState(tl *TaskList) *Task {
+func stateGitlabHttp(tl *TaskList) *Task {
 	return tl.CreateTask("state", "gitlab-http").
 		ShouldDisable(func(t *Task) bool {
 			return P.State.Type != TF_STATE_TYPE_GITLAB_HTTP

@@ -33,7 +33,7 @@ var _ = Describe("Environment file", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(WriteEnvironmentFile(tl).Job())
+							return JobSequence(environmentFile(tl).Job())
 						})
 				},
 			},

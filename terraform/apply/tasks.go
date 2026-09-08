@@ -5,7 +5,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformApply(tl *TaskList) *Task {
+func apply(tl *TaskList) *Task {
 	return tl.CreateTask("apply").
 		Set(func(t *Task) error {
 			t.CreateCommand(

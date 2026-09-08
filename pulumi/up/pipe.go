@@ -22,7 +22,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				PulumiUp(tl).Job(),
+				up(tl).Job(),
 			)
 		})
 }

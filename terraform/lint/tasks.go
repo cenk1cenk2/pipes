@@ -5,18 +5,18 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformLint(tl *TaskList) *Task {
-	return tl.CreateTask().
+func lint(tl *TaskList) *Task {
+	return tl.CreateTask("lint").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
-				TerraformFmtCheck(t.TL).Job(),
-				TerraformValidate(t.TL).Job(),
+				lintFmt(t.TL).Job(),
+				lintValidate(t.TL).Job(),
 			)
 		})
 }
 
-func TerraformFmtCheck(tl *TaskList) *Task {
-	return tl.CreateTask("fmt", "check").
+func lintFmt(tl *TaskList) *Task {
+	return tl.CreateTask("lint", "fmt").
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"terraform",
@@ -43,8 +43,8 @@ func TerraformFmtCheck(tl *TaskList) *Task {
 		})
 }
 
-func TerraformValidate(tl *TaskList) *Task {
-	return tl.CreateTask("validate").
+func lintValidate(tl *TaskList) *Task {
+	return tl.CreateTask("lint", "validate").
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"terraform",

@@ -37,7 +37,7 @@ var _ = Describe("Node add", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(AddNodeModules(tl).Job())
+							return JobSequence(add(tl).Job())
 						})
 				},
 			},

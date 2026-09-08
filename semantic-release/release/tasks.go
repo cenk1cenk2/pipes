@@ -4,7 +4,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func RunSemanticRelease(tl *TaskList) *Task {
+func release(tl *TaskList) *Task {
 	return tl.CreateTask("release").
 		Set(func(t *Task) error {
 			if P.Workspace {
