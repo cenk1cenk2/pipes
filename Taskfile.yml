@@ -4,8 +4,8 @@
 version: "3"
 
 vars:
-  # Every pipe module the fan-out tasks iterate. The template comes first, so the
-  # scaffold breaks before the published pipes do. Space separated for the loops.
+  # every pipe module the fan-out tasks iterate, space separated. The template comes
+  # first, so the scaffold breaks before the published pipes do.
   PACKAGES: >-
     template buildah go helm kustomize node pulumi select-env
     semantic-release terraform update-docker-hub-readme
@@ -25,12 +25,11 @@ includes:
   template:
     dir: ./_template
     taskfile: ./Taskfile.pipe.yml
-    # The scaffold ships no specs of its own, and ginkgo fails a run that finds
-    # no suites, so the pipe it seeds is the first thing with a test task.
+    # the scaffold ships no specs and ginkgo fails a run that finds no suites.
     excludes:
       - test
-  # Include keys are static YAML and cannot be driven by a variable, so this is
-  # the one place the pipe list stays written out.
+  # include keys are static YAML and cannot be driven by a variable, so this is the
+  # one place the pipe list stays written out.
   buildah:
     dir: ./buildah
     taskfile: ./Taskfile.pipe.yml
@@ -71,8 +70,8 @@ tasks:
 
   docs:
     desc: Generates documentation for all applications.
-    # Eleven parallel `go run` compilations exhaust the memory of the CI runner,
-    # so the documentation is generated one pipe at a time.
+    # parallel `go run` compilations exhaust the memory of the CI runner, so the
+    # documentation is generated one pipe at a time.
     cmds:
       - for: { var: PACKAGES }
         task: "{{ .ITEM }}:docs"

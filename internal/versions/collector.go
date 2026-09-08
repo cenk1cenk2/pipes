@@ -12,13 +12,10 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
-// Collector gathers the tags or the versions a pipe publishes under. Every source
-// is optional: a pipe leaves the fields of a source it does not have at their zero
-// value and the task for that source disables itself.
-//
-// The sources are composed by the pipe rather than by the collector, since the
-// parent task that reports the result is also where the pipe hangs whatever else
-// has to run once the values are in.
+// Collector gathers the tags or the versions a pipe publishes under. Every source is
+// optional: the task of a source left at its zero value disables itself. The pipe
+// composes the sources itself, since the parent task that reports the result is also
+// where it hangs whatever else has to run once the values are in.
 type Collector struct {
 	// Name prefixes every task the collector creates.
 	Name string

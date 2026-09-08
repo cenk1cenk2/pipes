@@ -1,6 +1,6 @@
-// Package setup holds the configuration the node subcommands share. The
-// instances live here rather than in main so that the flags that fill them and
-// the tasks that read them back are the same ones, whichever subcommand ran.
+// Package setup holds the configuration the node subcommands share, so that the
+// flags that fill it and the tasks that read it back are the same instances
+// whichever subcommand ran.
 package setup
 
 import (

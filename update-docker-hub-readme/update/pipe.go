@@ -26,8 +26,8 @@ type (
 		Readme
 	}
 
-	// Hub is dialled only once the flags carrying its address have been parsed,
-	// which is why the connection lives in the context rather than the pipe.
+	// the hub connection lives in the context, since it is dialled only once the
+	// flags carrying its address have been parsed.
 	Ctx struct {
 		Token  string
 		Readme map[string]ParsedReadme

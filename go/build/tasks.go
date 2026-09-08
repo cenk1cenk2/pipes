@@ -107,16 +107,10 @@ func GoBuild(tl *TaskList) *Task {
 		})
 }
 
-// GoBuildPackages resolves what the workspace actually has to build. The whole
-// workspace is built only when the pipeline asked for it through the flag:
-// setup.C.Workspace is on whenever the toolchain merely finds itself inside a
-// workspace, which is true of every child pipeline that builds a single module
-// of this repository, and those have to keep building only their own.
-//
-// Each module is asked from inside its own directory, both because a workspace
-// carries library modules that have no command to build and because the go tool
-// drops a directory whose name starts with an underscore out of a package
-// pattern, which is what the scaffold module lives under.
+// GoBuildPackages resolves what the workspace has to build. It follows the flag
+// and not setup.C.Workspace, which is on for any invocation that merely sits
+// inside a workspace. Each module is asked from inside its own directory, since
+// the go tool drops an underscored directory out of a package pattern.
 func GoBuildPackages(tl *TaskList) *Task {
 	return tl.CreateTask("packages").
 		ShouldDisable(func(_ *Task) bool {

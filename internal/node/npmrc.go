@@ -113,7 +113,7 @@ func GenerateNpmRc(tl *TaskList, cfg *Login) *Task {
 
 func VerifyNpmLogin(tl *TaskList, cfg *Login) *Task {
 	return tl.CreateTask("login").
-		// Without an npmrc file there is nothing holding the credentials for npm
+		// without an npmrc file there is nothing holding the credentials for npm
 		// to read back, so there is nothing to verify either.
 		ShouldDisable(func(_ *Task) bool {
 			return cfg.Entries == nil || len(cfg.NpmRcFiles) == 0

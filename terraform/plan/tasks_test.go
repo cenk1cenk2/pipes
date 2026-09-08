@@ -16,8 +16,6 @@ import (
 )
 
 var _ = Describe("Terraform plan tasks", func() {
-	// The tasks read the setup and the state of the pipe around them off their
-	// package level instances, so a spec seeds those the same way it seeds its own.
 	seed := func(name, cwd string) {
 		*setup.C = setup.Ctx{Cwd: cwd, Env: map[string]string{}}
 		*state.P = state.Pipe{State: state.State{Name: name}}
@@ -58,7 +56,7 @@ var _ = Describe("Terraform plan tasks", func() {
 	})
 
 	Describe("Terraform plan", func() {
-		// Only the plan task runs, since the report tasks that follow it would reach for
+		// only the plan task runs, since the report tasks that follow it would reach for
 		// a plan file the stubbed command never wrote.
 		run := func(runner *tests.TestingCommandRunner, environment map[string]string) error {
 			GinkgoHelper()
@@ -117,9 +115,7 @@ var _ = Describe("Terraform plan tasks", func() {
 	})
 
 	Describe("Terraform plan cleanup", func() {
-		// The pipe is seeded directly rather than through the flags, since a package
-		// level flag only reads its environment on the first parse of the process and
-		// the specs would otherwise decide each other's pipeline source.
+		// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 		run := func(cwd string, pipe Pipe) error {
 			GinkgoHelper()
 
@@ -156,7 +152,7 @@ var _ = Describe("Terraform plan tasks", func() {
 			return Pipe{Plan: Plan{Output: "plan", PipelineSource: source, PreviewForMergeRequests: true}}
 		}
 
-		// A preview plan is taken without the state lock, so it is not the plan that
+		// a preview plan is taken without the state lock, so it is not the plan that
 		// gets applied and must not outlive the job that wrote it.
 		It("removes the plan a merge request pipeline previewed", func() {
 			cwd := planned()

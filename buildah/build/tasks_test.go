@@ -22,8 +22,7 @@ var _ = Describe("Container image tags", func() {
 			To(Equal("registry.example.com/group/image:v1.0.0"))
 	})
 
-	// A pipeline with no registry configured builds the image locally, where a
-	// prefix would name something that is never pushed.
+	// a pipeline with no registry builds locally, where a prefix names nothing that is pushed.
 	It("leaves the image unprefixed without a registry", func() {
 		Expect(format("", "group/image", "v1.0.0")).To(Equal("group/image:v1.0.0"))
 	})

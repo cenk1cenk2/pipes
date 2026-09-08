@@ -10,8 +10,7 @@ type (
 		Paths []string
 	}
 
-	// Ctx carries the resolved overlays alongside what the setup resolves, so the
-	// build reads one context instead of two.
+	// Ctx carries the resolved overlays alongside what the setup resolves, so the build reads one context.
 	Ctx struct {
 		Cwd      string
 		Version  string

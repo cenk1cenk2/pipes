@@ -10,13 +10,11 @@ type Pipe struct {
 	Password string
 }
 
-// P is the registry the pipe authenticates against. The build and the manifest
-// commands read its uri back, since that is what they prefix every image they
-// publish with.
+// P is the registry the pipe authenticates against; the build and the manifest
+// commands read its uri back to prefix the images they publish.
 var P = &Pipe{}
 
-// New is the login stage of every buildah command, since an image that can not
-// be pushed is not worth the time it takes to build.
+// New is the login stage of every buildah command.
 func New(p *Plumber) *TaskList {
 	tl := &TaskList{}
 

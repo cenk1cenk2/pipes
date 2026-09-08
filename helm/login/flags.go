@@ -10,8 +10,7 @@ const (
 	CATEGORY_HELM_REGISTRY = "Helm Registry"
 )
 
-// Flags are declared once for the whole pipe, so every command that logs in
-// registers the same flags rather than its own copy of them.
+// Flags are declared once for the whole pipe, so every command that logs in registers the same ones.
 var Flags = []cli.Flag{
 	&cli.StringFlag{
 		Category: CATEGORY_HELM_REGISTRY,

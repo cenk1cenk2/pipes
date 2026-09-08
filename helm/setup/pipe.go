@@ -10,8 +10,7 @@ type (
 		Cwd string `validate:"omitempty,dir"`
 	}
 
-	// Ctx carries the chart alongside what the setup resolves, so the pipes that
-	// publish it read one context instead of two.
+	// Ctx carries the chart alongside what the setup resolves, so the pipes that publish it read one context.
 	Ctx struct {
 		Cwd     string
 		Version string

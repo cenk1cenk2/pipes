@@ -45,7 +45,7 @@ func Summarize(report Report) Summary {
 }
 
 func RenderSummary(summary Summary) string {
-	// Three ints behind a fixed set of tags leave the encoder nothing to fail on.
+	// three ints behind a fixed set of tags leave the encoder nothing to fail on.
 	body, _ := json.Marshal(summary, jsontext.Multiline(true), jsontext.WithIndent("  "))
 
 	return string(body) + "\n"

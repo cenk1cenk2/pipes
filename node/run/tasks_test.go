@@ -14,9 +14,6 @@ import (
 )
 
 var _ = Describe("Node run", func() {
-	// The tasks read the package manager and the environment of the pipe around
-	// them off their package level instances, so a spec seeds those the same way it
-	// seeds its own.
 	seed := func(packageManager string) {
 		*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
 			Exe:      packageManager,
@@ -28,7 +25,7 @@ var _ = Describe("Node run", func() {
 		}
 	}
 
-	// The whole task list runs rather than the task alone, since what the script
+	// the whole task list runs rather than the task alone, since what the script
 	// resolves to is decided before the tasks are built. The arguments are
 	// registered because the command line is what fills them.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe, args ...string) error {
@@ -63,7 +60,7 @@ var _ = Describe("Node run", func() {
 		Expect(invocation.Dir).To(Equal("."))
 	})
 
-	// The script flag is one string holding both halves, so the pipe has to cut it
+	// the script flag is one string holding both halves, so the pipe has to cut it
 	// where the arguments would otherwise have arrived already separated.
 	It("cuts the script flag into the script and its arguments", func() {
 		runner := fixtures.Runner()
@@ -75,7 +72,7 @@ var _ = Describe("Node run", func() {
 		Expect(invocation.Args).To(Equal([]string{"run", "lint", "--fix"}))
 	})
 
-	// The cut happens before the templating, so the script half of the flag has to
+	// the cut happens before the templating, so the script half of the flag has to
 	// be written without a space in it for the two to survive as one action each.
 	It("templates the script against the selected environment", func() {
 		runner := fixtures.Runner()

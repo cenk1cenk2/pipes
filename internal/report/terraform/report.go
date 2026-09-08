@@ -1,7 +1,6 @@
 // Package terraform writes the GitLab artifacts:reports:terraform JSON and the
-// merge request note that goes with it. Pulumi previews are reported through it
-// too, since GitLab has no report kind of their own and the terraform one
-// renders what a preview has to say.
+// merge request note that goes with it. Pulumi previews report through it too,
+// since GitLab has no report kind of their own.
 package terraform
 
 import (
@@ -17,9 +16,8 @@ import (
 //go:embed assets/mr-report.md.gotmpl
 var mergeRequestReportTemplate string
 
-// The plan report shared by the Terraform and Pulumi pipes. Other pipes report on
-// entirely different things and are expected to bring their own model and template
-// rather than bend this one.
+// The plan report shared by the Terraform and Pulumi pipes; a pipe reporting on
+// something else brings its own model and template.
 type (
 	Report struct {
 		Title    string
@@ -28,8 +26,7 @@ type (
 		Actions  []Action
 	}
 
-	// Names the tool-specific concepts the template renders, so both pipes produce
-	// one document structure while still calling things what they are.
+	// names the tool-specific concepts the template renders, so both pipes produce one document structure.
 	Labels struct {
 		Target      string
 		Outputs     string

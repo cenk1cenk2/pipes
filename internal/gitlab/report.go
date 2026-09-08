@@ -21,7 +21,7 @@ type MergeRequestReportConfig struct {
 	ProjectId       string `validate:"required_with=MergeRequestIid"`
 	MergeRequestIid int64  `validate:"omitempty,gt=0"`
 	Identifier      string `validate:"omitempty,printascii,excludes=-->"`
-	// Markers of earlier identifier schemes, so a note already posted under one of
+	// markers of earlier identifier schemes, so a note already posted under one of
 	// them is adopted instead of orphaned next to a duplicate.
 	LegacyIdentifiers []string
 }
@@ -30,7 +30,7 @@ type MergeRequestReportResult struct {
 	NoteId     int64
 	Identifier string
 	Created    bool
-	// Set when the note was found under an earlier identifier scheme rather than the
+	// set when the note was found under an earlier identifier scheme rather than the
 	// current one, which is the only signal that a marker migration took effect.
 	AdoptedLegacy bool
 }
@@ -47,12 +47,10 @@ func (r MergeRequestReportResult) Action() string {
 	return "updated"
 }
 
-// Builds the marker identifier that keeps concurrent report jobs on the same merge
-// request from overwriting each other's note. Discriminators name what the job is
-// reporting on -- a stack, a state, a working directory -- and are what makes the
-// identifier unique when a matrix or child pipeline runs the same job name several
-// times. They must be stable across pipeline runs, so never derive one from a job or
-// pipeline id: that would post a new note per push instead of updating the old one.
+// Builds the marker identifier that keeps concurrent report jobs on one merge request
+// from overwriting each other's note. Discriminators name what the job reports on and
+// must be stable across pipeline runs: one derived from a job or pipeline id posts a
+// new note per push instead of updating the old one.
 func ResolveReportIdentifier(override string, jobName string, discriminators ...string) string {
 	if override != "" {
 		return override
@@ -79,7 +77,7 @@ func sanitizeReportIdentifier(value string) string {
 		return r
 	}, value)
 
-	// One pass splices a fresh terminator out of what it leaves behind, so "--->->"
+	// one pass splices a fresh terminator out of what it leaves behind, so "--->->"
 	// would come back out as "-->" and cut the marker comment short.
 	for strings.Contains(value, "-->") {
 		value = strings.ReplaceAll(value, "-->", "")
@@ -88,9 +86,8 @@ func sanitizeReportIdentifier(value string) string {
 	return strings.TrimSpace(value)
 }
 
-// The note carrying the current marker always wins, wherever it sits in the
-// listing. Falling back to a legacy marker before exhausting the current one would
-// strand the note this job already owns and leave a stale plan on the merge request.
+// The note carrying the current marker always wins, wherever it sits in the listing:
+// falling back to a legacy marker early would strand the note this job already owns.
 func selectMergeRequestReportNote(notes []*clientgitlab.Note, marker string, legacy []string) *clientgitlab.Note {
 	for _, candidate := range append([]string{marker}, legacy...) {
 		if index := slices.IndexFunc(notes, func(note *clientgitlab.Note) bool {

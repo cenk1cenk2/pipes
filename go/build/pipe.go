@@ -22,9 +22,8 @@ type (
 		Arch string `json:"arch,omitempty" yaml:"arch,omitempty"`
 	}
 
-	// Ctx holds the directories a binary is actually built out of. A workspace
-	// carries library modules next to the commands, and those have nothing to
-	// build.
+	// Ctx holds the directories a binary is built out of, which leaves out the
+	// library modules a workspace carries next to the commands.
 	Ctx struct {
 		Packages []string
 	}

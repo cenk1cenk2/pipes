@@ -13,8 +13,7 @@ type Pipe struct {
 // P is the chart registry the pipe authenticates against.
 var P = &Pipe{}
 
-// New is the login stage of the helm commands that reach the registry, which is
-// every command that pulls a dependency or pushes a chart.
+// New is the login stage of every helm command that pulls a dependency or pushes a chart.
 func New(p *Plumber) *TaskList {
 	tl := &TaskList{}
 

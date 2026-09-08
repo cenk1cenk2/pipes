@@ -14,14 +14,11 @@ import (
 )
 
 var _ = Describe("Go lint", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, modules ...string) error {
 		GinkgoHelper()
 
 		*P = Pipe{Timeout: 5 * time.Minute}
-		// The tasks read what the setup resolved off its package level instance, so a
-		// spec seeds that the same way it seeds its own.
 		*setup.C = setup.Ctx{
 			Cwd:     "projects/api",
 			Env:     map[string]string{"GOPATH": "/cache"},
@@ -59,7 +56,7 @@ var _ = Describe("Go lint", func() {
 		Expect(invocation.Env).To(ContainElement("GOPATH=/cache"))
 	})
 
-	// Every module is linted from inside its own directory rather than through a
+	// every module is linted from inside its own directory rather than through a
 	// "<module>/..." pattern, since the go tool resolves such a pattern to nothing
 	// for a module whose directory name starts with an underscore.
 	It("lints every module of the workspace from inside it", func() {

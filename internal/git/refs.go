@@ -17,9 +17,9 @@ type Refs struct {
 	Tag    string
 }
 
-// References renders the refs as the "<kind>/<name>" strings that user supplied
-// match patterns are written against. The tag comes first so a tagged pipeline,
-// which also carries the branch it was tagged on, matches the tag rule.
+// References renders the refs as the "<kind>/<name>" strings match patterns are
+// written against. The tag comes first, so a tagged pipeline matches the tag rule
+// and not the branch it was tagged on.
 func (r Refs) References() []string {
 	references := []string{}
 
@@ -35,8 +35,8 @@ func (r Refs) References() []string {
 }
 
 // MatchAny returns the index of the first pattern matching any of the references,
-// or -1 when none of them do. Patterns are ranked ahead of references so the
-// earliest rule the user wrote wins, whichever ref it happened to match.
+// or -1 when none do. Patterns rank ahead of references, so the earliest rule the
+// user wrote wins whichever ref it matched.
 func MatchAny(patterns []string, references []string) (int, error) {
 	for index, pattern := range patterns {
 		re, err := regexp.Compile(pattern)

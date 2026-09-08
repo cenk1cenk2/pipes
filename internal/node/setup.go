@@ -17,9 +17,8 @@ type Config struct {
 	PackageManager string `validate:"oneof=npm yarn pnpm"`
 }
 
-// Ctx is the resolved package manager the tasks build their commands out of. A
-// pipe holds on to the same instance it handed to SetupTaskList, since it only
-// carries anything once that list has run.
+// Ctx is the resolved package manager the tasks build their commands out of; it
+// only carries anything once SetupTaskList has run.
 type Ctx struct {
 	PackageManager
 }

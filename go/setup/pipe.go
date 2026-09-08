@@ -11,16 +11,14 @@ type (
 		Workspace bool
 	}
 
-	// Ctx carries whether the modules are driven as a workspace alongside what the
-	// setup resolves, so the commands that have to tell the two apart read one
-	// context instead of probing the toolchain again.
+	// Ctx carries whether the modules are driven as a workspace, so the commands
+	// that tell the two apart never probe the toolchain again.
 	Ctx struct {
 		Cwd       string
 		Version   string
 		Env       map[string]string
 		Workspace bool
-		// Modules are the directories of every module the workspace drives, resolved
-		// once here because lint and build both walk them.
+		// Modules are the directories the workspace drives, resolved once for lint and build.
 		Modules []string
 	}
 )

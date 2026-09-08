@@ -25,8 +25,7 @@ type (
 		Full        string
 	}
 
-	// Result is the update response narrowed to what decides whether the readme
-	// actually landed on the repository.
+	// Result is the update response narrowed to what decides whether the readme landed.
 	Result struct {
 		CanEdit         bool
 		Description     string
@@ -173,8 +172,8 @@ func (c *client) UpdateReadme(
 	}
 
 	response := updateResponse{}
-	// The repository payload carries far more than the three fields above, so this
-	// decode stays lenient where the login one rejects unknown members.
+	// the repository payload carries far more than the fields above, so this decode
+	// stays lenient where the login one rejects unknown members.
 	if err := json.Unmarshal(body, &response); err != nil {
 		return Result{}, fmt.Errorf("Response unexpected: %w > %s", err, string(body))
 	}

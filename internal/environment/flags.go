@@ -26,12 +26,10 @@ type Config struct {
 	Git               git.Refs
 }
 
-// NewFlags builds the environment flags onto cfg. The git flags come first
-// because the references they carry are what the conditions match against.
-//
-// The pipes that only inject an environment on request unhide the enable flag
-// and flip its default with OverwriteCliFlag, so the flag stays hidden and on
-// here for the pipe whose whole job this is.
+// NewFlags builds the environment flags onto cfg. The git flags come first,
+// since the references they carry are what the conditions match against. The
+// enable flag ships hidden and on; a pipe that only injects an environment on
+// request unhides it and flips the default with OverwriteCliFlag.
 func NewFlags(opts Options) []cli.Flag {
 	return append(git.NewFlags(git.Options{Destination: &opts.Destination.Git}), []cli.Flag{
 		&cli.BoolFlag{

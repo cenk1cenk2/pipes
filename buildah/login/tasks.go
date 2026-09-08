@@ -58,10 +58,8 @@ func ContainerRegistryLogin(tl *TaskList) *Task {
 		})
 }
 
-// ContainerRegistryLoginVerify is the counterpart of the login task, for a
-// pipeline that carries no credentials and is relying on an ambient login: it
-// proves that login actually exists before the build spends time on an image it
-// cannot push.
+// ContainerRegistryLoginVerify proves that the ambient login a credential-less
+// pipeline relies on actually exists, before the build spends time on the image.
 func ContainerRegistryLoginVerify(tl *TaskList) *Task {
 	return tl.CreateTask("login", "verify").
 		ShouldDisable(func(_ *Task) bool {

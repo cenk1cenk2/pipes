@@ -43,7 +43,7 @@ var _ = Describe("Manifest", func() {
 				Fail(fmt.Sprintf("%s has no entry in pipes.yaml", dir))
 			})
 
-			// Every pipe is prefixed, including the one whose command is not.
+			// every pipe is prefixed, including the one whose command is not.
 			It("publishes to the image the directory names", func() {
 				Expect(entry.Image).To(Equal("cenk1cenk2/pipe-" + dir))
 			})
@@ -59,7 +59,7 @@ var _ = Describe("Manifest", func() {
 		})
 	}
 
-	// The pipeline publishes the descriptions rather than reading them from the
+	// the pipeline publishes the descriptions rather than reading them from the
 	// manifest, so the two are checked against each other until one of them can
 	// be generated from the other.
 	It("agrees with the readme matrix the pipeline publishes", func() {

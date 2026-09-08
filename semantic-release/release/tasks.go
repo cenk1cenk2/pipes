@@ -17,10 +17,7 @@ func RunSemanticRelease(tl *TaskList) *Task {
 				C.Exe,
 			).
 				Set(func(c *Command) error {
-					// this should be added for original multi-semantic-release and not the @qiwi/multi-semantic-release
-					// if P.SemanticRelease.Workspace {
-					// 	c.AppendArgs("--ignore-private-packages")
-					// }
+					// --ignore-private-packages belongs to the original multi-semantic-release, not @qiwi/multi-semantic-release.
 
 					if P.SemanticRelease.DryRun {
 						c.AppendEnvironment(map[string]string{

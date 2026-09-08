@@ -32,12 +32,9 @@ var _ = Describe("Docker Hub readme", func() {
 		*C = Ctx{Readme: map[string]ParsedReadme{}, Hub: client}
 	})
 
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
-	//
-	// A failing task terminates the process through the plumber, so only what the
-	// pipe does on its way through is asserted here and the errors it answers with
-	// are asserted on VerifyReadme instead.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
+	// a failing task terminates the process through the plumber, so the errors are
+	// asserted on VerifyReadme instead.
 	run := func(tasks ...func(*TaskList) *Task) error {
 		GinkgoHelper()
 
@@ -64,7 +61,7 @@ var _ = Describe("Docker Hub readme", func() {
 		}).Run()
 	}
 
-	// Writes a readme file and registers it as the discovered target, since the
+	// writes a readme file and registers it as the discovered target, since the
 	// update reads the file off disk rather than out of the pipe.
 	target := func(repository, content, description string) {
 		GinkgoHelper()
@@ -107,7 +104,7 @@ var _ = Describe("Docker Hub readme", func() {
 			}))
 		})
 
-		// The matrix is the way to update more than one repository in a job, so a
+		// the matrix is the way to update more than one repository in a job, so a
 		// pipeline that sets both should not have to drop the single target.
 		It("takes the single repository alongside the matrix", func() {
 			P.Readme = Readme{
@@ -195,7 +192,7 @@ var _ = Describe("VerifyReadme", func() {
 			To(MatchError("Uploaded README does not match with current repository README file."))
 	})
 
-	// The pipe leaves the short description alone when it was not given one, so
+	// the pipe leaves the short description alone when it was not given one, so
 	// whatever the repository already carries is not a mismatch.
 	It("ignores the short description the pipe did not push", func() {
 		Expect(VerifyReadme(hub.Result{
@@ -210,7 +207,7 @@ var _ = Describe("VerifyReadme", func() {
 			To(MatchError("Repository does not exists: https://hub.docker.com/v2/repositories/kilic/pipe"))
 	})
 
-	// A repository the user can not edit fails with a status that does not say
+	// a repository the user can not edit fails with a status that does not say
 	// which of the two went wrong, so the response is what points at the cause.
 	It("blames the credentials when the user can not edit the repository", func() {
 		Expect(VerifyReadme(

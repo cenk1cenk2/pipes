@@ -1,8 +1,5 @@
-// Package tests holds the checks that are about the repository rather than about
-// any one pipe, alongside the fixtures the pipes share in tests/fixtures.
-//
-// Nothing here imports a pipe, which is what lets a pipe keep its command tree
-// to itself.
+// Package tests holds the checks that are about the repository and not about any one
+// pipe. Nothing here imports a pipe, which lets a pipe keep its command tree to itself.
 package tests
 
 import (
@@ -31,8 +28,7 @@ type ManifestEntry struct {
 }
 
 // ReadmeMatrix is the shape the update-docker-hub-readme pipe is handed through
-// DOCKER_HUB_README_MATRIX. The manifest has to agree with it, since the pipeline is what
-// actually publishes the descriptions.
+// DOCKER_HUB_README_MATRIX, which is what actually publishes the descriptions.
 type ReadmeMatrix []ReadmeMatrixEntry
 
 type ReadmeMatrixEntry struct {
@@ -129,12 +125,10 @@ func ModuleDirs() ([]string, error) {
 	return dirs, nil
 }
 
-// Excluded are the directories that hold a Go module but no pipe. They are named
-// here rather than skipped by a pattern, so adding one is a decision somebody
-// writes down.
+// Excluded are the directories that hold a Go module but no pipe, named one by one
+// so that adding one is a decision somebody writes down.
 var Excluded = []string{
-	// _template is the scaffold a new pipe is copied from. It ships no image, so
-	// there is nothing to publish it under.
+	// _template is the scaffold a new pipe is copied from and ships no image.
 	"_template",
 	// internal is the shared library the pipes are built out of.
 	"internal",
@@ -142,10 +136,9 @@ var Excluded = []string{
 	"tests",
 }
 
-// Pipes are the module directories that are pipes: every module of the workspace
-// that is not written down as something else. The list is read while the spec
-// tree is built, so a directory added without a manifest entry gets a failing
-// spec of its own instead of one assertion buried inside another.
+// Pipes are the module directories that are pipes: every module not written down as
+// something else. The list is read while the spec tree is built, so a directory added
+// without a manifest entry gets a failing spec of its own.
 func Pipes() []string {
 	dirs, err := ModuleDirs()
 	if err != nil {

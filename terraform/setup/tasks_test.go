@@ -45,7 +45,7 @@ var _ = Describe("Terraform version", func() {
 		Expect(probe("Terraform v1.9.8\non linux_amd64\n")).To(Equal("v1.9.8"))
 	})
 
-	// The banner is only ever logged, and terraform has already proven it runs by
+	// the banner is only ever logged, and terraform has already proven it runs by
 	// answering at all, so an unrecognised one is reported rather than fatal.
 	It("reports the whole output when the banner does not match", func() {
 		Expect(probe("something else entirely\n")).To(Equal("something else entirely"))

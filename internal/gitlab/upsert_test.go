@@ -45,7 +45,7 @@ var _ = Describe("Merge request report upsert", func() {
 		return &clientgitlab.Note{ID: id, Body: body}
 	}
 
-	// Serves the notes a page at a time the way the API does, and records which
+	// serves the notes a page at a time the way the API does, and records which
 	// pages the upsert actually asked for.
 	listing := func(pages ...[]*clientgitlab.Note) {
 		notes.EXPECT().

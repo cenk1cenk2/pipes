@@ -6,9 +6,9 @@ import (
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
 )
 
-// The three calls the report upsert makes against a merge request's notes, narrowed
-// from the client so the note bookkeeping can be driven without a GitLab to talk to.
-// Signatures mirror clientgitlab.NotesService exactly.
+// The three note calls the report upsert makes, narrowed from the client so the
+// bookkeeping can be driven without a GitLab to talk to. Signatures mirror
+// clientgitlab.NotesService exactly.
 type Notes interface {
 	ListMergeRequestNotes(
 		pid any,

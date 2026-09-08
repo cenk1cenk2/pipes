@@ -1,5 +1,4 @@
-// Package fixtures is the test scaffolding the pipes share: the stubs and the
-// loggers a spec needs whichever module it lives in.
+// Package fixtures is the test scaffolding the pipes share, whichever module a spec lives in.
 package fixtures
 
 import (
@@ -10,15 +9,13 @@ import (
 )
 
 // Runner builds a command runner that answers the given responses instead of
-// executing anything. An invocation nothing matches still records, so a spec can
-// assert on what a pipe would have run without seeding a response for it.
+// executing anything. An invocation nothing matches still records.
 func Runner(responses ...tests.TestingCommandResponse) *tests.TestingCommandRunner {
 	return tests.NewTestingCommandRunner().AddResponses(responses...)
 }
 
 // Cli runs a task list command against the given runner. Every field of the spec
-// stays available, since the pipes differ in command name, flags and arguments
-// and only agree on wanting their commands stubbed.
+// stays available, since the pipes only agree on wanting their commands stubbed.
 func Cli(runner *tests.TestingCommandRunner, spec tests.TaskListCli) *tests.TaskListCliFixture {
 	spec.Runtime = Runtime{CommandRunner: runner.Runner()}
 
@@ -26,7 +23,7 @@ func Cli(runner *tests.TestingCommandRunner, spec tests.TaskListCli) *tests.Task
 }
 
 // Log is a logger that writes into the spec output at the loudest level, for the
-// functions that take one rather than reaching for the task they run under.
+// functions that take one instead of reaching for the task they run under.
 func Log() *logrus.Entry {
 	logger := logrus.New()
 	logger.SetOutput(GinkgoWriter)

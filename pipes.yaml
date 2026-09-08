@@ -1,7 +1,6 @@
 ---
-# The pipes this repository publishes. Every entry is checked against the command
-# tree the pipe builds and against the README matrix the pipeline pushes to
-# Docker Hub, so a pipe added without an entry here fails the conformance suite.
+# the pipes this repository publishes. Every entry is checked against the command tree
+# the pipe builds and against the README matrix the pipeline pushes to Docker Hub.
 pipes:
   - name: buildah
     image: cenk1cenk2/pipe-buildah

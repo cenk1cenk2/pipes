@@ -1,5 +1,4 @@
-// Package login writes the npmrc the package manager reads its credentials
-// back from, so the commands that reach a registry compose it after setup.
+// Package login writes the npmrc the package manager reads its credentials back from.
 package login
 
 import (

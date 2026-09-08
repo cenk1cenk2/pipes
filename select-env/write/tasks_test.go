@@ -16,10 +16,7 @@ import (
 )
 
 var _ = Describe("Environment file", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
-	// The task reads the selection of the pipe around it off its package level
-	// instance, so a spec seeds that the same way it seeds its own.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(pipe Pipe, selected environment.Ctx) error {
 		GinkgoHelper()
 
@@ -61,7 +58,7 @@ var _ = Describe("Environment file", func() {
 		Expect(os.ReadFile(file)).To(BeEquivalentTo("API_URL=\"https://api.example.com\"\n"))
 	})
 
-	// A pipeline sources the file unconditionally, so it has to exist even when
+	// a pipeline sources the file unconditionally, so it has to exist even when
 	// the selection resolved to nothing.
 	It("writes the file even when the selection carries no variables", func() {
 		Expect(run(

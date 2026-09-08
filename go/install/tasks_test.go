@@ -12,14 +12,11 @@ import (
 )
 
 var _ = Describe("Go install", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool) error {
 		GinkgoHelper()
 
 		*P = pipe
-		// The tasks read the tool the setup resolved off its package level
-		// instance, so a spec seeds that the same way it seeds its own.
 		*setup.C = setup.Ctx{
 			Cwd:       "projects/api",
 			Env:       map[string]string{"GOPATH": "/cache"},

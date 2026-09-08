@@ -13,8 +13,6 @@ import (
 )
 
 var _ = Describe("Node add", func() {
-	// The task reads the package manager of the pipe around it off its package
-	// level instance, so a spec seeds that the same way it seeds its own.
 	seed := func(packageManager string) {
 		*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
 			Exe:      packageManager,
@@ -22,8 +20,7 @@ var _ = Describe("Node add", func() {
 		}}
 	}
 
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe, packageManager string) error {
 		GinkgoHelper()
 
@@ -63,7 +60,7 @@ var _ = Describe("Node add", func() {
 		Expect(invocation.Dir).To(Equal("projects/web"))
 	})
 
-	// Where the global switch goes differs between the package managers, so it has
+	// where the global switch goes differs between the package managers, so it has
 	// to come out of the resolved commands rather than be spelled here.
 	It("installs globally with the switch of the package manager", func() {
 		runner := fixtures.Runner()

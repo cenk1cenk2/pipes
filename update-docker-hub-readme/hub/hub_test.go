@@ -146,7 +146,7 @@ var _ = Describe("UpdateReadme", func() {
 		}))
 	})
 
-	// The service answers HTML on some failures, and a decode error alone leaves
+	// the service answers HTML on some failures, and a decode error alone leaves
 	// nothing to tell the user what went wrong.
 	It("carries the response into the error when it is not the expected shape", func() {
 		answer = func(w http.ResponseWriter) {

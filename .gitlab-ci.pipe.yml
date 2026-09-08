@@ -47,7 +47,7 @@ build:
     paths:
       - $GO_CWD/dist/
   script:
-    # The parent hands down the binary it built from this commit, so the pipe that
+    # the parent hands down the binary it built from this commit, so the pipe that
     # builds every other pipe is never a release behind the flags it is given.
     - ./go/dist/pipe-bootstrap build
   rules:

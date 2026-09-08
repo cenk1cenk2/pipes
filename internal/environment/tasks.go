@@ -7,9 +7,8 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-// Ctx is what the environment task list resolves. A pipe that consumes the
-// selection holds on to the same instance it handed to SetupTaskList, since the
-// values only land once the tasks have run.
+// Ctx is what the environment task list resolves; the values only land once the
+// tasks have run, so a pipe holds on to the instance it handed to SetupTaskList.
 type Ctx struct {
 	References  []string
 	Environment string

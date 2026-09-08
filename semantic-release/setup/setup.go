@@ -1,6 +1,6 @@
-// Package setup holds the configuration the semantic-release pipe shares
-// between its task lists. The instances live here rather than in main so that
-// the flags that fill them and the tasks that read them back are the same ones.
+// Package setup holds the configuration the semantic-release pipe shares between
+// its task lists, so that the flags that fill it and the tasks that read it back
+// are the same instances.
 package setup
 
 import (

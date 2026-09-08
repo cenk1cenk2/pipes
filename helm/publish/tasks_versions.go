@@ -9,8 +9,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
-// The collector reads the parsed flags and the working directory the setup task
-// list resolved, so it is only built from inside a task list.
+// The collector reads the parsed flags and the resolved working directory, so it is only built from inside a task list.
 func HelmChartVersions() *versions.Collector {
 	return &versions.Collector{
 		Name: "versions",
@@ -26,8 +25,7 @@ func HelmChartVersions() *versions.Collector {
 	}
 }
 
-// A chart has no notion of a latest version, so the two sources the pipe does
-// have are all the parent waits on.
+// A chart has no notion of a latest version, so the parent waits on the other two sources only.
 func HelmChartVersionsParent(tl *TaskList) *Task {
 	collector := HelmChartVersions()
 

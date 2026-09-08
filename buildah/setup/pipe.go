@@ -9,8 +9,8 @@ type (
 		Cwd string `validate:"omitempty,dir"`
 	}
 
-	// Ctx is what New resolves. The pipe holds on to the same instance the steps
-	// read back, since the values only land once the setup task list has run.
+	// Ctx is what New resolves; the values only land once the setup task list has run,
+	// so the pipe holds on to the same instance the steps read back.
 	Ctx struct {
 		Cwd     string
 		Version string

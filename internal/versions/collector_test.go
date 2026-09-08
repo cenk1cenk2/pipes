@@ -15,10 +15,8 @@ import (
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
-// The expectations here are the output of the buildah and helm implementations
-// this collector replaced, captured before they were deleted.
 var _ = Describe("Collector", func() {
-	// The default the buildah and helm flags ship, which is what almost every
+	// the default the buildah and helm flags ship, which is what almost every
 	// pipeline actually runs with.
 	defaultSanitize := []versions.Match{
 		{Match: "([^/]*)/(.*)", Template: "{{ index $ 1 | upper }}_{{ index $ 2 }}"},
@@ -49,10 +47,10 @@ var _ = Describe("Collector", func() {
 				Entry("a semver tag", "v1.2.3", "docker.io/x/y:v1.2.3"),
 				Entry("a branch name", "main", "docker.io/x/y:main"),
 				Entry("the latest tag", "latest", "docker.io/x/y:latest"),
-				// A slash is not legal in a tag, which is the whole reason the default
+				// a slash is not legal in a tag, which is the whole reason the default
 				// sanitizer exists.
 				Entry("a slashed branch name", "feature/foo", "docker.io/x/y:FEATURE_foo"),
-				// Only the first slash is consumed, so a deeper branch keeps the rest.
+				// only the first slash is consumed, so a deeper branch keeps the rest.
 				Entry("a twice slashed branch name", "renovate/deps/bump", "docker.io/x/y:RENOVATE_deps/bump"),
 			)
 
@@ -85,7 +83,7 @@ var _ = Describe("Collector", func() {
 			)
 		})
 
-		// The template runs first, so a value it rewrote is what the sanitizer sees.
+		// the template runs first, so a value it rewrote is what the sanitizer sees.
 		Describe("with both a template and a sanitizer", func() {
 			collector := func() *versions.Collector {
 				return &versions.Collector{
@@ -103,7 +101,7 @@ var _ = Describe("Collector", func() {
 			})
 		})
 
-		// This is what lets a pipeline pass a template in as the tag itself rather
+		// this is what lets a pipeline pass a template in as the tag itself rather
 		// than writing a condition for it.
 		It("renders a value that matches nothing as a template of its own", func() {
 			collector := &versions.Collector{}
@@ -133,7 +131,7 @@ var _ = Describe("Collector", func() {
 		})
 	})
 
-	// A pipe composes the sources under a parent task of its own, which is where it
+	// a pipe composes the sources under a parent task of its own, which is where it
 	// compacts and reports what they collected; these specs stand in for that parent.
 	Describe("Sources", func() {
 		var (
@@ -178,7 +176,7 @@ var _ = Describe("Collector", func() {
 			Expect(out).To(Equal([]string{"v1.2.3", "main"}))
 		})
 
-		// The user tags are a package level flag destination shared with the rest of
+		// the user tags are a package level flag destination shared with the rest of
 		// the pipe, so collecting must not truncate them.
 		It("leaves the user values alone", func() {
 			user := []string{"v1.2.3", "v1.2.3", "main"}
@@ -196,7 +194,7 @@ var _ = Describe("Collector", func() {
 			Expect(out).To(ConsistOf("from-file-a", "from-file-b"))
 		})
 
-		// The user and the file source run in parallel, so which of them lands first
+		// the user and the file source run in parallel, so which of them lands first
 		// is not something a pipe may depend on.
 		It("collects both sources at once", func() {
 			Expect(os.WriteFile(filepath.Join(dir, "tags"), []byte("from-file"), 0600)).To(Succeed())
@@ -235,7 +233,7 @@ var _ = Describe("Collector", func() {
 			Expect(out).To(Equal([]string{"main"}))
 		})
 
-		// A pipe with no notion of a latest version, such as helm, leaves the patterns
+		// a pipe with no notion of a latest version, such as helm, leaves the patterns
 		// nil rather than passing an empty slice.
 		It("leaves the latest task out without any patterns", func() {
 			out := collect(&versions.Collector{

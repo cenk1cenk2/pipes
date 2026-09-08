@@ -14,9 +14,8 @@ import (
 
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
-		// The environment feature is opt-in for this pipe, unlike the pipes that own
-		// their environment. The flags are shared package level values, so this runs
-		// before the command tree reads them.
+		// the environment is opt-in here, and the flags are shared package level values,
+		// so this runs before the command tree reads them.
 		OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
 			return f.Name == "environment.enable"
 		}, func(f *cli.BoolFlag) *cli.BoolFlag {

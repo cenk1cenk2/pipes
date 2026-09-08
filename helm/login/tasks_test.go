@@ -14,8 +14,7 @@ import (
 )
 
 var _ = Describe("Helm registry login", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
 		GinkgoHelper()
 
@@ -49,7 +48,7 @@ var _ = Describe("Helm registry login", func() {
 		}))
 	})
 
-	// An argument list shows up in a process listing and in the command trace log,
+	// an argument list shows up in a process listing and in the command trace log,
 	// which is exactly what the password has to stay out of.
 	It("hands the password over stdin rather than in the arguments", func() {
 		runner := fixtures.Runner()
@@ -65,7 +64,7 @@ var _ = Describe("Helm registry login", func() {
 		Expect(stdin).To(Equal("secret"))
 	})
 
-	// Half a credential pair is not something to guess at, and a pipeline with
+	// half a credential pair is not something to guess at, and a pipeline with
 	// neither is relying on an ambient login the pipe must not clobber. Helm has
 	// no verify counterpart, so nothing runs at all.
 	DescribeTable(
@@ -86,7 +85,7 @@ var _ = Describe("Helm registry login", func() {
 		Entry("neither", "", "", 0),
 	)
 
-	// The password is the one value that must never reach a log line, and masking
+	// the password is the one value that must never reach a log line, and masking
 	// it here is what keeps every command the pipe runs after it from having to
 	// remember to.
 	It("keeps the password out of the log", func() {

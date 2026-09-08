@@ -9,10 +9,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Parse reads the comma separated tags out of the file at path. A path that does
-// not exist yields no tags and no error, since the file is usually written by an
-// earlier job that may legitimately not have run. A pipe that can not go on
-// without the tags asks for strict and gets an error instead.
+// Parse reads the comma separated tags out of the file at path. An absent path
+// yields no tags and no error, since the file is usually written by an earlier job
+// that may legitimately not have run; strict turns that absence into an error.
 func Parse(log *logrus.Entry, path string, strict bool) ([]string, error) {
 	if _, err := os.Stat(path); err != nil {
 		if strict && path != "" {

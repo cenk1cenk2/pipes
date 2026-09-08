@@ -9,9 +9,7 @@ import (
 
 //revive:disable:line-length-limit
 
-// The conditions a pipe falls back to when the user did not write its own. The
-// value is what the generated documentation prints as the flag default, so it
-// stays as it is until a step deliberately rewrites the docs.
+// The conditions a pipe falls back to; the value is printed verbatim as the flag default in the generated documentation.
 const DEFAULT_CONDITIONS = `[
     { "match": "^tags/v?\\d+.\\d+.\\d+$", "environment": "production" },
     { "match": "^tags/v?\\d+.\\d+.\\d+-.*\\.\\d+$", "environment": "stage" },
@@ -48,11 +46,9 @@ func Select(conditions []Condition, references []string) (string, error) {
 	return conditions[matched].Environment, nil
 }
 
-// Fetch strips the environment prefix off every variable in environ, so that
-// STAGE_TOKEN reaches the pipe as TOKEN once stage is the selected environment.
-// Variables that do not carry the prefix are kept as they are, which is what
-// lets an environment override only the few it cares about, and ENVIRONMENT
-// names the selection itself.
+// Fetch strips the environment prefix off every variable in environ, so STAGE_TOKEN
+// reaches the pipe as TOKEN once stage is selected. Unprefixed variables are kept as
+// they are, and ENVIRONMENT names the selection itself.
 func Fetch(environ []string, environment string) map[string]string {
 	prefix := strings.ToUpper(environment) + "_"
 

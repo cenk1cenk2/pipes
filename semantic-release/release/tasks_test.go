@@ -12,8 +12,7 @@ import (
 )
 
 var _ = Describe("Semantic release", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe, debug bool) error {
 		GinkgoHelper()
 
@@ -36,7 +35,7 @@ var _ = Describe("Semantic release", func() {
 			},
 		})
 
-		// The pipe reads its own debug off the log level, and the fixture leaves it
+		// the pipe reads its own debug off the log level, and the fixture leaves it
 		// on trace so that a spec can see what the task list did.
 		if !debug {
 			fixture.Plumber.Log.SetLevel(logrus.InfoLevel)

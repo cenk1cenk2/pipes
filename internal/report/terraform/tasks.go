@@ -10,12 +10,10 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
-// Everything a plan report needs that differs between the tools. Read is what
-// actually reaches for the plan -- a command for one pipe, a file for the other --
-// so the two tasks below stay the same shape whichever tool produced it.
-//
-// The tasks are handed the pipe's own instance rather than a copy, since it is
-// only filled once the flags the pipe builds it out of have been parsed.
+// Everything a plan report needs that differs between the tools. Read reaches for the
+// plan -- a command for one pipe, a file for the other -- so the two tasks below keep
+// one shape. The tasks take the pipe's own instance, which is only filled once its
+// flags have been parsed.
 type Source struct {
 	Read          func(t *Task) (Report, error)
 	Summary       func(Report) Summary
@@ -23,7 +21,7 @@ type Source struct {
 	Cwd           string
 	MergeRequest  gitlab.MergeRequestReportConfig
 	Notes         gitlab.NotesFactory
-	// Names what this job reports on, so concurrent report jobs on one merge
+	// names what this job reports on, so concurrent report jobs on one merge
 	// request do not overwrite each other's note.
 	Discriminators func() []string
 	Metadata       Metadata

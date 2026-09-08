@@ -4,7 +4,5 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-// The install command is driven entirely by the setup and login flags around
-// it, but the file stays so that a flag of its own lands where every other
-// command keeps them.
+// The install command carries no flags of its own; the file keeps the place every other command declares them in.
 var Flags = []cli.Flag{}

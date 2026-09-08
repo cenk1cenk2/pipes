@@ -27,9 +27,8 @@ init:
       done
     - go build -C go -mod=vendor -o dist/pipe-bootstrap
     - ./go/dist/pipe-bootstrap --version
-    # Workspace mode belongs to the lint run alone. Build reads the flag itself to
-    # decide whether it walks every module of the workspace, and this job only ever
-    # ships the one module its matrix entry points at.
+    # workspace mode belongs to the lint run alone: build reads the flag itself and
+    # this job only ships the one module its matrix entry points at.
     - GO_WORKSPACE=true ./go/dist/pipe-bootstrap lint
     - ./go/dist/pipe-bootstrap build
   cache:

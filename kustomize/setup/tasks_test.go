@@ -11,8 +11,7 @@ import (
 )
 
 var _ = Describe("Resolve overlays", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	resolve := func(cwd string, paths ...string) []string {
 		GinkgoHelper()
 
@@ -42,7 +41,7 @@ var _ = Describe("Resolve overlays", func() {
 		Expect(resolve("overlays/production")).To(Equal([]string{"overlays/production"}))
 	})
 
-	// The working directory flag defaults to ".", but a pipeline that unsets it
+	// the working directory flag defaults to ".", but a pipeline that unsets it
 	// would otherwise resolve an empty overlay path that Kustomize cannot read.
 	It("falls back to the current directory", func() {
 		Expect(resolve("")).To(Equal([]string{"."}))
@@ -53,7 +52,7 @@ var _ = Describe("Resolve overlays", func() {
 			To(Equal([]string{"clusters/prod/apps/api", "clusters/prod/apps/web"}))
 	})
 
-	// The same overlay reaching the build twice would render it twice and write the
+	// the same overlay reaching the build twice would render it twice and write the
 	// output file from two subtasks at once.
 	It("sorts the paths and drops the duplicates", func() {
 		Expect(resolve(".", "apps/web", "apps/api", "apps/web")).

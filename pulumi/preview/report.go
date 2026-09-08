@@ -95,7 +95,7 @@ func parsePulumiPlanReport(data []byte, metadata terraform.Metadata) (terraform.
 }
 
 func parsePulumiPlan(data []byte) (apitype.DeploymentPlanV1, int, error) {
-	// A decode failure means the payload is an unwrapped plan rather than a version
+	// a decode failure means the payload is an unwrapped plan rather than a version
 	// envelope, so it falls through to the unversioned path instead of erroring.
 	var versioned apitype.VersionedDeploymentPlan
 	if err := json.Unmarshal(data, &versioned, json.RejectUnknownMembers(true)); err == nil {

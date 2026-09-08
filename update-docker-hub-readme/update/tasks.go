@@ -54,9 +54,8 @@ func DiscoverJobs(tl *TaskList) *Task {
 		})
 }
 
-// VerifyReadme decides whether the readme actually landed on the repository.
-// The service answers 200 on a readme it did not take, so what came back rather
-// than the status alone is what proves it.
+// VerifyReadme decides whether the readme actually landed. The service answers 200
+// on a readme it did not take, so the response body and not the status proves it.
 func VerifyReadme(res hub.Result, repository string, readme ParsedReadme, content string) error {
 	switch res.StatusCode {
 	case http.StatusOK:

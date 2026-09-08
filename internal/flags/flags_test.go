@@ -23,7 +23,7 @@ var _ = Describe("Unmarshalling flags", func() {
 			Expect(dst).To(Equal([]condition{{Match: "^heads/main$", Environment: "develop"}}))
 		})
 
-		// Most of these flags are optional, so an unset one leaves the pipe on its zero
+		// most of these flags are optional, so an unset one leaves the pipe on its zero
 		// value rather than failing before the pipe has a chance to default it.
 		It("leaves the destination alone for an empty value", func() {
 			dst := []condition{{Match: "kept"}}
@@ -42,7 +42,7 @@ var _ = Describe("Unmarshalling flags", func() {
 			Expect(err.Error()).To(ContainSubstring("conditions"))
 		})
 
-		// The defaults are non-empty literals that would otherwise never be parsed, so
+		// the defaults are non-empty literals that would otherwise never be parsed, so
 		// a typo in one would only surface once a user overrode something else.
 		It("makes the flag validate its own default", func() {
 			dst := []condition{}
@@ -61,7 +61,7 @@ var _ = Describe("Unmarshalling flags", func() {
 			Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
 		})
 
-		// The defaults are written as JSON but documented as YAML, which only works
+		// the defaults are written as JSON but documented as YAML, which only works
 		// because YAML is a superset of it.
 		It("accepts the JSON the defaults are written in", func() {
 			dst := []condition{}

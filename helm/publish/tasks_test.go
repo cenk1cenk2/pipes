@@ -13,8 +13,6 @@ import (
 )
 
 var _ = Describe("Helm publish tasks", func() {
-	// The tasks read the chart the setup resolved off its package level instance, so
-	// a spec seeds that the same way it seeds its own.
 	seed := func(cwd, name string) {
 		*setup.C = setup.Ctx{
 			Cwd:   cwd,
@@ -23,11 +21,8 @@ var _ = Describe("Helm publish tasks", func() {
 		}
 	}
 
-	// The pipe is seeded rather than parsed out of the flags: a package level flag
-	// only reads its environment sources on the first parse of a process, so a suite
-	// that drove them would depend on the order the specs happen to run in. The
-	// versions are seeded for the same reason the pipe is, since collecting them
-	// reads the git references of whatever checkout the specs run in.
+	// a package level flag reads its environment only on the first parse, so the pipe
+	// and the versions are seeded rather than parsed.
 	run := func(
 		runner *tests.TestingCommandRunner,
 		pipe Pipe,
@@ -77,7 +72,7 @@ var _ = Describe("Helm publish tasks", func() {
 			Expect(invocation.Dir).To(Equal("charts/app"))
 		})
 
-		// The application version is what the chart reports as the version of the thing
+		// the application version is what the chart reports as the version of the thing
 		// it deploys, which most charts leave to whatever is committed in Chart.yaml.
 		It("carries the application version only when one was given", func() {
 			runner := fixtures.Runner()
@@ -99,7 +94,7 @@ var _ = Describe("Helm publish tasks", func() {
 			Expect(runner.InvocationNames()).To(Equal([]string{"helm", "helm"}))
 		})
 
-		// Nothing to package is a pipeline whose version conditions selected nothing,
+		// nothing to package is a pipeline whose version conditions selected nothing,
 		// not a failure, so the task disables itself rather than running helm on it.
 		It("runs nothing without a version", func() {
 			runner := fixtures.Runner()

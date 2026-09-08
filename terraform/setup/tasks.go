@@ -28,7 +28,7 @@ func version(tl *TaskList) *Task {
 				ShouldRunAfter(func(c *Command) error {
 					output := strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
 
-					// The banner is only ever logged, and terraform has already proven it
+					// the banner is only ever logged, and terraform has already proven it
 					// runs by answering at all, so an unrecognised one is reported whole
 					// rather than treated as an error.
 					if matches := pattern.FindStringSubmatch(output); len(matches) > 1 {

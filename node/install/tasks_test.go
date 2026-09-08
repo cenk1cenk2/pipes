@@ -14,9 +14,6 @@ import (
 )
 
 var _ = Describe("Node install", func() {
-	// The tasks read the package manager and the environment of the pipe around
-	// them off their package level instances, so a spec seeds those the same way it
-	// seeds its own.
 	seed := func(packageManager string) {
 		*setup.NodeCtx = node.Ctx{PackageManager: node.PackageManager{
 			Exe:      packageManager,
@@ -27,8 +24,7 @@ var _ = Describe("Node install", func() {
 		}
 	}
 
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe, packageManager string) error {
 		GinkgoHelper()
 
@@ -81,7 +77,7 @@ var _ = Describe("Node install", func() {
 		Expect(invocation.Args).To(Equal([]string{"i", "--unsafe-perm", "--foo"}))
 	})
 
-	// The cache directory is named after the package manager, and the flag it is
+	// the cache directory is named after the package manager, and the flag it is
 	// passed under differs between them.
 	It("points the package manager at a cache named after it", func() {
 		runner := fixtures.Runner()

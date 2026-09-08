@@ -42,7 +42,7 @@ func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terrafo
 		action := terraformChangeAction(change.Change.Actions)
 		moved := change.PreviousAddress != "" && change.PreviousAddress != change.Address
 
-		// A resource that only moved carries no-op actions, which would otherwise drop
+		// a resource that only moved carries no-op actions, which would otherwise drop
 		// it from the report entirely.
 		if action == "no-op" {
 			if !moved {

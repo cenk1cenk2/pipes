@@ -15,19 +15,16 @@ import (
 )
 
 var _ = Describe("Go build", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
 		GinkgoHelper()
 
-		// The build inherits the environment it runs in and the Taskfile exports
+		// the build inherits the environment it runs in and the Taskfile exports
 		// CGO_ENABLED for every task, so the spec below would assert against the
 		// setting of whatever ran it rather than the one the pipe put there.
 		tests.WithoutEnvironment("CGO_ENABLED")
 
 		*P = pipe
-		// The task reads the tool the setup resolved off its package level
-		// instances, so a spec seeds those the same way it seeds its own.
 		*setup.P = setup.Pipe{}
 		*setup.C = setup.Ctx{Cwd: "projects/api", Env: map[string]string{}}
 		*C = Ctx{}
@@ -107,7 +104,7 @@ var _ = Describe("Go build", func() {
 			To(Equal([]string{"build", "-mod=vendor", "-v", "-ldflags=", "-o", "dist/bin-linux-amd64"}))
 	})
 
-	// Cross compiling a target the runner has no toolchain for is what the pipe is
+	// cross compiling a target the runner has no toolchain for is what the pipe is
 	// for, so the build stays static unless the pipeline asks for CGO.
 	It("disables CGO unless the pipeline enabled it", func() {
 		runner := fixtures.Runner()
@@ -171,7 +168,7 @@ var _ = Describe("Go build", func() {
 		Expect(invocation.Args).To(ContainElements("-tags", "netgo,osusergo"))
 	})
 
-	// The workspace build follows the flag rather than what the setup resolved:
+	// the workspace build follows the flag rather than what the setup resolved:
 	// the probe behind setup.C.Workspace is on for any invocation that merely sits
 	// inside a workspace, and a child pipeline building one module must not start
 	// building all of them.
@@ -204,7 +201,7 @@ var _ = Describe("Go build", func() {
 		Expect(dirs).To(ConsistOf("/repository/_template", "/repository/api"))
 	})
 
-	// A workspace carries library modules next to the commands, and asking the go
+	// a workspace carries library modules next to the commands, and asking the go
 	// tool what each module holds is what keeps those out of the build.
 	It("leaves out a module that holds no command", func() {
 		runner := fixtures.Runner(

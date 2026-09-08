@@ -13,8 +13,6 @@ import (
 )
 
 var _ = Describe("Pulumi preview tasks", func() {
-	// The tasks read the setup and the stack of the pipe around them off their
-	// package level instances, so a spec seeds those the same way it seeds its own.
 	seed := func(name, cwd string) {
 		*setup.C = setup.Ctx{Cwd: cwd, Env: map[string]string{}}
 		*stack.P = stack.Pipe{Stack: name}
@@ -35,7 +33,7 @@ var _ = Describe("Pulumi preview tasks", func() {
 	})
 
 	Describe("Pulumi preview", func() {
-		// Only the preview task runs, since the report tasks that follow it would reach
+		// only the preview task runs, since the report tasks that follow it would reach
 		// for a plan file the stubbed command never wrote.
 		run := func(runner *tests.TestingCommandRunner, environment map[string]string) error {
 			GinkgoHelper()

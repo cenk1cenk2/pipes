@@ -13,8 +13,7 @@ import (
 	"go.yaml.in/yaml/v4"
 )
 
-// The collector reads the parsed flags, so it is only built from inside a task
-// list, never at package level.
+// The collector reads the parsed flags, so it is only built from inside a task list.
 func ContainerImageTags() *versions.Collector {
 	return &versions.Collector{
 		Name: "tags",
@@ -42,8 +41,7 @@ func ContainerImageTags() *versions.Collector {
 	}
 }
 
-// The manifest write hangs off the parent rather than the sequence around it, so
-// it only ever sees a tag list every source has already been collected into.
+// The manifest write hangs off the parent, so it only sees a fully collected tag list.
 func ContainerImageTagsParent(tl *TaskList) *Task {
 	collector := ContainerImageTags()
 

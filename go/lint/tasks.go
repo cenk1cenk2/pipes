@@ -8,10 +8,8 @@ import (
 func GoLint(tl *TaskList) *Task {
 	return tl.CreateTask("lint").
 		Set(func(t *Task) error {
-			// A workspace is linted one module at a time from inside it. The go tool
-			// drops directories whose name starts with an underscore out of a package
-			// pattern, so a "<module>/..." argument resolves to nothing at all for the
-			// scaffold and it would go unlinted without a word from the linter.
+			// linted from inside each module, since the go tool resolves a "<module>/..."
+			// pattern to nothing for an underscored directory.
 			for _, module := range setup.C.Modules {
 				lint(t).
 					SetDir(module).

@@ -9,8 +9,7 @@ const (
 )
 
 // Options is what the git flags are built onto. Every flag constructor takes a
-// struct rather than positional arguments, so a new knob is a new field instead
-// of a signature change at every call site.
+// struct, so a new knob is a new field and not a signature change at every call site.
 type Options struct {
 	Destination *Refs
 }
