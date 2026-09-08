@@ -13,7 +13,7 @@ import (
 func tags(tl *TaskList) *Task {
 	return tl.CreateTask("tags").
 		Set(func(t *Task) error {
-			parsed, err := tagsfile.Parse(t.Log, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
+			parsed, err := tagsfile.Parse(t, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
 
 			if err != nil {
 				return err

@@ -8,7 +8,6 @@ require (
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.43.0
-	github.com/sirupsen/logrus v1.10.2
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.com/gitlab-org/api/client-go/v2 v2.64.0
@@ -52,6 +51,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
+	github.com/sirupsen/logrus v1.10.2 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect

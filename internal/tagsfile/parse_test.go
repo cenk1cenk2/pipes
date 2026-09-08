@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
+	. "github.com/cenk1cenk2/plumber/v6"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -14,12 +14,12 @@ import (
 
 var _ = Describe("Parse", func() {
 	var (
-		log *logrus.Entry
+		t   *Task
 		dir string
 	)
 
 	BeforeEach(func() {
-		log = fixtures.Log()
+		t = fixtures.Task()
 		dir = GinkgoT().TempDir()
 	})
 
@@ -31,20 +31,20 @@ var _ = Describe("Parse", func() {
 	}
 
 	It("reads the tags out of a comma separated file", func() {
-		tags, err := tagsfile.Parse(log, write(".tags", "one,two,three"), false)
+		tags, err := tagsfile.Parse(t, write(".tags", "one,two,three"), false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(Equal([]string{"one", "two", "three"}))
 	})
 
 	// the file is usually written by a shell redirect, which leaves the newline in.
 	It("strips the line endings the writing job leaves behind", func() {
-		tags, err := tagsfile.Parse(log, write(".tags", "one,\ntwo,\r\nthree\n"), false)
+		tags, err := tagsfile.Parse(t, write(".tags", "one,\ntwo,\r\nthree\n"), false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(Equal([]string{"one", "two", "three"}))
 	})
 
 	It("reads a single tag with no separator", func() {
-		tags, err := tagsfile.Parse(log, write(".tags", "only"), false)
+		tags, err := tagsfile.Parse(t, write(".tags", "only"), false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(Equal([]string{"only"}))
 	})
@@ -52,7 +52,7 @@ var _ = Describe("Parse", func() {
 	// the file is normally produced by an earlier job that may legitimately not have
 	// run, so its absence is not on its own a reason to fail the pipeline.
 	It("yields nothing and no error when the file is not there", func() {
-		tags, err := tagsfile.Parse(log, filepath.Join(dir, "absent"), false)
+		tags, err := tagsfile.Parse(t, filepath.Join(dir, "absent"), false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(BeNil())
 	})
@@ -60,13 +60,13 @@ var _ = Describe("Parse", func() {
 	// strict is for the pipes that would otherwise publish something untagged, so
 	// there the absence of a configured file is the failure itself.
 	It("fails on an absent file under strict", func() {
-		tags, err := tagsfile.Parse(log, filepath.Join(dir, "absent"), true)
+		tags, err := tagsfile.Parse(t, filepath.Join(dir, "absent"), true)
 		Expect(err).To(MatchError(ContainSubstring("Tags file is set but does not exists")))
 		Expect(tags).To(BeNil())
 	})
 
 	It("yields nothing when no path was configured", func() {
-		tags, err := tagsfile.Parse(log, "", false)
+		tags, err := tagsfile.Parse(t, "", false)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(BeNil())
 	})
@@ -74,7 +74,7 @@ var _ = Describe("Parse", func() {
 	// strict says the configured file has to be there, and no path is not a
 	// configured file.
 	It("yields nothing when no path was configured even under strict", func() {
-		tags, err := tagsfile.Parse(log, "", true)
+		tags, err := tagsfile.Parse(t, "", true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(BeNil())
 	})
@@ -82,7 +82,7 @@ var _ = Describe("Parse", func() {
 	// strict only ever guards the absence, so a file that is there parses the same
 	// way whichever mode the pipe asked for.
 	It("parses a present file the same way under strict", func() {
-		tags, err := tagsfile.Parse(log, write(".tags", "one,two"), true)
+		tags, err := tagsfile.Parse(t, write(".tags", "one,two"), true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(Equal([]string{"one", "two"}))
 	})
@@ -91,7 +91,7 @@ var _ = Describe("Parse", func() {
 	// that has not run yet, so it fails whichever mode it was asked for.
 	It("names the file it could not read", func() {
 		for _, strict := range []bool{false, true} {
-			tags, err := tagsfile.Parse(log, dir, strict)
+			tags, err := tagsfile.Parse(t, dir, strict)
 			Expect(err).To(MatchError(ContainSubstring("Can not read the tags file")))
 			Expect(err).To(MatchError(ContainSubstring(dir)))
 			Expect(tags).To(BeNil())

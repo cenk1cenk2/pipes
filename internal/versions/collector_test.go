@@ -8,7 +8,6 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
@@ -23,10 +22,10 @@ var _ = Describe("Collector", func() {
 	}
 
 	Describe("Process", func() {
-		var log *logrus.Entry
+		var t *Task
 
 		BeforeEach(func() {
-			log = fixtures.Log()
+			t = fixtures.Task()
 		})
 
 		Describe("as buildah publishes container image tags", func() {
@@ -42,7 +41,7 @@ var _ = Describe("Collector", func() {
 			DescribeTable(
 				"prefixes the registry and the image name",
 				func(tag, expected string) {
-					Expect(image().Process(log, tag)).To(Equal(expected))
+					Expect(image().Process(t, tag)).To(Equal(expected))
 				},
 				Entry("a semver tag", "v1.2.3", "docker.io/x/y:v1.2.3"),
 				Entry("a branch name", "main", "docker.io/x/y:main"),
@@ -62,7 +61,7 @@ var _ = Describe("Collector", func() {
 					},
 				}
 
-				Expect(collector.Process(log, "v1.2.3")).To(Equal("x/y:v1.2.3"))
+				Expect(collector.Process(t, "v1.2.3")).To(Equal("x/y:v1.2.3"))
 			})
 		})
 
@@ -74,7 +73,7 @@ var _ = Describe("Collector", func() {
 			DescribeTable(
 				"leaves the value as it is without a format",
 				func(version, expected string) {
-					Expect(chart().Process(log, version)).To(Equal(expected))
+					Expect(chart().Process(t, version)).To(Equal(expected))
 				},
 				Entry("a semver version", "v1.2.3", "v1.2.3"),
 				Entry("a branch name", "main", "main"),
@@ -93,11 +92,11 @@ var _ = Describe("Collector", func() {
 			}
 
 			It("applies the template and leaves the sanitizer nothing to match", func() {
-				Expect(collector().Process(log, "heads/main")).To(Equal("branch-main"))
+				Expect(collector().Process(t, "heads/main")).To(Equal("branch-main"))
 			})
 
 			It("falls through to the sanitizer when no template matches", func() {
-				Expect(collector().Process(log, "tags/v1.0.0")).To(Equal("TAGS_v1.0.0"))
+				Expect(collector().Process(t, "tags/v1.0.0")).To(Equal("TAGS_v1.0.0"))
 			})
 		})
 
@@ -106,27 +105,27 @@ var _ = Describe("Collector", func() {
 		It("renders a value that matches nothing as a template of its own", func() {
 			collector := &versions.Collector{}
 
-			Expect(collector.Process(log, "{{ 1 | add 1 }}")).To(Equal("2"))
+			Expect(collector.Process(t, "{{ 1 | add 1 }}")).To(Equal("2"))
 		})
 
 		It("refuses a value that a template sanitized away entirely", func() {
 			collector := &versions.Collector{Sanitize: []versions.Match{{Match: "^(.*)$", Template: ""}}}
 
-			_, err := collector.Process(log, "anything")
+			_, err := collector.Process(t, "anything")
 			Expect(err).To(MatchError("Can not add empty tag to list."))
 		})
 
 		It("reports a sanitizer that does not compile", func() {
 			collector := &versions.Collector{Sanitize: []versions.Match{{Match: "([", Template: "x"}}}
 
-			_, err := collector.Process(log, "anything")
+			_, err := collector.Process(t, "anything")
 			Expect(err).To(MatchError(ContainSubstring("Can not compile sanitize regular expression")))
 		})
 
 		It("reports a template that does not compile", func() {
 			collector := &versions.Collector{Templates: []versions.Match{{Match: "([", Template: "x"}}}
 
-			_, err := collector.Process(log, "anything")
+			_, err := collector.Process(t, "anything")
 			Expect(err).To(MatchError(ContainSubstring("Can not compile tag template regular expression")))
 		})
 	})

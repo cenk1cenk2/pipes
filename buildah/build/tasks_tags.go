@@ -77,7 +77,7 @@ func tagsManifest(tl *TaskList, collector *versions.Collector) *Task {
 				return err
 			}
 
-			image, err := collector.Process(t.Log, target)
+			image, err := collector.Process(t, target)
 			if err != nil {
 				return err
 			}
