@@ -57,7 +57,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("NODE_ADD_CWD"),
 			cli.EnvVar("PACKAGES_NODE_CWD"),
 		),
-		Usage:       "Working directory for build operation.",
+		Usage:       "Working directory for the add operation.",
 		Required:    false,
 		Value:       ".",
 		Destination: &P.Add.Cwd,

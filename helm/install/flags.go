@@ -4,5 +4,6 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-// The install command carries no flags of its own; the file keeps the place every other command declares them in.
+//revive:disable:line-length-limit
+
 var Flags = []cli.Flag{}

@@ -31,7 +31,7 @@ Login to the given container registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$BUILDAH_LOGIN_REGISTRY_URI`<br />`$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code>"docker.io"</code> |
+| `$BUILDAH_LOGIN_REGISTRY_URI`<br />`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `false` | <code>"docker.io"</code> |
 | `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br />`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` | `false` | <code></code> |
 | `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br />`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` | `false` | <code></code> |
 
@@ -70,13 +70,13 @@ Build container images.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$BUILDAH_BUILD_MANIFEST_TARGET`<br />`$CONTAINER_MANIFEST_TARGET` | Target image names for patching the manifest. | `string`<br/>`format(Template([]string))` | `false` | <code></code> |
-| `$BUILDAH_BUILD_MANIFEST_FILE`<br />`$CONTAINER_MANIFEST_FILE` | Write all the images that are published in to a file for later use. | `string`<br/>`format(Template([]string))` | `false` | <code>".published-container-images_{{ $ | join \",\" | sha256sum }}"</code> |
+| `$BUILDAH_BUILD_MANIFEST_FILE`<br />`$CONTAINER_MANIFEST_FILE` | Write all the published images into a file for later use. | `string`<br/>`format(Template([]string))` | `false` | <code>".published-container-images_{{ $ | join \",\" | sha256sum }}"</code> |
 
 **Container Registry**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$BUILDAH_LOGIN_REGISTRY_URI`<br />`$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code>"docker.io"</code> |
+| `$BUILDAH_LOGIN_REGISTRY_URI`<br />`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `false` | <code>"docker.io"</code> |
 | `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br />`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` | `false` | <code></code> |
 | `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br />`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` | `false` | <code></code> |
 
@@ -85,7 +85,7 @@ Build container images.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$BUILDAH_BUILD_FILE_CONTEXT`<br />`$CONTAINER_FILE_CONTEXT` | Containerfile context argument for build operation. | `string` | `false` | <code>"."</code> |
-| `$BUILDAH_BUILD_FILE_NAME`<br />`$CONTAINER_FILE_NAME` | Containerfile path for the build operation | `string` | `false` | <code>"Dockerfile"</code> |
+| `$BUILDAH_BUILD_FILE_NAME`<br />`$CONTAINER_FILE_NAME` | Containerfile path for the build operation. | `string` | `false` | <code>"Dockerfile"</code> |
 
 **GIT**
 
@@ -126,6 +126,6 @@ Update manifests of the container images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$BUILDAH_LOGIN_REGISTRY_URI`<br />`$CONTAINER_REGISTRY_URI` | Container registry url to login to. | `string` | `false` | <code>"docker.io"</code> |
+| `$BUILDAH_LOGIN_REGISTRY_URI`<br />`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `false` | <code>"docker.io"</code> |
 | `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br />`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` | `false` | <code></code> |
 | `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br />`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` | `false` | <code></code> |

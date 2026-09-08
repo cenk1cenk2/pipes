@@ -19,7 +19,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("BUILDAH_LOGIN_REGISTRY_URI"),
 			cli.EnvVar("CONTAINER_REGISTRY_URI"),
 		),
-		Usage:       "Container registry url to login to.",
+		Usage:       "Container registry URL to login to.",
 		Required:    false,
 		Value:       "docker.io",
 		Destination: &P.Uri,

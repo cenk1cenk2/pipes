@@ -8,11 +8,11 @@ import (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name:  "default.flag",
-		Usage: "Some default flag.",
+		Name: "default.flag",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("PIPE_DEFAULT_FLAG"),
 		),
+		Usage:       "Some default flag.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Flag,

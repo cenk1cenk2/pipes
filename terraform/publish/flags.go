@@ -11,7 +11,7 @@ import (
 const (
 	CATEGORY_MODULE          = "Module"
 	CATEGORY_REGISTRY        = "Registry"
-	CATEGORY_REGISTRY_GITLAB = "Registry - Gitlab"
+	CATEGORY_REGISTRY_GITLAB = "Registry - GitLab"
 )
 
 var Flags = CombineFlags(
@@ -84,7 +84,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_API_URL"),
 				cli.EnvVar("CI_API_V4_URL"),
 			),
-			Usage:       "Gitlab API URL for publish call.",
+			Usage:       "GitLab API URL for the publish call.",
 			Required:    false,
 			Destination: &P.Registry.Gitlab.ApiUrl,
 		},
@@ -96,7 +96,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_PROJECT_ID"),
 				cli.EnvVar("CI_PROJECT_ID"),
 			),
-			Usage:       "Gitlab project id for publish call.",
+			Usage:       "GitLab project id for the publish call.",
 			Required:    false,
 			Destination: &P.Registry.Gitlab.ProjectId,
 		},
@@ -104,11 +104,11 @@ var Flags = CombineFlags(
 		&cli.StringFlag{
 			Category: CATEGORY_REGISTRY_GITLAB,
 			Name:     "terraform.publish.registry.gitlab.token",
-			Usage:    "Gitlab API token for publish call.",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("TERRAFORM_PUBLISH_REGISTRY_GITLAB_TOKEN"),
 				cli.EnvVar("CI_JOB_TOKEN"),
 			),
+			Usage:       "GitLab API token for the publish call.",
 			Required:    false,
 			Destination: &P.Registry.Gitlab.Token,
 		},

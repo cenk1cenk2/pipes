@@ -18,7 +18,7 @@ func NewFlags(opts Options) []cli.Flag {
 			Category:    CATEGORY_PACKAGE_MANAGER,
 			Name:        "node.package-manager",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("NODE_PACKAGE_MANAGER")),
-			Usage:       `Preferred Package manager for nodejs. format(enum("npm", "yarn", "pnpm"))`,
+			Usage:       `Preferred package manager for nodejs. format(enum("npm", "yarn", "pnpm"))`,
 			Required:    false,
 			Value:       DEFAULT_PACKAGE_MANAGER,
 			Destination: &opts.Destination.PackageManager,

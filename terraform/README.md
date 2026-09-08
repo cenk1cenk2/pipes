@@ -60,15 +60,15 @@ Install terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TERRAFORM_STATE_TYPE`<br />`$TF_STATE_TYPE` | Terraform state type. | `string`<br/>`format(enum("gitlab-http"))` | `false` | <code></code> |
 | `$TERRAFORM_STATE_NAME`<br />`$TF_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
-| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min, in seconds | `string` | `false` | <code>"5"</code> |
+| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Fail when no Terraform state type is configured. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | HTTP address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | HTTP lock address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | HTTP lock method for the GitLab HTTP state backend. | `string` | `false` | <code>"POST"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | HTTP unlock address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | HTTP unlock method for the GitLab HTTP state backend. | `string` | `false` | <code>"DELETE"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | HTTP username for the GitLab HTTP state backend. | `string` | `false` | <code>"gitlab-ci-token"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | HTTP password for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | Minimum time to wait between HTTP retries for the GitLab HTTP state backend, in seconds. | `string` | `false` | <code>"5"</code> |
 
 ### `pipe-terraform lint`
 
@@ -116,7 +116,7 @@ Plan terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TERRAFORM_LOG_LEVEL`<br />`$TF_LOG_LEVEL`<br />`$TF_LOG` | Terraform log level. | `string`<br/>`format(enum("trace", "debug", "info", "warn", "error"))` | `false` | <code></code> |
 
-**Gitlab Merge Request Report**
+**GitLab Merge Request Report**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -127,7 +127,7 @@ Plan terraform project.
 | `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `false` | <code>0</code> |
 | `$GITLAB_MR_REPORT_IDENTIFIER` | Hidden marker identifier for merge request report notes. Defaults to the job name combined with the stack or state under report. | `string` | `false` | <code></code> |
 
-**Gitlab Pipeline**
+**GitLab Pipeline**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
@@ -175,15 +175,15 @@ Plan terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TERRAFORM_STATE_TYPE`<br />`$TF_STATE_TYPE` | Terraform state type. | `string`<br/>`format(enum("gitlab-http"))` | `false` | <code></code> |
 | `$TERRAFORM_STATE_NAME`<br />`$TF_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
-| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min, in seconds | `string` | `false` | <code>"5"</code> |
+| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Fail when no Terraform state type is configured. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | HTTP address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | HTTP lock address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | HTTP lock method for the GitLab HTTP state backend. | `string` | `false` | <code>"POST"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | HTTP unlock address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | HTTP unlock method for the GitLab HTTP state backend. | `string` | `false` | <code>"DELETE"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | HTTP username for the GitLab HTTP state backend. | `string` | `false` | <code>"gitlab-ci-token"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | HTTP password for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | Minimum time to wait between HTTP retries for the GitLab HTTP state backend, in seconds. | `string` | `false` | <code>"5"</code> |
 
 ### `pipe-terraform apply`
 
@@ -229,15 +229,15 @@ Apply terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TERRAFORM_STATE_TYPE`<br />`$TF_STATE_TYPE` | Terraform state type. | `string`<br/>`format(enum("gitlab-http"))` | `false` | <code></code> |
 | `$TERRAFORM_STATE_NAME`<br />`$TF_STATE_NAME` | Terraform state name. | `string` | `false` | <code>"default"</code> |
-| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Terraform state strict. | `bool` | `false` | <code>false</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | State configuration for terraform: http-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | State configuration for terraform: http-lock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | State configuration for terraform: http-lock-method | `string` | `false` | <code>"POST"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | State configuration for terraform: http-unlock-address | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | State configuration for terraform: http-unlock-method | `string` | `false` | <code>"DELETE"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | State configuration for terraform: http-username | `string` | `false` | <code>"gitlab-ci-token"</code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | State configuration for terraform: http-password | `string` | `false` | <code></code> |
-| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | State configuration for terraform: http-retry-wait-min, in seconds | `string` | `false` | <code>"5"</code> |
+| `$TERRAFORM_STATE_STRICT`<br />`$TF_STATE_STRICT` | Fail when no Terraform state type is configured. | `bool` | `false` | <code>false</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_ADDRESS`<br />`$TF_HTTP_ADDRESS`<br />`$TF_ADDRESS` | HTTP address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_ADDRESS`<br />`$TF_HTTP_LOCK_ADDRESS` | HTTP lock address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_LOCK_METHOD`<br />`$TF_HTTP_LOCK_METHOD` | HTTP lock method for the GitLab HTTP state backend. | `string` | `false` | <code>"POST"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_ADDRESS`<br />`$TF_HTTP_UNLOCK_ADDRESS` | HTTP unlock address for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_UNLOCK_METHOD`<br />`$TF_HTTP_UNLOCK_METHOD` | HTTP unlock method for the GitLab HTTP state backend. | `string` | `false` | <code>"DELETE"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_USERNAME`<br />`$TF_HTTP_USERNAME`<br />`$TF_USERNAME` | HTTP username for the GitLab HTTP state backend. | `string` | `false` | <code>"gitlab-ci-token"</code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_PASSWORD`<br />`$TF_HTTP_PASSWORD`<br />`$TF_PASSWORD`<br />`$CI_JOB_TOKEN` | HTTP password for the GitLab HTTP state backend. | `string` | `false` | <code></code> |
+| `$TERRAFORM_STATE_GITLAB_HTTP_HTTP_RETRY_WAIT_MIN`<br />`$TF_HTTP_RETRY_WAIT_MIN` | Minimum time to wait between HTTP retries for the GitLab HTTP state backend, in seconds. | `string` | `false` | <code>"5"</code> |
 
 ### `pipe-terraform publish`
 
@@ -259,13 +259,13 @@ Publish terraform project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$TERRAFORM_PUBLISH_REGISTRY_NAME`<br />`$TF_MODULE_REGISTRY` | Registry of the module that will be published. | `string`<br/>`format(enum("gitlab"))` | `false` | <code>"gitlab"</code> |
 
-**Registry - Gitlab**
+**Registry - GitLab**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_API_URL`<br />`$CI_API_V4_URL` | Gitlab API URL for publish call. | `string` | `false` | <code></code> |
-| `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_PROJECT_ID`<br />`$CI_PROJECT_ID` | Gitlab project id for publish call. | `string` | `false` | <code></code> |
-| `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_TOKEN`<br />`$CI_JOB_TOKEN` | Gitlab API token for publish call. | `string` | `false` | <code></code> |
+| `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_API_URL`<br />`$CI_API_V4_URL` | GitLab API URL for the publish call. | `string` | `false` | <code></code> |
+| `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_PROJECT_ID`<br />`$CI_PROJECT_ID` | GitLab project id for the publish call. | `string` | `false` | <code></code> |
+| `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_TOKEN`<br />`$CI_JOB_TOKEN` | GitLab API token for the publish call. | `string` | `false` | <code></code> |
 
 **Tags File**
 

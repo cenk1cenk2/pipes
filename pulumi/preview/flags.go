@@ -33,7 +33,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("PULUMI_PREVIEW_SUMMARY_OUTPUT"),
 				cli.EnvVar("PULUMI_SUMMARY_OUTPUT"),
 			),
-			Usage:       "Output file for Pulumi preview summary. Leave empty to skip summary generation.",
+			Usage:       "Output file for pulumi preview summary. Leave empty to skip summary generation.",
 			Required:    false,
 			Value:       "pulumi-summary.json",
 			Destination: &P.Summary.Output,

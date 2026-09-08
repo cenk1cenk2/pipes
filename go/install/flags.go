@@ -29,7 +29,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_INSTALL_ARGS"),
 		),
-		Usage:       "Arguments to append to install command.",
+		Usage:       "Arguments to append to the install command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,

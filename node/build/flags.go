@@ -22,7 +22,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_SCRIPT"),
 		),
-		Usage:       fmt.Sprintf("package.json script for building operation. %s", environment.HELP_FORMAT_TEMPLATE),
+		Usage:       fmt.Sprintf("package.json script for the build operation. %s", environment.HELP_FORMAT_TEMPLATE),
 		Required:    false,
 		Value:       "build",
 		Destination: &P.Build.Script,
@@ -34,7 +34,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_SCRIPT_ARGS"),
 		),
-		Usage:       fmt.Sprintf("package.json script arguments for building operation. %s", environment.HELP_FORMAT_TEMPLATE),
+		Usage:       fmt.Sprintf("package.json script arguments for the build operation. %s", environment.HELP_FORMAT_TEMPLATE),
 		Required:    false,
 		Value:       "",
 		Destination: &P.Build.ScriptArgs,
@@ -46,7 +46,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_CWD"),
 		),
-		Usage:       "Working directory for build operation.",
+		Usage:       "Working directory for the build operation.",
 		Required:    false,
 		Value:       ".",
 		Destination: &P.Build.Cwd,

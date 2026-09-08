@@ -4,8 +4,10 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+//revive:disable:line-length-limit
+
 const (
-	CATEGORY_GITLAB_MERGE_REQUEST_REPORT = "Gitlab Merge Request Report"
+	CATEGORY_GITLAB_MERGE_REQUEST_REPORT = "GitLab Merge Request Report"
 )
 
 // Options is what the merge request report flags are built onto.

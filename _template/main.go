@@ -18,7 +18,6 @@ func main() {
 			Usage:       DESCRIPTION,
 			Description: DESCRIPTION,
 			Flags:       CombineFlags(pipe.Flags),
-			// a stage reads the parsed flag values as it constructs, so the task lists are built in here.
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(
 					pipe.New(p),

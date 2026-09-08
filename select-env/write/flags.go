@@ -17,7 +17,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("ENVIRONMENT_FILE"),
 		),
-		Usage:       "File for writing the environment variables for selected environment.",
+		Usage:       "File for writing the environment variables of the selected environment.",
 		Required:    true,
 		Value:       "env.environment",
 		Destination: &P.Environment.File,

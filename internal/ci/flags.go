@@ -8,7 +8,7 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_CI = "Gitlab Pipeline"
+	CATEGORY_CI = "GitLab Pipeline"
 )
 
 // Options is what the CI flags are built onto.

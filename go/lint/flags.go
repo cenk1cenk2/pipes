@@ -19,7 +19,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_LINT_ARGS"),
 		),
-		Usage:       "Arguments to append to lint command.",
+		Usage:       "Arguments to append to the lint command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,

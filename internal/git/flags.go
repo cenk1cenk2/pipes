@@ -4,6 +4,8 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+//revive:disable:line-length-limit
+
 const (
 	CATEGORY_GIT = "GIT"
 )

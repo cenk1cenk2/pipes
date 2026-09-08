@@ -31,7 +31,7 @@ Install Helm chart dependencies.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$HELM_LOGIN_REGISTRY_URI`<br />`$HELM_REGISTRY_URI` | Helm registry url to login to. | `string` | `false` | <code>"docker.io"</code> |
+| `$HELM_LOGIN_REGISTRY_URI`<br />`$HELM_REGISTRY_URI` | Helm registry URL to login to. | `string` | `false` | <code>"docker.io"</code> |
 | `$HELM_LOGIN_REGISTRY_USERNAME`<br />`$HELM_REGISTRY_USERNAME` | Helm registry username for the given registry. | `string` | `false` | <code></code> |
 | `$HELM_LOGIN_REGISTRY_PASSWORD`<br />`$HELM_REGISTRY_PASSWORD` | Helm registry password for the given registry. | `string` | `false` | <code></code> |
 
@@ -52,7 +52,7 @@ Lint Helm chart templates.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$HELM_LINT_KUBERNETES_VERSION`<br />`$KUBERNETES_VERSION` | Kubernetes version to use for linting charts. | `string` | `false` | <code></code> |
-| `$HELM_LINT_SHOULD_TEMPLATE` | If set to true, the lint command will also template the chart. | `bool` | `false` | <code>true</code> |
+| `$HELM_LINT_SHOULD_TEMPLATE` | Template the chart while linting. | `bool` | `false` | <code>true</code> |
 
 ### `pipe-helm publish`
 
@@ -81,7 +81,7 @@ Publish Helm chart templates.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$HELM_LOGIN_REGISTRY_URI`<br />`$HELM_REGISTRY_URI` | Helm registry url to login to. | `string` | `false` | <code>"docker.io"</code> |
+| `$HELM_LOGIN_REGISTRY_URI`<br />`$HELM_REGISTRY_URI` | Helm registry URL to login to. | `string` | `false` | <code>"docker.io"</code> |
 | `$HELM_LOGIN_REGISTRY_USERNAME`<br />`$HELM_REGISTRY_USERNAME` | Helm registry username for the given registry. | `string` | `false` | <code></code> |
 | `$HELM_LOGIN_REGISTRY_PASSWORD`<br />`$HELM_REGISTRY_PASSWORD` | Helm registry password for the given registry. | `string` | `false` | <code></code> |
 

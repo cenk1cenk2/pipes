@@ -7,7 +7,7 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_PULUMI = "pulumi"
+	CATEGORY_PULUMI = "Pulumi"
 )
 
 var Flags = []cli.Flag{

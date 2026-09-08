@@ -48,7 +48,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("SEMANTIC_RELEASE_CI_COMMIT_REFERENCE"),
 			cli.EnvVar("CI_COMMIT_REF_NAME"),
 		),
-		Usage:       "Current commit reference that can be branch or tag name of the project.",
+		Usage:       "Current commit reference, either the branch or the tag name of the project.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.CI.CommitReference,

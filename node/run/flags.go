@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("NODE_COMMAND_SCRIPT"),
 		),
 		Usage: fmt.Sprintf(
-			"package.json script for given command operation. %s",
+			"package.json script for the given command operation. %s",
 			environment.HELP_FORMAT_TEMPLATE,
 		),
 		Required:    false,

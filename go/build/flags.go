@@ -18,7 +18,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_ARGS"),
 		),
-		Usage:       "Arguments to append to build command.",
+		Usage:       "Arguments to append to the build command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,

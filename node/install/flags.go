@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_INSTALL_CWD"),
 		),
-		Usage:       "Install CWD for the package manager.",
+		Usage:       "Working directory for the install operation.",
 		Required:    false,
 		Value:       ".",
 		Destination: &P.Install.Cwd,
@@ -44,7 +44,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_INSTALL_ARGS"),
 		),
-		Usage:       "Arguments to append to install command.",
+		Usage:       "Arguments to append to the install command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Install.Args,

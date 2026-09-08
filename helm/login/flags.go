@@ -19,7 +19,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("HELM_LOGIN_REGISTRY_URI"),
 			cli.EnvVar("HELM_REGISTRY_URI"),
 		),
-		Usage:       "Helm registry url to login to.",
+		Usage:       "Helm registry URL to login to.",
 		Required:    false,
 		Value:       "docker.io",
 		Destination: &P.Uri,

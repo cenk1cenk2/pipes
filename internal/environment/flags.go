@@ -71,7 +71,7 @@ format(json([]struct{ match: RegExp, environment: string }))
 			Category:    CATEGORY_ENVIRONMENT,
 			Name:        "environment.strict",
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_STRICT")),
-			Usage:       "Fail on no environment selected.",
+			Usage:       "Fail when no environment is selected.",
 			Required:    false,
 			Value:       true,
 			Destination: &opts.Destination.Strict,

@@ -20,7 +20,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("DOCKER_HUB_USERNAME"),
 			cli.EnvVar("DOCKER_USERNAME"),
 		),
-		Usage:       "DockerHub username for updating the readme.",
+		Usage:       "DockerHub username for updating the README.",
 		Required:    true,
 		Destination: &P.DockerHub.Username,
 	},
@@ -32,7 +32,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("DOCKER_HUB_PASSWORD"),
 			cli.EnvVar("DOCKER_PASSWORD"),
 		),
-		Usage:       "DockerHub password for updating the readme.",
+		Usage:       "DockerHub password for updating the README.",
 		Required:    true,
 		Destination: &P.DockerHub.Password,
 	},
@@ -43,7 +43,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_ADDRESS"),
 		),
-		Usage:       "HTTP address for the DockerHub compatible service.",
+		Usage:       "HTTP address for the DockerHub-compatible service.",
 		Value:       "https://hub.docker.com/v2/repositories",
 		Destination: &P.DockerHub.Address,
 	},
@@ -57,7 +57,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("CONTAINER_IMAGE_NAME"),
 			cli.EnvVar("README_REPOSITORY"),
 		),
-		Usage:       "Repository for applying the readme on.",
+		Usage:       "Repository to apply the README to.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Readme.Repository,
@@ -70,10 +70,10 @@ var Flags = []cli.Flag{
 			cli.EnvVar("DOCKER_HUB_README_FILE"),
 			cli.EnvVar("README_FILE"),
 		),
-		Usage:       "Readme file for the given repository.",
+		Usage:       "README file for the given repository.",
+		Required:    false,
 		Value:       "README.md",
 		Destination: &P.Readme.File,
-		Required:    false,
 	},
 
 	&cli.StringFlag{
@@ -84,8 +84,8 @@ var Flags = []cli.Flag{
 			cli.EnvVar("README_SHORT_DESCRIPTION"),
 		),
 		Usage:       "Short description to display on DockerHub.",
-		Destination: &P.Readme.Description,
 		Required:    false,
+		Destination: &P.Readme.Description,
 	},
 
 	flags.JSONFlag(&P.Readme.Matrix, &cli.StringFlag{

@@ -25,7 +25,7 @@ var Flags = []cli.Flag{
 		Category:    CATEGORY_SETUP,
 		Name:        "go.cache",
 		Sources:     cli.NewValueSourceChain(cli.EnvVar("GO_CACHE")),
-		Usage:       "Enable go cache.",
+		Usage:       "Cache directory for go commands. Leave empty to use the environment defaults.",
 		Required:    false,
 		Value:       "./.go/",
 		Destination: &P.Cache,
