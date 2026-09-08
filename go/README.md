@@ -74,7 +74,6 @@ Run golangci-lint on the project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_LINT_ARGS` | Arguments to append to lint command. | `string` | `false` | <code></code> |
 | `$GO_LINT_TIMEOUT` | Timeout for the lint command. | `duration` | `false` | <code>5m0s</code> |
-| `$GO_LINT_CACHE` | Path to cache lint results. | `string` | `false` | <code>"./.golangci-lint"</code> |
 
 **Setup**
 

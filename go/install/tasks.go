@@ -7,24 +7,65 @@ import (
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
+// Only one of the vendor tasks fires, since the gates below are the two halves
+// of the workspace condition the setup resolved.
 func vendor(tl *TaskList) *Task {
 	return tl.CreateTask("vendor").
+		SetJobWrapper(func(_ Job, t *Task) Job {
+			return JobParallel(
+				vendorModule(tl).Job(),
+				vendorWorkspace(tl).Job(),
+			)
+		})
+}
+
+func vendorModule(tl *TaskList) *Task {
+	return tl.CreateTask("vendor", "module").
+		ShouldDisable(func(_ *Task) bool {
+			return setup.C.Workspace
+		}).
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"go",
+				"mod",
+				"vendor",
 			).
 				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				SetDir(setup.C.Cwd).
 				Set(func(c *Command) error {
-					if setup.C.Workspace {
-						c.AppendArgs("work", "vendor")
+					t.Log.Infof("Vendoring: in %s", setup.C.Cwd)
 
-						t.Log.Infof("Vendoring workspace: in %s", setup.C.Cwd)
-					} else {
-						c.AppendArgs("mod", "vendor")
-
-						t.Log.Infof("Vendoring: in %s", setup.C.Cwd)
+					if P.Args != "" {
+						c.AppendArgs(strings.Split(P.Args, " ")...)
 					}
+
+					return nil
+				}).
+				AppendEnvironment(setup.C.Env).
+				AddSelfToTheTask()
+
+			return nil
+		}).
+		ShouldRunAfter(func(t *Task) error {
+			return t.RunCommandJobAsJobSequence()
+		})
+}
+
+func vendorWorkspace(tl *TaskList) *Task {
+	return tl.CreateTask("vendor", "workspace").
+		ShouldDisable(func(_ *Task) bool {
+			return !setup.C.Workspace
+		}).
+		Set(func(t *Task) error {
+			t.CreateCommand(
+				"go",
+				"work",
+				"vendor",
+			).
+				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+				SetDir(setup.C.Cwd).
+				Set(func(c *Command) error {
+					t.Log.Infof("Vendoring workspace: in %s", setup.C.Cwd)
 
 					if P.Args != "" {
 						c.AppendArgs(strings.Split(P.Args, " ")...)

@@ -10,7 +10,6 @@ type (
 	Pipe struct {
 		Args    string
 		Timeout time.Duration
-		Cache   string
 	}
 )
 

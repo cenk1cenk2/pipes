@@ -14,16 +14,25 @@ import (
 )
 
 var _ = Describe("Go lint", func() {
-	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
-	run := func(runner *tests.TestingCommandRunner, modules ...string) error {
+	seed := func(pipe Pipe, workspace bool, modules ...string) {
 		GinkgoHelper()
 
-		*P = Pipe{Timeout: 5 * time.Minute}
+		pipe.Timeout = 5 * time.Minute
+
+		*P = pipe
 		*setup.C = setup.Ctx{
-			Cwd:     "projects/api",
-			Env:     map[string]string{"GOPATH": "/cache"},
-			Modules: modules,
+			Cwd:       "projects/api",
+			Env:       map[string]string{"GOPATH": "/cache"},
+			Workspace: workspace,
+			Modules:   modules,
 		}
+	}
+
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
+	run := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool, modules ...string) error {
+		GinkgoHelper()
+
+		seed(pipe, workspace, modules...)
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
@@ -42,10 +51,23 @@ var _ = Describe("Go lint", func() {
 		}).Run()
 	}
 
+	disabled := func(workspace bool, task func(*TaskList) *Task) bool {
+		GinkgoHelper()
+
+		seed(Pipe{}, workspace)
+
+		tl := &TaskList{}
+		tl.New(NewPlumber(func(_ *Plumber) *cli.Command {
+			return &cli.Command{Name: "test"}
+		}))
+
+		return task(tl).IsDisabled()
+	}
+
 	It("lints the working directory when the setup resolved no workspace", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner)).To(Succeed())
+		Expect(run(runner, Pipe{}, false)).To(Succeed())
 
 		Expect(runner.InvocationNames()).To(Equal([]string{"golangci-lint"}))
 
@@ -62,7 +84,7 @@ var _ = Describe("Go lint", func() {
 	It("lints every module of the workspace from inside it", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, "/repository/_template", "/repository/api")).To(Succeed())
+		Expect(run(runner, Pipe{}, true, "/repository/_template", "/repository/api")).To(Succeed())
 
 		invocations := runner.Invocations()
 		Expect(invocations).To(HaveLen(2))
@@ -77,10 +99,44 @@ var _ = Describe("Go lint", func() {
 	It("carries the resolved environment into every module", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, "/repository/api", "/repository/worker")).To(Succeed())
+		Expect(run(runner, Pipe{}, true, "/repository/api", "/repository/worker")).To(Succeed())
 
 		for _, invocation := range runner.Invocations() {
 			Expect(invocation.Env).To(ContainElement("GOPATH=/cache"))
 		}
 	})
+
+	It("appends the arguments to the single module lint", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, Pipe{Args: "--fix"}, false)).To(Succeed())
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).To(Equal([]string{"run", "-v", "--timeout", "5m0s", "--fix"}))
+	})
+
+	// the paths stay last, so the arguments the pipeline appends can not detach
+	// the "./..." pattern from the command.
+	It("appends the arguments before the paths of every module", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, Pipe{Args: "--fix"}, true, "/repository/api")).To(Succeed())
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).To(Equal([]string{"run", "-v", "--timeout", "5m0s", "--fix", "./..."}))
+	})
+
+	// the two lint tasks are the halves of the workspace condition, so exactly one
+	// of them runs under the parent whichever way the setup resolved.
+	DescribeTable(
+		"lints through exactly one of the two tasks",
+		func(workspace bool, module, workspaceDisabled bool) {
+			Expect(disabled(workspace, lintModule)).To(Equal(module))
+			Expect(disabled(workspace, lintWorkspace)).To(Equal(workspaceDisabled))
+		},
+		Entry("no workspace", false, false, true),
+		Entry("workspace", true, true, false),
+	)
 })

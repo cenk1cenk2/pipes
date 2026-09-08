@@ -12,8 +12,7 @@ import (
 )
 
 var _ = Describe("Go install", func() {
-	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
-	run := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool) error {
+	seed := func(pipe Pipe, workspace bool) {
 		GinkgoHelper()
 
 		*P = pipe
@@ -22,6 +21,13 @@ var _ = Describe("Go install", func() {
 			Env:       map[string]string{"GOPATH": "/cache"},
 			Workspace: workspace,
 		}
+	}
+
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
+	run := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool) error {
+		GinkgoHelper()
+
+		seed(pipe, workspace)
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
@@ -41,6 +47,19 @@ var _ = Describe("Go install", func() {
 				},
 			},
 		}).Run()
+	}
+
+	disabled := func(workspace bool, task func(*TaskList) *Task) bool {
+		GinkgoHelper()
+
+		seed(Pipe{}, workspace)
+
+		tl := &TaskList{}
+		tl.New(NewPlumber(func(_ *Plumber) *cli.Command {
+			return &cli.Command{Name: "test"}
+		}))
+
+		return task(tl).IsDisabled()
 	}
 
 	It("vendors the single module in the working directory", func() {
@@ -74,7 +93,27 @@ var _ = Describe("Go install", func() {
 		invocations := runner.Invocations()
 		Expect(invocations).NotTo(BeEmpty())
 		Expect(invocations[0].Args).To(Equal([]string{"work", "vendor", "-e"}))
+
+		single := fixtures.Runner()
+
+		Expect(run(single, Pipe{Args: "-e"}, false)).To(Succeed())
+
+		invocations = single.Invocations()
+		Expect(invocations).NotTo(BeEmpty())
+		Expect(invocations[0].Args).To(Equal([]string{"mod", "vendor", "-e"}))
 	})
+
+	// the two vendor tasks are the halves of the workspace condition, so exactly
+	// one of them runs under the parent whichever way the setup resolved.
+	DescribeTable(
+		"vendors through exactly one of the two tasks",
+		func(workspace bool, module, workspaceDisabled bool) {
+			Expect(disabled(workspace, vendorModule)).To(Equal(module))
+			Expect(disabled(workspace, vendorWorkspace)).To(Equal(workspaceDisabled))
+		},
+		Entry("no workspace", false, false, true),
+		Entry("workspace", true, true, false),
+	)
 
 	It("verifies the modules unless the pipeline turned it off", func() {
 		runner := fixtures.Runner()
