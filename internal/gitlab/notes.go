@@ -9,7 +9,7 @@ import (
 // The three note calls the report upsert makes, narrowed from the client so the
 // bookkeeping can be driven without a GitLab to talk to. Signatures mirror
 // clientgitlab.NotesService exactly.
-type Notes interface {
+type NotesAdapter interface {
 	ListMergeRequestNotes(
 		pid any,
 		mergeRequest int64,
@@ -30,13 +30,13 @@ type Notes interface {
 	) (*clientgitlab.Note, *clientgitlab.Response, error)
 }
 
-var _ Notes = (*clientgitlab.NotesService)(nil)
+var _ NotesAdapter = (*clientgitlab.NotesService)(nil)
 
 // Dials only when a report is actually going to be written, so a pipe that never
 // reaches the report task never needs a token that parses.
-type NotesFactory func(config MergeRequestReportConfig) (Notes, error)
+type NotesFactory func(config MergeRequestReportConfig) (NotesAdapter, error)
 
-func NewNotes(config MergeRequestReportConfig) (Notes, error) {
+func NewNotes(config MergeRequestReportConfig) (NotesAdapter, error) {
 	client, err := clientgitlab.NewClient(
 		config.Token,
 		clientgitlab.WithBaseURL(config.ApiUrl),

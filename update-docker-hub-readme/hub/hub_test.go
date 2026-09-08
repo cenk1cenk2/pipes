@@ -72,7 +72,7 @@ var _ = Describe("UpdateReadme", func() {
 		request *http.Request
 		body    string
 		answer  func(w http.ResponseWriter)
-		subject Client
+		subject ClientAdapter
 	)
 
 	BeforeEach(func() {

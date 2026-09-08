@@ -26,7 +26,7 @@ var _ = Describe("Merge request report upsert", func() {
 	)
 
 	var (
-		notes       *mockgitlab.MockNotes
+		notes       *mockgitlab.MockNotesAdapter
 		listedPages []int64
 		createdBody string
 		updatedNote int64
@@ -34,7 +34,7 @@ var _ = Describe("Merge request report upsert", func() {
 	)
 
 	BeforeEach(func() {
-		notes = mockgitlab.NewMockNotes(GinkgoT())
+		notes = mockgitlab.NewMockNotesAdapter(GinkgoT())
 		listedPages = nil
 		createdBody = ""
 		updatedNote = 0

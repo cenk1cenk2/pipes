@@ -33,14 +33,10 @@ type (
 		StatusCode      int
 	}
 
-	Client interface {
+	ClientAdapter interface {
 		Login(ctx context.Context, username, password string) (string, error)
 		UpdateReadme(ctx context.Context, token, repository string, readme Readme) (Result, error)
 	}
-
-	// ClientFactory dials the service only once the flags carrying its address
-	// have been parsed.
-	ClientFactory func(address, userAgent string) Client
 )
 
 type (
@@ -72,9 +68,9 @@ type client struct {
 	client       *http.Client
 }
 
-var _ Client = (*client)(nil)
+var _ ClientAdapter = (*client)(nil)
 
-func NewClient(address, userAgent string) Client {
+func NewClient(address, userAgent string) ClientAdapter {
 	return &client{
 		address:      address,
 		loginAddress: LOGIN_ADDRESS,

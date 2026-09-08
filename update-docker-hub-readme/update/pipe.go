@@ -31,7 +31,7 @@ type (
 	Ctx struct {
 		Token  string
 		Readme map[string]ParsedReadme
-		Hub    hub.Client
+		Hub    hub.ClientAdapter
 	}
 )
 

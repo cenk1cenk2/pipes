@@ -10,7 +10,7 @@ import (
 
 // The Terraform module registry, narrowed to the one call the publish pipe makes so
 // the upload can be driven without a GitLab to talk to.
-type ModuleRegistry interface {
+type ModuleRegistryAdapter interface {
 	UploadModule(ctx context.Context, name, system, version string, archive io.Reader) error
 }
 
@@ -21,9 +21,9 @@ type moduleRegistry struct {
 	client    *http.Client
 }
 
-var _ ModuleRegistry = (*moduleRegistry)(nil)
+var _ ModuleRegistryAdapter = (*moduleRegistry)(nil)
 
-func NewModuleRegistry(apiUrl, projectId, token string) ModuleRegistry {
+func NewModuleRegistry(apiUrl, projectId, token string) ModuleRegistryAdapter {
 	return &moduleRegistry{
 		apiUrl:    apiUrl,
 		projectId: projectId,

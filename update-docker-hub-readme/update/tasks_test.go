@@ -19,10 +19,10 @@ import (
 )
 
 var _ = Describe("Docker Hub readme", func() {
-	var client *mockhub.MockClient
+	var client *mockhub.MockClientAdapter
 
 	BeforeEach(func() {
-		client = mockhub.NewMockClient(GinkgoT())
+		client = mockhub.NewMockClientAdapter(GinkgoT())
 
 		*P = Pipe{DockerHub: DockerHub{
 			Username: "user",

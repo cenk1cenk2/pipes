@@ -32,7 +32,7 @@ type (
 	Ctx struct {
 		Tags     []string
 		Packages []PublishablePackage
-		Registry gitlab.ModuleRegistry
+		Registry gitlab.ModuleRegistryAdapter
 	}
 )
 

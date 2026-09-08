@@ -102,7 +102,7 @@ func selectMergeRequestReportNote(notes []*clientgitlab.Note, marker string, leg
 
 func UpsertMergeRequestReport(
 	ctx context.Context,
-	notes Notes,
+	notes NotesAdapter,
 	config MergeRequestReportConfig,
 	body string,
 ) (*MergeRequestReportResult, error) {
