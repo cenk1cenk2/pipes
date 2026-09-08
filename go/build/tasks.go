@@ -17,9 +17,15 @@ func build(tl *TaskList) *Task {
 				P.BuildTargets = append(P.BuildTargets, GoBuildTarget{Os: runtime.GOOS, Arch: runtime.GOARCH})
 			}
 
-			linker, err := linkerFlags()
+			flags := P.LinkerFlags
+
+			for k, v := range P.BuildVariables {
+				flags = fmt.Sprintf("%s -X %s=%s", flags, k, v)
+			}
+
+			linker, err := InlineTemplate[any](strings.TrimSpace(flags), nil)
 			if err != nil {
-				return err
+				return fmt.Errorf("Cannot template linker flags: %s", flags)
 			}
 
 			packages := C.Packages
@@ -34,7 +40,7 @@ func build(tl *TaskList) *Task {
 						target.Os = runtime.GOOS
 					}
 					if target.Arch == "" {
-						target.Os = runtime.GOARCH
+						target.Arch = runtime.GOARCH
 					}
 
 					output, err := InlineTemplate(P.BinaryTemplate, map[string]string{
@@ -160,19 +166,4 @@ func packages(tl *TaskList) *Task {
 
 			return nil
 		})
-}
-
-func linkerFlags() (string, error) {
-	flags := P.LinkerFlags
-
-	for k, v := range P.BuildVariables {
-		flags = fmt.Sprintf("%s -X %s=%s", flags, k, v)
-	}
-
-	linker, err := InlineTemplate[any](strings.TrimSpace(flags), nil)
-	if err != nil {
-		return "", fmt.Errorf("Cannot template linker flags: %s", flags)
-	}
-
-	return linker, nil
 }

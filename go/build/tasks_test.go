@@ -2,6 +2,7 @@ package build
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
@@ -140,6 +141,22 @@ var _ = Describe("Go build", func() {
 		}
 
 		Expect(outputs).To(ConsistOf("dist/bin-linux-amd64", "dist/bin-darwin-arm64"))
+	})
+
+	// a target that only pins the operating system leaves the architecture to the
+	// one the pipeline runs on, so cross compiling a single os stays a one liner.
+	It("defaults the architecture of a target that only names an operating system", func() {
+		runner := fixtures.Runner()
+
+		p := pipe()
+		p.BuildTargets = []GoBuildTarget{{Os: "windows"}}
+
+		Expect(run(runner, p)).To(Succeed())
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).
+			To(ContainElement(fmt.Sprintf("dist/bin-windows-%s", runtime.GOARCH)))
 	})
 
 	It("turns the build variables into linker flags", func() {
