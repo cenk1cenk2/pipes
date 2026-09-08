@@ -3,8 +3,10 @@ package git_test
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("References", func() {
@@ -13,7 +15,7 @@ var _ = Describe("References", func() {
 			To(Equal([]string{"tags/v1.0.0", "heads/main"}))
 	})
 
-	// A tagged pipeline carries the branch it was tagged on as well, so the order
+	// a tagged pipeline carries the branch it was tagged on as well, so the order
 	// is what decides that a release matches the tag rule and not the branch rule.
 	It("puts the tag ahead of the branch", func() {
 		Expect(git.Refs{Branch: "main", Tag: "v1.0.0"}.References()[0]).To(Equal("tags/v1.0.0"))
@@ -38,7 +40,7 @@ var _ = Describe("MatchAny", func() {
 		Expect(matched).To(Equal(0))
 	})
 
-	// The pattern order is the user's rule order, so an earlier rule wins even when
+	// the pattern order is the user's rule order, so an earlier rule wins even when
 	// a later one matches a reference that sorts first.
 	It("ranks the patterns above the references", func() {
 		matched, err := git.MatchAny([]string{`^heads/main$`, `^tags/v1\.0\.0$`}, references)
@@ -68,7 +70,7 @@ var _ = Describe("MatchAny", func() {
 		Expect(err.Error()).To(ContainSubstring(`^tags/(`))
 	})
 
-	// A bad pattern behind a matching one would otherwise decide whether the pipe
+	// a bad pattern behind a matching one would otherwise decide whether the pipe
 	// fails purely by where the user put it in the list.
 	It("stops at the first match before reaching a broken pattern", func() {
 		matched, err := git.MatchAny([]string{`^tags/`, `^heads/(`}, references)
@@ -82,8 +84,7 @@ var _ = Describe("Flags", func() {
 		refs := git.Refs{}
 		flags := git.NewFlags(git.Options{Destination: &refs})
 
-		Expect(flags).To(HaveLen(2))
-		Expect(flags[0].Names()).To(Equal([]string{"git.branch"}))
-		Expect(flags[1].Names()).To(Equal([]string{"git.tag"}))
+		Expect(fixtures.Flag[*cli.StringFlag](flags, "git.branch").Destination).To(BeIdenticalTo(&refs.Branch))
+		Expect(fixtures.Flag[*cli.StringFlag](flags, "git.tag").Destination).To(BeIdenticalTo(&refs.Tag))
 	})
 })

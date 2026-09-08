@@ -36,7 +36,7 @@ var _ = Describe("Parse", func() {
 		Expect(tags).To(Equal([]string{"one", "two", "three"}))
 	})
 
-	// The file is usually written by a shell redirect, which leaves the newline in.
+	// the file is usually written by a shell redirect, which leaves the newline in.
 	It("strips the line endings the writing job leaves behind", func() {
 		tags, err := tagsfile.Parse(log, write(".tags", "one,\ntwo,\r\nthree\n"), false)
 		Expect(err).NotTo(HaveOccurred())
@@ -49,7 +49,7 @@ var _ = Describe("Parse", func() {
 		Expect(tags).To(Equal([]string{"only"}))
 	})
 
-	// The file is normally produced by an earlier job that may legitimately not have
+	// the file is normally produced by an earlier job that may legitimately not have
 	// run, so its absence is not on its own a reason to fail the pipeline.
 	It("yields nothing and no error when the file is not there", func() {
 		tags, err := tagsfile.Parse(log, filepath.Join(dir, "absent"), false)
@@ -57,7 +57,7 @@ var _ = Describe("Parse", func() {
 		Expect(tags).To(BeNil())
 	})
 
-	// Strict is for the pipes that would otherwise publish something untagged, so
+	// strict is for the pipes that would otherwise publish something untagged, so
 	// there the absence of a configured file is the failure itself.
 	It("fails on an absent file under strict", func() {
 		tags, err := tagsfile.Parse(log, filepath.Join(dir, "absent"), true)
@@ -71,12 +71,31 @@ var _ = Describe("Parse", func() {
 		Expect(tags).To(BeNil())
 	})
 
-	// Strict says the configured file has to be there, and no path is not a
+	// strict says the configured file has to be there, and no path is not a
 	// configured file.
 	It("yields nothing when no path was configured even under strict", func() {
 		tags, err := tagsfile.Parse(log, "", true)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(tags).To(BeNil())
+	})
+
+	// strict only ever guards the absence, so a file that is there parses the same
+	// way whichever mode the pipe asked for.
+	It("parses a present file the same way under strict", func() {
+		tags, err := tagsfile.Parse(log, write(".tags", "one,two"), true)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(tags).To(Equal([]string{"one", "two"}))
+	})
+
+	// a path that stats but does not read is a misconfigured pipeline, not a job
+	// that has not run yet, so it fails whichever mode it was asked for.
+	It("names the file it could not read", func() {
+		for _, strict := range []bool{false, true} {
+			tags, err := tagsfile.Parse(log, dir, strict)
+			Expect(err).To(MatchError(ContainSubstring("Can not read the tags file")))
+			Expect(err).To(MatchError(ContainSubstring(dir)))
+			Expect(tags).To(BeNil())
+		}
 	})
 })
 
@@ -94,7 +113,7 @@ var _ = Describe("Flags", func() {
 		Expect(flags[1].Names()).To(Equal([]string{"tags-file.strict"}))
 	})
 
-	// Pipes that always read the file leniently have no strict flag to document.
+	// pipes that always read the file leniently have no strict flag to document.
 	It("leaves the strict flag out for a nil destination", func() {
 		var path string
 

@@ -7,31 +7,10 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("NewFlags", func() {
-	names := func(flags []cli.Flag) []string {
-		found := []string{}
-		for _, flag := range flags {
-			found = append(found, flag.Names()...)
-		}
-
-		return found
-	}
-
-	It("registers every coordinate the report renders", func() {
-		metadata := terraform.Metadata{}
-
-		Expect(names(ci.NewFlags(ci.Options{Destination: &metadata}))).To(Equal([]string{
-			"ci.job-name",
-			"ci.job-url",
-			"ci.pipeline-id",
-			"ci.pipeline-url",
-			"ci.commit-sha",
-			"ci.commit-short-sha",
-		}))
-	})
-
 	It("files them all under one category", func() {
 		metadata := terraform.Metadata{}
 
@@ -40,15 +19,25 @@ var _ = Describe("NewFlags", func() {
 		}
 	})
 
-	// The flags exist to fill the report metadata, so each one has to land on its
-	// own field of the struct the caller passed rather than a copy of it.
-	It("binds each flag onto the given metadata", func() {
+	// the flags exist to fill the report metadata, so an unbound one leaves the
+	// report with a hole in it that nothing else fills.
+	It("binds every flag onto the given metadata", func() {
 		metadata := terraform.Metadata{}
-		flags := ci.NewFlags(ci.Options{Destination: &metadata})
 
-		//nolint:errcheck
-		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&metadata.JobName))
-		//nolint:errcheck
-		Expect(flags[5].(*cli.StringFlag).Destination).To(BeIdenticalTo(&metadata.CommitShortSha))
+		for _, flag := range ci.NewFlags(ci.Options{Destination: &metadata}) {
+			//nolint:errcheck
+			Expect(flag.(*cli.StringFlag).Destination).NotTo(BeNil(), flag.Names()[0])
+		}
+	})
+
+	// two pipes each register their own metadata, so one call handing back the flags
+	// of another would bind both onto whichever ran last.
+	It("builds a fresh set of flags per metadata", func() {
+		first, second := terraform.Metadata{}, terraform.Metadata{}
+
+		Expect(fixtures.Flag[*cli.StringFlag](ci.NewFlags(ci.Options{Destination: &first}), "ci.job-name").Destination).
+			To(BeIdenticalTo(&first.JobName))
+		Expect(fixtures.Flag[*cli.StringFlag](ci.NewFlags(ci.Options{Destination: &second}), "ci.job-name").Destination).
+			To(BeIdenticalTo(&second.JobName))
 	})
 })

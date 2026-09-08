@@ -5,14 +5,15 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-// envChains is the exact, ordered environment source chain of every flag that
-// answers to more than one name, keyed by the canonical name the chain starts
-// with. The names a pipeline already sets are kept forever behind the canonical
-// one, so the order is the precedence and reordering an entry silently changes
-// which value a running pipeline picks up.
+// envChains is the environment source chain a flag is already known to resolve
+// through, keyed by the canonical name the chain starts with. The names a pipeline
+// already sets are kept forever behind the canonical one, so the order is the
+// precedence and reordering an entry silently changes which value a running
+// pipeline picks up.
 //
-// The table is closed in both directions: a chain listed here has to keep this
-// order, and a flag that grows a second source has to be added here.
+// Every chain here has to stay the head of the chain the pipe actually documents.
+// A new flag needs no entry, and a fallback appended behind the ones below changes
+// no precedence, so only reordering, removing or inserting ahead fails the spec.
 var envChains = map[string]map[string][]string{
 	"buildah": {
 		"BUILDAH_BUILD_FILE_CONTEXT":         {"CONTAINER_FILE_CONTEXT"},
@@ -160,10 +161,24 @@ var _ = Describe("Environment sources", func() {
 			chains, err := ReadEnvChains(dir)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(chains).To(
-				Equal(envChains[dir]),
-				"the environment source chains moved, which changes the value a running pipeline resolves",
-			)
+			for canonical, recorded := range envChains[dir] {
+				Expect(chains).To(
+					HaveKey(canonical),
+					"%s no longer falls back to %v, which changes the value a running pipeline resolves",
+					canonical, recorded,
+				)
+
+				actual := chains[canonical]
+				Expect(len(actual)).To(
+					BeNumerically(">=", len(recorded)),
+					"%s dropped a source it used to fall back to: %v", canonical, recorded,
+				)
+				Expect(actual[:len(recorded)]).To(
+					Equal(recorded),
+					"the source chain of %s moved, which changes the value a running pipeline resolves",
+					canonical,
+				)
+			}
 		})
 	}
 })

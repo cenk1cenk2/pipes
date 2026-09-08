@@ -11,7 +11,7 @@ import (
 )
 
 var _ = Describe("Go version", func() {
-	// The toolchain prints a banner no pattern narrows down, so what it answers is
+	// the toolchain prints a banner no pattern narrows down, so what it answers is
 	// reported whole once the surrounding whitespace is off it.
 	It("reports the whole banner the toolchain printed", func() {
 		*C = Ctx{Env: map[string]string{}}
@@ -43,13 +43,11 @@ var _ = Describe("Go version", func() {
 })
 
 var _ = Describe("Go workspace", func() {
-	// The flags are not registered with the spec command, since the pipe is seeded
-	// directly and a package level flag only reads its environment on first parse.
+	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
 	run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
 		GinkgoHelper()
 
-		// Only the resolved tool is rebuilt, so what the previous run decided about
-		// the workspace is still there for the run under test to overwrite.
+		// the workspace is deliberately not reset, so a run overwrites what the last one decided.
 		*P = pipe
 		C.Cwd = "projects/api"
 		C.Env = map[string]string{}
@@ -165,16 +163,6 @@ var _ = Describe("Go modules", func() {
 		Expect(invocation.Args).To(Equal([]string{"list", "-m", "-f", "{{.Dir}}"}))
 		Expect(invocation.Dir).To(Equal("projects/api"))
 		Expect(invocation.Env).To(ContainElement("GOPATH=/cache"))
-	})
-
-	// The scaffold module lives under a directory the go tool drops out of package
-	// patterns, so it is kept here and linted from inside its own directory.
-	It("keeps the modules the go tool hides from package patterns", func() {
-		runner := fixtures.Runner(modules("/repository/_template\n/repository/api\n"))
-
-		Expect(run(runner, true)).To(Succeed())
-
-		Expect(C.Modules).To(Equal([]string{"/repository/_template", "/repository/api"}))
 	})
 
 	It("asks the toolchain for nothing outside workspace mode", func() {

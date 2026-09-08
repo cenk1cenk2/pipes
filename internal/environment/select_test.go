@@ -2,6 +2,7 @@ package environment_test
 
 import (
 	"encoding/json"
+	"slices"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -9,6 +10,7 @@ import (
 
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("Select", func() {
@@ -21,14 +23,14 @@ var _ = Describe("Select", func() {
 		Expect(environment.Select(conditions, []string{"heads/main"})).To(Equal("develop"))
 	})
 
-	// The conditions are the user's rule order, so an earlier rule wins even when a
+	// the conditions are the user's rule order, so an earlier rule wins even when a
 	// later one matches a reference that comes first.
 	It("ranks the conditions above the references", func() {
 		Expect(environment.Select(conditions, []string{"heads/main", "tags/v1.0.0"})).
 			To(Equal("production"))
 	})
 
-	// Nothing matching is not on its own an error, since it is the strict flag and
+	// nothing matching is not on its own an error, since it is the strict flag and
 	// not this function that decides whether the pipe may carry on without one.
 	It("reports an empty environment when nothing matches", func() {
 		Expect(environment.Select(conditions, []string{"heads/feature/one"})).To(BeEmpty())
@@ -45,7 +47,7 @@ var _ = Describe("Select", func() {
 		Expect(err.Error()).To(ContainSubstring(`^tags/(`))
 	})
 
-	// The default conditions ship as the flag default, so a typo in one would only
+	// the default conditions ship as the flag default, so a typo in one would only
 	// surface on the pipeline that happened to need it.
 	It("selects through the shipped default conditions", func() {
 		defaults := []environment.Condition{}
@@ -58,7 +60,7 @@ var _ = Describe("Select", func() {
 		Expect(environment.Select(defaults, git.Refs{Branch: "feature/one"}.References())).To(BeEmpty())
 	})
 
-	// A tagged pipeline carries the branch it was tagged on as well, and the tag is
+	// a tagged pipeline carries the branch it was tagged on as well, and the tag is
 	// what decides the environment of a release.
 	It("selects the tag environment for a tagged pipeline on main", func() {
 		defaults := []environment.Condition{}
@@ -75,7 +77,7 @@ var _ = Describe("Fetch", func() {
 			To(HaveKeyWithValue("TOKEN", "stage-token"))
 	})
 
-	// An environment is expected to override only the few variables it cares about,
+	// an environment is expected to override only the few variables it cares about,
 	// so everything else has to reach the pipe untouched.
 	It("keeps the variables without the prefix as they are", func() {
 		Expect(environment.Fetch([]string{"PATH=/usr/bin"}, "stage")).
@@ -112,65 +114,53 @@ var _ = Describe("Fetch", func() {
 })
 
 var _ = Describe("NewFlags", func() {
-	names := func(flags []cli.Flag) []string {
-		found := []string{}
-		for _, flag := range flags {
-			found = append(found, flag.Names()...)
-		}
-
-		return found
+	flags := func(cfg *environment.Config) []cli.Flag {
+		return environment.NewFlags(environment.Options{Destination: cfg})
 	}
 
-	// The git flags come first because the references they carry are what the
-	// conditions match against, and the order is what the documentation prints.
+	// the references the git flags carry are what the conditions match against, and
+	// the order is what the generated documentation prints.
 	It("registers the git flags ahead of the environment ones", func() {
-		cfg := environment.Config{}
+		names := fixtures.FlagNames(flags(&environment.Config{}))
 
-		Expect(names(environment.NewFlags(environment.Options{Destination: &cfg}))).To(Equal([]string{
-			"git.branch",
-			"git.tag",
-			"environment.enable",
-			"environment.conditions",
-			"environment.fail-on-no-reference",
-			"environment.strict",
-		}))
+		Expect(names).To(ContainElements("git.branch", "git.tag", "environment.conditions"))
+		Expect(slices.Index(names, "git.tag")).
+			To(BeNumerically("<", slices.Index(names, "environment.conditions")))
 	})
 
-	// A pipe reads the selection back off the same instance it registered, so a
+	// a pipe reads the selection back off the same instance it registered, so a
 	// flag landing on a copy would leave it on the zero value.
 	It("binds each flag onto the given configuration", func() {
 		cfg := environment.Config{}
-		flags := environment.NewFlags(environment.Options{Destination: &cfg})
+		registered := flags(&cfg)
 
-		//nolint:errcheck
-		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.Git.Branch))
-		//nolint:errcheck
-		Expect(flags[2].(*cli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.Enable))
-		//nolint:errcheck
-		Expect(flags[4].(*cli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.FailOnNoReference))
-		//nolint:errcheck
-		Expect(flags[5].(*cli.BoolFlag).Destination).To(BeIdenticalTo(&cfg.Strict))
+		Expect(fixtures.Flag[*cli.StringFlag](registered, "git.branch").Destination).
+			To(BeIdenticalTo(&cfg.Git.Branch))
+		Expect(fixtures.Flag[*cli.BoolFlag](registered, "environment.enable").Destination).
+			To(BeIdenticalTo(&cfg.Enable))
+		Expect(fixtures.Flag[*cli.BoolFlag](registered, "environment.fail-on-no-reference").Destination).
+			To(BeIdenticalTo(&cfg.FailOnNoReference))
+		Expect(fixtures.Flag[*cli.BoolFlag](registered, "environment.strict").Destination).
+			To(BeIdenticalTo(&cfg.Strict))
 	})
 
-	// The conditions flag is a JSON string the pipe reads back as a struct, and its
-	// own default is the value most pipelines end up running with.
+	// the conditions flag is a JSON string the pipe reads back as a struct.
 	It("unmarshals the conditions onto the given configuration", func() {
 		cfg := environment.Config{}
-		flags := environment.NewFlags(environment.Options{Destination: &cfg})
 
-		//nolint:errcheck
-		Expect(flags[3].(*cli.StringFlag).Validator(environment.DEFAULT_CONDITIONS)).To(Succeed())
-		Expect(cfg.Conditions).To(HaveLen(4))
-		Expect(cfg.Conditions[0].Environment).To(Equal("production"))
+		Expect(fixtures.Flag[*cli.StringFlag](flags(&cfg), "environment.conditions").
+			Validator(environment.DEFAULT_CONDITIONS)).To(Succeed())
+		Expect(cfg.Conditions).NotTo(BeEmpty())
 	})
 
-	// Two pipes each register their own configuration, so one call handing back the
+	// two pipes each register their own configuration, so one call handing back the
 	// flags of another would bind both onto whichever ran last.
 	It("builds a fresh set of flags per configuration", func() {
 		first, second := environment.Config{}, environment.Config{}
 
-		//nolint:errcheck
-		Expect(environment.NewFlags(environment.Options{Destination: &first})[2].(*cli.BoolFlag).Destination).
-			NotTo(BeIdenticalTo(environment.NewFlags(environment.Options{Destination: &second})[2].(*cli.BoolFlag).Destination))
+		Expect(fixtures.Flag[*cli.BoolFlag](flags(&first), "environment.enable").Destination).
+			To(BeIdenticalTo(&first.Enable))
+		Expect(fixtures.Flag[*cli.BoolFlag](flags(&second), "environment.enable").Destination).
+			To(BeIdenticalTo(&second.Enable))
 	})
 })

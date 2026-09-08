@@ -7,6 +7,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.43.0
 	github.com/sirupsen/logrus v1.10.2
+	github.com/urfave/cli/v3 v3.11.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 )
 
@@ -25,7 +26,6 @@ require (
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
-	github.com/urfave/cli/v3 v3.11.0 // indirect
 	github.com/workanator/go-floc/v3 v3.0.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.55.0 // indirect

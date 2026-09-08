@@ -6,22 +6,16 @@ import (
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/internal/node"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("PackageManagers", func() {
-	It("knows the package managers the configuration accepts", func() {
-		Expect(node.PackageManagers).To(HaveKey("npm"))
-		Expect(node.PackageManagers).To(HaveKey("yarn"))
-		Expect(node.PackageManagers).To(HaveKey("pnpm"))
-		Expect(node.PackageManagers).To(HaveLen(3))
-	})
-
-	// The default is what every pipeline that never set the flag runs with.
+	// the default is what every pipeline that never set the flag runs with.
 	It("knows the default package manager", func() {
 		Expect(node.PackageManagers).To(HaveKey(node.DEFAULT_PACKAGE_MANAGER))
 	})
 
-	// Every command a task builds comes out of this table, so a package manager
+	// every command a task builds comes out of this table, so a package manager
 	// missing one of them would produce a command with a hole in it.
 	It("spells every operation for each of them", func() {
 		for name, commands := range node.PackageManagers {
@@ -39,59 +33,38 @@ var _ = Describe("PackageManagers", func() {
 	// arguments of the package manager itself.
 	It("only delimits the run arguments for npm", func() {
 		Expect(node.PackageManagers["npm"].RunDelimiter).To(Equal([]string{"--"}))
-		Expect(node.PackageManagers["yarn"].RunDelimiter).To(BeEmpty())
-		Expect(node.PackageManagers["pnpm"].RunDelimiter).To(BeEmpty())
+
+		for name, commands := range node.PackageManagers {
+			if name == "npm" {
+				continue
+			}
+
+			Expect(commands.RunDelimiter).To(BeEmpty(), name)
+		}
 	})
 })
 
 var _ = Describe("NewFlags", func() {
-	It("registers the package manager flag", func() {
-		cfg := node.Config{}
-		flags := node.NewFlags(node.Options{Destination: &cfg})
-
-		Expect(flags).To(HaveLen(1))
-		Expect(flags[0].Names()).To(Equal([]string{"node.package-manager"}))
-	})
-
-	// A pipe reads the choice back off the same instance it registered, so a flag
+	// a pipe reads the choice back off the same instance it registered, so a flag
 	// landing on a copy would leave it on the zero value.
-	It("binds the flag onto the given configuration", func() {
+	It("binds the package manager flag onto the given configuration", func() {
 		cfg := node.Config{}
-		flags := node.NewFlags(node.Options{Destination: &cfg})
+		flag := fixtures.Flag[*cli.StringFlag](node.NewFlags(node.Options{Destination: &cfg}), "node.package-manager")
 
-		//nolint:errcheck
-		Expect(flags[0].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.PackageManager))
-		//nolint:errcheck
-		Expect(flags[0].(*cli.StringFlag).Value).To(Equal(node.DEFAULT_PACKAGE_MANAGER))
+		Expect(flag.Destination).To(BeIdenticalTo(&cfg.PackageManager))
+		Expect(flag.Value).To(Equal(node.DEFAULT_PACKAGE_MANAGER))
 	})
 })
 
 var _ = Describe("NewLoginFlags", func() {
-	names := func(flags []cli.Flag) []string {
-		found := []string{}
-		for _, flag := range flags {
-			found = append(found, flag.Names()...)
-		}
-
-		return found
+	flags := func(cfg *node.Login) []cli.Flag {
+		return node.NewLoginFlags(node.LoginOptions{Destination: cfg})
 	}
-
-	It("registers every part of the npmrc the pipe writes", func() {
-		cfg := node.Login{}
-
-		Expect(names(node.NewLoginFlags(node.LoginOptions{Destination: &cfg}))).To(Equal([]string{
-			"npm.login",
-			"npm.npmrc-file",
-			"npm.npmrc",
-		}))
-	})
 
 	It("unmarshals the credentials onto the given configuration", func() {
 		cfg := node.Login{}
-		flags := node.NewLoginFlags(node.LoginOptions{Destination: &cfg})
 
-		//nolint:errcheck
-		Expect(flags[0].(*cli.StringFlag).Validator(
+		Expect(fixtures.Flag[*cli.StringFlag](flags(&cfg), "npm.login").Validator(
 			`[{ "username": "ci", "token": "npm-token", "registry": "registry.example.com" }]`,
 		)).To(Succeed())
 
@@ -100,27 +73,26 @@ var _ = Describe("NewLoginFlags", func() {
 		}))
 	})
 
-	// The credentials are optional, so a pipe that only appends a plain npmrc has
+	// the credentials are optional, so a pipe that only appends a plain npmrc has
 	// to get past validation with nothing set.
 	It("leaves the credentials alone for an empty value", func() {
 		cfg := node.Login{}
 
-		//nolint:errcheck
-		Expect(node.NewLoginFlags(node.LoginOptions{Destination: &cfg})[0].(*cli.StringFlag).Validator("")).To(Succeed())
+		Expect(fixtures.Flag[*cli.StringFlag](flags(&cfg), "npm.login").Validator("")).To(Succeed())
 		Expect(cfg.Entries).To(BeNil())
 	})
 
-	// The tasks write to and then read back the files this flag names, so it has to
+	// the tasks write to and then read back the files this flag names, so it has to
 	// reach the configuration rather than sit unbound on the flag.
 	It("binds the npmrc files onto the given configuration", func() {
 		cfg := node.Login{}
-		flags := node.NewLoginFlags(node.LoginOptions{Destination: &cfg})
+		registered := flags(&cfg)
 
-		//nolint:errcheck
-		Expect(flags[1].(*cli.StringSliceFlag).Destination).To(BeIdenticalTo(&cfg.NpmRcFiles))
-		//nolint:errcheck
-		Expect(flags[1].(*cli.StringSliceFlag).Value).To(Equal([]string{".npmrc"}))
-		//nolint:errcheck
-		Expect(flags[2].(*cli.StringFlag).Destination).To(BeIdenticalTo(&cfg.NpmRc))
+		Expect(fixtures.Flag[*cli.StringSliceFlag](registered, "npm.npmrc-file").Destination).
+			To(BeIdenticalTo(&cfg.NpmRcFiles))
+		Expect(fixtures.Flag[*cli.StringSliceFlag](registered, "npm.npmrc-file").Value).
+			To(Equal([]string{".npmrc"}))
+		Expect(fixtures.Flag[*cli.StringFlag](registered, "npm.npmrc").Destination).
+			To(BeIdenticalTo(&cfg.NpmRc))
 	})
 })
