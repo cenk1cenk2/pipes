@@ -33,14 +33,14 @@ type LoginOptions struct {
 
 func NewLoginFlags(opts LoginOptions) []cli.Flag {
 	return []cli.Flag{
-		flags.JSONFlag(&cli.StringFlag{
+		flags.JSONFlag(&opts.Destination.Entries, &cli.StringFlag{
 			Category: "Login",
 			Name:     "npm.login",
 			Sources:  cli.NewValueSourceChain(cli.EnvVar("NPM_LOGIN")),
 			Usage:    "NPM registries to login. format(json([]struct{ username: string, token: string, registry?: string, useHttps?: bool }))",
 			Required: false,
 			Value:    "",
-		}, &opts.Destination.Entries),
+		}),
 
 		&cli.StringSliceFlag{
 			Category:    "Login",

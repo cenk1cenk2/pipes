@@ -17,7 +17,7 @@ var _ = Describe("Unmarshalling flags", func() {
 	Describe("JSONFlag", func() {
 		It("unmarshals the value into the destination", func() {
 			dst := []condition{}
-			flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
 
 			Expect(flag.Validator(`[{ "match": "^heads/main$", "environment": "develop" }]`)).To(Succeed())
 			Expect(dst).To(Equal([]condition{{Match: "^heads/main$", Environment: "develop"}}))
@@ -27,7 +27,7 @@ var _ = Describe("Unmarshalling flags", func() {
 		// value rather than failing before the pipe has a chance to default it.
 		It("leaves the destination alone for an empty value", func() {
 			dst := []condition{{Match: "kept"}}
-			flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
 
 			Expect(flag.Validator("")).To(Succeed())
 			Expect(dst).To(Equal([]condition{{Match: "kept"}}))
@@ -35,7 +35,7 @@ var _ = Describe("Unmarshalling flags", func() {
 
 		It("names the flag in the error so the message points at the input", func() {
 			dst := []condition{}
-			flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
 
 			err := flag.Validator("{not json")
 			Expect(err).To(HaveOccurred())
@@ -46,7 +46,7 @@ var _ = Describe("Unmarshalling flags", func() {
 		// a typo in one would only surface once a user overrode something else.
 		It("makes the flag validate its own default", func() {
 			dst := []condition{}
-			flag := flags.JSONFlag(&cli.StringFlag{Name: "conditions"}, &dst)
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
 
 			Expect(flag.ValidateDefaults).To(BeTrue())
 		})
@@ -55,7 +55,7 @@ var _ = Describe("Unmarshalling flags", func() {
 	Describe("YAMLFlag", func() {
 		It("unmarshals the value into the destination", func() {
 			dst := []condition{}
-			flag := flags.YAMLFlag(&cli.StringFlag{Name: "sanitize-tags"}, &dst)
+			flag := flags.YAMLFlag(&dst, &cli.StringFlag{Name: "sanitize-tags"})
 
 			Expect(flag.Validator("- match: \"^tags/\"\n  environment: production\n")).To(Succeed())
 			Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
@@ -65,7 +65,7 @@ var _ = Describe("Unmarshalling flags", func() {
 		// because YAML is a superset of it.
 		It("accepts the JSON the defaults are written in", func() {
 			dst := []condition{}
-			flag := flags.YAMLFlag(&cli.StringFlag{Name: "sanitize-tags"}, &dst)
+			flag := flags.YAMLFlag(&dst, &cli.StringFlag{Name: "sanitize-tags"})
 
 			Expect(flag.Validator(`[{ "match": "^tags/", "environment": "production" }]`)).To(Succeed())
 			Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
@@ -73,7 +73,7 @@ var _ = Describe("Unmarshalling flags", func() {
 
 		It("names the flag in the error", func() {
 			dst := []condition{}
-			flag := flags.YAMLFlag(&cli.StringFlag{Name: "sanitize-tags"}, &dst)
+			flag := flags.YAMLFlag(&dst, &cli.StringFlag{Name: "sanitize-tags"})
 
 			err := flag.Validator("\t- broken")
 			Expect(err).To(HaveOccurred())

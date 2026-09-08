@@ -10,7 +10,7 @@ const CATEGORY_LOGIN = "Login"
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
-	flags.JSONFlag(&cli.StringFlag{
+	flags.JSONFlag(&P.Registry.Credentials, &cli.StringFlag{
 		Category: CATEGORY_LOGIN,
 		Name:     "terraform.login.registry.credentials",
 		Sources: cli.NewValueSourceChain(
@@ -19,5 +19,5 @@ var Flags = []cli.Flag{
 		),
 		Usage:    "Terraform registry credentials. format(json([]struct{ registry: string, token: string }))",
 		Required: false,
-	}, &P.Registry.Credentials),
+	}),
 }

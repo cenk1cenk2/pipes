@@ -86,7 +86,7 @@ var Flags = []cli.Flag{
 		Destination: &P.EnableCGO,
 	},
 
-	flags.YAMLFlag(&cli.StringFlag{
+	flags.YAMLFlag(&P.BuildTargets, &cli.StringFlag{
 		Category: CATEGORY_BUILD,
 		Name:     "go.build.targets",
 		Sources: cli.NewValueSourceChain(
@@ -95,7 +95,7 @@ var Flags = []cli.Flag{
 		Usage:    "Build targets for the build process. format(yaml([]struct{ os?: string, arch?: string }))",
 		Required: false,
 		Value:    `[]`,
-	}, &P.BuildTargets),
+	}),
 
 	&cli.StringSliceFlag{
 		Category: CATEGORY_BUILD,
@@ -109,7 +109,7 @@ var Flags = []cli.Flag{
 		Destination: &P.BuildTags,
 	},
 
-	flags.YAMLFlag(&cli.StringFlag{
+	flags.YAMLFlag(&P.BuildVariables, &cli.StringFlag{
 		Category: CATEGORY_BUILD,
 		Name:     "go.build.variables",
 		Sources: cli.NewValueSourceChain(
@@ -118,5 +118,5 @@ var Flags = []cli.Flag{
 		Usage:    "Build variables for the build process. format(yaml(map[string]string))",
 		Required: false,
 		Value:    `{}`,
-	}, &P.BuildVariables),
+	}),
 }

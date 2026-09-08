@@ -43,7 +43,7 @@ func NewFlags(opts Options) []cli.Flag {
 			Destination: &opts.Destination.Enable,
 		},
 
-		flags.JSONFlag(&cli.StringFlag{
+		flags.JSONFlag(&opts.Destination.Conditions, &cli.StringFlag{
 			Category: CATEGORY_ENVIRONMENT,
 			Name:     "environment.conditions",
 			Sources:  cli.NewValueSourceChain(cli.EnvVar("ENVIRONMENT_CONDITIONS")),
@@ -55,7 +55,7 @@ format(json([]struct{ match: RegExp, environment: string }))
 `),
 			Required: false,
 			Value:    DEFAULT_CONDITIONS,
-		}, &opts.Destination.Conditions),
+		}),
 
 		&cli.BoolFlag{
 			Category:    CATEGORY_ENVIRONMENT,

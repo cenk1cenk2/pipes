@@ -52,7 +52,7 @@ var Flags = []cli.Flag{
 		Destination: &P.Manifest.Images,
 	},
 
-	flags.YAMLFlag(&cli.StringFlag{
+	flags.YAMLFlag(&P.Manifest.Matrix, &cli.StringFlag{
 		Category: CATEGORY_CONTAINER_MANIFEST,
 		Name:     "buildah.manifest.matrix",
 		Sources: cli.NewValueSourceChain(
@@ -61,5 +61,5 @@ var Flags = []cli.Flag{
 		),
 		Usage:    "Matrix of all the images that should be manifested. format(yaml([]struct{ target: string, images: []string }))",
 		Required: false,
-	}, &P.Manifest.Matrix),
+	}),
 }

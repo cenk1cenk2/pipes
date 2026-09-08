@@ -8,21 +8,21 @@ import (
 	"go.yaml.in/yaml/v4"
 )
 
-// JSONFlag makes the flag unmarshal its value into dst as part of validation.
+// JSONFlag fills dst from the flag's value as part of validation.
 // Unknown members are rejected, so a misspelled key fails the flag.
-func JSONFlag[T any](flag *cli.StringFlag, dst *T) *cli.StringFlag {
-	return unmarshalFlag(flag, dst, func(data []byte, v any) error {
+func JSONFlag[T any](dst *T, flag *cli.StringFlag) *cli.StringFlag {
+	return unmarshalFlag(dst, flag, func(data []byte, v any) error {
 		return json.Unmarshal(data, v, json.RejectUnknownMembers(true))
 	})
 }
 
 // YAMLFlag is JSONFlag for the flags documented as YAML. JSON parses as YAML, so
 // the two only differ in the usage text.
-func YAMLFlag[T any](flag *cli.StringFlag, dst *T) *cli.StringFlag {
-	return unmarshalFlag(flag, dst, yaml.Unmarshal)
+func YAMLFlag[T any](dst *T, flag *cli.StringFlag) *cli.StringFlag {
+	return unmarshalFlag(dst, flag, yaml.Unmarshal)
 }
 
-func unmarshalFlag[T any](flag *cli.StringFlag, dst *T, unmarshal func([]byte, any) error) *cli.StringFlag {
+func unmarshalFlag[T any](dst *T, flag *cli.StringFlag, unmarshal func([]byte, any) error) *cli.StringFlag {
 	flag.ValidateDefaults = true
 	flag.Validator = func(v string) error {
 		// most of these flags are optional, so an unset one leaves the destination alone.

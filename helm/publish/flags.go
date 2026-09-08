@@ -47,7 +47,7 @@ var Flags = CombineFlags(
 			Destination: &P.Chart.Versions,
 		},
 
-		flags.YAMLFlag(&cli.StringFlag{
+		flags.YAMLFlag(&P.Chart.VersionsTemplate, &cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-template",
 			Sources: cli.NewValueSourceChain(
@@ -62,9 +62,9 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 `),
 			Required: false,
 			Value:    "[]",
-		}, &P.Chart.VersionsTemplate),
+		}),
 
-		flags.YAMLFlag(&cli.StringFlag{
+		flags.YAMLFlag(&P.Chart.VersionsSanitize, &cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,
 			Name:     "helm.publish.chart.versions-sanitize",
 			Sources: cli.NewValueSourceChain(
@@ -79,7 +79,7 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 `),
 			Required: false,
 			Value:    DEFAULT_SANITIZE_VERSIONS,
-		}, &P.Chart.VersionsSanitize),
+		}),
 
 		&cli.StringFlag{
 			Category: CATEGORY_HELM_CHART,

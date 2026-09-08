@@ -68,7 +68,7 @@ var Flags = CombineFlags(
 			Destination: &P.Image.Tags,
 		},
 
-		flags.YAMLFlag(&cli.StringFlag{
+		flags.YAMLFlag(&P.Image.TagsTemplate, &cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.tags-template",
 			Sources: cli.NewValueSourceChain(
@@ -83,9 +83,9 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 `),
 			Required: false,
 			Value:    "[]",
-		}, &P.Image.TagsTemplate),
+		}),
 
-		flags.YAMLFlag(&cli.StringFlag{
+		flags.YAMLFlag(&P.Image.TagsSanitize, &cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.tags-sanitize",
 			Sources: cli.NewValueSourceChain(
@@ -100,9 +100,9 @@ format(yaml([]struct{ match: RegExp, template: Template(match) }))
 `),
 			Required: false,
 			Value:    DEFAULT_SANITIZE_TAGS,
-		}, &P.Image.TagsSanitize),
+		}),
 
-		flags.YAMLFlag(&cli.StringFlag{
+		flags.YAMLFlag(&P.Image.TagAsLatest, &cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.tag-as-latest",
 			Sources: cli.NewValueSourceChain(
@@ -117,7 +117,7 @@ format(yaml([]RegExp))
 `),
 			Required: false,
 			Value:    DEFAULT_TAG_AS_LATEST,
-		}, &P.Image.TagAsLatest),
+		}),
 
 		&cli.BoolFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
@@ -145,7 +145,7 @@ format(yaml([]RegExp))
 			Destination: &P.Image.Push,
 		},
 
-		flags.YAMLFlag(&cli.StringFlag{
+		flags.YAMLFlag(&P.Image.BuildArgs, &cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,
 			Name:     "buildah.build.image.build-args",
 			Sources: cli.NewValueSourceChain(
@@ -160,7 +160,7 @@ format(yaml(map[string]Template()))
 `),
 			Required: false,
 			Value:    "",
-		}, &P.Image.BuildArgs),
+		}),
 
 		&cli.StringFlag{
 			Category: CATEGORY_CONTAINER_IMAGE,

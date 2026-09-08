@@ -88,7 +88,7 @@ var Flags = []cli.Flag{
 		Required:    false,
 	},
 
-	flags.JSONFlag(&cli.StringFlag{
+	flags.JSONFlag(&P.Readme.Matrix, &cli.StringFlag{
 		Category: CATEGORY_README,
 		Name:     "docker-hub.readme.matrix",
 		Sources: cli.NewValueSourceChain(
@@ -97,5 +97,5 @@ var Flags = []cli.Flag{
 		),
 		Usage:    "Matrix of multiple README files to update. format(json([]struct{ repository: string, file: string, description?: string }))",
 		Required: false,
-	}, &P.Readme.Matrix),
+	}),
 }
