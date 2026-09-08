@@ -10,9 +10,8 @@ type (
 	}
 
 	SemanticRelease struct {
-		DryRun            bool
-		Workspace         bool
-		IsolateWorkspaces []string
+		DryRun    bool
+		Workspace bool
 	}
 
 	Pipe struct {

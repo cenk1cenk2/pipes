@@ -16,7 +16,7 @@ func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		// the environment is opt-in here, and the flags are shared package level values,
 		// so this runs before the command tree reads them.
-		OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
+		OverwriteCliFlag(setup.Flags, func(f *cli.BoolFlag) bool {
 			return f.Name == "environment.enable"
 		}, func(f *cli.BoolFlag) *cli.BoolFlag {
 			f.Hidden = false
@@ -30,12 +30,10 @@ func main() {
 			Version:     VERSION,
 			Usage:       DESCRIPTION,
 			Description: DESCRIPTION,
-			Flags:       CombineFlags(setup.EnvironmentFlags, setup.NodeFlags, setup.LoginFlags, release.Flags),
+			Flags:       CombineFlags(setup.Flags, release.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(
-					setup.NewEnvironment(p),
 					setup.New(p),
-					setup.NewLogin(p),
 					release.New(p),
 				))
 			},

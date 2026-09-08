@@ -1,6 +1,6 @@
 // Package setup holds the configuration the semantic-release pipe shares between
-// its task lists, so that the flags that fill it and the tasks that read it back
-// are the same instances.
+// its stages, so that the flags that fill it and the tasks that read it back are
+// the same instances.
 package setup
 
 import (
@@ -19,18 +19,20 @@ var (
 	Login = &node.Login{}
 )
 
-// NewEnvironment selects the environment the release runs against.
-func NewEnvironment(p *Plumber) *TaskList {
-	return environment.SetupTaskList(p, Environment, EnvironmentCtx)
-}
-
-// New resolves the package manager the release library is installed with.
+// New composes every setup stage into the one task list the command wires in:
+// the injected environment, the package manager and the registry credentials.
+// The inner lists keep their own validation and disable hooks, which is why
+// they are combined as a job rather than flattened.
 func New(p *Plumber) *TaskList {
-	return node.SetupTaskList(p, NodeConfig, NodeCtx)
-}
+	tl := &TaskList{}
 
-// NewLogin writes the npmrc the package manager reads its credentials back
-// from, so it composes after New.
-func NewLogin(p *Plumber) *TaskList {
-	return node.LoginTaskList(p, Login)
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		Set(func(_ *TaskList) Job {
+			return CombineTaskLists(
+				environment.SetupTaskList(p, Environment, EnvironmentCtx),
+				node.SetupTaskList(p, NodeConfig, NodeCtx),
+				node.LoginTaskList(p, Login),
+			)
+		})
 }
