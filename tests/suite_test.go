@@ -9,5 +9,5 @@ import (
 
 func TestManifest(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Manifest Suite")
+	RunSpecs(t, "Repository Suite")
 }

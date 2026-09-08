@@ -1,99 +1,38 @@
 package tests
 
 import (
-	"fmt"
 	"path/filepath"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Manifest", func() {
-	var manifest Manifest
+// published is DOCKER_HUB_README_MATRIX written out verbatim, in the order the
+// job carries it. Changing the job and changing this list is the same commit.
+var published = []ReadmeMatrixEntry{
+	{Repository: "cenk1cenk2/pipe-buildah", File: "./buildah/README.md", Description: "Builds and publishes a container image with given conditions."},
+	{Repository: "cenk1cenk2/pipe-node", File: "./node/README.md", Description: "Node.JS operations for pipelines."},
+	{Repository: "cenk1cenk2/pipe-pulumi", File: "./pulumi/README.md", Description: "Pulumi operations for pipelines."},
+	{Repository: "cenk1cenk2/pipe-go", File: "./go/README.md", Description: "Golang operations for pipelines."},
+	{Repository: "cenk1cenk2/pipe-helm", File: "./helm/README.md", Description: "Helm operations for pipelines."},
+	{Repository: "cenk1cenk2/pipe-kustomize", File: "./kustomize/README.md", Description: "Kustomize operations for pipelines."},
+	{Repository: "cenk1cenk2/pipe-select-env", File: "./select-env/README.md", Description: "Selects an environment given on the conditions."},
+	{Repository: "cenk1cenk2/pipe-semantic-release", File: "./semantic-release/README.md", Description: "semantic-release embedded inside a container for CI jobs."},
+	{Repository: "cenk1cenk2/pipe-terraform", File: "./terraform/README.md", Description: "Terraform helper pipe."},
+	{Repository: "cenk1cenk2/pipe-update-docker-hub-readme", File: "./update-docker-hub-readme/README.md", Description: "Updates the README on DockerHub for given repository."},
+}
 
-	BeforeEach(func() {
-		var err error
-
-		manifest, err = ReadManifest()
-		Expect(err).NotTo(HaveOccurred())
-	})
-
-	It("has one entry per pipe and nothing else", func() {
-		names := make([]string, len(manifest.Pipes))
-		for i, entry := range manifest.Pipes {
-			names[i] = entry.Name
-		}
-
-		Expect(names).To(Equal(Pipes()), "add the module to pipes.yaml, or to Excluded with the reason it is not a pipe")
-	})
-
-	for _, dir := range Pipes() {
-		Describe(dir, func() {
-			var entry ManifestEntry
-
-			BeforeEach(func() {
-				for _, candidate := range manifest.Pipes {
-					if candidate.Name == dir {
-						entry = candidate
-
-						return
-					}
-				}
-
-				Fail(fmt.Sprintf("%s has no entry in pipes.yaml", dir))
-			})
-
-			// every pipe is prefixed, including the one whose command is not.
-			It("publishes to the image the directory names", func() {
-				Expect(entry.Image).To(Equal("cenk1cenk2/pipe-" + dir))
-			})
-
-			It("points at a readme that is there", func() {
-				Expect(entry.Readme).To(Equal("./" + dir + "/README.md"))
-				Expect(filepath.Join(Root(), entry.Readme)).To(BeAnExistingFile())
-			})
-
-			It("carries a description", func() {
-				Expect(entry.Description).NotTo(BeEmpty())
-			})
-		})
-	}
-
-	// the pipeline publishes the descriptions rather than reading them from the
-	// manifest, so the two are checked against each other until one of them can
-	// be generated from the other.
-	It("agrees with the readme matrix the pipeline publishes", func() {
+var _ = Describe("update-docker-hub-readme", func() {
+	It("publishes exactly this matrix", func() {
 		matrix, err := ReadReadmeMatrix()
 		Expect(err).NotTo(HaveOccurred())
 
-		published := map[string]ReadmeMatrixEntry{}
-		for _, entry := range matrix {
-			published[entry.Repository] = entry
-		}
-
-		for _, entry := range manifest.Pipes {
-			Expect(published).To(HaveKey(entry.Image), fmt.Sprintf("%s is not published by the update-docker-hub-readme job", entry.Name))
-			Expect(published[entry.Image].File).To(Equal(entry.Readme))
-			Expect(published[entry.Image].Description).To(Equal(entry.Description))
-		}
-
-		Expect(published).To(HaveLen(len(manifest.Pipes)), "the pipeline publishes an image the manifest does not list")
+		Expect(matrix).To(Equal(published))
 	})
 
-	It("leaves the excluded modules out", func() {
-		for _, dir := range Excluded {
-			for _, entry := range manifest.Pipes {
-				Expect(entry.Name).NotTo(Equal(dir))
-			}
-		}
-	})
-
-	It("excludes only directories that are there", func() {
-		dirs, err := ModuleDirs()
-		Expect(err).NotTo(HaveOccurred())
-
-		for _, dir := range Excluded {
-			Expect(dirs).To(ContainElement(dir), "the exclusion outlived the directory it was written for")
+	It("points every entry at a readme that is there", func() {
+		for _, entry := range published {
+			Expect(filepath.Join(Root(), entry.File)).To(BeAnExistingFile())
 		}
 	})
 })

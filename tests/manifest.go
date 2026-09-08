@@ -1,5 +1,6 @@
-// Package tests holds the checks that are about the repository and not about any one
-// pipe. Nothing here imports a pipe, which lets a pipe keep its command tree to itself.
+// Package tests holds the checks that are about the repository and not about any
+// one pipe. Nothing here imports a pipe, which lets a pipe keep its command tree
+// to itself.
 package tests
 
 import (
@@ -7,37 +8,19 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 
 	"go.yaml.in/yaml/v4"
 )
 
-// Manifest is pipes.yaml: the list of pipes this repository publishes, and the
-// only place that list is written down by hand.
-type Manifest struct {
-	Pipes []ManifestEntry `yaml:"pipes"`
-}
-
-type ManifestEntry struct {
-	Name  string `yaml:"name"`
-	Image string `yaml:"image"`
-	// Readme is the path the pipeline uploads to the registry, relative to the
-	// repository root.
-	Readme      string `yaml:"readme"`
-	Description string `yaml:"description"`
-}
-
-// ReadmeMatrix is the shape the update-docker-hub-readme pipe is handed through
-// DOCKER_HUB_README_MATRIX, which is what actually publishes the descriptions.
-type ReadmeMatrix []ReadmeMatrixEntry
-
+// ReadmeMatrixEntry is one repository of DOCKER_HUB_README_MATRIX, which is what
+// the update-docker-hub-readme job actually publishes to Docker Hub.
 type ReadmeMatrixEntry struct {
 	Repository  string `json:"repository"`
 	File        string `json:"file"`
 	Description string `json:"description"`
 }
 
-// pipeline is the part of .gitlab-ci.yml the manifest is checked against.
+// pipeline is the part of .gitlab-ci.yml the specs read.
 type pipeline struct {
 	UpdateDockerHubReadme struct {
 		Variables struct {
@@ -57,103 +40,29 @@ func Root() string {
 	return root
 }
 
-func ReadManifest() (Manifest, error) {
-	var manifest Manifest
-
-	contents, err := os.ReadFile(filepath.Join(Root(), "pipes.yaml"))
-	if err != nil {
-		return manifest, err
-	}
-
-	if err := yaml.Unmarshal(contents, &manifest); err != nil {
-		return manifest, fmt.Errorf("Can not unmarshal pipes.yaml: %w", err)
-	}
-
-	return manifest, nil
-}
-
-func ReadReadmeMatrix() (ReadmeMatrix, error) {
-	var (
-		ci     pipeline
-		matrix ReadmeMatrix
-	)
+func ReadReadmeMatrix() ([]ReadmeMatrixEntry, error) {
+	var ci pipeline
 
 	contents, err := os.ReadFile(filepath.Join(Root(), ".gitlab-ci.yml"))
 	if err != nil {
-		return matrix, err
+		return nil, err
 	}
 
 	if err := yaml.Unmarshal(contents, &ci); err != nil {
-		return matrix, fmt.Errorf("Can not unmarshal .gitlab-ci.yml: %w", err)
+		return nil, fmt.Errorf("Can not unmarshal .gitlab-ci.yml: %w", err)
 	}
 
 	raw := ci.UpdateDockerHubReadme.Variables.ReadmeMatrix
 
 	if raw == "" {
-		return matrix, fmt.Errorf("DOCKER_HUB_README_MATRIX is not set on the update-docker-hub-readme job")
+		return nil, fmt.Errorf("DOCKER_HUB_README_MATRIX is not set on the update-docker-hub-readme job")
 	}
 
+	var matrix []ReadmeMatrixEntry
+
 	if err := json.Unmarshal([]byte(raw), &matrix); err != nil {
-		return matrix, fmt.Errorf("Can not unmarshal DOCKER_HUB_README_MATRIX: %w", err)
+		return nil, fmt.Errorf("Can not unmarshal DOCKER_HUB_README_MATRIX: %w", err)
 	}
 
 	return matrix, nil
-}
-
-// ModuleDirs are the directories of the workspace that hold a Go module, which
-// is where a pipe that nothing has registered yet would show up.
-func ModuleDirs() ([]string, error) {
-	entries, err := os.ReadDir(Root())
-	if err != nil {
-		return nil, err
-	}
-
-	dirs := []string{}
-
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-
-		if _, err := os.Stat(filepath.Join(Root(), entry.Name(), "go.mod")); err != nil {
-			continue
-		}
-
-		dirs = append(dirs, entry.Name())
-	}
-
-	return dirs, nil
-}
-
-// Excluded are the directories that hold a Go module but no pipe, named one by one
-// so that adding one is a decision somebody writes down.
-var Excluded = []string{
-	// _template is the scaffold a new pipe is copied from and ships no image.
-	"_template",
-	// internal is the shared library the pipes are built out of.
-	"internal",
-	// tests is this module.
-	"tests",
-}
-
-// Pipes are the module directories that are pipes: every module not written down as
-// something else. The list is read while the spec tree is built, so a directory added
-// without a manifest entry gets a failing spec of its own.
-func Pipes() []string {
-	dirs, err := ModuleDirs()
-	if err != nil {
-		panic(err)
-	}
-
-	pipes := []string{}
-
-	for _, dir := range dirs {
-		if slices.Contains(Excluded, dir) {
-			continue
-		}
-
-		pipes = append(pipes, dir)
-	}
-
-	return pipes
 }
