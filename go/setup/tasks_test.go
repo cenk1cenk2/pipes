@@ -1,6 +1,9 @@
 package setup
 
 import (
+	"os"
+	"path/filepath"
+
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/cenk1cenk2/plumber/v6/tests"
 	. "github.com/onsi/ginkgo/v2"
@@ -43,16 +46,14 @@ var _ = Describe("Go version", func() {
 })
 
 var _ = Describe("Go workspace", func() {
-	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
-	run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
+	// the workspace is deliberately not reset, so a run overwrites what the last one decided.
+	run := func(cwd string) error {
 		GinkgoHelper()
 
-		// the workspace is deliberately not reset, so a run overwrites what the last one decided.
-		*P = pipe
-		C.Cwd = "projects/api"
+		C.Cwd = cwd
 		C.Env = map[string]string{}
 
-		return fixtures.Cli(runner, tests.TaskListCli{
+		return fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
 			AppName:     "pipe-go",
 			CommandName: "setup",
 			TaskLists: []tests.TaskListFactory{
@@ -69,56 +70,37 @@ var _ = Describe("Go workspace", func() {
 		}).Run()
 	}
 
-	gowork := func(stdout string) tests.TestingCommandResponse {
-		return tests.TestingCommandResponse{Name: "go", Args: []string{"env", "GOWORK"}, Stdout: stdout}
+	workspaced := func() string {
+		GinkgoHelper()
+
+		dir := GinkgoT().TempDir()
+		Expect(os.WriteFile(filepath.Join(dir, "go.work"), []byte("go 1.27\n"), 0o600)).To(Succeed())
+
+		return dir
 	}
 
-	It("takes the workspace from the flag without asking the toolchain", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, Pipe{Workspace: true})).To(Succeed())
+	It("drives the modules as a workspace when the working directory holds the workspace file", func() {
+		Expect(run(workspaced())).To(Succeed())
 
 		Expect(C.Workspace).To(BeTrue())
-		Expect(runner.Invocations()).To(BeEmpty())
 	})
 
-	It("falls back to the workspace the toolchain reports", func() {
-		runner := fixtures.Runner(gowork("/repository/go.work\n"))
+	// a module of a bigger workspace is built on its own, so the workspace file of
+	// a parent directory is none of this run's business.
+	It("stays on the single module when only a parent directory holds the workspace file", func() {
+		child := filepath.Join(workspaced(), "api")
+		Expect(os.Mkdir(child, 0o700)).To(Succeed())
 
-		Expect(run(runner, Pipe{})).To(Succeed())
-
-		Expect(C.Workspace).To(BeTrue())
-
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Name).To(Equal("go"))
-		Expect(invocation.Args).To(Equal([]string{"env", "GOWORK"}))
-		Expect(invocation.Dir).To(Equal("projects/api"))
-	})
-
-	// go env reports "off" instead of an empty value when workspace mode is
-	// explicitly disabled, which is not a workspace to vendor or to enumerate.
-	It("stays on the single module when the toolchain reports workspace mode off", func() {
-		runner := fixtures.Runner(gowork("off\n"))
-
-		Expect(run(runner, Pipe{})).To(Succeed())
-
-		Expect(C.Workspace).To(BeFalse())
-	})
-
-	It("stays on the single module when the toolchain reports nothing", func() {
-		runner := fixtures.Runner(gowork(""))
-
-		Expect(run(runner, Pipe{})).To(Succeed())
+		Expect(run(child)).To(Succeed())
 
 		Expect(C.Workspace).To(BeFalse())
 	})
 
 	It("forgets a workspace that the current run did not detect", func() {
-		Expect(run(fixtures.Runner(gowork("/repository/go.work\n")), Pipe{})).To(Succeed())
+		Expect(run(workspaced())).To(Succeed())
 		Expect(C.Workspace).To(BeTrue())
 
-		Expect(run(fixtures.Runner(gowork("off\n")), Pipe{})).To(Succeed())
+		Expect(run(GinkgoT().TempDir())).To(Succeed())
 		Expect(C.Workspace).To(BeFalse())
 	})
 })

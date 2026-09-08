@@ -107,14 +107,16 @@ func build(tl *TaskList) *Task {
 		})
 }
 
-// Resolves what the workspace has to build. It follows the flag and not
-// setup.C.Workspace, which is on for any invocation that merely sits inside a
-// workspace. Each module is asked from inside its own directory, since the go
-// tool drops an underscored directory out of a package pattern.
+// packages resolves what the workspace has to build. Workspace mode only holds
+// when the workspace file sits at the working directory itself, so a child
+// pipeline building one module of a bigger workspace stays on the single module.
+// The modules need no emptiness guard here, since the setup errors out when it
+// resolves none of them. Each module is asked from inside its own directory,
+// since the go tool drops an underscored directory out of a package pattern.
 func packages(tl *TaskList) *Task {
 	return tl.CreateTask("packages").
 		ShouldDisable(func(_ *Task) bool {
-			return !setup.P.Workspace || len(setup.C.Modules) == 0
+			return !setup.C.Workspace
 		}).
 		Set(func(t *Task) error {
 			C.Packages = nil

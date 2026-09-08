@@ -6,13 +6,12 @@ import (
 
 type (
 	Pipe struct {
-		Cwd       string `validate:"omitempty,dir"`
-		Cache     string `validate:"omitempty,dirpath"`
-		Workspace bool
+		Cwd   string `validate:"omitempty,dir"`
+		Cache string `validate:"omitempty,dirpath"`
 	}
 
 	// Ctx carries whether the modules are driven as a workspace, so the commands
-	// that tell the two apart never probe the toolchain again.
+	// that tell the two apart never look for the workspace file again.
 	Ctx struct {
 		Cwd       string
 		Version   string

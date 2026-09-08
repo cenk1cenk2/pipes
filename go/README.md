@@ -34,7 +34,6 @@ Vendor go modules.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go build`
 
@@ -62,7 +61,6 @@ Build an application.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go lint`
 
@@ -84,7 +82,6 @@ Run golangci-lint on the project.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 ### `pipe-go tool`
 
@@ -98,7 +95,6 @@ Run a specified go tool.
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Enable go cache. | `string` | `false` | <code>"./.go/"</code> |
-| `$GO_WORKSPACE`<br />`$GO_LINT_WORKSPACE` | Drive the modules as a Go workspace instead of the single module in the working directory. | `bool` | `false` | <code>false</code> |
 
 **Tool**
 

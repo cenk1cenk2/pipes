@@ -1,7 +1,10 @@
 package setup
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -59,48 +62,29 @@ func env(tl *TaskList) *Task {
 		})
 }
 
+// The detection is scoped to the working directory on purpose: "go env GOWORK"
+// searches the parent directories too, which would turn every module that
+// merely sits inside a workspace into a workspace run.
 func workspace(tl *TaskList) *Task {
 	return tl.CreateTask("workspace").
 		Set(func(t *Task) error {
-			C.Workspace = P.Workspace
+			gowork := filepath.Join(C.Cwd, "go.work")
 
-			if C.Workspace {
-				t.Log.Debugf("Go workspace mode is enabled: %s", C.Cwd)
+			if _, err := os.Stat(gowork); err != nil {
+				if !errors.Is(err, fs.ErrNotExist) {
+					return fmt.Errorf("Cannot probe for the workspace file: %s -> %w", gowork, err)
+				}
+
+				C.Workspace = false
 
 				return nil
 			}
 
-			t.CreateCommand(
-				"go",
-				"env",
-				"GOWORK",
-			).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				SetDir(C.Cwd).
-				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command) error {
-					stream := c.GetStdoutStream()
+			C.Workspace = true
 
-					if len(stream) == 0 {
-						return nil
-					}
-
-					// go env reports "off" instead of an empty value when workspace mode is explicitly disabled.
-					if gowork := strings.TrimSpace(stream[0]); gowork != "" && gowork != "off" {
-						C.Workspace = true
-
-						t.Log.Debugf("Go workspace detected: %s", gowork)
-					}
-
-					return nil
-				}).
-				AppendEnvironment(C.Env).
-				AddSelfToTheTask()
+			t.Log.Debugf("Go workspace detected: %s", gowork)
 
 			return nil
-		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
 		})
 }
 
