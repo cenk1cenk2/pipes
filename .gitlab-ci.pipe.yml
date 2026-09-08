@@ -1,0 +1,79 @@
+---
+spec:
+  inputs:
+    cwd:
+      type: string
+      description: The working directory of the pipe.
+    container-image-name:
+      type: string
+      description: The name of the container image.
+    container-matrix:
+      type: array
+      description: A matrix of containers for building images.
+    container-rules:
+      type: array
+      description: Rules for container publishing.
+      default:
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        - if: $CI_COMMIT_TAG
+---
+stages:
+  - build
+  - container
+
+variables:
+  GO_CWD: $[[inputs.cwd]]
+
+build:
+  stage: build
+  image: cenk1cenk2/pipe-go:bootstrap
+  needs:
+    # the parent's install job vendored the workspace and built the pipe from this
+    # commit; reaching across the pipeline boundary for its artifacts is what keeps
+    # this job from vendoring all over again.
+    - pipeline: $CI_PARENT_PIPELINE_ID
+      job: install
+      artifacts: true
+  variables:
+    GO_BUILD_BINARY_NAME: pipe
+    GO_BUILD_LINKER_FLAGS: -w -s
+    GO_BUILD_VARIABLES: |-
+      main.VERSION: BUILD.{{ now | date "2006-01-02T15:04:05Z0700" }}
+    GO_BUILD_TARGETS: |-
+      - os: linux
+        arch: amd64
+  cache:
+    - key: $CI_JOB_NAME_SLUG
+      paths:
+        - .go/cache/
+  artifacts:
+    paths:
+      - $GO_CWD/dist/
+  script:
+    # the parent hands down the binary it built from this commit, so the pipe that
+    # builds every other pipe is never a release behind the flags it is given.
+    - ./go/dist/pipe-bootstrap build
+  rules:
+    - when: always
+  tags:
+    - amd64
+    - docker
+
+container:
+  stage: container
+  image: cenk1cenk2/pipe-buildah:bootstrap
+  needs:
+    - job: build
+  variables:
+    CONTAINER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
+    CONTAINER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
+    CONTAINER_FILE_CONTEXT: $[[inputs.cwd]]
+    CONTAINER_IMAGE_NAME: $[[inputs.container-image-name]]
+  parallel:
+    matrix: $[[inputs.container-matrix]]
+  script:
+    - pipe build
+  rules: $[[inputs.container-rules]]
+  tags:
+    - amd64
+    - docker

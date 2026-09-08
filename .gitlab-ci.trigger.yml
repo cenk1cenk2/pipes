@@ -1,0 +1,61 @@
+---
+# One pipe becomes one trigger job here, and that job starts the child pipeline
+# that builds and publishes it. Inputs are interpolated when the file is
+# compiled, before any rule is evaluated, so $[[inputs.dir]] below lands in
+# changes: paths as a literal directory. A runtime variable would not: nested
+# variable references are never expanded inside changes: paths.
+spec:
+  inputs:
+    name:
+      type: string
+      description: >-
+        The name of the pipe, which names the trigger job and suffixes the
+        published image. Kept apart from dir so a rename of either one does not
+        drag the other along, even though every pipe spells them the same today.
+    dir:
+      type: string
+      description: >-
+        The directory of the pipe, relative to the repository root. This is what
+        the changes: paths below watch and what the child pipeline builds in.
+    container-matrix:
+      type: array
+      description: A matrix of containers for building images.
+    container-rules:
+      type: array
+      description: Rules for container publishing.
+      default:
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        - if: $CI_COMMIT_TAG
+---
+"pipe-$[[inputs.name]]":
+  stage: pipes
+  variables:
+    # a child pipeline cannot address the pipeline that started it, so the parent
+    # id is handed down as a variable for the child's needs: block to point at.
+    CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+  trigger:
+    strategy: depend
+    include:
+      - local: .gitlab-ci.pipe.yml
+        inputs:
+          cwd: ./$[[inputs.dir]]
+          container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
+          container-matrix: $[[inputs.container-matrix]]
+          container-rules: $[[inputs.container-rules]]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths: &changes-paths
+          - .gitlab-ci.yml
+          - .gitlab-ci.trigger.yml
+          - .gitlab-ci.pipe.yml
+          - go.work
+          - go.work.sum
+          - internal/**/*
+          - $[[inputs.dir]]/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *changes-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    - if: $CI_COMMIT_TAG
