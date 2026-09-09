@@ -6,7 +6,7 @@ package mockgitlab
 
 import (
 	mock "github.com/stretchr/testify/mock"
-	"gitlab.com/gitlab-org/api/client-go/v2"
+	"gitlab.com/gitlab-org/api/client-go/v3"
 )
 
 // NewMockNotesAdapter creates a new instance of MockNotesAdapter. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

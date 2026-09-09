@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/stretchr/testify/mock"
-	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
+	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 	mockgitlab "gitlab.kilic.dev/devops/pipes/internal/test/mocks/gitlab"
 )
 

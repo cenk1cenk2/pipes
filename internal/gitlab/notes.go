@@ -3,7 +3,7 @@ package gitlab
 import (
 	"fmt"
 
-	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
+	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 )
 
 // The three note calls the report upsert makes, narrowed from the client so the

@@ -5,7 +5,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	validator "github.com/go-playground/validator/v10"
-	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
+	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 )
 
 var _ = Describe("Merge request report config", func() {
