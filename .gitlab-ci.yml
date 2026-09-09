@@ -142,16 +142,10 @@ install:
   extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   script:
-    # the published bootstrap image predates this workspace and still hardcodes
-    # "go mod vendor", which Go refuses in workspace mode, so vendor with the
-    # toolchain first and build the pipe this branch ships.
-    - go work vendor
-    - go build -C go -mod=vendor -o dist/pipe-bootstrap
-    - ./go/dist/pipe-bootstrap install
+    - pipe install
   artifacts:
     paths:
       - vendor/
-      - go/dist/
   cache:
     - key: $CI_JOB_NAME_SLUG-v2
       paths:
@@ -178,7 +172,7 @@ lint:
           - ./tests
           - ./_template
   script:
-    - ./go/dist/pipe-bootstrap lint
+    - pipe lint
   tags:
     - amd64
     - docker
@@ -214,7 +208,7 @@ test:
           - ./internal
           - ./tests
   script:
-    - ./go/dist/pipe-bootstrap test
+    - pipe test
   tags:
     - amd64
     - docker
@@ -251,7 +245,7 @@ build:template:
   script:
     # the scaffold ships no image and gets no trigger child pipeline, so this is the
     # only job that keeps it compiling against the workspace.
-    - ./go/dist/pipe-bootstrap build
+    - pipe build
   tags:
     - amd64
     - docker
