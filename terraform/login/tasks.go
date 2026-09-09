@@ -1,9 +1,11 @@
 package login
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
@@ -12,9 +14,9 @@ func environmentCredentials(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Registry.Credentials) == 0
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			for _, c := range P.Registry.Credentials {
-				t.Log.Infof("Generating registry token: %s", c.Registry)
+				t.Log.Info(fmt.Sprintf("Generating registry token: %s", c.Registry))
 
 				sanitized := strings.ReplaceAll(c.Registry, ".", "_")
 				sanitized = strings.ReplaceAll(sanitized, "-", "__")
@@ -24,7 +26,7 @@ func environmentCredentials(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

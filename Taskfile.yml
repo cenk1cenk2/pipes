@@ -51,6 +51,8 @@ includes:
   select-env:
     dir: ./select-env
     taskfile: ./Taskfile.pipe.yml
+    vars:
+      DOCS_ENV: ENVIRONMENT_FILE=env.environment
   semantic-release:
     dir: ./semantic-release
     taskfile: ./Taskfile.pipe.yml
@@ -60,6 +62,8 @@ includes:
   update-docker-hub-readme:
     dir: ./update-docker-hub-readme
     taskfile: ./Taskfile.pipe.yml
+    vars:
+      DOCS_ENV: DOCKER_HUB_USERNAME=docs DOCKER_HUB_PASSWORD=docs
 
 tasks:
   build:

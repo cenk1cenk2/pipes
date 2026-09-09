@@ -1,9 +1,10 @@
 package manifest
 
 import (
+	"context"
 	"fmt"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/buildah/login"
 )
 
@@ -38,11 +39,11 @@ var C = &Ctx{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if login.P.Uri != "" {
 				P.Manifest.Target = fmt.Sprintf("%s/%s", login.P.Uri, P.Manifest.Target)
 
-				tl.Log.Infof("Using default manifest target: %s", P.Manifest.Target)
+				tl.Log.Info(fmt.Sprintf("Using default manifest target: %s", P.Manifest.Target))
 			}
 
 			if err := p.Validate(P); err != nil {

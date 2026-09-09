@@ -1,9 +1,10 @@
 package update
 
 import (
+	"context"
 	"fmt"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 )
 
@@ -43,7 +44,7 @@ var C = &Ctx{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if err := p.Validate(P); err != nil {
 				return err
 			}

@@ -1,7 +1,7 @@
 package preview
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"

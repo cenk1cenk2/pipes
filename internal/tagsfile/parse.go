@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 // Parse reads the comma separated tags out of the file at path. An absent path
@@ -21,9 +21,8 @@ func Parse(t *Task, path string, strict bool) ([]string, error) {
 		return nil, nil
 	}
 
-	t.Log.Infof(
-		"Tags file exists: %s",
-		path,
+	t.Log.Info(fmt.Sprintf("Tags file exists: %s",
+		path),
 	)
 
 	content, err := os.ReadFile(path)

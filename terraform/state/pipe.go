@@ -1,7 +1,9 @@
 package state
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 type (
@@ -41,7 +43,7 @@ var P = &Pipe{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {

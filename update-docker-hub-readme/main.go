@@ -4,7 +4,7 @@ package main
 import (
 	"context"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
@@ -23,6 +23,10 @@ func main() {
 				return p.RunJobs(CombineTaskLists(
 					update.New(p),
 				))
+			},
+
+			Commands: []*cli.Command{
+				DocsCommand(p),
 			},
 		}
 	}).

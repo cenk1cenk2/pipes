@@ -1,12 +1,13 @@
 package plan
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
@@ -53,7 +54,7 @@ func reportSource() terraform.Source {
 	}
 
 	return terraform.Source{
-		Read: func(t *Task) (terraform.Report, error) {
+		Read: func(ctx context.Context, t *Task) (terraform.Report, error) {
 			if P.Plan.Output == "" {
 				return terraform.Report{}, fmt.Errorf("terraform plan output is required for the plan report")
 			}
@@ -66,10 +67,10 @@ func reportSource() terraform.Source {
 			).
 				SetDir(setup.C.Cwd).
 				AppendEnvironment(setup.C.Env).
-				SetLogLevel(LOG_LEVEL_TRACE, LOG_LEVEL_WARN, LOG_LEVEL_DEBUG).
+				SetLogLevel(LogLevelTrace, LogLevelWarn, LogLevelDebug).
 				EnableStreamRecording()
 
-			if err := show.Run(); err != nil {
+			if err := show.Run(ctx); err != nil {
 				return terraform.Report{}, err
 			}
 
@@ -87,13 +88,13 @@ func reportSource() terraform.Source {
 
 func plan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"plan",
 				"-input=false",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Plan.Output != "" {
 						c.AppendArgs(fmt.Sprintf("-out=%s", P.Plan.Output))
 					}
@@ -118,8 +119,8 @@ func plan(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -136,7 +137,7 @@ func cleanup(tl *TaskList) *Task {
 
 			return false
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			output := P.Plan.Output
 			if !filepath.IsAbs(output) {
 				output = filepath.Join(setup.C.Cwd, output)
@@ -146,7 +147,7 @@ func cleanup(tl *TaskList) *Task {
 				return fmt.Errorf("remove Terraform plan file %s: %w", output, err)
 			}
 
-			t.Log.Infof("Removed Terraform plan file: %s", output)
+			t.Log.Info(fmt.Sprintf("Removed Terraform plan file: %s", output))
 
 			return nil
 		})

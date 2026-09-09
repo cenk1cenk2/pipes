@@ -1,11 +1,10 @@
 package release
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
-	"github.com/cenk1cenk2/plumber/v6/tests"
+	. "github.com/cenk1cenk2/plumber/v7"
+	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -38,7 +37,7 @@ var _ = Describe("Semantic release", func() {
 		// the pipe reads its own debug off the log level, and the fixture leaves it
 		// on trace so that a spec can see what the task list did.
 		if !debug {
-			fixture.Plumber.Log.SetLevel(logrus.InfoLevel)
+			fixture.Plumber.SetLoggerLevel(LogLevelInfo)
 		}
 
 		return fixture.Run()

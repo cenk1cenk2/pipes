@@ -2,12 +2,12 @@ package login
 
 import (
 	"bytes"
+	"fmt"
 
-	. "github.com/cenk1cenk2/plumber/v6"
-	"github.com/cenk1cenk2/plumber/v6/tests"
+	. "github.com/cenk1cenk2/plumber/v7"
+	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -129,8 +129,8 @@ var _ = Describe("Container registry login", func() {
 	// remember to.
 	It("keeps the password out of the log", func() {
 		var (
-			log    *logrus.Logger
-			output = &bytes.Buffer{}
+			plumber *Plumber
+			output  = &bytes.Buffer{}
 		)
 
 		*P = credentials()
@@ -140,15 +140,14 @@ var _ = Describe("Container registry login", func() {
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
 				func(p *Plumber, _ *cli.Command) *TaskList {
-					log = p.Log
-					log.SetOutput(output)
+					plumber = p.SetLoggerOutput(output)
 
 					return New(p)
 				},
 			},
 		}).Run()).To(Succeed())
 
-		log.Infof("logging in with %s", P.Password)
+		plumber.Log.Info(fmt.Sprintf("logging in with %s", P.Password))
 		Expect(output.String()).NotTo(ContainSubstring("secret"))
 	})
 })

@@ -1,27 +1,29 @@
 package install
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
 func install(tl *TaskList) *Task {
 	return tl.CreateTask("install").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"init",
 				"-input=false",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Install.Reconfigure {
-						t.Log.Infoln("Will reconfigure state.")
+						t.Log.Info("Will reconfigure state.")
 
 						c.AppendArgs("-reconfigure")
 					}
 
 					if P.Install.UseLockfile {
-						t.Log.Infoln("Using lockfile.")
+						t.Log.Info("Using lockfile.")
 
 						c.AppendArgs("-lockfile=readonly")
 					}
@@ -38,7 +40,7 @@ func install(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

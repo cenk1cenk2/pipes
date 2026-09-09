@@ -1,9 +1,10 @@
 package lint
 
 import (
+	"context"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
@@ -24,7 +25,7 @@ func lintModule(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"golangci-lint",
 				"run",
@@ -32,9 +33,9 @@ func lintModule(tl *TaskList) *Task {
 				"--timeout",
 				P.Timeout.String(),
 			).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDebug).
 				SetDir(setup.C.Cwd).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Args != "" {
 						c.AppendArgs(strings.Split(P.Args, " ")...)
 					}
@@ -46,8 +47,8 @@ func lintModule(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -58,7 +59,7 @@ func lintWorkspace(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return !setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			for _, module := range setup.C.Modules {
 				t.CreateCommand(
 					"golangci-lint",
@@ -67,9 +68,9 @@ func lintWorkspace(tl *TaskList) *Task {
 					"--timeout",
 					P.Timeout.String(),
 				).
-					SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+					SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDebug).
 					SetDir(module).
-					Set(func(c *Command) error {
+					Set(func(_ context.Context, c *Command) error {
 						if P.Args != "" {
 							c.AppendArgs(strings.Split(P.Args, " ")...)
 						}
@@ -84,7 +85,7 @@ func lintWorkspace(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

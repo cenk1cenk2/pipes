@@ -1,7 +1,7 @@
 package environment_test
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
@@ -24,7 +24,7 @@ var _ = Describe("SetupTaskList", func() {
 		p := NewPlumber(func(_ *Plumber) *cli.Command {
 			return &cli.Command{Name: "test"}
 		})
-		p.Log.SetOutput(GinkgoWriter)
+		p.SetLoggerOutput(GinkgoWriter)
 
 		return ctx, p.RunJobs(environment.SetupTaskList(p, &cfg, &ctx).Job())
 	}

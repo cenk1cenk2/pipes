@@ -6,13 +6,13 @@ import (
 	"os"
 	"path"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
 func tags(tl *TaskList) *Task {
 	return tl.CreateTask("tags").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			parsed, err := tagsfile.Parse(t, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
 
 			if err != nil {
@@ -22,9 +22,9 @@ func tags(tl *TaskList) *Task {
 			C.Tags = parsed
 
 			if len(C.Tags) > 0 {
-				t.Log.Infof("Tags file has been parsed: %+v", C.Tags)
+				t.Log.Info(fmt.Sprintf("Tags file has been parsed: %+v", C.Tags))
 			} else {
-				t.Log.Warnln("Tags file does not contain any tags, doing nothing.")
+				t.Log.Warn("Tags file does not contain any tags, doing nothing.")
 			}
 
 			return nil
@@ -33,10 +33,10 @@ func tags(tl *TaskList) *Task {
 
 func packageTask(tl *TaskList) *Task {
 	return tl.CreateTask("package", P.Module.Name, P.Module.System).
-		Set(func(t *Task) error {
+		Set(func(ctx context.Context, t *Task) error {
 			for _, tag := range C.Tags {
 				t.CreateSubtask(tag).
-					Set(func(t *Task) error {
+					Set(func(_ context.Context, t *Task) error {
 						output := fmt.Sprintf("%s/%s-%s-%s.tar.gz", TFModuleOutputDir, P.Module.Name, P.Module.System, tag)
 
 						t.CreateCommand(
@@ -47,13 +47,13 @@ func packageTask(tl *TaskList) *Task {
 							".",
 						).
 							SetDir(P.Module.Cwd).
-							SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							ShouldRunBefore(func(c *Command) error {
-								c.Log.Infof("Creating package for tag: %s", tag)
+							SetLogLevel(LogLevelDebug, LogLevelDefault, LogLevelDefault).
+							ShouldRunBefore(func(_ context.Context, c *Command) error {
+								c.Log.Info(fmt.Sprintf("Creating package for tag: %s", tag))
 
 								return nil
 							}).
-							ShouldRunAfter(func(c *Command) error {
+							ShouldRunAfter(func(_ context.Context, c *Command) error {
 								t.Lock.Lock()
 								C.Packages = append(C.Packages, PublishablePackage{
 									Tag:    tag,
@@ -67,16 +67,16 @@ func packageTask(tl *TaskList) *Task {
 
 						return nil
 					}).
-					ShouldRunAfter(func(t *Task) error {
-						return t.RunCommandJobAsJobSequence()
+					ShouldRunAfter(func(ctx context.Context, t *Task) error {
+						return t.RunCommandJobAsJobSequence(ctx)
 					}).
 					AddSelfToTheParentAsParallel()
 			}
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -94,10 +94,10 @@ func publishGitlab(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return P.Registry.Name != TFRegistryGitLab
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			for _, p := range C.Packages {
 				t.CreateSubtask(p.Tag).
-					Set(func(t *Task) error {
+					Set(func(_ context.Context, t *Task) error {
 						file, err := os.Open(p.Output)
 						if err != nil {
 							return err
@@ -115,7 +115,7 @@ func publishGitlab(tl *TaskList) *Task {
 							return err
 						}
 
-						t.Log.Infof("Package has been published: %s@%s", P.Module.Name, p.Tag)
+						t.Log.Info(fmt.Sprintf("Package has been published: %s@%s", P.Module.Name, p.Tag))
 
 						return nil
 					}).
@@ -124,7 +124,7 @@ func publishGitlab(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }

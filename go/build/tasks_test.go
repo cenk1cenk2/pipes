@@ -5,8 +5,8 @@ import (
 	"runtime"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
-	"github.com/cenk1cenk2/plumber/v6/tests"
+	. "github.com/cenk1cenk2/plumber/v7"
+	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"

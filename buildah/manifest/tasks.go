@@ -1,13 +1,14 @@
 package manifest
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"slices"
 	"strings"
 
 	glob "github.com/bmatcuk/doublestar/v4"
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"go.yaml.in/yaml/v4"
 )
 
@@ -16,7 +17,7 @@ func discoverFile(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Manifest.Files) == 0
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			cwd, err := os.Getwd()
 
 			if err != nil {
@@ -38,9 +39,8 @@ func discoverFile(tl *TaskList) *Task {
 			}
 
 			if len(matches) == 0 {
-				t.Log.Warnf(
-					"Can not match any files with the given pattern: %s",
-					strings.Join(P.Manifest.Files, ", "),
+				t.Log.Warn(fmt.Sprintf("Can not match any files with the given pattern: %s",
+					strings.Join(P.Manifest.Files, ", ")),
 				)
 
 				return nil
@@ -48,7 +48,7 @@ func discoverFile(tl *TaskList) *Task {
 
 			matches = slices.Compact(slices.Sorted(slices.Values(matches)))
 
-			t.Log.Debugf("Paths matched for given pattern: %s", strings.Join(matches, ", "))
+			t.Log.Debug(fmt.Sprintf("Paths matched for given pattern: %s", strings.Join(matches, ", ")))
 
 			C.Matches = matches
 
@@ -61,10 +61,10 @@ func fetchFile(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return len(C.Matches) == 0
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			for _, f := range C.Matches {
 				t.CreateSubtask(f).
-					Set(func(t *Task) error {
+					Set(func(_ context.Context, t *Task) error {
 						content, err := os.ReadFile(f)
 						if err != nil {
 							return err
@@ -79,7 +79,7 @@ func fetchFile(tl *TaskList) *Task {
 							return nil
 						}
 
-						t.Log.Debugf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f)
+						t.Log.Debug(fmt.Sprintf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f))
 
 						t.Lock.Lock()
 						C.ManifestedImages[parsed.Target] = append(C.ManifestedImages[parsed.Target], parsed.Images...)
@@ -91,8 +91,8 @@ func fetchFile(tl *TaskList) *Task {
 			}
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -101,7 +101,7 @@ func fetchUser(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return len(P.Manifest.Images) == 0
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			if P.Manifest.Target != "" && len(P.Manifest.Images) > 0 {
 				t.Lock.Lock()
 				var err error
@@ -112,7 +112,7 @@ func fetchUser(tl *TaskList) *Task {
 				C.ManifestedImages[P.Manifest.Target] = append(C.ManifestedImages[P.Manifest.Target], P.Manifest.Images...)
 				t.Lock.Unlock()
 
-				t.Log.Debugf("Fetched direct image: %s -> %v", P.Manifest.Target, P.Manifest.Images)
+				t.Log.Debug(fmt.Sprintf("Fetched direct image: %s -> %v", P.Manifest.Target, P.Manifest.Images))
 			}
 
 			for _, entry := range P.Manifest.Matrix {
@@ -120,7 +120,7 @@ func fetchUser(tl *TaskList) *Task {
 				C.ManifestedImages[entry.Target] = append(C.ManifestedImages[entry.Target], entry.Images...)
 				t.Lock.Unlock()
 
-				t.Log.Debugf("Fetched manifest from matrix: %s -> %v", entry.Target, entry.Images)
+				t.Log.Debug(fmt.Sprintf("Fetched manifest from matrix: %s -> %v", entry.Target, entry.Images))
 			}
 
 			return nil
@@ -129,10 +129,10 @@ func fetchUser(tl *TaskList) *Task {
 
 func manifest(tl *TaskList) *Task {
 	return tl.CreateTask("manifest").
-		Set(func(t *Task) error {
+		Set(func(ctx context.Context, t *Task) error {
 			for target, images := range C.ManifestedImages {
 				t.CreateSubtask(target).
-					Set(func(t *Task) error {
+					Set(func(_ context.Context, t *Task) error {
 						t.
 							CreateCommand(
 								"buildah",
@@ -166,15 +166,15 @@ func manifest(tl *TaskList) *Task {
 
 						return nil
 					}).
-					ShouldRunAfter(func(t *Task) error {
-						return t.RunCommandJobAsJobSequence()
+					ShouldRunAfter(func(ctx context.Context, t *Task) error {
+						return t.RunCommandJobAsJobSequence(ctx)
 					}).
 					AddSelfToTheParentAsParallel()
 			}
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }

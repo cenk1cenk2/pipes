@@ -1,19 +1,20 @@
 package setup
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	helmv2loader "helm.sh/helm/v4/pkg/chart/v2/loader"
 )
 
 func initialize(tl *TaskList) *Task {
 	return tl.CreateTask("init").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			C.Cwd = P.Cwd
 
-			t.Log.Debugf("Working directory: %s", C.Cwd)
+			t.Log.Debug(fmt.Sprintf("Working directory: %s", C.Cwd))
 
 			return nil
 		})
@@ -21,13 +22,13 @@ func initialize(tl *TaskList) *Task {
 
 func version(tl *TaskList) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand("helm", "version").
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				ShouldRunAfter(func(c *Command) error {
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+				ShouldRunAfter(func(_ context.Context, c *Command) error {
 					C.Version = strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
 
-					c.Log.Infof("helm version: %s", C.Version)
+					c.Log.Info(fmt.Sprintf("helm version: %s", C.Version))
 
 					return nil
 				}).
@@ -36,14 +37,14 @@ func version(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
 func read(tl *TaskList) *Task {
 	return tl.CreateTask("read").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			chart, err := helmv2loader.Load(C.Cwd)
 			if err != nil {
 				return fmt.Errorf("Error loading helm chart: %v in %s", err, C.Cwd)
@@ -51,7 +52,7 @@ func read(tl *TaskList) *Task {
 				return fmt.Errorf("Can not load helm chart: %s", C.Cwd)
 			}
 
-			t.Log.Infof("Chart Name: %s", chart.Metadata.Name)
+			t.Log.Info(fmt.Sprintf("Chart Name: %s", chart.Metadata.Name))
 
 			C.Chart = chart
 

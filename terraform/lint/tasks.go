@@ -1,7 +1,9 @@
 package lint
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
@@ -17,7 +19,7 @@ func lint(tl *TaskList) *Task {
 
 func lintFmt(tl *TaskList) *Task {
 	return tl.CreateTask("lint", "fmt").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"fmt",
@@ -25,7 +27,7 @@ func lintFmt(tl *TaskList) *Task {
 				"-diff",
 				"-recursive",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Lint.FormatCheckArgs != "" {
 						c.AppendArgs(P.Lint.FormatCheckArgs)
 					}
@@ -38,19 +40,19 @@ func lintFmt(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
 func lintValidate(tl *TaskList) *Task {
 	return tl.CreateTask("lint", "validate").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"validate",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Lint.ValidateArgs != "" {
 						c.AppendArgs(P.Lint.ValidateArgs)
 					}
@@ -63,7 +65,7 @@ func lintValidate(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

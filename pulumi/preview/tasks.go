@@ -1,11 +1,12 @@
 package preview
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
@@ -31,7 +32,7 @@ func reportSource() terraform.Source {
 	metadata.Cwd = setup.C.Cwd
 
 	return terraform.Source{
-		Read: func(_ *Task) (terraform.Report, error) {
+		Read: func(_ context.Context, _ *Task) (terraform.Report, error) {
 			planPath := P.Plan
 			if !filepath.IsAbs(planPath) {
 				planPath = filepath.Join(setup.C.Cwd, planPath)
@@ -56,7 +57,7 @@ func reportSource() terraform.Source {
 
 func plan(tl *TaskList) *Task {
 	return tl.CreateTask("plan").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"pulumi",
 				"preview",
@@ -70,7 +71,7 @@ func plan(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

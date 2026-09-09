@@ -1,7 +1,10 @@
 package node
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+	"fmt"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 //revive:disable:line-length-limit
@@ -30,7 +33,7 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 
 	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(_ *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, _ *TaskList) error {
 			return p.Validate(cfg)
 		}).
 		Set(func(tl *TaskList) Job {
@@ -43,13 +46,13 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 
 func initialize(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("init").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			ctx.PackageManager = PackageManager{
 				Exe:      cfg.PackageManager,
 				Commands: PackageManagers[cfg.PackageManager],
 			}
 
-			t.Log.Infof("Using package manager: %s", cfg.PackageManager)
+			t.Log.Info(fmt.Sprintf("Using package manager: %s", cfg.PackageManager))
 
 			return nil
 		})
@@ -57,23 +60,23 @@ func initialize(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 
 func version(tl *TaskList, ctx *Ctx) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"node",
 				"--version",
 			).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command) error {
+				ShouldRunAfter(func(_ context.Context, c *Command) error {
 					stream := c.GetCombinedStream()
 
 					if len(stream) == 0 {
-						t.Log.Debugln("Can not fetch node.js version.")
+						t.Log.Debug("Can not fetch node.js version.")
 
 						return nil
 					}
 
-					t.Log.Infof("node.js version: %s", stream[0])
+					t.Log.Info(fmt.Sprintf("node.js version: %s", stream[0]))
 
 					return nil
 				}).
@@ -82,23 +85,23 @@ func version(tl *TaskList, ctx *Ctx) *Task {
 			t.CreateCommand(
 				ctx.PackageManager.Exe,
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					c.AppendArgs(ctx.PackageManager.Commands.Version...)
 
 					return nil
 				}).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
 				EnableStreamRecording().
-				ShouldRunAfter(func(c *Command) error {
+				ShouldRunAfter(func(_ context.Context, c *Command) error {
 					stream := c.GetCombinedStream()
 
 					if len(stream) == 0 {
-						t.Log.Debugln("Can not fetch package manager version.")
+						t.Log.Debug("Can not fetch package manager version.")
 
 						return nil
 					}
 
-					t.Log.Infof("%s version: v%s", ctx.PackageManager.Exe, stream[0])
+					t.Log.Info(fmt.Sprintf("%s version: v%s", ctx.PackageManager.Exe, stream[0]))
 
 					return nil
 				}).
@@ -106,7 +109,7 @@ func version(tl *TaskList, ctx *Ctx) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobParallel()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobParallel(ctx)
 		})
 }

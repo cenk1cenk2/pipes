@@ -5,7 +5,7 @@ package main
 import (
 	"context"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/urfave/cli/v3"
 
 	"gitlab.kilic.dev/devops/pipes/select-env/setup"
@@ -26,6 +26,10 @@ func main() {
 					setup.New(p),
 					write.New(p),
 				))
+			},
+
+			Commands: []*cli.Command{
+				DocsCommand(p),
 			},
 		}
 	}).

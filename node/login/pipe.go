@@ -2,7 +2,7 @@
 package login
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
 
