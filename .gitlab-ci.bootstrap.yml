@@ -23,9 +23,11 @@ build:
       done
     - go build -C go -mod=vendor -o dist/pipe-bootstrap
     - ./go/dist/pipe-bootstrap --version
-    # vendoring and linting cover the whole workspace, so they are worth doing once
-    # rather than once per module; each build then points GO_CWD at one module.
-    - ./go/dist/pipe-bootstrap lint
+    # vendoring covers the whole workspace, so it is worth doing once rather than
+    # once per module.
+    - GO_CWD=./internal ./go/dist/pipe-bootstrap lint
+    - GO_CWD=./go ./go/dist/pipe-bootstrap lint
+    - GO_CWD=./buildah ./go/dist/pipe-bootstrap lint
     - GO_CWD=./go ./go/dist/pipe-bootstrap build
     - GO_CWD=./buildah ./go/dist/pipe-bootstrap build
   cache:
