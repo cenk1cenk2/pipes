@@ -1,6 +1,6 @@
 # pipe-terraform
 
-Running terraform inside the pipelines.
+Terraform actions for pipelines.
 
 `pipe-terraform [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 

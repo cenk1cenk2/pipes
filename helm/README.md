@@ -1,6 +1,6 @@
 # pipe-helm
 
-Helm charts for CI pipelines.
+Helm chart toolkit for pipelines.
 
 `pipe-helm [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 

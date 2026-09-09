@@ -1,6 +1,6 @@
 # pipe-go
 
-Build Go applications with the CI pipe.
+Pipe for Go builds.
 
 `pipe-go [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 

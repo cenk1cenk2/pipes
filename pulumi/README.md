@@ -1,6 +1,6 @@
 # pipe-pulumi
 
-Pulumi actions for CI pipelines.
+Pulumi related tasks in the pipeline.
 
 `pipe-pulumi [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 

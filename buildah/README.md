@@ -1,6 +1,6 @@
 # pipe-buildah
 
-Builds and publishes container images from CI/CD with buildah.io
+Builds and publishes container images from CI with buildah.io
 
 `pipe-buildah [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 
