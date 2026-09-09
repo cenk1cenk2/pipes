@@ -111,11 +111,12 @@ include:
         - CONTAINER_IMAGE_TAGS: |-
             latest
 
-.rules-default: &rules-default
-  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    interruptible: true
-  - if: $CI_COMMIT_TAG
+.rules-default:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+    - if: $CI_COMMIT_TAG
 
 bootstrap:
   stage: bootstrap
@@ -138,30 +139,25 @@ bootstrap:
 
 install:
   stage: install
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   script:
-    # the published bootstrap image predates this workspace and still hardcodes
-    # "go mod vendor", which Go refuses in workspace mode, so vendor with the
-    # toolchain first and build the pipe this branch ships.
-    - go work vendor
-    - go build -C go -mod=vendor -o dist/pipe-bootstrap
-    - ./go/dist/pipe-bootstrap install
+    - pipe install
   artifacts:
     paths:
       - vendor/
-      - go/dist/
   cache:
     - key: $CI_JOB_NAME_SLUG-v2
       paths:
         - vendor/
         - .go/
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 lint:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -169,17 +165,21 @@ lint:
     - key: $CI_JOB_NAME_SLUG-v2
       paths:
         - .go/cache/
+  parallel:
+    matrix:
+      - GO_CWD:
+          - ./internal
+          - ./tests
+          - ./_template
   script:
-    # the binary built from this branch detects the workspace file at the repository
-    # root; the one baked into the image would lint the root as a module.
-    - ./go/dist/pipe-bootstrap lint
-  rules: *rules-default
+    - pipe lint
   tags:
     - amd64
     - docker
 
 generate:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -188,13 +188,13 @@ generate:
     - git status --porcelain -- '**/test/mocks/**'
     - |-
       test -z "$(git status --porcelain -- '**/test/mocks/**')" || (echo "mocks are stale, run: task generate" && exit 1)
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 test:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -202,15 +202,20 @@ test:
     - key: $CI_JOB_NAME_SLUG-v2
       paths:
         - .go/cache/
+  parallel:
+    matrix:
+      - GO_CWD:
+          - ./internal
+          - ./tests
   script:
-    - task --yes test
-  rules: *rules-default
+    - pipe test
   tags:
     - amd64
     - docker
 
 docs:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -224,13 +229,13 @@ docs:
     - task --yes docs
     - |-
       git diff --exit-code -- '**/README.md' || (echo "readmes are stale, run: task docs" && exit 1)
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 build:template:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -240,8 +245,7 @@ build:template:
   script:
     # the scaffold ships no image and gets no trigger child pipeline, so this is the
     # only job that keeps it compiling against the workspace.
-    - ./go/dist/pipe-bootstrap build
-  rules: *rules-default
+    - pipe build
   tags:
     - amd64
     - docker
