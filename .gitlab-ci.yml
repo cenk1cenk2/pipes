@@ -111,11 +111,12 @@ include:
         - CONTAINER_IMAGE_TAGS: |-
             latest
 
-.rules-default: &rules-default
-  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    interruptible: true
-  - if: $CI_COMMIT_TAG
+.rules-default:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+    - if: $CI_COMMIT_TAG
 
 bootstrap:
   stage: bootstrap
@@ -138,6 +139,7 @@ bootstrap:
 
 install:
   stage: install
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   script:
     # the published bootstrap image predates this workspace and still hardcodes
@@ -155,13 +157,13 @@ install:
       paths:
         - vendor/
         - .go/
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 lint:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -177,13 +179,13 @@ lint:
           - ./_template
   script:
     - ./go/dist/pipe-bootstrap lint
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 generate:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -192,13 +194,13 @@ generate:
     - git status --porcelain -- '**/test/mocks/**'
     - |-
       test -z "$(git status --porcelain -- '**/test/mocks/**')" || (echo "mocks are stale, run: task generate" && exit 1)
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 test:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -213,13 +215,13 @@ test:
           - ./tests
   script:
     - ./go/dist/pipe-bootstrap test
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 docs:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -233,13 +235,13 @@ docs:
     - task --yes docs
     - |-
       git diff --exit-code -- '**/README.md' || (echo "readmes are stale, run: task docs" && exit 1)
-  rules: *rules-default
   tags:
     - amd64
     - docker
 
 build:template:
   stage: test
+  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -250,7 +252,6 @@ build:template:
     # the scaffold ships no image and gets no trigger child pipeline, so this is the
     # only job that keeps it compiling against the workspace.
     - ./go/dist/pipe-bootstrap build
-  rules: *rules-default
   tags:
     - amd64
     - docker
