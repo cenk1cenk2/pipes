@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-json v0.28.0
 	github.com/joho/godotenv v1.5.1
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-	github.com/onsi/ginkgo/v2 v2.32.1
+	github.com/onsi/ginkgo/v2 v2.32.2
 	github.com/onsi/gomega v1.43.0
 	github.com/pulumi/pulumi/sdk/v3 v3.261.0
 	github.com/sirupsen/logrus v1.10.2
