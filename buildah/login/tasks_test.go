@@ -129,8 +129,8 @@ var _ = Describe("Container registry login", func() {
 	// remember to.
 	It("keeps the password out of the log", func() {
 		var (
-			app    *Plumber
-			output = &bytes.Buffer{}
+			plumber *Plumber
+			output  = &bytes.Buffer{}
 		)
 
 		*P = credentials()
@@ -140,14 +140,14 @@ var _ = Describe("Container registry login", func() {
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
 				func(p *Plumber, _ *cli.Command) *TaskList {
-					app = p.SetLoggerOutput(output)
+					plumber = p.SetLoggerOutput(output)
 
 					return New(p)
 				},
 			},
 		}).Run()).To(Succeed())
 
-		app.Log.Info(fmt.Sprintf("logging in with %s", P.Password))
+		plumber.Log.Info(fmt.Sprintf("logging in with %s", P.Password))
 		Expect(output.String()).NotTo(ContainSubstring("secret"))
 	})
 })
