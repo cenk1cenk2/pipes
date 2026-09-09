@@ -25,7 +25,7 @@ Login to the given container registries.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$BUILDAH_CWD` | Working directory for buildah commands. | `string` | `false` | <code>"."</code> |
+| `$BUILDAH_CWD`<br />`$CONTAINER_CWD` | Working directory for buildah commands. | `string` | `false` | <code>"."</code> |
 
 **Container Registry**
 
@@ -45,7 +45,7 @@ Build container images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$BUILDAH_CWD` | Working directory for buildah commands. | `string` | `false` | <code>"."</code> |
+| `$BUILDAH_CWD`<br />`$CONTAINER_CWD` | Working directory for buildah commands. | `string` | `false` | <code>"."</code> |
 
 **Container Image**
 
@@ -111,7 +111,7 @@ Update manifests of the container images.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$BUILDAH_CWD` | Working directory for buildah commands. | `string` | `false` | <code>"."</code> |
+| `$BUILDAH_CWD`<br />`$CONTAINER_CWD` | Working directory for buildah commands. | `string` | `false` | <code>"."</code> |
 
 **Container Manifest**
 
