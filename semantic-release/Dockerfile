@@ -16,7 +16,7 @@ RUN \
   corepack enable && corepack prepare pnpm@latest --activate && \
   mkdir -p ${SEMANTIC_RELEASE_HOME} && \
   cd ${SEMANTIC_RELEASE_HOME} && \
-  pnpm add --prod semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec semantic-release-docker semantic-release-replace-plugin && \
+  pnpm add semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec semantic-release-docker semantic-release-replace-plugin && \
   pnpm store prune && \
   # # https://github.com/npm/cli/issues/4605
   # npm i -g npm@8.4
