@@ -1,6 +1,6 @@
 # pipe-template
 
-template-cli
+A template for CLI scaffolding.
 
 `pipe-template [FLAGS]`
 

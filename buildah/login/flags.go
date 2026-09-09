@@ -7,44 +7,45 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_CONTAINER_REGISTRY = "Container Registry"
+	CategoryContainerRegistry = "Container Registry"
 )
 
+// Flags are declared once for the whole pipe, so every command that logs in registers the same ones.
 var Flags = []cli.Flag{
-
-	// CATEGORY_CONTAINER_REGISTRY
-
 	&cli.StringFlag{
-		Category: CATEGORY_CONTAINER_REGISTRY,
-		Name:     "container-registry.uri",
+		Category: CategoryContainerRegistry,
+		Name:     "buildah.login.registry.uri",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("BUILDAH_LOGIN_REGISTRY_URI"),
 			cli.EnvVar("CONTAINER_REGISTRY_URI"),
 		),
-		Usage:       "Container registry url to login to.",
+		Usage:       "Container registry URL to login to.",
 		Required:    false,
 		Value:       "docker.io",
-		Destination: &P.ContainerRegistry.Uri,
+		Destination: &P.Uri,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_CONTAINER_REGISTRY,
-		Name:     "container-registry.username",
+		Category: CategoryContainerRegistry,
+		Name:     "buildah.login.registry.username",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("BUILDAH_LOGIN_REGISTRY_USERNAME"),
 			cli.EnvVar("CONTAINER_REGISTRY_USERNAME"),
 		),
 		Usage:       "Container registry username for the given registry.",
 		Required:    false,
-		Destination: &P.ContainerRegistry.Username,
+		Destination: &P.Username,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_CONTAINER_REGISTRY,
-		Name:     "container-registry.password",
+		Category: CategoryContainerRegistry,
+		Name:     "buildah.login.registry.password",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("BUILDAH_LOGIN_REGISTRY_PASSWORD"),
 			cli.EnvVar("CONTAINER_REGISTRY_PASSWORD"),
 		),
 		Usage:       "Container registry password for the given registry.",
 		Required:    false,
-		Destination: &P.ContainerRegistry.Password,
+		Destination: &P.Password,
 	},
 }

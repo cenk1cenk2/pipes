@@ -7,46 +7,51 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_CONFIG       = "Config"
-	CATEGORY_PROJECT      = "Project"
-	CATEGORY_CI_VARIABLES = "Injected Variables"
+	CategoryConfig      = "Config"
+	CategoryProject     = "Project"
+	CategoryCIVariables = "Injected Variables"
 )
 
 var Flags = []cli.Flag{
-	// CATEGORY_CONFIG
+
+	// CategoryProject
+
 	&cli.StringFlag{
-		Category: CATEGORY_CONFIG,
-		Name:     "terraform-config.log-level",
+		Category: CategoryProject,
+		Name:     "terraform.cwd",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TERRAFORM_CWD"),
+			cli.EnvVar("TF_ROOT"),
+		),
+		Usage:       "Working directory for terraform commands.",
+		Required:    false,
+		Value:       ".",
+		Destination: &P.Cwd,
+	},
+
+	// CategoryConfig
+
+	&cli.StringFlag{
+		Category: CategoryConfig,
+		Name:     "terraform.log-level",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TERRAFORM_LOG_LEVEL"),
 			cli.EnvVar("TF_LOG_LEVEL"),
 			cli.EnvVar("TF_LOG"),
 		),
-		Usage:       `Terraform log level. enum("trace", "debug", "info", "warn", "error")`,
+		Usage:       `Terraform log level. format(enum("trace", "debug", "info", "warn", "error"))`,
 		Required:    false,
 		Value:       "",
-		Destination: &P.Config.LogLevel,
+		Destination: &P.LogLevel,
 	},
 
-	// CATEGORY_PROJECT
+	// CategoryCIVariables
 
 	&cli.StringFlag{
-		Category: CATEGORY_PROJECT,
-		Name:     "terraform-project.cwd",
+		Category: CategoryCIVariables,
+		Name:     "terraform.ci.api-url",
 		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("TF_ROOT"),
-		),
-		Usage:       "Terraform project working directory",
-		Required:    false,
-		Value:       ".",
-		Destination: &P.Project.Cwd,
-	},
-
-	// CATEGORY_CI_VARIABLES
-
-	&cli.StringFlag{
-		Category: CATEGORY_CI_VARIABLES,
-		Name:     "terraform-var.api-url",
-		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TERRAFORM_CI_API_URL"),
 			cli.EnvVar("TF_VAR_CI_API_V4_URL"),
 			cli.EnvVar("CI_API_V4_URL"),
 		),
@@ -57,9 +62,10 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_CI_VARIABLES,
-		Name:     "terraform-var.project-id",
+		Category: CategoryCIVariables,
+		Name:     "terraform.ci.project-id",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("TERRAFORM_CI_PROJECT_ID"),
 			cli.EnvVar("TF_VAR_CI_PROJECT_ID"),
 			cli.EnvVar("CI_PROJECT_ID"),
 		),

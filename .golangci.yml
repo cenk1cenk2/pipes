@@ -5,6 +5,8 @@ linters:
   default: standard
   exclusions:
     generated: lax
+    paths:
+      - test/mocks/
     rules:
       - linters:
           - lll

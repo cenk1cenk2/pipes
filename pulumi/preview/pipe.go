@@ -2,8 +2,8 @@ package preview
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 type (
@@ -15,10 +15,11 @@ type (
 		Plan string
 		Summary
 		MergeRequestReport gitlab.MergeRequestReportConfig
-		ReportMetadata     iac.Metadata
+		ReportMetadata     terraform.Metadata
 	}
 
 	Ctx struct {
+		Report terraform.Source
 	}
 )
 
@@ -32,20 +33,22 @@ func New(p *Plumber) *TaskList {
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
 			if !P.MergeRequestReport.Enabled {
-				P.MergeRequestReport.MergeRequestId = 0
+				P.MergeRequestReport.MergeRequestIid = 0
 			}
 
 			if err := p.Validate(P); err != nil {
 				return err
 			}
 
+			C.Report = reportSource()
+
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				PulumiPlan(tl).Job(),
-				PulumiSummary(tl).Job(),
-				PulumiMergeRequestReport(tl).Job(),
+				plan(tl).Job(),
+				terraform.SummaryTask(tl, &C.Report).Job(),
+				terraform.MergeRequestReportTask(tl, &C.Report).Job(),
 			)
 		})
 }

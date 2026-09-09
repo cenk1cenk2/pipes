@@ -8,7 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
-func HelmPackage(tl *TaskList) *Task {
+func packageTask(tl *TaskList) *Task {
 	return tl.CreateTask("package").
 		ShouldDisable(func(t *Task) bool {
 			if len(C.Versions) == 0 {
@@ -29,16 +29,16 @@ func HelmPackage(tl *TaskList) *Task {
 							"helm",
 							"package",
 							"-d",
-							P.HelmChart.Destination,
+							P.Chart.Destination,
 							".",
 							"--version",
 							version,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							SetDir(setup.P.Cwd).
+							SetDir(setup.C.Cwd).
 							Set(func(c *Command) error {
-								if P.HelmChart.AppVersion != "" {
-									c.AppendArgs("--app-version", P.HelmChart.AppVersion)
+								if P.Chart.AppVersion != "" {
+									c.AppendArgs("--app-version", P.Chart.AppVersion)
 								}
 
 								return nil
@@ -60,7 +60,7 @@ func HelmPackage(tl *TaskList) *Task {
 		})
 }
 
-func HelmPublish(tl *TaskList) *Task {
+func publish(tl *TaskList) *Task {
 	return tl.CreateTask("publish").
 		ShouldDisable(func(t *Task) bool {
 			if len(C.Versions) == 0 {
@@ -73,18 +73,18 @@ func HelmPublish(tl *TaskList) *Task {
 		}).
 		Set(func(t *Task) error {
 			for _, version := range C.Versions {
-				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, P.HelmChart.Target)
+				t.Log.Infof("Publishing Helm Chart with version: %s to %s", version, P.Chart.Target)
 
 				t.CreateSubtask(fmt.Sprintf("%s@%s", setup.C.Chart.Name(), version)).
 					Set(func(t *Task) error {
 						t.CreateCommand(
 							"helm",
 							"push",
-							filepath.Join(P.HelmChart.Destination, fmt.Sprintf("%s-%s.tgz", setup.C.Chart.Name(), version)),
-							P.HelmChart.Target,
+							filepath.Join(P.Chart.Destination, fmt.Sprintf("%s-%s.tgz", setup.C.Chart.Name(), version)),
+							P.Chart.Target,
 						).
 							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-							SetDir(setup.P.Cwd).
+							SetDir(setup.C.Cwd).
 							AddSelfToTheTask()
 
 						return nil

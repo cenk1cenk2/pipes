@@ -1,0 +1,83 @@
+package flags_test
+
+import (
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/urfave/cli/v3"
+
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
+)
+
+var _ = Describe("Unmarshalling flags", func() {
+	type condition struct {
+		Match       string `json:"match"       yaml:"match"`
+		Environment string `json:"environment" yaml:"environment"`
+	}
+
+	Describe("JSONFlag", func() {
+		It("unmarshals the value into the destination", func() {
+			dst := []condition{}
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
+
+			Expect(flag.Validator(`[{ "match": "^heads/main$", "environment": "develop" }]`)).To(Succeed())
+			Expect(dst).To(Equal([]condition{{Match: "^heads/main$", Environment: "develop"}}))
+		})
+
+		// most of these flags are optional, so an unset one leaves the pipe on its zero
+		// value rather than failing before the pipe has a chance to default it.
+		It("leaves the destination alone for an empty value", func() {
+			dst := []condition{{Match: "kept"}}
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
+
+			Expect(flag.Validator("")).To(Succeed())
+			Expect(dst).To(Equal([]condition{{Match: "kept"}}))
+		})
+
+		It("names the flag in the error so the message points at the input", func() {
+			dst := []condition{}
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
+
+			err := flag.Validator("{not json")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("conditions"))
+		})
+
+		// the defaults are non-empty literals that would otherwise never be parsed, so
+		// a typo in one would only surface once a user overrode something else.
+		It("makes the flag validate its own default", func() {
+			dst := []condition{}
+			flag := flags.JSONFlag(&dst, &cli.StringFlag{Name: "conditions"})
+
+			Expect(flag.ValidateDefaults).To(BeTrue())
+		})
+	})
+
+	Describe("YAMLFlag", func() {
+		It("unmarshals the value into the destination", func() {
+			dst := []condition{}
+			flag := flags.YAMLFlag(&dst, &cli.StringFlag{Name: "sanitize-tags"})
+
+			Expect(flag.Validator("- match: \"^tags/\"\n  environment: production\n")).To(Succeed())
+			Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
+		})
+
+		// the defaults are written as JSON but documented as YAML, which only works
+		// because YAML is a superset of it.
+		It("accepts the JSON the defaults are written in", func() {
+			dst := []condition{}
+			flag := flags.YAMLFlag(&dst, &cli.StringFlag{Name: "sanitize-tags"})
+
+			Expect(flag.Validator(`[{ "match": "^tags/", "environment": "production" }]`)).To(Succeed())
+			Expect(dst).To(Equal([]condition{{Match: "^tags/", Environment: "production"}}))
+		})
+
+		It("names the flag in the error", func() {
+			dst := []condition{}
+			flag := flags.YAMLFlag(&dst, &cli.StringFlag{Name: "sanitize-tags"})
+
+			err := flag.Validator("\t- broken")
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("sanitize-tags"))
+		})
+	})
+})

@@ -22,7 +22,10 @@ type (
 		Arch string `json:"arch,omitempty" yaml:"arch,omitempty"`
 	}
 
+	// Ctx holds the directories a binary is built out of, which leaves out the
+	// library modules a workspace carries next to the commands.
 	Ctx struct {
+		Packages []string
 	}
 )
 
@@ -35,15 +38,12 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoBuild(tl).Job(),
+				packages(tl).Job(),
+				build(tl).Job(),
 			)
 		})
 }

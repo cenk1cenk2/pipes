@@ -1,44 +1,42 @@
 ---
 stages:
-  - init
+  - build
   - container
 
 variables:
   GOPATH: $CI_PROJECT_DIR/.go
 
-init:
-  stage: init
+build:
+  stage: build
   image: golang:1.27-alpine
   variables:
     GO_BUILD_BINARY_NAME: pipe
-    GO_BUILD_LINKER: -w -s
+    GO_BUILD_LINKER_FLAGS: -w -s
     GO_BUILD_VARIABLES: |-
-      main.VERSION: bootstrap.{{ now | date "2006-01-02T15:04:05Z0700" }}
-  parallel:
-    matrix:
-      - GO_CWD: go
-      - GO_CWD: buildah
+      main.version: bootstrap.{{ now | date "2006-01-02T15:04:05Z0700" }}
   script:
     - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | BINDIR=/usr/bin sh -s
-    - go mod vendor
-    - go mod verify
+    - go work vendor
     - |-
-      (
-        cd go
-        go build -mod=vendor -o dist/pipe-bootstrap
-      )
+      for mod in $(go list -m -f '{{.Dir}}'); do
+        go -C "$mod" mod verify
+      done
+    - go build -C go -mod=vendor -o dist/pipe-bootstrap
     - ./go/dist/pipe-bootstrap --version
+    # vendoring and linting cover the whole workspace, so they are worth doing once
+    # rather than once per module; each build then points GO_CWD at one module.
     - ./go/dist/pipe-bootstrap lint
-    - ./go/dist/pipe-bootstrap build
+    - GO_CWD=./go ./go/dist/pipe-bootstrap build
+    - GO_CWD=./buildah ./go/dist/pipe-bootstrap build
   cache:
-    - key: bootstrap-init
+    - key: bootstrap-build
       paths:
         - vendor/
-        - $GO_CWD/dist/
         - .go/
   artifacts:
     paths:
-      - $GO_CWD/dist/
+      - go/dist/
+      - buildah/dist/
   tags:
     - amd64
     - docker
@@ -51,6 +49,9 @@ container:
     CONTAINER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
     CONTAINER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
   script:
+    # the buildah pipe built one stage ago is what builds both bootstrap images:
+    # the published :bootstrap image is what this run is about to replace, so
+    # reaching for it here would build the new images with the old binary.
     - ./buildah/dist/pipe-linux-amd64 build
   parallel:
     matrix:

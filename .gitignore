@@ -1,8 +1,11 @@
 .idea
 *.iml
 env
-**/vendor/
+/vendor/
+/go.work.sum
+/.go/
 **/dist/
+coverage.out
 **/.sonarqube
 **/node_modules
 

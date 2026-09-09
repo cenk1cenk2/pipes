@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 var _ = Describe("Pulumi plan merge request report", func() {
@@ -19,8 +19,8 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		return data
 	}
 
-	metadata := func() iac.Metadata {
-		return iac.Metadata{
+	metadata := func() terraform.Metadata {
+		return terraform.Metadata{
 			Target:         "dev",
 			Cwd:            ".",
 			JobName:        "pulumi-preview",
@@ -42,32 +42,30 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Expect(report.Total()).To(Equal(2))
 		Expect(report.Actions).To(HaveLen(2))
 		Expect(report.Actions[0].Action).To(Equal("create"))
-		Expect(report.Actions[0].Resources).To(ContainElement(iac.Resource{
+		Expect(report.Actions[0].Resources).To(ContainElement(terraform.Resource{
 			Name: "aws:s3/bucket:Bucket/logs",
 			Id:   "urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs",
 		}))
-		Expect(report.Actions[0].Outputs).To(ConsistOf(iac.Output{
+		Expect(report.Actions[0].Outputs).To(ConsistOf(terraform.Output{
 			Name:   "aws:s3/bucket:Bucket/logs",
 			Fields: []string{"bucketName"},
 		}))
 
-		summary := summarizePulumiReport(report)
-		Expect(summary).To(Equal(pulumiSummary{
+		summary := terraform.Summarize(report)
+		Expect(summary).To(Equal(terraform.Summary{
 			Create: 1,
 			Update: 1,
 			Delete: 0,
 		}))
 
-		summaryBody, err := renderSummary(summary)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(summaryBody)).To(Equal(`{
+		Expect(terraform.RenderSummary(summary)).To(Equal(`{
   "create": 1,
   "update": 1,
   "delete": 0
 }
 `))
 
-		body, err := iac.RenderMergeRequestReport(report)
+		body, err := terraform.RenderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("## Pulumi preview report"))
 		Expect(body).To(ContainSubstring("| Stack | `dev` |"))
@@ -96,24 +94,24 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Expect(report.Actions[2].Action).To(Equal("delete-replaced"))
 
 		for _, action := range report.Actions {
-			Expect(action.Resources).To(ContainElement(iac.Resource{
+			Expect(action.Resources).To(ContainElement(terraform.Resource{
 				Name: "aws:lambda/function:Function/worker",
 				Id:   "urn:pulumi:stage::example::aws:lambda/function:Function::worker",
 			}))
-			Expect(action.Outputs).To(ConsistOf(iac.Output{
+			Expect(action.Outputs).To(ConsistOf(terraform.Output{
 				Name:   "aws:lambda/function:Function/worker",
 				Fields: []string{"arn"},
 			}))
 		}
 
-		summary := summarizePulumiReport(report)
-		Expect(summary).To(Equal(pulumiSummary{
+		summary := terraform.Summarize(report)
+		Expect(summary).To(Equal(terraform.Summary{
 			Create: 1,
 			Update: 0,
 			Delete: 1,
 		}))
 
-		body, err := iac.RenderMergeRequestReport(report)
+		body, err := terraform.RenderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("Plan schema version"))
 		Expect(body).NotTo(ContainSubstring("secret-arn-value"))

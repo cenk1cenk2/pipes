@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	NodeInstall struct {
+	Install struct {
 		Cwd         string `validate:"dir"`
 		UseLockFile bool
 		Args        string
@@ -13,7 +13,7 @@ type (
 	}
 
 	Pipe struct {
-		NodeInstall
+		Install
 	}
 )
 
@@ -25,15 +25,11 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				InstallNodeDependencies(tl).Job(),
+				install(tl).Job(),
 			)
 		})
 }

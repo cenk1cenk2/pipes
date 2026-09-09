@@ -4,43 +4,45 @@ import (
 	"fmt"
 
 	"github.com/urfave/cli/v3"
-	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_NODE_COMMAND = "Command"
+	CategoryNodeCommand = "Command"
 )
 
 var Flags = []cli.Flag{
 
-	// CATEGORY_NODE_COMMAND
+	// CategoryNodeCommand
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_COMMAND,
-		Name:     "node.command_script",
+		Category: CategoryNodeCommand,
+		Name:     "node.run.script",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_RUN_SCRIPT"),
 			cli.EnvVar("NODE_COMMAND_SCRIPT"),
 		),
 		Usage: fmt.Sprintf(
-			"package.json script for given command operation. %s",
-			environment.HELP_FORMAT_ENVIRONMENT_TEMPLATE,
+			"package.json script for the given command operation. %s",
+			environment.HelpFormatTemplate,
 		),
 		Required:    false,
-		Destination: &P.NodeCommand.Script,
+		Destination: &P.Run.Script,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_NODE_COMMAND,
-		Name:     "node.command_cwd",
+		Category: CategoryNodeCommand,
+		Name:     "node.run.cwd",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("NODE_RUN_CWD"),
 			cli.EnvVar("NODE_COMMAND_CWD"),
 		),
 		Usage:       "Working directory for the given command operation.",
 		Required:    false,
 		Value:       ".",
-		Destination: &P.NodeCommand.Cwd,
+		Destination: &P.Run.Cwd,
 	},
 }
 
@@ -49,7 +51,7 @@ var Arguments = []cli.Argument{
 		Name:        "arg",
 		Min:         0,
 		Max:         -1,
-		UsageText:   "Tool to run.",
-		Destination: &P.NodeCommand.Command,
+		UsageText:   "Arguments appended to the script.",
+		Destination: &P.Run.Command,
 	},
 }

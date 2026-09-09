@@ -5,7 +5,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 )
 
-func PulumiUp(tl *TaskList) *Task {
+func up(tl *TaskList) *Task {
 	return tl.CreateTask("up").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -17,7 +17,7 @@ func PulumiUp(tl *TaskList) *Task {
 				"--plan",
 				P.Plan,
 			).
-				SetDir(setup.P.Cwd).
+				SetDir(setup.C.Cwd).
 				AddSelfToTheTask()
 
 			return nil

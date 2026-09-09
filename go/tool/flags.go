@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_TOOL = "Tool"
+	CategoryTool = "Tool"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_TOOL,
+		Category: CategoryTool,
 		Name:     "go.tool",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_TOOL"),
@@ -24,12 +24,12 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_TOOL,
+		Category: CategoryTool,
 		Name:     "go.tool.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_TOOL_ARGS"),
 		),
-		Usage:       "Arguments to append to tool command.",
+		Usage:       "Arguments to append to the tool command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,

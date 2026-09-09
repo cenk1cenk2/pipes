@@ -42,15 +42,11 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GenerateTerraformEnvVarsState(tl).Job(),
+				state(tl).Job(),
 			)
 		})
 }

@@ -4,8 +4,8 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func DefaultTask(tl *TaskList) *Task {
-	return tl.CreateTask("default").
+func entrypoint(tl *TaskList) *Task {
+	return tl.CreateTask("entrypoint").
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"echo",

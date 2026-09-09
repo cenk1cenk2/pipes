@@ -28,14 +28,17 @@ build:
   stage: build
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
+    # the parent's install job vendored the workspace and built the pipe from this
+    # commit; reaching across the pipeline boundary for its artifacts is what keeps
+    # this job from vendoring all over again.
     - pipeline: $CI_PARENT_PIPELINE_ID
       job: install
       artifacts: true
   variables:
     GO_BUILD_BINARY_NAME: pipe
-    GO_BUILD_LINKER: -w -s
+    GO_BUILD_LINKER_FLAGS: -w -s
     GO_BUILD_VARIABLES: |-
-      main.VERSION: BUILD.{{ now | date "2006-01-02T15:04:05Z0700" }}
+      main.version: BUILD.{{ now | date "2006-01-02T15:04:05Z0700" }}
     GO_BUILD_TARGETS: |-
       - os: linux
         arch: amd64
@@ -47,7 +50,9 @@ build:
     paths:
       - $GO_CWD/dist/
   script:
-    - pipe build
+    # the parent hands down the binary it built from this commit, so the pipe that
+    # builds every other pipe is never a release behind the flags it is given.
+    - ./go/dist/pipe-bootstrap build
   rules:
     - when: always
   tags:

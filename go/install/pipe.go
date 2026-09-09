@@ -9,30 +9,22 @@ type (
 		Verify bool
 		Args   string
 	}
-
-	Ctx struct {
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
-var C = &Ctx{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoModVendor(tl).Job(),
-				GoModVerify(tl).Job(),
+				vendor(tl).Job(),
+				verify(tl).Job(),
 			)
 		})
 }

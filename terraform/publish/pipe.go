@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	. "github.com/cenk1cenk2/plumber/v6"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
 type (
@@ -31,6 +32,7 @@ type (
 	Ctx struct {
 		Tags     []string
 		Packages []PublishablePackage
+		Registry gitlab.ModuleRegistryAdapter
 	}
 )
 
@@ -51,13 +53,19 @@ func New(p *Plumber) *TaskList {
 				return err
 			}
 
+			C.Registry = gitlab.NewModuleRegistry(
+				P.Registry.Gitlab.ApiUrl,
+				P.Registry.Gitlab.ProjectId,
+				P.Registry.Gitlab.Token,
+			)
+
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				TerraformTagsFile(tl).Job(),
-				TerraformPackage(tl).Job(),
-				TerraformPublish(tl).Job(),
+				tags(tl).Job(),
+				packageTask(tl).Job(),
+				publish(tl).Job(),
 			)
 		})
 }

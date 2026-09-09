@@ -1,7 +1,6 @@
 package plan
 
 import (
-	"encoding/json/jsontext"
 	json "encoding/json/v2"
 	"fmt"
 	"maps"
@@ -9,14 +8,8 @@ import (
 	"strings"
 
 	tfjson "github.com/hashicorp/terraform-json"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
-
-type terraformSummary struct {
-	Create int `json:"create"`
-	Update int `json:"update"`
-	Delete int `json:"delete"`
-}
 
 var mergeRequestReportActionOrder = []string{
 	"create",
@@ -30,17 +23,17 @@ var mergeRequestReportActionOrder = []string{
 	"unknown",
 }
 
-func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, error) {
+func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terraform.Report, error) {
 	plan, err := decodeTerraformShowPlan(output)
 	if err != nil {
-		return iac.Report{}, err
+		return terraform.Report{}, err
 	}
 
 	metadata.ToolVersion = plan.TerraformVersion
 	metadata.PlanTime = plan.Timestamp
 	metadata.PlanSchema = plan.FormatVersion
 
-	resources := map[string][]iac.Resource{}
+	resources := map[string][]terraform.Resource{}
 	for _, change := range plan.ResourceChanges {
 		if change == nil || change.Change == nil {
 			continue
@@ -49,7 +42,7 @@ func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, e
 		action := terraformChangeAction(change.Change.Actions)
 		moved := change.PreviousAddress != "" && change.PreviousAddress != change.Address
 
-		// A resource that only moved carries no-op actions, which would otherwise drop
+		// a resource that only moved carries no-op actions, which would otherwise drop
 		// it from the report entirely.
 		if action == "no-op" {
 			if !moved {
@@ -59,7 +52,7 @@ func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, e
 			action = "move"
 		}
 
-		resource := iac.Resource{
+		resource := terraform.Resource{
 			Name: change.Address,
 		}
 		if moved {
@@ -69,7 +62,7 @@ func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, e
 		resources[action] = append(resources[action], resource)
 	}
 
-	outputs := map[string][]iac.Output{}
+	outputs := map[string][]terraform.Output{}
 	for name, change := range plan.OutputChanges {
 		if change == nil {
 			continue
@@ -80,12 +73,12 @@ func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, e
 			continue
 		}
 
-		outputs[action] = append(outputs[action], iac.Output{Name: name})
+		outputs[action] = append(outputs[action], terraform.Output{Name: name})
 	}
 
-	return iac.Report{
+	return terraform.Report{
 		Title: "Terraform plan report",
-		Labels: iac.Labels{
+		Labels: terraform.Labels{
 			Target:      "State",
 			Outputs:     "Outputs",
 			ToolVersion: "Terraform version",
@@ -93,42 +86,6 @@ func parseTerraformShowPlan(output []byte, metadata iac.Metadata) (iac.Report, e
 		Metadata: metadata,
 		Actions:  mergeRequestReportActions(resources, outputs),
 	}, nil
-}
-
-func summarizeTerraformShowPlan(output []byte) (terraformSummary, error) {
-	plan, err := decodeTerraformShowPlan(output)
-	if err != nil {
-		return terraformSummary{}, err
-	}
-
-	summary := terraformSummary{}
-	for _, change := range plan.ResourceChanges {
-		if change == nil || change.Change == nil {
-			continue
-		}
-
-		for _, action := range change.Change.Actions {
-			switch action {
-			case tfjson.ActionCreate:
-				summary.Create++
-			case tfjson.ActionUpdate:
-				summary.Update++
-			case tfjson.ActionDelete:
-				summary.Delete++
-			}
-		}
-	}
-
-	return summary, nil
-}
-
-func renderSummary(summary terraformSummary) ([]byte, error) {
-	body, err := json.Marshal(summary, jsontext.Multiline(true), jsontext.WithIndent("  "))
-	if err != nil {
-		return nil, fmt.Errorf("render terraform summary: %w", err)
-	}
-
-	return append(body, '\n'), nil
 }
 
 func decodeTerraformShowPlan(output []byte) (tfjson.Plan, error) {
@@ -162,31 +119,31 @@ func terraformChangeAction(actions tfjson.Actions) string {
 }
 
 func mergeRequestReportActions(
-	resources map[string][]iac.Resource,
-	outputs map[string][]iac.Output,
-) []iac.Action {
+	resources map[string][]terraform.Resource,
+	outputs map[string][]terraform.Output,
+) []terraform.Action {
 	names := slices.Concat(slices.Collect(maps.Keys(resources)), slices.Collect(maps.Keys(outputs)))
 	slices.Sort(names)
 
-	actions := []iac.Action{}
+	actions := []terraform.Action{}
 	for _, name := range slices.Compact(names) {
-		action := iac.Action{
+		action := terraform.Action{
 			Action:    name,
 			Resources: slices.Clone(resources[name]),
 			Outputs:   slices.Clone(outputs[name]),
 		}
 
-		slices.SortFunc(action.Resources, func(left, right iac.Resource) int {
+		slices.SortFunc(action.Resources, func(left, right terraform.Resource) int {
 			return strings.Compare(left.Name, right.Name)
 		})
-		slices.SortFunc(action.Outputs, func(left, right iac.Output) int {
+		slices.SortFunc(action.Outputs, func(left, right terraform.Output) int {
 			return strings.Compare(left.Name, right.Name)
 		})
 
 		actions = append(actions, action)
 	}
 
-	iac.SortActions(actions, mergeRequestReportActionOrder)
+	terraform.SortActions(actions, mergeRequestReportActionOrder)
 
 	return actions
 }

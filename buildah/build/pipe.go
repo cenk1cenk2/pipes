@@ -2,19 +2,20 @@ package build
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
 type (
-	ContainerImage struct {
+	Image struct {
 		Platforms      []string
 		Name           string
 		Tags           []string
 		TagAsLatest    []string
 		TagsFile       string
 		TagsFileStrict bool
-		TagsSanitize   []ContainerImageMatch
-		TagsTemplate   []ContainerImageMatch
+		TagsSanitize   []versions.Match
+		TagsTemplate   []versions.Match
 		Pull           bool
 		Push           bool
 		BuildArgs      map[string]string
@@ -24,31 +25,25 @@ type (
 		StorageDriver  string `validate:"oneof=overlay overlay2 vfs"`
 	}
 
-	ContainerFile struct {
+	File struct {
 		Context string
 		Name    string
 	}
 
-	ContainerManifest struct {
+	Manifest struct {
 		Target string
 		File   string
 	}
 
-	ContainerImageMatch struct {
-		Match    string `json:"match"    yaml:"match"    validate:"required"`
-		Template string `json:"template" yaml:"template" validate:"required"`
-	}
-
 	Pipe struct {
-		Git flags.GitFlags
-		ContainerImage
-		ContainerFile
-		ContainerManifest
+		Git git.Refs
+		Image
+		File
+		Manifest
 	}
 
 	Ctx struct {
-		Tags       []string
-		References []string
+		Tags []string
 	}
 )
 
@@ -61,18 +56,13 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				ParseReferences(tl).Job(),
-				ContainerImageTagsParent(tl).Job(),
-				ContainerBuild(tl).Job(),
-				ContainerPush(tl).Job(),
+				tags(tl).Job(),
+				build(tl).Job(),
+				push(tl).Job(),
 			)
 		})
 }

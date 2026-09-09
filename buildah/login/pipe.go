@@ -4,35 +4,28 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-type (
-	ContainerRegistry struct {
-		Uri      string
-		Username string
-		Password string
-	}
+type Pipe struct {
+	Uri      string
+	Username string
+	Password string
+}
 
-	Pipe struct {
-		ContainerRegistry
-	}
-)
-
-var TL = TaskList{}
-
+// P is the registry the pipe authenticates against; the build and the manifest
+// commands read its uri back to prefix the images they publish.
 var P = &Pipe{}
 
+// New is the login stage of every buildah command.
 func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
+	tl := &TaskList{}
 
-			return nil
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				ContainerRegistryLogin(tl).Job(),
+				loginParent(tl).Job(),
 			)
 		})
 }

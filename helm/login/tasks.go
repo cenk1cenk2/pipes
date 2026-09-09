@@ -7,14 +7,14 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func HelmLogin(tl *TaskList) *Task {
+func login(tl *TaskList) *Task {
 	return tl.CreateTask("login").
 		ShouldDisable(func(t *Task) bool {
-			return P.HelmRegistry.Username == "" ||
-				P.HelmRegistry.Password == ""
+			return P.Username == "" ||
+				P.Password == ""
 		}).
 		ShouldRunBefore(func(t *Task) error {
-			t.Plumber.AppendSecrets(P.HelmRegistry.Password)
+			t.Plumber.AppendSecrets(P.Password)
 
 			return nil
 		}).
@@ -23,22 +23,22 @@ func HelmLogin(tl *TaskList) *Task {
 				"helm",
 				"registry",
 				"login",
-				P.HelmRegistry.Uri,
+				P.Uri,
 				"--username",
-				P.HelmRegistry.Username,
+				P.Username,
 				"--password-stdin",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command) error {
 					c.Log.Infof(
 						"Logging in to chart repository: %s",
-						P.HelmRegistry.Uri,
+						P.Uri,
 					)
 
 					return nil
 				}).
 				SetStdin(func(c *Command) io.Reader {
-					return strings.NewReader(P.HelmRegistry.Password)
+					return strings.NewReader(P.Password)
 				}).
 				AddSelfToTheTask()
 

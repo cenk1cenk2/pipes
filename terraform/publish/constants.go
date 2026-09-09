@@ -1,7 +1,7 @@
 package publish
 
 const (
-	TF_MODULE_OUTPUT_DIR = "/tmp"
+	TFModuleOutputDir = "/tmp"
 
-	TF_REGISTRY_GITLAB = "gitlab"
+	TFRegistryGitLab = "gitlab"
 )

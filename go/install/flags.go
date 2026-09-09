@@ -7,12 +7,12 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_INSTALL = "Install"
+	CategoryInstall = "Install"
 )
 
 var Flags = []cli.Flag{
 	&cli.BoolFlag{
-		Category: CATEGORY_INSTALL,
+		Category: CategoryInstall,
 		Name:     "go.install.verify",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_INSTALL_VERIFY"),
@@ -24,12 +24,12 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_INSTALL,
+		Category: CategoryInstall,
 		Name:     "go.install.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_INSTALL_ARGS"),
 		),
-		Usage:       "Arguments to append to install command.",
+		Usage:       "Arguments to append to the install command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,

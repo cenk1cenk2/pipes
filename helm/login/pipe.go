@@ -4,35 +4,27 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-type (
-	HelmRegistry struct {
-		Uri      string
-		Username string
-		Password string
-	}
+type Pipe struct {
+	Uri      string
+	Username string
+	Password string
+}
 
-	Pipe struct {
-		HelmRegistry
-	}
-)
-
-var TL = TaskList{}
-
+// P is the chart registry the pipe authenticates against.
 var P = &Pipe{}
 
+// New is the login stage of every helm command that pulls a dependency or pushes a chart.
 func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
+	tl := &TaskList{}
 
-			return nil
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmLogin(tl).Job(),
+				login(tl).Job(),
 			)
 		})
 }

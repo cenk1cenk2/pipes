@@ -1,0 +1,17 @@
+go 1.27.0
+
+use (
+	./_template
+	./buildah
+	./go
+	./helm
+	./internal
+	./kustomize
+	./node
+	./pulumi
+	./select-env
+	./semantic-release
+	./terraform
+	./tests
+	./update-docker-hub-readme
+)

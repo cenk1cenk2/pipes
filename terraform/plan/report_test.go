@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 var _ = Describe("Terraform merge request report", func() {
@@ -19,8 +19,8 @@ var _ = Describe("Terraform merge request report", func() {
 		return data
 	}
 
-	metadata := func() iac.Metadata {
-		return iac.Metadata{
+	metadata := func() terraform.Metadata {
+		return terraform.Metadata{
 			Target:         "production",
 			Cwd:            ".",
 			JobName:        "tf-plan",
@@ -42,34 +42,34 @@ var _ = Describe("Terraform merge request report", func() {
 		Expect(report.Total()).To(Equal(5))
 
 		Expect(report.Actions).To(ConsistOf(
-			iac.Action{
+			terraform.Action{
 				Action:    "create",
-				Resources: []iac.Resource{{Name: "aws_s3_bucket.logs"}},
-				Outputs:   []iac.Output{{Name: "bucket_name"}},
+				Resources: []terraform.Resource{{Name: "aws_s3_bucket.logs"}},
+				Outputs:   []terraform.Output{{Name: "bucket_name"}},
 			},
-			iac.Action{
+			terraform.Action{
 				Action:    "update",
-				Resources: []iac.Resource{{Name: "aws_instance.web"}},
-				Outputs:   []iac.Output{{Name: "endpoint"}},
+				Resources: []terraform.Resource{{Name: "aws_instance.web"}},
+				Outputs:   []terraform.Output{{Name: "endpoint"}},
 			},
-			iac.Action{
+			terraform.Action{
 				Action:    "delete",
 				Resources: nil,
-				Outputs:   []iac.Output{{Name: "password"}},
+				Outputs:   []terraform.Output{{Name: "password"}},
 			},
-			iac.Action{
+			terraform.Action{
 				Action:    "replace",
-				Resources: []iac.Resource{{Name: "aws_db_instance.main"}},
+				Resources: []terraform.Resource{{Name: "aws_db_instance.main"}},
 				Outputs:   nil,
 			},
-			iac.Action{
+			terraform.Action{
 				Action:    "move",
-				Resources: []iac.Resource{{Name: "aws_sqs_queue.jobs", PreviousName: "aws_sqs_queue.legacy_jobs"}},
+				Resources: []terraform.Resource{{Name: "aws_sqs_queue.jobs", PreviousName: "aws_sqs_queue.legacy_jobs"}},
 				Outputs:   nil,
 			},
-			iac.Action{
+			terraform.Action{
 				Action:    "read",
-				Resources: []iac.Resource{{Name: "data.aws_caller_identity.current"}},
+				Resources: []terraform.Resource{{Name: "data.aws_caller_identity.current"}},
 				Outputs:   nil,
 			},
 		))
@@ -91,7 +91,7 @@ var _ = Describe("Terraform merge request report", func() {
 		report, err := parseTerraformShowPlan(readFixture("plan.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
 
-		body, err := iac.RenderMergeRequestReport(report)
+		body, err := terraform.RenderMergeRequestReport(report)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("## Terraform plan report"))
@@ -116,17 +116,17 @@ var _ = Describe("Terraform merge request report", func() {
 	})
 
 	It("keeps the summary artifact independent of the report grouping", func() {
-		summary, err := summarizeTerraformShowPlan(readFixture("plan.json"))
+		report, err := parseTerraformShowPlan(readFixture("plan.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
-		Expect(summary).To(Equal(terraformSummary{
+
+		summary := terraform.Summarize(report)
+		Expect(summary).To(Equal(terraform.Summary{
 			Create: 2,
 			Update: 1,
 			Delete: 1,
 		}))
 
-		body, err := renderSummary(summary)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(string(body)).To(Equal(`{
+		Expect(terraform.RenderSummary(summary)).To(Equal(`{
   "create": 2,
   "update": 1,
   "delete": 1

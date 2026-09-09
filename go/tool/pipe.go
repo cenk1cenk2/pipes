@@ -13,15 +13,11 @@ type (
 		Args    string
 		Command []string
 	}
-
-	Ctx struct {
-	}
 )
 
 var TL = TaskList{}
 
 var P = &Pipe{}
-var C = &Ctx{}
 
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
@@ -36,15 +32,11 @@ func New(p *Plumber) *TaskList {
 				}
 			}
 
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				GoTool(tl).Job(),
+				tool(tl).Job(),
 			)
 		})
 }

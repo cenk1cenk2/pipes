@@ -6,31 +6,33 @@ import (
 
 type (
 	Pipe struct {
-		Cwd string `validate:"dirpath"`
+		Cwd string `validate:"omitempty,dir"`
 	}
 
+	// Ctx is what New resolves; the values only land once the setup task list has run,
+	// so the pipe holds on to the same instance the steps read back.
 	Ctx struct {
+		Cwd     string
+		Version string
+		Env     map[string]string
 	}
 )
 
-var TL = TaskList{}
-
 var P = &Pipe{}
-var C = &Ctx{}
+var C = &Ctx{Env: map[string]string{}}
 
 func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
+	tl := &TaskList{}
 
-			return nil
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				Setup(tl).Job(),
+				initialize(tl).Job(),
+				version(tl).Job(),
 			)
 		})
 }

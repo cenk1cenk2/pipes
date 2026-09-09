@@ -5,7 +5,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func TerraformInstall(tl *TaskList) *Task {
+func install(tl *TaskList) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
 			t.CreateCommand(
@@ -32,8 +32,8 @@ func TerraformInstall(tl *TaskList) *Task {
 
 					return nil
 				}).
-				SetDir(setup.P.Cwd).
-				AppendEnvironment(setup.C.EnvVars).
+				SetDir(setup.C.Cwd).
+				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil

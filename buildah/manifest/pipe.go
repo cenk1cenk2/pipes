@@ -8,20 +8,20 @@ import (
 )
 
 type (
-	ContainerManifest struct {
+	Manifest struct {
 		Target string
 		Images []string
 		Files  []string
-		Matrix []ContainerManifestMatrix
+		Matrix []ManifestMatrix
 	}
 
-	ContainerManifestMatrix struct {
+	ManifestMatrix struct {
 		Target string   `json:"target,omitempty" yaml:"target,omitempty"`
 		Images []string `json:"images"           yaml:"images"`
 	}
 
 	Pipe struct {
-		ContainerManifest
+		Manifest
 	}
 
 	Ctx struct {
@@ -39,10 +39,10 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if login.P.ContainerRegistry.Uri != "" {
-				P.ContainerManifest.Target = fmt.Sprintf("%s/%s", login.P.ContainerRegistry.Uri, P.ContainerManifest.Target)
+			if login.P.Uri != "" {
+				P.Manifest.Target = fmt.Sprintf("%s/%s", login.P.Uri, P.Manifest.Target)
 
-				tl.Log.Infof("Using default manifest target: %s", P.ContainerManifest.Target)
+				tl.Log.Infof("Using default manifest target: %s", P.Manifest.Target)
 			}
 
 			if err := p.Validate(P); err != nil {
@@ -57,12 +57,12 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				JobParallel(
 					JobSequence(
-						DiscoverPublishedImageFiles(tl).Job(),
-						FetchPublishedImagesFromFiles(tl).Job(),
+						discoverFile(tl).Job(),
+						fetchFile(tl).Job(),
 					),
-					FetchUserPublishedImages(tl).Job(),
+					fetchUser(tl).Job(),
 				),
-				UpdateManifests(tl).Job(),
+				manifest(tl).Job(),
 			)
 		})
 }

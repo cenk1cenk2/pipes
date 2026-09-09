@@ -10,32 +10,36 @@ type (
 		Cache string `validate:"omitempty,dirpath"`
 	}
 
+	// Ctx carries whether the modules are driven as a workspace, so the commands
+	// that tell the two apart never look for the workspace file again.
 	Ctx struct {
-		EnvVars map[string]string
+		Cwd       string
+		Version   string
+		Env       map[string]string
+		Workspace bool
+		// Modules are the directories the workspace drives, resolved once for lint and build.
+		Modules []string
 	}
 )
 
-var TL = TaskList{}
-
 var P = &Pipe{}
-var C = &Ctx{
-	EnvVars: map[string]string{},
-}
+var C = &Ctx{Env: map[string]string{}}
 
 func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
+	tl := &TaskList{}
 
-			return nil
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
-			return JobParallel(
-				GoVersion(tl).Job(),
-				GoEnv(tl).Job(),
+			return JobSequence(
+				initialize(tl).Job(),
+				version(tl).Job(),
+				env(tl).Job(),
+				workspace(tl).Job(),
+				modules(tl).Job(),
 			)
 		})
 }

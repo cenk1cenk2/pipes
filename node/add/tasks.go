@@ -1,42 +1,32 @@
-package pipe
+package add
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
-	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
-func AddNodeModules(tl *TaskList) *Task {
-	return tl.CreateTask("packages", "node").
+func add(tl *TaskList) *Task {
+	return tl.CreateTask("add").
 		Set(func(t *Task) error {
+			packageManager := setup.NodeCtx.PackageManager
+
 			t.CreateCommand(
-				setup.C.PackageManager.Exe,
+				packageManager.Exe,
 			).
 				Set(func(c *Command) error {
-					ctx := environment.EnvironmentTemplate{
-						Environment: environment.C.Environment,
-						EnvVars:     environment.C.EnvVars,
+					if P.Add.Global {
+						c.AppendArgs(packageManager.Commands.Global...)
 					}
 
-					if P.NodeAdd.Global {
-						c.AppendArgs(setup.C.PackageManager.Commands.Global...)
+					c.AppendArgs(packageManager.Commands.Add...)
+
+					if P.Add.ScriptArgs != "" {
+						c.AppendArgs(P.Add.ScriptArgs)
 					}
 
-					c.AppendArgs(setup.C.PackageManager.Commands.Add...)
+					c.AppendArgs(P.Add.Packages...)
 
-					if P.NodeAdd.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(P.NodeAdd.ScriptArgs, ctx)
-
-						if err != nil {
-							return err
-						}
-
-						c.AppendArgs(tmpl)
-					}
-
-					c.AppendArgs(P.NodeAdd.Packages...)
-
-					c.SetDir(P.NodeAdd.Cwd)
+					c.SetDir(P.Add.Cwd)
 
 					return nil
 				}).

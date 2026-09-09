@@ -1,0 +1,34 @@
+package build
+
+import (
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
+	"gitlab.kilic.dev/devops/pipes/buildah/login"
+)
+
+var _ = Describe("Container image tags", func() {
+	format := func(uri, name, tag string) string {
+		GinkgoHelper()
+
+		P.Image.Name = name
+		login.P.Uri = uri
+
+		return tagsCollector().Format(tag)
+	}
+
+	It("prefixes the image with the registry the login step authenticated against", func() {
+		Expect(format("registry.example.com", "group/image", "v1.0.0")).
+			To(Equal("registry.example.com/group/image:v1.0.0"))
+	})
+
+	// a pipeline with no registry builds locally, where a prefix names nothing that is pushed.
+	It("leaves the image unprefixed without a registry", func() {
+		Expect(format("", "group/image", "v1.0.0")).To(Equal("group/image:v1.0.0"))
+	})
+
+	It("keeps a registry that already carries a port and a path", func() {
+		Expect(format("registry.example.com:5000/mirror", "image", "latest")).
+			To(Equal("registry.example.com:5000/mirror/image:latest"))
+	})
+})

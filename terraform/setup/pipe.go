@@ -5,51 +5,42 @@ import (
 )
 
 type (
-	Project struct {
-		Cwd string `validate:"omitempty,dir"`
-	}
-
 	CiVariables struct {
 		ProjectId string
 		ApiUrl    string
 	}
 
-	Config struct {
+	Pipe struct {
+		CiVariables
+		Cwd      string `validate:"omitempty,dir"`
 		LogLevel string `validate:"omitempty,oneof=trace debug info warn error"`
 	}
 
-	Pipe struct {
-		Project
-		Config
-		CiVariables
-	}
-
+	// Ctx is what New resolves; the values only land once the setup task list has run,
+	// so the pipe holds on to the same instance the steps read back.
 	Ctx struct {
-		EnvVars map[string]string
+		Cwd     string
+		Version string
+		Env     map[string]string
 	}
 )
 
-var TL = TaskList{}
-
 var P = &Pipe{}
-var C = &Ctx{}
+var C = &Ctx{Env: map[string]string{}}
 
 func New(p *Plumber) *TaskList {
-	return TL.New(p).
+	tl := &TaskList{}
+
+	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			C.EnvVars = make(map[string]string)
-
-			return nil
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
-			return JobParallel(
-				Version(tl).Job(),
-				GenerateTerraformEnvVars(tl).Job(),
+			return JobSequence(
+				initialize(tl).Job(),
+				version(tl).Job(),
+				environment(tl).Job(),
 			)
 		})
 }

@@ -9,24 +9,24 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_LINT = "Lint"
+	CategoryLint = "Lint"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "go.lint.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_LINT_ARGS"),
 		),
-		Usage:       "Arguments to append to lint command.",
+		Usage:       "Arguments to append to the lint command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,
 	},
 
 	&cli.DurationFlag{
-		Category: CATEGORY_LINT,
+		Category: CategoryLint,
 		Name:     "go.lint.timeout",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_LINT_TIMEOUT"),
@@ -35,17 +35,5 @@ var Flags = []cli.Flag{
 		Required:    false,
 		Value:       time.Duration(5 * time.Minute),
 		Destination: &P.Timeout,
-	},
-
-	&cli.StringFlag{
-		Category: CATEGORY_LINT,
-		Name:     "go.lint.cache",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("GO_LINT_CACHE"),
-		),
-		Usage:       "Path to cache lint results.",
-		Required:    false,
-		Value:       "./.golangci-lint",
-		Destination: &P.Cache,
 	},
 }

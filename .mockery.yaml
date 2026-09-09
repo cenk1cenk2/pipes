@@ -1,0 +1,23 @@
+---
+log-level: info
+template: testify
+force-file-write: true
+formatter: goimports
+filename: "{{.InterfaceName | snakecase}}.go"
+structname: "Mock{{.InterfaceName}}"
+include-auto-generated: false
+recursive: false
+packages:
+  gitlab.kilic.dev/devops/pipes/internal/gitlab:
+    config:
+      dir: internal/test/mocks/gitlab
+      pkgname: mockgitlab
+    interfaces:
+      NotesAdapter:
+      ModuleRegistryAdapter:
+  gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub:
+    config:
+      dir: update-docker-hub-readme/test/mocks/hub
+      pkgname: mockhub
+    interfaces:
+      ClientAdapter:

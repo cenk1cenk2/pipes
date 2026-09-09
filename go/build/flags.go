@@ -1,33 +1,31 @@
 package build
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v3"
-	"go.yaml.in/yaml/v4"
+	"gitlab.kilic.dev/devops/pipes/internal/flags"
 )
 
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_BUILD = "Build"
+	CategoryBuild = "Build"
 )
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_ARGS"),
 		),
-		Usage:       "Arguments to append to build command.",
+		Usage:       "Arguments to append to the build command.",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Args,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.output",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_OUTPUT"),
@@ -39,7 +37,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.binary-name",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_BINARY_NAME"),
@@ -51,21 +49,22 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.binary-template",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_BINARY_TEMPLATE"),
 		),
-		Usage:       "Binary naming for the build artifact. format(Template(map[string]))",
+		Usage:       "Binary naming for the build artifact. format(Template(map[string]string))",
 		Required:    false,
 		Value:       "{{ .name }}{{ if .os }}-{{ .os }}{{ end }}{{ if .arch }}-{{ .arch }}{{ end }}",
 		Destination: &P.BinaryTemplate,
 	},
 
 	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
-		Name:     "go.build.linker",
+		Category: CategoryBuild,
+		Name:     "go.build.linker-flags",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_BUILD_LINKER_FLAGS"),
 			cli.EnvVar("GO_BUILD_LINKER"),
 		),
 		Usage:       "Arguments for the linker during the build process. format(Template())",
@@ -75,7 +74,7 @@ var Flags = []cli.Flag{
 	},
 
 	&cli.BoolFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.enable-cgo",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_ENABLE_CGO"),
@@ -87,31 +86,19 @@ var Flags = []cli.Flag{
 		Destination: &P.EnableCGO,
 	},
 
-	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+	flags.YAMLFlag(&P.BuildTargets, &cli.StringFlag{
+		Category: CategoryBuild,
 		Name:     "go.build.targets",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_TARGETS"),
 		),
-		Usage:            "Build targets for the build process. format(yaml([]struct{ os: string?, arch: string? }))",
-		Required:         false,
-		Value:            `[]`,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
-
-			if err := yaml.Unmarshal([]byte(v), &P.BuildTargets); err != nil {
-				return fmt.Errorf("Cannot unmarshal build targets: %w", err)
-			}
-
-			return nil
-		},
-	},
+		Usage:    "Build targets for the build process. format(yaml([]struct{ os?: string, arch?: string }))",
+		Required: false,
+		Value:    `[]`,
+	}),
 
 	&cli.StringSliceFlag{
-		Category: CATEGORY_BUILD,
+		Category: CategoryBuild,
 		Name:     "go.build.tags",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_TAGS"),
@@ -122,26 +109,14 @@ var Flags = []cli.Flag{
 		Destination: &P.BuildTags,
 	},
 
-	&cli.StringFlag{
-		Category: CATEGORY_BUILD,
+	flags.YAMLFlag(&P.BuildVariables, &cli.StringFlag{
+		Category: CategoryBuild,
 		Name:     "go.build.variables",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_BUILD_VARIABLES"),
 		),
-		Usage:            "Build variables for the build process. format(yaml(map[string]string))",
-		Required:         false,
-		Value:            `{}`,
-		ValidateDefaults: true,
-		Validator: func(v string) error {
-			if v == "" {
-				return nil
-			}
-
-			if err := yaml.Unmarshal([]byte(v), &P.BuildVariables); err != nil {
-				return fmt.Errorf("Cannot unmarshal build variables: %w", err)
-			}
-
-			return nil
-		},
-	},
+		Usage:    "Build variables for the build process. format(yaml(map[string]string))",
+		Required: false,
+		Value:    `{}`,
+	}),
 }

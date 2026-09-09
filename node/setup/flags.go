@@ -1,29 +1,13 @@
 package setup
 
 import (
-	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	"gitlab.kilic.dev/devops/pipes/internal/environment"
+	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
 
-//revive:disable:line-length-limit
-
-const (
-	CATEGORY_NODE_PACKAGE_MANAGER = "Package Manager"
+// The flags are built once, since main unhides the environment enable flag on the
+// slice it hands to the subcommands and a second slice would not carry it.
+var (
+	EnvironmentFlags = environment.NewFlags(environment.Options{Destination: Environment})
+	NodeFlags        = node.NewFlags(node.Options{Destination: NodeConfig})
 )
-
-var Flags = []cli.Flag{
-
-	// CATEGORY_NODE_PACKAGE_MANAGER
-
-	&cli.StringFlag{
-		Category: CATEGORY_NODE_PACKAGE_MANAGER,
-		Name:     "node.package_manager",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("NODE_PACKAGE_MANAGER"),
-		),
-		Usage:       `Preferred Package manager for nodejs. enum("npm", "yarn", "pnpm")`,
-		Required:    false,
-		Value:       flags.FLAG_DEFAULT_NODE_PACKAGE_MANAGER,
-		Destination: &P.Node.PackageManager,
-	},
-}

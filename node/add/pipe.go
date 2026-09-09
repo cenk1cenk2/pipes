@@ -1,11 +1,11 @@
-package pipe
+package add
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
 type (
-	NodeAdd struct {
+	Add struct {
 		Packages   []string
 		Global     bool
 		ScriptArgs string
@@ -13,7 +13,7 @@ type (
 	}
 
 	Pipe struct {
-		NodeAdd
+		Add
 	}
 )
 
@@ -25,18 +25,14 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldDisable(func(tl *TaskList) bool {
-			return len(P.NodeAdd.Packages) == 0
+			return len(P.Add.Packages) == 0
 		}).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				AddNodeModules(tl).Job(),
+				add(tl).Job(),
 			)
 		})
 }

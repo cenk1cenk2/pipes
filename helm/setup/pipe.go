@@ -7,33 +7,34 @@ import (
 
 type (
 	Pipe struct {
-		Cwd string `validate:"omitempty,dirpath"`
+		Cwd string `validate:"omitempty,dir"`
 	}
 
+	// Ctx carries the chart alongside what the setup resolves, so the pipes that publish it read one context.
 	Ctx struct {
-		Chart *helmv2.Chart
+		Cwd     string
+		Version string
+		Env     map[string]string
+		Chart   *helmv2.Chart
 	}
 )
 
-var TL = TaskList{}
-
 var P = &Pipe{}
-var C = &Ctx{}
+var C = &Ctx{Env: map[string]string{}}
 
 func New(p *Plumber) *TaskList {
-	return TL.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
+	tl := &TaskList{}
 
-			return nil
+	return tl.New(p).
+		SetRuntimeDepth(3).
+		ShouldRunBefore(func(_ *TaskList) error {
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				HelmVersion(tl).Job(),
-				HelmLoadChart(tl).Job(),
+				initialize(tl).Job(),
+				version(tl).Job(),
+				read(tl).Job(),
 			)
 		})
 }

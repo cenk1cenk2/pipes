@@ -23,16 +23,12 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobParallel(
-				HelmLint(tl).Job(),
-				HelmTemplate(tl).Job(),
+				lint(tl).Job(),
+				template(tl).Job(),
 			)
 		})
 }

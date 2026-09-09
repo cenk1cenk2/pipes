@@ -9,7 +9,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
-func GenerateTerraformEnvVarsState(tl *TaskList) *Task {
+func state(tl *TaskList) *Task {
 	return tl.CreateTask("state").
 		Set(func(t *Task) error {
 			if P.State.Strict && P.State.Type == "" {
@@ -21,20 +21,20 @@ func GenerateTerraformEnvVarsState(tl *TaskList) *Task {
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
 				job,
-				GenerateTerraformEnvVarsGitlabState(t.TL).Job(),
+				stateGitlabHttp(t.TL).Job(),
 			)
 		})
 }
 
-func GenerateTerraformEnvVarsGitlabState(tl *TaskList) *Task {
+func stateGitlabHttp(tl *TaskList) *Task {
 	return tl.CreateTask("state", "gitlab-http").
 		ShouldDisable(func(t *Task) bool {
-			return P.State.Type != TF_STATE_TYPE_GITLAB_HTTP
+			return P.State.Type != TFStateTypeGitLabHTTP
 		}).
 		Set(func(t *Task) error {
 			if P.GitlabHttpState.HttpAddress == "" {
 				P.GitlabHttpState.HttpAddress = strings.Join([]string{
-					setup.P.ApiUrl,
+					setup.P.CiVariables.ApiUrl,
 					"projects",
 					url.PathEscape(setup.P.CiVariables.ProjectId),
 					"terraform/state",
@@ -46,7 +46,7 @@ func GenerateTerraformEnvVarsGitlabState(tl *TaskList) *Task {
 				t.Log.Debugf("State HTTP address has not been set, using default for state type: %s", P.GitlabHttpState.HttpAddress)
 			}
 
-			setup.C.EnvVars["TF_HTTP_ADDRESS"] = P.GitlabHttpState.HttpAddress
+			setup.C.Env["TF_HTTP_ADDRESS"] = P.GitlabHttpState.HttpAddress
 
 			if P.GitlabHttpState.HttpLockAddress == "" {
 				P.GitlabHttpState.HttpLockAddress = strings.Join([]string{
@@ -57,8 +57,8 @@ func GenerateTerraformEnvVarsGitlabState(tl *TaskList) *Task {
 				t.Log.Debugf("State HTTP lock address has not been set, using default for state type: %s", P.GitlabHttpState.HttpLockAddress)
 			}
 
-			setup.C.EnvVars["TF_HTTP_LOCK_ADDRESS"] = P.GitlabHttpState.HttpLockAddress
-			setup.C.EnvVars["TF_HTTP_LOCK_METHOD"] = P.GitlabHttpState.HttpLockMethod
+			setup.C.Env["TF_HTTP_LOCK_ADDRESS"] = P.GitlabHttpState.HttpLockAddress
+			setup.C.Env["TF_HTTP_LOCK_METHOD"] = P.GitlabHttpState.HttpLockMethod
 
 			if P.GitlabHttpState.HttpUnlockAddress == "" {
 				P.GitlabHttpState.HttpUnlockAddress = strings.Join([]string{
@@ -69,23 +69,23 @@ func GenerateTerraformEnvVarsGitlabState(tl *TaskList) *Task {
 				t.Log.Debugf("State HTTP unlock address has not been set, using default for state type: %s", P.GitlabHttpState.HttpUnlockAddress)
 			}
 
-			setup.C.EnvVars["TF_HTTP_UNLOCK_ADDRESS"] = P.GitlabHttpState.HttpUnlockAddress
-			setup.C.EnvVars["TF_HTTP_UNLOCK_METHOD"] = P.GitlabHttpState.HttpUnlockMethod
+			setup.C.Env["TF_HTTP_UNLOCK_ADDRESS"] = P.GitlabHttpState.HttpUnlockAddress
+			setup.C.Env["TF_HTTP_UNLOCK_METHOD"] = P.GitlabHttpState.HttpUnlockMethod
 
 			if P.GitlabHttpState.HttpUsername == "" {
 				return fmt.Errorf("TF_HTTP_USERNAME is required for state type: %s", P.State.Type)
 			}
-			setup.C.EnvVars["TF_HTTP_USERNAME"] = P.GitlabHttpState.HttpUsername
+			setup.C.Env["TF_HTTP_USERNAME"] = P.GitlabHttpState.HttpUsername
 
 			if P.GitlabHttpState.HttpPassword == "" {
 				return fmt.Errorf("TF_HTTP_PASSWORD is required for state type: %s", P.State.Type)
 			}
-			setup.C.EnvVars["TF_HTTP_PASSWORD"] = P.GitlabHttpState.HttpPassword
+			setup.C.Env["TF_HTTP_PASSWORD"] = P.GitlabHttpState.HttpPassword
 			t.Plumber.AppendSecrets(P.GitlabHttpState.HttpPassword)
 
-			setup.C.EnvVars["TF_HTTP_RETRY_WAIT_MIN"] = P.GitlabHttpState.HttpRetryWaitMin
+			setup.C.Env["TF_HTTP_RETRY_WAIT_MIN"] = P.GitlabHttpState.HttpRetryWaitMin
 
-			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", setup.C.EnvVars)
+			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", setup.C.Env)
 
 			return nil
 		})

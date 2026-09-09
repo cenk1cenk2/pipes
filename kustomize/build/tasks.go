@@ -10,7 +10,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/kustomize/setup"
 )
 
-func RenderOverlays(tl *TaskList) *Task {
+func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").
 		ShouldDisable(func(t *Task) bool {
 			return len(setup.C.Overlays) == 0

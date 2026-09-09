@@ -2,13 +2,13 @@ package build
 
 import (
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/flags"
+	"gitlab.kilic.dev/devops/pipes/internal/git"
 )
 
 type (
-	Git flags.GitFlags
+	Git git.Refs
 
-	NodeBuild struct {
+	Build struct {
 		Script     string
 		ScriptArgs string
 		Cwd        string `validate:"dir"`
@@ -16,7 +16,7 @@ type (
 
 	Pipe struct {
 		Git
-		NodeBuild
+		Build
 	}
 )
 
@@ -28,15 +28,11 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(tl *TaskList) error {
-			if err := p.Validate(P); err != nil {
-				return err
-			}
-
-			return nil
+			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				BuildNodeApplication(tl).Job(),
+				build(tl).Job(),
 			)
 		})
 }

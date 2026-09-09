@@ -3,7 +3,12 @@
 
 version: "3"
 
-vars: {}
+vars:
+  # every pipe module the fan-out tasks iterate, space separated. The template comes
+  # first, so the scaffold breaks before the published pipes do.
+  PACKAGES: >-
+    template buildah go helm kustomize node pulumi select-env
+    semantic-release terraform update-docker-hub-readme
 
 env:
   CGO_ENABLED: 0
@@ -12,12 +17,19 @@ env:
 output: prefixed
 
 includes:
-  go-library:
-    taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-library.yml?ref_type=heads
+  go-workspace:
+    taskfile: https://gitlab.kilic.dev/libraries/taskfiles/-/raw/main/Taskfile.go-workspace.yml?ref_type=heads
     flatten: true
+    excludes:
+      - test
   template:
     dir: ./_template
     taskfile: ./Taskfile.pipe.yml
+    # the scaffold ships no specs and ginkgo fails a run that finds no suites.
+    excludes:
+      - test
+  # include keys are static YAML and cannot be driven by a variable, so this is the
+  # one place the pipe list stays written out.
   buildah:
     dir: ./buildah
     taskfile: ./Taskfile.pipe.yml
@@ -50,31 +62,44 @@ includes:
     taskfile: ./Taskfile.pipe.yml
 
 tasks:
-  packages:
-    internal: true
-    deps:
-      - task: "template:{{ .command }}"
-      - task: "buildah:{{ .command }}"
-      - task: "go:{{ .command }}"
-      - task: "helm:{{ .command }}"
-      - task: "kustomize:{{ .command }}"
-      - task: "node:{{ .command }}"
-      - task: "pulumi:{{ .command }}"
-      - task: "select-env:{{ .command }}"
-      - task: "semantic-release:{{ .command }}"
-      - task: "terraform:{{ .command }}"
-      - task: "update-docker-hub-readme:{{ .command }}"
-
   build:
     desc: Builds all the applications.
-    cmds:
-      - task: packages
-        vars:
-          command: build
+    deps:
+      - for: { var: PACKAGES }
+        task: "{{ .ITEM }}:build"
 
   docs:
     desc: Generates documentation for all applications.
+    # parallel `go run` compilations exhaust the memory of the CI runner, so the
+    # documentation is generated one pipe at a time.
     cmds:
-      - task: packages
-        vars:
-          command: docs
+      - for: { var: PACKAGES }
+        task: "{{ .ITEM }}:docs"
+
+  test:
+    desc: Tests every module in the workspace with ginkgo.
+    cmds:
+      - |-
+        go tool ginkgo \
+        --cover --coverpkg=./... --coverprofile=coverage.out \
+        -vv --silence-skips --fail-fast -r \
+        {{ .CLI_ARGS }} \
+        ./...
+
+  generate:
+    desc: Generates checked-in files.
+    cmds:
+      - task: generate:mockery
+
+  generate:mockery:
+    internal: true
+    cmds:
+      - go tool mockery
+    generates:
+      - "**/test/mocks/**"
+    sources:
+      - .mockery.yaml
+      - "**/*.go"
+      - "**/go.{mod,sum}"
+      - go.work
+      - exclude: "**/test/mocks/**"

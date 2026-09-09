@@ -5,17 +5,21 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/common/gitlab"
-	"gitlab.kilic.dev/devops/pipes/common/report/iac"
+	"gitlab.kilic.dev/devops/pipes/internal/ci"
+	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
+
+const CategoryPlan = "Plan"
 
 //revive:disable:line-length-limit
 
 var Flags = CombineFlags(
 	[]cli.Flag{
 		&cli.StringFlag{
-			Name: "terraform-plan.out",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.output",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_OUTPUT"),
 				cli.EnvVar("TF_PLAN_CACHE"),
 				cli.EnvVar("TF_APPLY_OUTPUT"),
 				cli.EnvVar("TF_PLAN_OUTPUT"),
@@ -27,8 +31,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform-plan.args",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.args",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_ARGS"),
 				cli.EnvVar("TF_PLAN_ARGS"),
 			),
 			Usage:       "Additional arguments for terraform plan.",
@@ -38,8 +44,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.BoolFlag{
-			Name: "terraform-plan.preview-for-mrs",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.preview-for-merge-requests",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS"),
 				cli.EnvVar("TF_PLAN_PREVIEW_FOR_MRS"),
 			),
 			Usage:       "Run merge request terraform plans as previews without state locking.",
@@ -49,8 +57,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform-plan.pipeline-source",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.pipeline-source",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_PIPELINE_SOURCE"),
 				cli.EnvVar("CI_PIPELINE_SOURCE"),
 			),
 			Usage:       "GitLab CI pipeline source used to detect merge request pipelines.",
@@ -60,8 +70,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.Uint32Flag{
-			Name: "terraform-plan.retry-tries",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.retry-tries",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_RETRY_TRIES"),
 				cli.EnvVar("TF_PLAN_RETRY_TRIES"),
 			),
 			Usage:       "Number of retries for terraform plan command.",
@@ -71,8 +83,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.DurationFlag{
-			Name: "terraform-plan.retry-delay",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.retry-delay",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_RETRY_DELAY"),
 				cli.EnvVar("TF_PLAN_RETRY_DELAY"),
 			),
 			Usage:       "Delay between retries for terraform plan command.",
@@ -82,8 +96,10 @@ var Flags = CombineFlags(
 		},
 
 		&cli.StringFlag{
-			Name: "terraform-plan.summary-output",
+			Category: CategoryPlan,
+			Name:     "terraform.plan.summary.output",
 			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PLAN_SUMMARY_OUTPUT"),
 				cli.EnvVar("TERRAFORM_SUMMARY_OUTPUT"),
 			),
 			Usage:       "Output file for terraform plan summary. Leave empty to skip summary generation.",
@@ -92,11 +108,6 @@ var Flags = CombineFlags(
 			Destination: &P.Summary.Output,
 		},
 	},
-	gitlab.NewMergeRequestReportFlags(&P.MergeRequestReport),
-	iac.NewMetadataFlags(&P.ReportMetadata),
+	gitlab.NewFlags(gitlab.Options{Destination: &P.MergeRequestReport}),
+	ci.NewFlags(ci.Options{Destination: &P.ReportMetadata}),
 )
-
-//revive:disable:unused-parameter
-func ProcessFlags(tl *TaskList) error {
-	return nil
-}

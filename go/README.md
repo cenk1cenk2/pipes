@@ -1,6 +1,6 @@
 # pipe-go
 
-Build Go applications with the CI pipe.
+Pipe for Go builds.
 
 `pipe-go [GLOBAL FLAGS] [COMMAND] [FLAGS]`
 
@@ -26,14 +26,14 @@ Vendor go modules.
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_INSTALL_VERIFY` | Use the sum file to verify module integrity. | `bool` | `false` | <code>true</code> |
-| `$GO_INSTALL_ARGS` | Arguments to append to install command. | `string` | `false` | <code></code> |
+| `$GO_INSTALL_ARGS` | Arguments to append to the install command. | `string` | `false` | <code></code> |
 
 **Setup**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
-| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code></code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
+| `$GO_CACHE` | Cache directory for go commands. Leave empty to use the environment defaults. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go build`
 
@@ -45,13 +45,13 @@ Build an application.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_BUILD_ARGS` | Arguments to append to build command. | `string` | `false` | <code></code> |
+| `$GO_BUILD_ARGS` | Arguments to append to the build command. | `string` | `false` | <code></code> |
 | `$GO_BUILD_OUTPUT` | Output location for the build artifacts. | `string` | `false` | <code>"./dist/"</code> |
 | `$GO_BUILD_BINARY_NAME` | Name of the binary to output during build. | `string` | `false` | <code>"bin"</code> |
-| `$GO_BUILD_BINARY_TEMPLATE` | Binary naming for the build artifact. | `string`<br/>`format(Template(map[string]))` | `false` | <code>"{{ .name }}{{ if .os }}-{{ .os }}{{ end }}{{ if .arch }}-{{ .arch }}{{ end }}"</code> |
-| `$GO_BUILD_LINKER` | Arguments for the linker during the build process. | `string`<br/>`format(Template())` | `false` | <code></code> |
+| `$GO_BUILD_BINARY_TEMPLATE` | Binary naming for the build artifact. | `string`<br/>`format(Template(map[string]string))` | `false` | <code>"{{ .name }}{{ if .os }}-{{ .os }}{{ end }}{{ if .arch }}-{{ .arch }}{{ end }}"</code> |
+| `$GO_BUILD_LINKER_FLAGS`<br />`$GO_BUILD_LINKER` | Arguments for the linker during the build process. | `string`<br/>`format(Template())` | `false` | <code></code> |
 | `$GO_BUILD_ENABLE_CGO`<br />`$CGO_ENABLED` | Enable CGO during the build process. | `bool` | `false` | <code>false</code> |
-| `$GO_BUILD_TARGETS` | Build targets for the build process. | `string`<br/>`format(yaml([]struct{ os: string?, arch: string? }))` | `false` | <code>"[]"</code> |
+| `$GO_BUILD_TARGETS` | Build targets for the build process. | `string`<br/>`format(yaml([]struct{ os?: string, arch?: string }))` | `false` | <code>"[]"</code> |
 | `$GO_BUILD_TAGS` | Build tags for the build process. | `string[]` | `false` | <code></code> |
 | `$GO_BUILD_VARIABLES` | Build variables for the build process. | `string`<br/>`format(yaml(map[string]string))` | `false` | <code>"{}"</code> |
 
@@ -59,8 +59,28 @@ Build an application.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
-| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code></code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
+| `$GO_CACHE` | Cache directory for go commands. Leave empty to use the environment defaults. | `string` | `false` | <code>"./.go/"</code> |
+
+### `pipe-go lint`
+
+Run golangci-lint on the project.
+
+#### Flags
+
+**Lint**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GO_LINT_ARGS` | Arguments to append to the lint command. | `string` | `false` | <code></code> |
+| `$GO_LINT_TIMEOUT` | Timeout for the lint command. | `duration` | `false` | <code>5m0s</code> |
+
+**Setup**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
+| `$GO_CACHE` | Cache directory for go commands. Leave empty to use the environment defaults. | `string` | `false` | <code>"./.go/"</code> |
 
 ### `pipe-go tool`
 
@@ -72,12 +92,12 @@ Run a specified go tool.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$GO_CWD` | Build CWD for the package manager. | `string` | `false` | <code>"."</code> |
-| `$GO_CACHE` | Enable go cache. | `string` | `false` | <code></code> |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
+| `$GO_CACHE` | Cache directory for go commands. Leave empty to use the environment defaults. | `string` | `false` | <code>"./.go/"</code> |
 
 **Tool**
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
 | `$GO_TOOL` | Binary that provides the tooling. | `string` | `false` | <code></code> |
-| `$GO_TOOL_ARGS` | Arguments to append to tool command. | `string` | `false` | <code></code> |
+| `$GO_TOOL_ARGS` | Arguments to append to the tool command. | `string` | `false` | <code></code> |

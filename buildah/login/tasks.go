@@ -7,49 +7,47 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func ContainerRegistryLoginParent(tl *TaskList) *Task {
+func loginParent(tl *TaskList) *Task {
 	return tl.CreateTask("login", "parent").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
-				ContainerRegistryLogin(tl).Job(),
-				ContainerRegistryLoginVerify(tl).Job(),
+				login(tl).Job(),
+				loginVerify(tl).Job(),
 			)
 		})
 }
 
-func ContainerRegistryLogin(tl *TaskList) *Task {
+func login(tl *TaskList) *Task {
 	return tl.CreateTask("login").
 		ShouldDisable(func(t *Task) bool {
-			return P.ContainerRegistry.Username == "" ||
-				P.ContainerRegistry.Password == ""
+			return P.Username == "" ||
+				P.Password == ""
 		}).
 		ShouldRunBefore(func(t *Task) error {
-			t.Plumber.AppendSecrets(P.ContainerRegistry.Password)
+			t.Plumber.AppendSecrets(P.Password)
 
 			return nil
 		}).
 		Set(func(t *Task) error {
-
-			// login task
 			t.CreateCommand(
 				"buildah",
 				"login",
-				P.ContainerRegistry.Uri,
+				P.Uri,
 				"--username",
-				P.ContainerRegistry.Username,
+				P.Username,
 				"--password-stdin",
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command) error {
 					c.Log.Infof(
 						"Logging in to container registry: %s",
-						P.ContainerRegistry.Uri,
+						P.Uri,
 					)
 
 					return nil
 				}).
 				SetStdin(func(c *Command) io.Reader {
-					return strings.NewReader(P.ContainerRegistry.Password)
+					return strings.NewReader(P.Password)
 				}).
 				AddSelfToTheTask()
 
@@ -60,23 +58,24 @@ func ContainerRegistryLogin(tl *TaskList) *Task {
 		})
 }
 
-func ContainerRegistryLoginVerify(tl *TaskList) *Task {
+// Proves that the ambient login a credential-less pipeline relies on actually
+// exists, before the build spends time on the image.
+func loginVerify(tl *TaskList) *Task {
 	return tl.CreateTask("login", "verify").
-		ShouldDisable(func(t *Task) bool {
-			return P.ContainerRegistry.Username != "" &&
-				P.ContainerRegistry.Password != ""
+		ShouldDisable(func(_ *Task) bool {
+			return P.Username != "" && P.Password != ""
 		}).
 		Set(func(t *Task) error {
 			t.CreateCommand(
 				"buildah",
 				"login",
-				P.ContainerRegistry.Uri,
+				P.Uri,
 			).
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
 				Set(func(c *Command) error {
 					c.Log.Debugf(
 						"Will verify authentication in to container registry: %s",
-						P.ContainerRegistry.Uri,
+						P.Uri,
 					)
 
 					return nil

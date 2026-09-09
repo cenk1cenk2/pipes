@@ -7,18 +7,18 @@ import (
 //revive:disable:line-length-limit
 
 const (
-	CATEGORY_HELM = "Helm"
+	CategoryHelm = "Helm"
 )
 
 var Flags = []cli.Flag{
-
 	&cli.StringFlag{
-		Category: CATEGORY_HELM,
+		Category: CategoryHelm,
 		Name:     "helm.cwd",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("HELM_CWD"),
 			cli.EnvVar("HELM_ROOT"),
 		),
-		Usage:       "Working directory for Helm commands.",
+		Usage:       "Working directory for helm commands.",
 		Required:    false,
 		Value:       ".",
 		Destination: &P.Cwd,

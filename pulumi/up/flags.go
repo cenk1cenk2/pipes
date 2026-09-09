@@ -4,12 +4,16 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+const CategoryPulumiUp = "Up"
+
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Name: "pulumi.up.plan",
+		Category: CategoryPulumiUp,
+		Name:     "pulumi.up.plan",
 		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("PULUMI_UP_PLAN"),
 			cli.EnvVar("PULUMI_PLAN"),
 		),
 		Usage:       "Input file for pulumi plan.",

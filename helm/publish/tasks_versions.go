@@ -1,22 +1,40 @@
 package publish
 
 import (
-	"path"
 	"slices"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v6"
-	"gitlab.kilic.dev/devops/pipes/common/parser"
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
-func HelmChartVersionsParent(tl *TaskList) *Task {
+// The collector reads the parsed flags and the resolved working directory, so it is only built from inside a task list.
+func versionsCollector() *versions.Collector {
+	return &versions.Collector{
+		Name: "versions",
+
+		FromUser: P.Chart.Versions,
+
+		File:       P.Chart.VersionFile,
+		FileStrict: P.Chart.VersionFileStrict,
+		FileDir:    setup.C.Cwd,
+
+		Templates: P.Chart.VersionsTemplate,
+		Sanitize:  P.Chart.VersionsSanitize,
+	}
+}
+
+// A chart has no notion of a latest version, so the parent waits on the other two sources only.
+func versionsTask(tl *TaskList) *Task {
+	collector := versionsCollector()
+
 	return tl.CreateTask("versions").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobSequence(
 				JobParallel(
-					HelmChartVersionsFromUser(tl).Job(),
-					HelmChartVersionsFromFile(tl).Job(),
+					collector.UserTask(tl, &C.Versions).Job(),
+					collector.FileTask(tl, &C.Versions).Job(),
 				),
 				job,
 			)
@@ -24,55 +42,8 @@ func HelmChartVersionsParent(tl *TaskList) *Task {
 		Set(func(t *Task) error {
 			C.Versions = slices.Compact(C.Versions)
 
-			t.Log.Infof(
-				"Helm Chart versions: %s", strings.Join(C.Versions, ", "),
-			)
+			t.Log.Infof("Helm Chart versions: %s", strings.Join(C.Versions, ", "))
 
 			return nil
-		})
-}
-
-func HelmChartVersionsFromUser(tl *TaskList) *Task {
-	return tl.CreateTask("versions", "user").
-		ShouldDisable(func(t *Task) bool {
-			return len(P.HelmChart.Versions) == 0
-		}).
-		Set(func(t *Task) error {
-			// add all the specified version
-			for _, v := range slices.Compact(P.HelmChart.Versions) {
-				if err := AddHelmChartVersion(t, v); err != nil {
-					return err
-				}
-			}
-
-			return nil
-		})
-}
-
-func HelmChartVersionsFromFile(tl *TaskList) *Task {
-	return tl.CreateTask("versions", "file").
-		ShouldDisable(func(t *Task) bool {
-			return P.HelmChart.VersionFile == ""
-		}).
-		Set(func(t *Task) error {
-			// add versions through versions file
-			versions, err := parser.ParseTagsFile(t.Log, path.Join(setup.P.Cwd, P.HelmChart.VersionFile), P.HelmChart.VersionFileStrict)
-
-			if err != nil {
-				return err
-			}
-
-			for _, v := range versions {
-				t.CreateSubtask(v).
-					Set(func(t *Task) error {
-						return AddHelmChartVersion(t, v)
-					}).
-					AddSelfToTheParentAsParallel()
-			}
-
-			return nil
-		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
 		})
 }

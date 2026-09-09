@@ -7,19 +7,18 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v6"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
-	environment "gitlab.kilic.dev/devops/pipes/select-env/setup"
 )
 
-func InstallNodeDependencies(tl *TaskList) *Task {
+func install(tl *TaskList) *Task {
 	return tl.CreateTask("install").
 		Set(func(t *Task) error {
-			packageManager := setup.C.PackageManager
+			packageManager := setup.NodeCtx.PackageManager
 
 			t.CreateCommand(
 				packageManager.Exe,
 			).
 				Set(func(c *Command) error {
-					if P.NodeInstall.UseLockFile {
+					if P.Install.UseLockFile {
 						c.AppendArgs(packageManager.Commands.InstallWithLock...)
 
 						t.Log.Infoln("Using lockfile for installation.")
@@ -29,9 +28,9 @@ func InstallNodeDependencies(tl *TaskList) *Task {
 						t.Log.Infoln("Installing dependencies without a lockfile.")
 					}
 
-					c.AppendArgs(strings.Split(P.NodeInstall.Args, " ")...)
+					c.AppendArgs(strings.Split(P.Install.Args, " ")...)
 
-					if P.NodeInstall.Cache {
+					if P.Install.Cache {
 						cacheDir := fmt.Sprintf(".%s", packageManager.Exe)
 						t.Log.Infof("Setting up cache: %s", cacheDir)
 
@@ -39,10 +38,9 @@ func InstallNodeDependencies(tl *TaskList) *Task {
 						c.AppendArgs(cacheDir)
 					}
 
-					c.SetDir(P.NodeInstall.Cwd)
+					c.SetDir(P.Install.Cwd)
 
-					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(environment.C.EnvVars)
+					c.AppendDirectEnvironment(os.Environ()...)
 
 					return nil
 				}).

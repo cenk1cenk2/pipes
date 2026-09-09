@@ -6,20 +6,26 @@ import (
 	. "github.com/cenk1cenk2/plumber/v6"
 )
 
-func Setup(tl *TaskList) *Task {
-	return tl.CreateTask("setup").
+func initialize(tl *TaskList) *Task {
+	return tl.CreateTask("init").
 		Set(func(t *Task) error {
-			t.CreateCommand(
-				"pulumi",
-				"version",
-			).
+			C.Cwd = P.Cwd
+
+			t.Log.Debugf("Working directory: %s", C.Cwd)
+
+			return nil
+		})
+}
+
+func version(tl *TaskList) *Task {
+	return tl.CreateTask("version").
+		Set(func(t *Task) error {
+			t.CreateCommand("pulumi", "version").
 				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
 				ShouldRunAfter(func(c *Command) error {
-					stream := c.GetCombinedStream()
+					C.Version = strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
 
-					joined := strings.Join(stream, "\n")
-
-					c.Log.Infof("Pulumi version: %s", joined)
+					c.Log.Infof("pulumi version: %s", C.Version)
 
 					return nil
 				}).
