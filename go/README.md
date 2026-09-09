@@ -82,6 +82,27 @@ Run golangci-lint on the project.
 | `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
 | `$GO_CACHE` | Cache directory for go commands. Leave empty to use the environment defaults. | `string` | `false` | <code>"./.go/"</code> |
 
+### `pipe-go test`
+
+Run ginkgo on the project.
+
+#### Flags
+
+**Setup**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GO_CWD` | Working directory for go commands. | `string` | `false` | <code>"."</code> |
+| `$GO_CACHE` | Cache directory for go commands. Leave empty to use the environment defaults. | `string` | `false` | <code>"./.go/"</code> |
+
+**Test**
+
+| Flag / Environment |  Description   |  Type    | Required | Default |
+|---------------- | --------------- | --------------- |  --------------- |  --------------- |
+| `$GO_TEST_RUNNER` | Test runner for the test command. | `string`<br/>`format(enum("ginkgo", "go"))` | `false` | <code>"ginkgo"</code> |
+| `$GO_TEST_ARGS` | Arguments to append to the test command. | `string` | `false` | <code></code> |
+| `$GO_TEST_COVERAGE` | Coverage profile to write. Leave empty to skip coverage. | `string` | `false` | <code>"coverage.out"</code> |
+
 ### `pipe-go tool`
 
 Run a specified go tool.

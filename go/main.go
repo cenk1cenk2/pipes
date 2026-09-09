@@ -10,6 +10,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/go/install"
 	"gitlab.kilic.dev/devops/pipes/go/lint"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
+	"gitlab.kilic.dev/devops/pipes/go/test"
 	gotool "gitlab.kilic.dev/devops/pipes/go/tool"
 )
 
@@ -52,6 +53,17 @@ func main() {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							lint.New(p),
+						))
+					},
+				},
+				{
+					Name:        "test",
+					Description: "Run ginkgo on the project.",
+					Flags:       CombineFlags(setup.Flags, test.Flags),
+					Action: func(_ context.Context, _ *cli.Command) error {
+						return p.RunJobs(CombineTaskLists(
+							setup.New(p),
+							test.New(p),
 						))
 					},
 				},
