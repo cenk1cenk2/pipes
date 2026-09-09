@@ -27,6 +27,10 @@ func main() {
 					write.New(p),
 				))
 			},
+
+			Commands: []*cli.Command{
+				DocsCommand(p),
+			},
 		}
 	}).
 		SetDocumentationOptions(DocumentationOptions{

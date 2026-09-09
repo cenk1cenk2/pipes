@@ -93,6 +93,8 @@ func main() {
 						))
 					},
 				},
+
+				DocsCommand(p),
 			},
 		}
 	}).

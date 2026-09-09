@@ -56,6 +56,8 @@ func main() {
 						))
 					},
 				},
+
+				DocsCommand(p),
 			},
 		}
 	}).

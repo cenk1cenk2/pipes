@@ -68,8 +68,12 @@ tasks:
     interactive: true
     env:
       LOG_LEVEL: trace
+    # urfave/cli validates the required flags of every parent command before it dispatches
+    # to a subcommand, so a pipe whose root carries required flags has to satisfy them
+    # before the docs command it never reads them for can run. DOCS_ENV is where such a
+    # pipe seeds them, from Taskfile.yml.
     cmds:
-      - go run . MARKDOWN_DOC
+      - "{{ .DOCS_ENV }} go run . docs markdown"
 
   help:
     desc: Generates help for the application.

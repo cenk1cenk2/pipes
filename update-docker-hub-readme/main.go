@@ -24,6 +24,10 @@ func main() {
 					update.New(p),
 				))
 			},
+
+			Commands: []*cli.Command{
+				DocsCommand(p),
+			},
 		}
 	}).
 		SetDocumentationOptions(DocumentationOptions{

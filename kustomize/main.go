@@ -30,6 +30,8 @@ func main() {
 						))
 					},
 				},
+
+				DocsCommand(p),
 			},
 		}
 	}).

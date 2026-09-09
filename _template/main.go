@@ -23,6 +23,10 @@ func main() {
 					pipe.New(p),
 				))
 			},
+
+			Commands: []*cli.Command{
+				DocsCommand(p),
+			},
 		}
 	}).
 		SetDocumentationOptions(DocumentationOptions{

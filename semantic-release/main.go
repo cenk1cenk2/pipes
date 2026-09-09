@@ -36,6 +36,10 @@ func main() {
 					release.New(p),
 				))
 			},
+
+			Commands: []*cli.Command{
+				DocsCommand(p),
+			},
 		}
 	}).
 		SetDocumentationOptions(DocumentationOptions{
