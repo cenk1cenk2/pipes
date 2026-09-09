@@ -10,7 +10,7 @@ require (
 	github.com/onsi/gomega v1.43.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
-	gitlab.com/gitlab-org/api/client-go/v2 v2.64.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.2.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 )

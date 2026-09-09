@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	clientgitlab "gitlab.com/gitlab-org/api/client-go/v2"
+	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 )
 
 func mergeRequestReportMarker(identifier string) string {
