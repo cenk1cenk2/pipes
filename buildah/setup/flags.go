@@ -12,9 +12,12 @@ const (
 
 var Flags = []cli.Flag{
 	&cli.StringFlag{
-		Category:    CategoryBuildah,
-		Name:        "buildah.cwd",
-		Sources:     cli.NewValueSourceChain(cli.EnvVar("BUILDAH_CWD")),
+		Category: CategoryBuildah,
+		Name:     "buildah.cwd",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("BUILDAH_CWD"),
+			cli.EnvVar("CONTAINER_CWD"),
+		),
 		Usage:       "Working directory for buildah commands.",
 		Required:    false,
 		Value:       ".",
