@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
@@ -59,6 +58,8 @@ func reportSource() terraform.Source {
 				return terraform.Report{}, fmt.Errorf("terraform plan output is required for the plan report")
 			}
 
+			var output string
+
 			show := t.CreateCommand(
 				"terraform",
 				"show",
@@ -68,13 +69,13 @@ func reportSource() terraform.Source {
 				SetDir(setup.C.Cwd).
 				AppendEnvironment(setup.C.Env).
 				SetLogLevel(LogLevelTrace, LogLevelWarn, LogLevelDebug).
-				EnableStreamRecording()
+				CaptureStdout(&output)
 
 			if err := show.Run(ctx); err != nil {
 				return terraform.Report{}, err
 			}
 
-			return parseTerraformShowPlan([]byte(strings.Join(show.GetStdoutStream(), "")), metadata)
+			return parseTerraformShowPlan([]byte(output), metadata)
 		},
 		Summary:        terraform.Summarize,
 		SummaryOutput:  summaryOutput,

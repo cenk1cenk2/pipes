@@ -61,26 +61,28 @@ func initialize(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 func version(tl *TaskList, ctx *Ctx) *Task {
 	return tl.CreateTask("version").
 		Set(func(_ context.Context, t *Task) error {
+			var nodeVersion string
+
 			t.CreateCommand(
 				"node",
 				"--version",
 			).
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
-				EnableStreamRecording().
+				CaptureOutput(&nodeVersion).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
-					stream := c.GetCombinedStream()
-
-					if len(stream) == 0 {
+					if nodeVersion == "" {
 						t.Log.Debug("Can not fetch node.js version.")
 
 						return nil
 					}
 
-					t.Log.Info(fmt.Sprintf("node.js version: %s", stream[0]))
+					t.Log.Info(fmt.Sprintf("node.js version: %s", nodeVersion))
 
 					return nil
 				}).
 				AddSelfToTheTask()
+
+			var packageManagerVersion string
 
 			t.CreateCommand(
 				ctx.PackageManager.Exe,
@@ -91,17 +93,15 @@ func version(tl *TaskList, ctx *Ctx) *Task {
 					return nil
 				}).
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
-				EnableStreamRecording().
+				CaptureOutput(&packageManagerVersion).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
-					stream := c.GetCombinedStream()
-
-					if len(stream) == 0 {
+					if packageManagerVersion == "" {
 						t.Log.Debug("Can not fetch package manager version.")
 
 						return nil
 					}
 
-					t.Log.Info(fmt.Sprintf("%s version: v%s", ctx.PackageManager.Exe, stream[0]))
+					t.Log.Info(fmt.Sprintf("%s version: v%s", ctx.PackageManager.Exe, packageManagerVersion))
 
 					return nil
 				}).
