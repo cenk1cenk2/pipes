@@ -1,4 +1,3 @@
-// Command pipe-helm runs Helm operations for CI pipelines.
 package main
 
 import (
@@ -14,13 +13,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-helm",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Helm chart toolkit for pipelines.",
 			Commands: []*cli.Command{
 				{
 					Name:        "install",

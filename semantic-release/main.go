@@ -12,10 +12,10 @@ import (
 	"gitlab.kilic.dev/devops/pipes/semantic-release/setup"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
-		// the environment is opt-in here, and the flags are shared package level values,
-		// so this runs before the command tree reads them.
 		OverwriteCliFlag(setup.Flags, func(f *cli.BoolFlag) bool {
 			return f.Name == "environment.enable"
 		}, func(f *cli.BoolFlag) *cli.BoolFlag {
@@ -26,10 +26,9 @@ func main() {
 		})
 
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-semantic-release",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Releases applications through the semantic-release library.",
 			Flags:       CombineFlags(setup.Flags, release.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(

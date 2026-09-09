@@ -17,13 +17,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-terraform",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Terraform actions for pipelines.",
 			Commands: []*cli.Command{
 				{
 					Name:        "install",

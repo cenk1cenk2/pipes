@@ -1,4 +1,3 @@
-// Command pipe-buildah builds and publishes container images from CI/CD.
 package main
 
 import (
@@ -13,13 +12,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/buildah/setup"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-buildah",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Builds and publishes container images from CI with buildah.io",
 			Commands: []*cli.Command{
 				{
 					Name:        "login",

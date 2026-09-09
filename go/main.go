@@ -1,4 +1,3 @@
-// Command pipe-go builds Go applications from CI/CD.
 package main
 
 import (
@@ -14,13 +13,14 @@ import (
 	gotool "gitlab.kilic.dev/devops/pipes/go/tool"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-go",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Pipe for Go builds.",
 			Commands: []*cli.Command{
 				{
 					Name:        "install",

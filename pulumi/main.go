@@ -13,13 +13,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/pulumi/up"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-pulumi",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Pulumi related tasks in the pipeline.",
 			Commands: []*cli.Command{
 				{
 					Name:        "preview",

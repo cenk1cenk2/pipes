@@ -10,13 +10,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/update"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-update-docker-hub-readme",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Updates the readme file on DockerHub or any compatible API.",
 			Flags:       CombineFlags(update.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(

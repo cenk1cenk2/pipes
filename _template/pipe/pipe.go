@@ -30,7 +30,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
-				defaultTask(tl).Job(),
+				entrypoint(tl).Job(),
 			)
 		})
 }

@@ -12,13 +12,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/select-env/write"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "select-env",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Selects an set of environment variable prefix depending on the condition.",
 			Flags:       CombineFlags(setup.Flags, write.Flags),
 			Action: func(_ context.Context, _ *cli.Command) error {
 				return p.RunJobs(CombineTaskLists(

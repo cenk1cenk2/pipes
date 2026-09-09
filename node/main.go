@@ -1,5 +1,3 @@
-// Command pipe-node installs dependencies and builds Node.js applications from
-// CI/CD.
 package main
 
 import (
@@ -16,6 +14,8 @@ import (
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		// the environment is opt-in here, and the flags are shared package level values,
@@ -30,10 +30,9 @@ func main() {
 		})
 
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-node",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Pipe for installing node.js dependencies and building node.js applications on CI/CD.",
 			Commands: []*cli.Command{
 				{
 					Name:        "login",

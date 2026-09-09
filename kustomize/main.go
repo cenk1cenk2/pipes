@@ -1,4 +1,3 @@
-// Command pipe-kustomize runs Kustomize operations for CI pipelines.
 package main
 
 import (
@@ -11,13 +10,14 @@ import (
 	"gitlab.kilic.dev/devops/pipes/kustomize/setup"
 )
 
+var version = "latest"
+
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
 		return &cli.Command{
-			Name:        CLIName,
+			Name:        "pipe-kustomize",
 			Version:     version,
-			Usage:       Description,
-			Description: Description,
+			Description: "Kustomize operations for CI pipelines.",
 			Commands: []*cli.Command{
 				{
 					Name:        "build",
