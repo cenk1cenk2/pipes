@@ -14,9 +14,10 @@ import (
 
 const JSONRequest = "application/json"
 
-// The login endpoint belongs to the account API, while the configured address
-// points at the repositories the readme is pushed to.
-const LoginAddress = "https://hub.docker.com/v2/users/login/"
+// The token endpoint belongs to the account API, while the configured address
+// points at the repositories the readme is pushed to. Its secret takes a personal
+// access token just as well as a password.
+const LoginAddress = "https://hub.docker.com/v2/auth/token"
 
 type (
 	// Readme is the pair of descriptions a repository page shows.
@@ -41,12 +42,12 @@ type (
 
 type (
 	credentials struct {
-		Username string `json:"username,omitempty"`
-		Password string `json:"password,omitempty"`
+		Identifier string `json:"identifier"`
+		Secret     string `json:"secret"`
 	}
 
 	loginResponse struct {
-		Token string `json:"token"`
+		AccessToken string `json:"access_token"`
 	}
 
 	updateRequest struct {
@@ -81,8 +82,8 @@ func NewClient(address, userAgent string) ClientAdapter {
 
 func (c *client) Login(ctx context.Context, username, password string) (string, error) {
 	body, err := json.Marshal(credentials{
-		Username: username,
-		Password: password,
+		Identifier: username,
+		Secret:     password,
 	}, jsontext.EscapeForHTML(true))
 
 	if err != nil {
@@ -116,12 +117,20 @@ func (c *client) Login(ctx context.Context, username, password string) (string, 
 		return "", err
 	}
 
-	response := loginResponse{}
-	if err := json.Unmarshal(body, &response, json.RejectUnknownMembers(true)); err != nil {
-		return "", err
+	if res.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("Login failed with code: %d > %s", res.StatusCode, string(body))
 	}
 
-	return response.Token, nil
+	response := loginResponse{}
+	if err := json.Unmarshal(body, &response); err != nil {
+		return "", fmt.Errorf("Response unexpected: %w > %s", err, string(body))
+	}
+
+	if response.AccessToken == "" {
+		return "", fmt.Errorf("Response carries no access token: %s", string(body))
+	}
+
+	return response.AccessToken, nil
 }
 
 func (c *client) UpdateReadme(
@@ -169,7 +178,7 @@ func (c *client) UpdateReadme(
 
 	response := updateResponse{}
 	// the repository payload carries far more than the fields above, so this decode
-	// stays lenient where the login one rejects unknown members.
+	// stays lenient.
 	if err := json.Unmarshal(body, &response); err != nil {
 		return Result{}, fmt.Errorf("Response unexpected: %w > %s", err, string(body))
 	}

@@ -22,7 +22,7 @@ var _ = Describe("Login", func() {
 		request = nil
 		body = ""
 		answer = func(w http.ResponseWriter) {
-			_, _ = w.Write([]byte(`{"token":"jwt-token"}`))
+			_, _ = w.Write([]byte(`{"access_token":"jwt-token"}`))
 		}
 
 		server := httptest.NewServer(
@@ -39,31 +39,53 @@ var _ = Describe("Login", func() {
 		DeferCleanup(server.Close)
 
 		subject = NewClient("", "pipe-update-docker-hub-readme").(*client)
-		subject.loginAddress = server.URL + "/v2/users/login/"
+		subject.loginAddress = server.URL + "/v2/auth/token"
 	})
 
 	It("posts the credentials as the account API expects them", func() {
-		_, err := subject.Login(context.Background(), "user", "password")
+		_, err := subject.Login(context.Background(), "user", "dckr_pat_secret")
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(request.Method).To(Equal(http.MethodPost))
 		Expect(request.Header.Get("Content-Type")).To(Equal(JSONRequest))
-		Expect(body).To(Equal(`{"username":"user","password":"password"}`))
+		Expect(body).To(Equal(`{"identifier":"user","secret":"dckr_pat_secret"}`))
 	})
 
 	It("hands back the token", func() {
-		Expect(subject.Login(context.Background(), "user", "password")).To(Equal("jwt-token"))
+		Expect(subject.Login(context.Background(), "user", "dckr_pat_secret")).To(Equal("jwt-token"))
+	})
+
+	// the service answers a JSON error body on rejected credentials, and decoding it
+	// as a token leaves nothing to tell the user what went wrong.
+	It("carries the response into the error when the credentials are rejected", func() {
+		answer = func(w http.ResponseWriter) {
+			w.WriteHeader(http.StatusUnauthorized)
+			_, _ = w.Write([]byte(`{"message":"unauthorized","errinfo":{}}`))
+		}
+
+		_, err := subject.Login(context.Background(), "user", "dckr_pat_secret")
+
+		Expect(err).To(MatchError(ContainSubstring(`{"message":"unauthorized","errinfo":{}}`)))
 	})
 
 	It("fails when the response is not the expected shape", func() {
 		answer = func(w http.ResponseWriter) {
-			w.WriteHeader(http.StatusUnauthorized)
 			_, _ = w.Write([]byte("<html>unauthorized</html>"))
 		}
 
-		_, err := subject.Login(context.Background(), "user", "password")
+		_, err := subject.Login(context.Background(), "user", "dckr_pat_secret")
 
 		Expect(err).To(HaveOccurred())
+	})
+
+	It("fails when the response carries no token", func() {
+		answer = func(w http.ResponseWriter) {
+			_, _ = w.Write([]byte(`{"detail":"Incorrect authentication credentials"}`))
+		}
+
+		_, err := subject.Login(context.Background(), "user", "dckr_pat_secret")
+
+		Expect(err).To(MatchError(ContainSubstring("Incorrect authentication credentials")))
 	})
 })
 
