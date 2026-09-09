@@ -88,3 +88,5 @@ require (
 replace gitlab.kilic.dev/devops/pipes/internal => ../internal
 
 replace gitlab.kilic.dev/devops/pipes/tests => ../tests
+
+tool github.com/onsi/ginkgo/v2/ginkgo
