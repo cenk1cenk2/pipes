@@ -1,9 +1,10 @@
 package publish
 
 import (
+	"context"
 	"regexp"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
@@ -44,7 +45,7 @@ var C = &Ctx{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if P.Module.Name != "" {
 				P.Module.Name = regexp.MustCompile(`[_ ]`).ReplaceAllString(P.Module.Name, "-")
 			}

@@ -1,16 +1,18 @@
 package pipe
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 func entrypoint(tl *TaskList) *Task {
 	return tl.CreateTask("entrypoint").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"echo",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					c.AppendArgs("hello")
 
 					return nil
@@ -19,7 +21,7 @@ func entrypoint(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

@@ -1,19 +1,21 @@
 package stack
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 )
 
 func stack(tl *TaskList) *Task {
 	return tl.CreateTask("stack").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"pulumi",
 				"stack",
 				"select",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					c.AppendArgs(P.Stack)
 
 					return nil
@@ -23,7 +25,7 @@ func stack(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

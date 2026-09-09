@@ -1,9 +1,10 @@
 package plan
 
 import (
+	"context"
 	"time"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
@@ -42,7 +43,7 @@ var C = &Ctx{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if !P.MergeRequestReport.Enabled {
 				P.MergeRequestReport.MergeRequestIid = 0
 			}

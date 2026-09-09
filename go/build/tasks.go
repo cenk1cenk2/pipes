@@ -1,18 +1,19 @@
 package build
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"runtime"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
 func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").
-		Set(func(t *Task) error {
+		Set(func(ctx context.Context, t *Task) error {
 			if len(P.BuildTargets) == 0 {
 				P.BuildTargets = append(P.BuildTargets, GoBuildTarget{Os: runtime.GOOS, Arch: runtime.GOARCH})
 			}
@@ -59,7 +60,7 @@ func build(tl *TaskList) *Task {
 					}
 
 					t.CreateSubtask(name).
-						Set(func(t *Task) error {
+						Set(func(_ context.Context, t *Task) error {
 							t.CreateCommand(
 								"go",
 								"build",
@@ -67,8 +68,8 @@ func build(tl *TaskList) *Task {
 								"-v",
 							).
 								SetDir(module).
-								Set(func(c *Command) error {
-									t.Log.Infof("Building: %s in %s for %s/%s", P.BinaryName, module, target.Os, target.Arch)
+								Set(func(_ context.Context, c *Command) error {
+									t.Log.Info(fmt.Sprintf("Building: %s in %s for %s/%s", P.BinaryName, module, target.Os, target.Arch))
 
 									if !P.EnableCGO {
 										c.AppendEnvironment(map[string]string{
@@ -99,8 +100,8 @@ func build(tl *TaskList) *Task {
 
 							return nil
 						}).
-						ShouldRunAfter(func(t *Task) error {
-							return t.RunCommandJobAsJobParallel()
+						ShouldRunAfter(func(ctx context.Context, t *Task) error {
+							return t.RunCommandJobAsJobParallel(ctx)
 						}).
 						AddSelfToTheParentAsParallel()
 				}
@@ -108,8 +109,8 @@ func build(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -124,7 +125,7 @@ func packages(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return !setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			C.Packages = nil
 
 			for _, module := range setup.C.Modules {
@@ -135,10 +136,10 @@ func packages(tl *TaskList) *Task {
 					`{{if eq .Name "main"}}{{.Dir}}{{end}}`,
 					"./...",
 				).
-					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
+					SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
 					SetDir(module).
 					EnableStreamRecording().
-					ShouldRunAfter(func(c *Command) error {
+					ShouldRunAfter(func(_ context.Context, c *Command) error {
 						for _, dir := range c.GetStdoutStream() {
 							if dir := strings.TrimSpace(dir); dir != "" {
 								C.Packages = append(C.Packages, dir)
@@ -153,8 +154,8 @@ func packages(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			if err := t.RunCommandJobAsJobSequence(); err != nil {
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			if err := t.RunCommandJobAsJobSequence(ctx); err != nil {
 				return err
 			}
 
@@ -162,7 +163,7 @@ func packages(tl *TaskList) *Task {
 				return fmt.Errorf("Can not resolve any commands to build out of the go workspace.")
 			}
 
-			t.Log.Infof("Commands of the workspace: %s", strings.Join(C.Packages, ", "))
+			t.Log.Info(fmt.Sprintf("Commands of the workspace: %s", strings.Join(C.Packages, ", ")))
 
 			return nil
 		})

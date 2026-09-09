@@ -1,12 +1,14 @@
 package release
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 func release(tl *TaskList) *Task {
 	return tl.CreateTask("release").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			if P.Workspace {
 				C.Exe = MultiSemanticReleaseExe
 			} else {
@@ -16,7 +18,7 @@ func release(tl *TaskList) *Task {
 			t.CreateCommand(
 				C.Exe,
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					// --ignore-private-packages belongs to the original multi-semantic-release, not @qiwi/multi-semantic-release.
 
 					if P.SemanticRelease.DryRun {
@@ -39,7 +41,7 @@ func release(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

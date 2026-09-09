@@ -1,9 +1,11 @@
 package install
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
@@ -24,16 +26,16 @@ func vendorModule(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"go",
 				"mod",
 				"vendor",
 			).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDefault).
 				SetDir(setup.C.Cwd).
-				Set(func(c *Command) error {
-					t.Log.Infof("Vendoring: in %s", setup.C.Cwd)
+				Set(func(_ context.Context, c *Command) error {
+					t.Log.Info(fmt.Sprintf("Vendoring: in %s", setup.C.Cwd))
 
 					if P.Args != "" {
 						c.AppendArgs(strings.Split(P.Args, " ")...)
@@ -46,8 +48,8 @@ func vendorModule(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -56,16 +58,16 @@ func vendorWorkspace(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return !setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"go",
 				"work",
 				"vendor",
 			).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDefault).
 				SetDir(setup.C.Cwd).
-				Set(func(c *Command) error {
-					t.Log.Infof("Vendoring workspace: in %s", setup.C.Cwd)
+				Set(func(_ context.Context, c *Command) error {
+					t.Log.Info(fmt.Sprintf("Vendoring workspace: in %s", setup.C.Cwd))
 
 					if P.Args != "" {
 						c.AppendArgs(strings.Split(P.Args, " ")...)
@@ -78,8 +80,8 @@ func vendorWorkspace(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -88,16 +90,16 @@ func verify(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return !P.Verify
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"go",
 				"mod",
 				"verify",
 			).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDefault).
 				SetDir(setup.C.Cwd).
-				Set(func(c *Command) error {
-					t.Log.Infof("Verifying modules: in %s", setup.C.Cwd)
+				Set(func(_ context.Context, c *Command) error {
+					t.Log.Info(fmt.Sprintf("Verifying modules: in %s", setup.C.Cwd))
 
 					return nil
 				}).
@@ -105,7 +107,7 @@ func verify(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

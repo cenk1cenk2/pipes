@@ -2,8 +2,8 @@
 package fixtures
 
 import (
-	"github.com/cenk1cenk2/plumber/v6"
-	"github.com/cenk1cenk2/plumber/v6/tests"
+	"github.com/cenk1cenk2/plumber/v7"
+	"github.com/cenk1cenk2/plumber/v7/tests"
 )
 
 // Runner builds a command runner that answers the given responses instead of

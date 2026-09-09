@@ -1,23 +1,25 @@
 package tool
 
 import (
+	"context"
+	"fmt"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
 func tool(tl *TaskList) *Task {
 	return tl.CreateTask("tool", P.Tool).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"go",
 				"tool",
 			).
 				SetDir(setup.C.Cwd).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				Set(func(c *Command) error {
-					t.Log.Infof("Tool: %s in %s", P.Tool, setup.C.Cwd)
+				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDefault).
+				Set(func(_ context.Context, c *Command) error {
+					t.Log.Info(fmt.Sprintf("Tool: %s in %s", P.Tool, setup.C.Cwd))
 
 					c.AppendArgs(P.Tool)
 
@@ -30,7 +32,7 @@ func tool(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

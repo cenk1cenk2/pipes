@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
 
@@ -15,7 +15,7 @@ import (
 // one shape. The tasks take the pipe's own instance, which is only filled once its
 // flags have been parsed.
 type Source struct {
-	Read          func(t *Task) (Report, error)
+	Read          func(ctx context.Context, t *Task) (Report, error)
 	Summary       func(Report) Summary
 	SummaryOutput string
 	Cwd           string
@@ -31,15 +31,15 @@ func SummaryTask(tl *TaskList, src *Source) *Task {
 	return tl.CreateTask("summary").
 		ShouldDisable(func(t *Task) bool {
 			if src.SummaryOutput == "" {
-				t.Log.Debugln("Skipping plan summary because no summary output file is configured.")
+				t.Log.Debug("Skipping plan summary because no summary output file is configured.")
 
 				return true
 			}
 
 			return false
 		}).
-		Set(func(t *Task) error {
-			report, err := src.Read(t)
+		Set(func(ctx context.Context, t *Task) error {
+			report, err := src.Read(ctx, t)
 			if err != nil {
 				return err
 			}
@@ -53,7 +53,7 @@ func SummaryTask(tl *TaskList, src *Source) *Task {
 				return fmt.Errorf("write plan summary %s: %w", output, err)
 			}
 
-			t.Log.Infof("Wrote plan summary: %s", output)
+			t.Log.Info(fmt.Sprintf("Wrote plan summary: %s", output))
 
 			return nil
 		})
@@ -67,15 +67,15 @@ func MergeRequestReportTask(tl *TaskList, src *Source) *Task {
 			}
 
 			if src.MergeRequest.MergeRequestIid == 0 {
-				t.Log.Debugln("Skipping GitLab merge request report because this is not a merge request pipeline.")
+				t.Log.Debug("Skipping GitLab merge request report because this is not a merge request pipeline.")
 
 				return true
 			}
 
 			return false
 		}).
-		Set(func(t *Task) error {
-			report, err := src.Read(t)
+		Set(func(ctx context.Context, t *Task) error {
+			report, err := src.Read(ctx, t)
 			if err != nil {
 				return err
 			}
@@ -103,11 +103,10 @@ func MergeRequestReportTask(tl *TaskList, src *Source) *Task {
 				return err
 			}
 
-			t.Log.Infof(
-				"Merge request report note %s: %d (identifier: %s)",
+			t.Log.Info(fmt.Sprintf("Merge request report note %s: %d (identifier: %s)",
 				result.Action(),
 				result.NoteId,
-				result.Identifier,
+				result.Identifier),
 			)
 
 			return nil

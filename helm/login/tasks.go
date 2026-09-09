@@ -1,10 +1,12 @@
 package login
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 func login(tl *TaskList) *Task {
@@ -13,12 +15,12 @@ func login(tl *TaskList) *Task {
 			return P.Username == "" ||
 				P.Password == ""
 		}).
-		ShouldRunBefore(func(t *Task) error {
+		ShouldRunBefore(func(_ context.Context, t *Task) error {
 			t.Plumber.AppendSecrets(P.Password)
 
 			return nil
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"helm",
 				"registry",
@@ -28,11 +30,10 @@ func login(tl *TaskList) *Task {
 				P.Username,
 				"--password-stdin",
 			).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT).
-				Set(func(c *Command) error {
-					c.Log.Infof(
-						"Logging in to chart repository: %s",
-						P.Uri,
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDefault).
+				Set(func(_ context.Context, c *Command) error {
+					c.Log.Info(fmt.Sprintf("Logging in to chart repository: %s",
+						P.Uri),
 					)
 
 					return nil
@@ -44,7 +45,7 @@ func login(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

@@ -1,12 +1,13 @@
 package build
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"slices"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	"gitlab.kilic.dev/devops/pipes/buildah/manifest"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
@@ -57,10 +58,10 @@ func tags(tl *TaskList) *Task {
 				tagsManifest(tl, collector).Job(),
 			)
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			C.Tags = slices.Compact(C.Tags)
 
-			t.Log.Infof("Image tags: %s", strings.Join(C.Tags, ", "))
+			t.Log.Info(fmt.Sprintf("Image tags: %s", strings.Join(C.Tags, ", ")))
 
 			return nil
 		})
@@ -71,13 +72,13 @@ func tagsManifest(tl *TaskList, collector *versions.Collector) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return P.Manifest.File == "" || P.Manifest.Target == ""
 		}).
-		Set(func(t *Task) error {
+		Set(func(ctx context.Context, t *Task) error {
 			target, err := InlineTemplate(P.Manifest.Target, C.Tags)
 			if err != nil {
 				return err
 			}
 
-			image, err := collector.Process(t, target)
+			image, err := collector.Process(ctx, t, target)
 			if err != nil {
 				return err
 			}
@@ -93,7 +94,7 @@ func tagsManifest(tl *TaskList, collector *versions.Collector) *Task {
 
 			filename, err := InlineTemplate(P.Manifest.File, C.Tags)
 
-			t.Log.Debugf("Filename for outputting the tags to: %s", filename)
+			t.Log.Debug(fmt.Sprintf("Filename for outputting the tags to: %s", filename))
 
 			if err != nil {
 				return err
@@ -103,7 +104,7 @@ func tagsManifest(tl *TaskList, collector *versions.Collector) *Task {
 				return err
 			}
 
-			t.Log.Infof("Wrote image manifest to file for later use: %s", filename)
+			t.Log.Info(fmt.Sprintf("Wrote image manifest to file for later use: %s", filename))
 
 			return nil
 		})

@@ -1,9 +1,10 @@
 package run
 
 import (
+	"context"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 type (
@@ -31,7 +32,7 @@ var C = &Ctx{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if P.Run.Script == "" {
 				C.Script = P.Command[0]
 				C.ScriptArgs = strings.Join(P.Command[1:], " ")

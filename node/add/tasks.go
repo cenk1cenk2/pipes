@@ -1,19 +1,21 @@
 package add
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
 func add(tl *TaskList) *Task {
 	return tl.CreateTask("add").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			packageManager := setup.NodeCtx.PackageManager
 
 			t.CreateCommand(
 				packageManager.Exe,
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Add.Global {
 						c.AppendArgs(packageManager.Commands.Global...)
 					}
@@ -34,7 +36,7 @@ func add(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

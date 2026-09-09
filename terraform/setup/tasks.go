@@ -1,18 +1,20 @@
 package setup
 
 import (
+	"context"
+	"fmt"
 	"regexp"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 func initialize(tl *TaskList) *Task {
 	return tl.CreateTask("init").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			C.Cwd = P.Cwd
 
-			t.Log.Debugf("Working directory: %s", C.Cwd)
+			t.Log.Debug(fmt.Sprintf("Working directory: %s", C.Cwd))
 
 			return nil
 		})
@@ -20,12 +22,12 @@ func initialize(tl *TaskList) *Task {
 
 func version(tl *TaskList) *Task {
 	return tl.CreateTask("version").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			pattern := regexp.MustCompile(`Terraform (v\d+\.\d+\.\d+)`)
 
 			t.CreateCommand("terraform", "version").
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG).
-				ShouldRunAfter(func(c *Command) error {
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+				ShouldRunAfter(func(_ context.Context, c *Command) error {
 					output := strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
 
 					// the banner is only ever logged, and terraform has already proven it
@@ -37,7 +39,7 @@ func version(tl *TaskList) *Task {
 						C.Version = output
 					}
 
-					c.Log.Infof("terraform version: %s", C.Version)
+					c.Log.Info(fmt.Sprintf("terraform version: %s", C.Version))
 
 					return nil
 				}).
@@ -46,14 +48,14 @@ func version(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
 func environment(tl *TaskList) *Task {
 	return tl.CreateTask("environment").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			C.Env["TF_IN_AUTOMATION"] = "true"
 
 			C.Env["TF_LOG"] = P.LogLevel
@@ -61,7 +63,7 @@ func environment(tl *TaskList) *Task {
 			C.Env["TF_VAR_CI_API_V4_URL"] = P.CiVariables.ApiUrl
 			C.Env["TF_VAR_CI_PROJECT_ID"] = P.CiVariables.ProjectId
 
-			t.Log.Debugf("Generated following environment variables for terraform to consume: %+v", C.Env)
+			t.Log.Debug(fmt.Sprintf("Generated following environment variables for terraform to consume: %+v", C.Env))
 
 			return nil
 		})

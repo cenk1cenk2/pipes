@@ -1,7 +1,9 @@
 package add
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 type (
@@ -27,7 +29,7 @@ func New(p *Plumber) *TaskList {
 		ShouldDisable(func(tl *TaskList) bool {
 			return len(P.Add.Packages) == 0
 		}).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {

@@ -1,18 +1,20 @@
 package run
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
 func run(tl *TaskList) *Task {
 	return tl.CreateTask("run", C.Script).
-		Set(func(t *Task) error {
+		Set(func(ctx context.Context, t *Task) error {
 			t.CreateCommand(
 				setup.NodeCtx.PackageManager.Exe,
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					ctx := environment.Template{
 						Environment: setup.EnvironmentCtx.Environment,
 						EnvVars:     setup.EnvironmentCtx.EnvVars,
@@ -50,7 +52,7 @@ func run(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

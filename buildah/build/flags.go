@@ -8,7 +8,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 const (

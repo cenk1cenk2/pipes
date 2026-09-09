@@ -1,7 +1,9 @@
 package setup
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 type (
@@ -26,7 +28,7 @@ func New(p *Plumber) *TaskList {
 
 	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(_ *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, _ *TaskList) error {
 			return p.Validate(P)
 		}).
 		Set(func(tl *TaskList) Job {

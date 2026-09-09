@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"os"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 )
 
 func login(tl *TaskList) *Task {
 	return tl.CreateTask("login").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			token, err := C.Hub.Login(
 				context.Background(),
 				P.DockerHub.Username,
@@ -23,7 +23,7 @@ func login(tl *TaskList) *Task {
 				return err
 			}
 
-			t.Log.Debugln("Authentication token obtained.")
+			t.Log.Debug("Authentication token obtained.")
 
 			C.Token = token
 
@@ -33,7 +33,7 @@ func login(tl *TaskList) *Task {
 
 func discover(tl *TaskList) *Task {
 	return tl.CreateTask("discover").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			if P.Readme.Repository != "" {
 				C.Readme[P.Readme.Repository] = ParsedReadme{
 					File:        P.Readme.File,
@@ -92,17 +92,16 @@ func verifyReadme(res hub.Result, repository string, readme ParsedReadme, conten
 
 func update(tl *TaskList) *Task {
 	return tl.CreateTask("update").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			for repository, readme := range C.Readme {
 				t.CreateSubtask(repository).
-					Set(func(t *Task) error {
-						t.Log.Debugf(
-							"Running against repository: %s/%s",
+					Set(func(_ context.Context, t *Task) error {
+						t.Log.Debug(fmt.Sprintf("Running against repository: %s/%s",
 							P.DockerHub.Address,
-							repository,
+							repository),
 						)
 
-						t.Log.Debugf("Trying to read file: %s", readme.File)
+						t.Log.Debug(fmt.Sprintf("Trying to read file: %s", readme.File))
 
 						content, err := os.ReadFile(readme.File)
 
@@ -124,17 +123,16 @@ func update(tl *TaskList) *Task {
 							return err
 						}
 
-						t.Log.Debugf("Status Code: %d", res.StatusCode)
+						t.Log.Debug(fmt.Sprintf("Status Code: %d", res.StatusCode))
 
 						if err := verifyReadme(res, repository, readme, string(content)); err != nil {
 							return err
 						}
 
-						t.Log.Infof(
-							"Successfully pushed readme file to: %s > %s/%s",
+						t.Log.Info(fmt.Sprintf("Successfully pushed readme file to: %s > %s/%s",
 							readme.File,
 							P.DockerHub.Address,
-							repository,
+							repository),
 						)
 
 						return nil
@@ -144,7 +142,7 @@ func update(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }

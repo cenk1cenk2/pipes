@@ -1,19 +1,21 @@
 package apply
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
 func apply(tl *TaskList) *Task {
 	return tl.CreateTask("apply").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"terraform",
 				"apply",
 				"-input=false",
 			).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					if P.Apply.Output != "" {
 						c.AppendArgs(P.Apply.Output)
 					}
@@ -30,7 +32,7 @@ func apply(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

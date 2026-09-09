@@ -1,18 +1,18 @@
 package build
 
 import (
+	"context"
 	"fmt"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").
-		Set(func(t *Task) error {
-			t.Log.Infof(
-				"Building container image: %s in %s",
+		Set(func(_ context.Context, t *Task) error {
+			t.Log.Info(fmt.Sprintf("Building container image: %s in %s",
 				P.File.Name,
-				P.File.Context,
+				P.File.Context),
 			)
 
 			// build image
@@ -21,7 +21,7 @@ func build(tl *TaskList) *Task {
 				"build",
 			).
 				SetDir(P.File.Context).
-				Set(func(c *Command) error {
+				Set(func(_ context.Context, c *Command) error {
 					c.AppendEnvironment(map[string]string{
 						"STORAGE_DRIVER": P.Image.StorageDriver,
 					})
@@ -67,8 +67,8 @@ func build(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -77,19 +77,18 @@ func push(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return !P.Image.Push
 		}).
-		Set(func(t *Task) error {
+		Set(func(ctx context.Context, t *Task) error {
 			for _, tag := range C.Tags {
 				t.CreateSubtask(tag).
-					Set(func(t *Task) error {
+					Set(func(_ context.Context, t *Task) error {
 						t.CreateCommand(
 							"buildah",
 							"push",
 							tag,
 						).
-							Set(func(c *Command) error {
-								t.Log.Infof(
-									"Pushing container image: %s",
-									tag,
+							Set(func(_ context.Context, c *Command) error {
+								t.Log.Info(fmt.Sprintf("Pushing container image: %s",
+									tag),
 								)
 
 								c.AppendEnvironment(map[string]string{
@@ -98,20 +97,20 @@ func push(tl *TaskList) *Task {
 
 								return nil
 							}).
-							SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
+							SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDefault).
 							AddSelfToTheTask()
 
 						return nil
 					}).
-					ShouldRunAfter(func(t *Task) error {
-						return t.RunCommandJobAsJobParallel()
+					ShouldRunAfter(func(ctx context.Context, t *Task) error {
+						return t.RunCommandJobAsJobParallel(ctx)
 					}).
 					AddSelfToTheParentAsParallel()
 			}
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }

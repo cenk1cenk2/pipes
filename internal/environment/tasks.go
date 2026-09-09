@@ -1,10 +1,11 @@
 package environment
 
 import (
+	"context"
 	"fmt"
 	"os"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 // Ctx is what the environment task list resolves; the values only land once the
@@ -25,7 +26,7 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 		ShouldDisable(func(_ *TaskList) bool {
 			return !cfg.Enable
 		}).
-		ShouldRunBefore(func(_ *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, _ *TaskList) error {
 			return p.Validate(cfg)
 		}).
 		Set(func(tl *TaskList) Job {
@@ -40,14 +41,14 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 
 func initReferences(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("init", "references").
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			ctx.References = cfg.Git.References()
 
 			if cfg.FailOnNoReference && len(ctx.References) == 0 {
 				return fmt.Errorf("References for the given environment has not been found.")
 			}
 
-			t.Log.Debugf("References for environment selection: %v", ctx.References)
+			t.Log.Debug(fmt.Sprintf("References for environment selection: %v", ctx.References))
 
 			return nil
 		})
@@ -55,8 +56,8 @@ func initReferences(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 
 func environmentSelect(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("environment", "select").
-		Set(func(t *Task) error {
-			t.Log.Debugf("Conditions for environment variable selection: %+v", cfg.Conditions)
+		Set(func(_ context.Context, t *Task) error {
+			t.Log.Debug(fmt.Sprintf("Conditions for environment variable selection: %+v", cfg.Conditions))
 
 			selected, err := Select(cfg.Conditions, ctx.References)
 
@@ -67,7 +68,7 @@ func environmentSelect(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 			ctx.Environment = selected
 
 			if ctx.Environment != "" {
-				t.Log.Infof("Environment selected: %s", ctx.Environment)
+				t.Log.Info(fmt.Sprintf("Environment selected: %s", ctx.Environment))
 
 				return nil
 			}
@@ -76,7 +77,7 @@ func environmentSelect(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 				return fmt.Errorf("Environment is not selected. Can not process further on strict mode.")
 			}
 
-			t.Log.Infof("No environment has been selected.")
+			t.Log.Info("No environment has been selected.")
 
 			return nil
 		})
@@ -87,10 +88,10 @@ func environmentFetch(tl *TaskList, ctx *Ctx) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return ctx.Environment == ""
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			ctx.EnvVars = Fetch(os.Environ(), ctx.Environment)
 
-			t.Log.Infof("Environment variables that matches the current environment: %s -> %+v", ctx.Environment, ctx.EnvVars)
+			t.Log.Info(fmt.Sprintf("Environment variables that matches the current environment: %s -> %+v", ctx.Environment, ctx.EnvVars))
 
 			return nil
 		})

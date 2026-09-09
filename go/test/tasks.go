@@ -1,7 +1,9 @@
 package test
 
 import (
-	. "github.com/cenk1cenk2/plumber/v6"
+	"context"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
 )
 
@@ -22,19 +24,19 @@ func testModule(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			name, args := command()
 
 			t.CreateCommand(name, args...).
-				SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDebug).
 				SetDir(setup.C.Cwd).
 				AppendEnvironment(setup.C.Env).
 				AddSelfToTheTask()
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -45,12 +47,12 @@ func testWorkspace(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return !setup.C.Workspace
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			name, args := command()
 
 			for _, module := range setup.C.Modules {
 				t.CreateCommand(name, args...).
-					SetLogLevel(LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
+					SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDebug).
 					SetDir(module).
 					AppendEnvironment(setup.C.Env).
 					AddSelfToTheTask()
@@ -58,7 +60,7 @@ func testWorkspace(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

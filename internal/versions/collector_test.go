@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
@@ -40,8 +40,8 @@ var _ = Describe("Collector", func() {
 
 			DescribeTable(
 				"prefixes the registry and the image name",
-				func(tag, expected string) {
-					Expect(image().Process(t, tag)).To(Equal(expected))
+				func(ctx SpecContext, tag, expected string) {
+					Expect(image().Process(ctx, t, tag)).To(Equal(expected))
 				},
 				Entry("a semver tag", "v1.2.3", "docker.io/x/y:v1.2.3"),
 				Entry("a branch name", "main", "docker.io/x/y:main"),
@@ -53,7 +53,7 @@ var _ = Describe("Collector", func() {
 				Entry("a twice slashed branch name", "renovate/deps/bump", "docker.io/x/y:RENOVATE_deps/bump"),
 			)
 
-			It("omits the registry when the pipe formats without one", func() {
+			It("omits the registry when the pipe formats without one", func(ctx SpecContext) {
 				collector := &versions.Collector{
 					Sanitize: defaultSanitize,
 					Format: func(tag string) string {
@@ -61,7 +61,7 @@ var _ = Describe("Collector", func() {
 					},
 				}
 
-				Expect(collector.Process(t, "v1.2.3")).To(Equal("x/y:v1.2.3"))
+				Expect(collector.Process(ctx, t, "v1.2.3")).To(Equal("x/y:v1.2.3"))
 			})
 		})
 
@@ -72,8 +72,8 @@ var _ = Describe("Collector", func() {
 
 			DescribeTable(
 				"leaves the value as it is without a format",
-				func(version, expected string) {
-					Expect(chart().Process(t, version)).To(Equal(expected))
+				func(ctx SpecContext, version, expected string) {
+					Expect(chart().Process(ctx, t, version)).To(Equal(expected))
 				},
 				Entry("a semver version", "v1.2.3", "v1.2.3"),
 				Entry("a branch name", "main", "main"),
@@ -91,41 +91,41 @@ var _ = Describe("Collector", func() {
 				}
 			}
 
-			It("applies the template and leaves the sanitizer nothing to match", func() {
-				Expect(collector().Process(t, "heads/main")).To(Equal("branch-main"))
+			It("applies the template and leaves the sanitizer nothing to match", func(ctx SpecContext) {
+				Expect(collector().Process(ctx, t, "heads/main")).To(Equal("branch-main"))
 			})
 
-			It("falls through to the sanitizer when no template matches", func() {
-				Expect(collector().Process(t, "tags/v1.0.0")).To(Equal("TAGS_v1.0.0"))
+			It("falls through to the sanitizer when no template matches", func(ctx SpecContext) {
+				Expect(collector().Process(ctx, t, "tags/v1.0.0")).To(Equal("TAGS_v1.0.0"))
 			})
 		})
 
 		// this is what lets a pipeline pass a template in as the tag itself rather
 		// than writing a condition for it.
-		It("renders a value that matches nothing as a template of its own", func() {
+		It("renders a value that matches nothing as a template of its own", func(ctx SpecContext) {
 			collector := &versions.Collector{}
 
-			Expect(collector.Process(t, "{{ 1 | add 1 }}")).To(Equal("2"))
+			Expect(collector.Process(ctx, t, "{{ 1 | add 1 }}")).To(Equal("2"))
 		})
 
-		It("refuses a value that a template sanitized away entirely", func() {
+		It("refuses a value that a template sanitized away entirely", func(ctx SpecContext) {
 			collector := &versions.Collector{Sanitize: []versions.Match{{Match: "^(.*)$", Template: ""}}}
 
-			_, err := collector.Process(t, "anything")
+			_, err := collector.Process(ctx, t, "anything")
 			Expect(err).To(MatchError("Can not add empty tag to list."))
 		})
 
-		It("reports a sanitizer that does not compile", func() {
+		It("reports a sanitizer that does not compile", func(ctx SpecContext) {
 			collector := &versions.Collector{Sanitize: []versions.Match{{Match: "([", Template: "x"}}}
 
-			_, err := collector.Process(t, "anything")
+			_, err := collector.Process(ctx, t, "anything")
 			Expect(err).To(MatchError(ContainSubstring("Can not compile sanitize regular expression")))
 		})
 
-		It("reports a template that does not compile", func() {
+		It("reports a template that does not compile", func(ctx SpecContext) {
 			collector := &versions.Collector{Templates: []versions.Match{{Match: "([", Template: "x"}}}
 
-			_, err := collector.Process(t, "anything")
+			_, err := collector.Process(ctx, t, "anything")
 			Expect(err).To(MatchError(ContainSubstring("Can not compile tag template regular expression")))
 		})
 	})
@@ -143,7 +143,7 @@ var _ = Describe("Collector", func() {
 			p = NewPlumber(func(_ *Plumber) *cli.Command {
 				return &cli.Command{Name: "test"}
 			})
-			p.Log.SetOutput(GinkgoWriter)
+			p.SetLoggerOutput(GinkgoWriter)
 
 			tl = &TaskList{}
 			tl.New(p)

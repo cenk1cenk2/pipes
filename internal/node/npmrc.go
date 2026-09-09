@@ -1,11 +1,12 @@
 package node
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/nochso/gomd/eol"
 )
 
@@ -35,7 +36,7 @@ func LoginTaskList(p *Plumber, cfg *Login) *TaskList {
 
 	return tl.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(_ *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, _ *TaskList) error {
 			return p.Validate(cfg)
 		}).
 		Set(func(tl *TaskList) Job {
@@ -51,20 +52,17 @@ func npmrc(tl *TaskList, cfg *Login) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return cfg.Entries == nil && cfg.NpmRc == ""
 		}).
-		Set(func(t *Task) error {
-			t.Log.Debugf(
-				".npmrc file: %s", strings.Join(cfg.NpmRcFiles, ", "),
-			)
+		Set(func(_ context.Context, t *Task) error {
+			t.Log.Debug(fmt.Sprintf(".npmrc file: %s", strings.Join(cfg.NpmRcFiles, ", ")))
 
 			lines := []string{}
 
 			if cfg.Entries != nil {
-				t.Log.Infoln("Logging in to given registries with credentials.")
+				t.Log.Info("Logging in to given registries with credentials.")
 
 				for _, v := range cfg.Entries {
-					t.Log.Infof(
-						"Generating login credentials for the registry: %s",
-						v.Registry,
+					t.Log.Info(fmt.Sprintf("Generating login credentials for the registry: %s",
+						v.Registry),
 					)
 
 					lines = append(
@@ -75,7 +73,7 @@ func npmrc(tl *TaskList, cfg *Login) *Task {
 			}
 
 			if cfg.NpmRc != "" {
-				t.Log.Infoln("Appending directly to the given npmrc file.")
+				t.Log.Info("Appending directly to the given npmrc file.")
 
 				lines = append(lines, strings.Split(cfg.NpmRc, eol.OSDefault().String())...)
 			}
@@ -83,8 +81,8 @@ func npmrc(tl *TaskList, cfg *Login) *Task {
 			for _, file := range cfg.NpmRcFiles {
 				t.CreateSubtask(file).
 					Set(
-						func(st *Task) error {
-							st.Log.Infof("Generating npmrc file: %s", file)
+						func(_ context.Context, st *Task) error {
+							st.Log.Info(fmt.Sprintf("Generating npmrc file: %s", file))
 
 							f, err := os.OpenFile(file,
 								os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -106,8 +104,8 @@ func npmrc(tl *TaskList, cfg *Login) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -118,17 +116,15 @@ func login(tl *TaskList, cfg *Login) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return cfg.Entries == nil || len(cfg.NpmRcFiles) == 0
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			for _, v := range cfg.Entries {
 				t.CreateCommand(
 					"npm",
 					"whoami",
 				).
-					SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEBUG).
-					Set(func(c *Command) error {
-						c.Log.Infof(
-							"Checking login credentials for Npm registry: %s", v.Registry,
-						)
+					SetLogLevel(LogLevelDebug, LogLevelDefault, LogLevelDebug).
+					Set(func(_ context.Context, c *Command) error {
+						c.Log.Info(fmt.Sprintf("Checking login credentials for Npm registry: %s", v.Registry))
 
 						var url string
 
@@ -152,7 +148,7 @@ func login(tl *TaskList, cfg *Login) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobParallel()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobParallel(ctx)
 		})
 }

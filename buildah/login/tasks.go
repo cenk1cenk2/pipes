@@ -1,10 +1,12 @@
 package login
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 func loginParent(tl *TaskList) *Task {
@@ -23,12 +25,12 @@ func login(tl *TaskList) *Task {
 			return P.Username == "" ||
 				P.Password == ""
 		}).
-		ShouldRunBefore(func(t *Task) error {
+		ShouldRunBefore(func(_ context.Context, t *Task) error {
 			t.Plumber.AppendSecrets(P.Password)
 
 			return nil
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"buildah",
 				"login",
@@ -37,11 +39,10 @@ func login(tl *TaskList) *Task {
 				P.Username,
 				"--password-stdin",
 			).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT).
-				Set(func(c *Command) error {
-					c.Log.Infof(
-						"Logging in to container registry: %s",
-						P.Uri,
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDefault).
+				Set(func(_ context.Context, c *Command) error {
+					c.Log.Info(fmt.Sprintf("Logging in to container registry: %s",
+						P.Uri),
 					)
 
 					return nil
@@ -53,8 +54,8 @@ func login(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
 
@@ -65,17 +66,16 @@ func loginVerify(tl *TaskList) *Task {
 		ShouldDisable(func(_ *Task) bool {
 			return P.Username != "" && P.Password != ""
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(
 				"buildah",
 				"login",
 				P.Uri,
 			).
-				SetLogLevel(LOG_LEVEL_DEBUG, LOG_LEVEL_DEFAULT, LOG_LEVEL_DEFAULT).
-				Set(func(c *Command) error {
-					c.Log.Debugf(
-						"Will verify authentication in to container registry: %s",
-						P.Uri,
+				SetLogLevel(LogLevelDebug, LogLevelDefault, LogLevelDefault).
+				Set(func(_ context.Context, c *Command) error {
+					c.Log.Debug(fmt.Sprintf("Will verify authentication in to container registry: %s",
+						P.Uri),
 					)
 
 					return nil
@@ -84,7 +84,7 @@ func loginVerify(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunCommandJobAsJobSequence()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }

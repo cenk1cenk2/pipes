@@ -1,10 +1,12 @@
 package publish
 
 import (
+	"context"
+	"fmt"
 	"slices"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
@@ -39,10 +41,10 @@ func versionsTask(tl *TaskList) *Task {
 				job,
 			)
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			C.Versions = slices.Compact(C.Versions)
 
-			t.Log.Infof("Helm Chart versions: %s", strings.Join(C.Versions, ", "))
+			t.Log.Info(fmt.Sprintf("Helm Chart versions: %s", strings.Join(C.Versions, ", ")))
 
 			return nil
 		})

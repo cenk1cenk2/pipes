@@ -1,10 +1,11 @@
 package tool
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 type (
@@ -22,7 +23,7 @@ var P = &Pipe{}
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
-		ShouldRunBefore(func(tl *TaskList) error {
+		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if len(P.Command) > 0 {
 				if P.Tool == "" {
 					P.Tool = P.Command[0]

@@ -1,12 +1,13 @@
 package build
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	. "github.com/cenk1cenk2/plumber/v6"
+	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/kustomize/setup"
 )
 
@@ -15,7 +16,7 @@ func build(tl *TaskList) *Task {
 		ShouldDisable(func(t *Task) bool {
 			return len(setup.C.Overlays) == 0
 		}).
-		Set(func(t *Task) error {
+		Set(func(_ context.Context, t *Task) error {
 			if P.Output != "" {
 				if err := os.MkdirAll(P.Output, 0o755); err != nil {
 					return fmt.Errorf("Can not create Kustomize output directory: %s: %w", P.Output, err)
@@ -24,7 +25,7 @@ func build(tl *TaskList) *Task {
 
 			for _, overlay := range setup.C.Overlays {
 				t.CreateSubtask(overlay).
-					Set(func(t *Task) error {
+					Set(func(_ context.Context, t *Task) error {
 						result := renderOverlay(overlay, P)
 
 						t.Lock.Lock()
@@ -35,7 +36,7 @@ func build(tl *TaskList) *Task {
 							return fmt.Errorf("Can not build Kustomize overlay: %s: %w", overlay, result.Err)
 						}
 
-						t.Log.Infof("Built Kustomize overlay: %s (%d resources)", overlay, result.DocCount)
+						t.Log.Info(fmt.Sprintf("Built Kustomize overlay: %s (%d resources)", overlay, result.DocCount))
 
 						if P.Output != "" {
 							if err := writeOverlay(overlay, result); err != nil {
@@ -50,8 +51,8 @@ func build(tl *TaskList) *Task {
 
 			return nil
 		}).
-		ShouldRunAfter(func(t *Task) error {
-			return t.RunSubtasks()
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunSubtasks(ctx)
 		})
 }
 
