@@ -48,7 +48,7 @@ Install node.js dependencies with the given package manager.
 | `$NODE_INSTALL_CWD` | Working directory for the install operation. | `string` | `false` | <code>"."</code> |
 | `$NODE_INSTALL_USE_LOCK_FILE` | Use the lockfile while installing the packages. | `bool` | `false` | <code>true</code> |
 | `$NODE_INSTALL_ARGS` | Arguments to append to the install command. | `string` | `false` | <code></code> |
-| `$NODE_INSTALL_CACHE`<br />`$NODE_INSTALL_CACHE_ENABLE` | Enable caching for the package manager. | `bool` | `false` | <code>true</code> |
+| `$NODE_INSTALL_CACHE` | Enable caching for the package manager. | `bool` | `false` | <code>true</code> |
 
 **Login**
 
@@ -80,10 +80,10 @@ Install node packages with the given package manager.
 
 | Flag / Environment |  Description   |  Type    | Required | Default |
 |---------------- | --------------- | --------------- |  --------------- |  --------------- |
-| `$NODE_ADD_PACKAGES`<br />`$PACKAGES_NODE` | Install node packages before performing operations. | `string[]` | `true` | <code></code> |
-| `$NODE_ADD_GLOBAL`<br />`$PACKAGES_NODE_GLOBAL` | Install node packages globally. | `bool` | `false` | <code>true</code> |
-| `$NODE_ADD_SCRIPT_ARGS`<br />`$PACKAGES_NODE_SCRIPT_ARGS` | Script arguments to append to the install command. | `string` | `false` | <code></code> |
-| `$NODE_ADD_CWD`<br />`$PACKAGES_NODE_CWD` | Working directory for the add operation. | `string` | `false` | <code>"."</code> |
+| `$NODE_ADD_PACKAGES` | Install node packages before performing operations. | `string[]` | `true` | <code></code> |
+| `$NODE_ADD_GLOBAL` | Install node packages globally. | `bool` | `false` | <code>true</code> |
+| `$NODE_ADD_SCRIPT_ARGS` | Script arguments to append to the install command. | `string` | `false` | <code></code> |
+| `$NODE_ADD_CWD` | Working directory for the add operation. | `string` | `false` | <code>"."</code> |
 
 ### `pipe-node build`
 

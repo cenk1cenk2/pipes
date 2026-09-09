@@ -16,7 +16,6 @@ var Flags = []cli.Flag{
 		Name:     "node.add.packages",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_PACKAGES"),
-			cli.EnvVar("PACKAGES_NODE"),
 		),
 		Usage:       "Install node packages before performing operations.",
 		Required:    true,
@@ -29,7 +28,6 @@ var Flags = []cli.Flag{
 		Name:     "node.add.global",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_GLOBAL"),
-			cli.EnvVar("PACKAGES_NODE_GLOBAL"),
 		),
 		Usage:       "Install node packages globally.",
 		Required:    false,
@@ -42,7 +40,6 @@ var Flags = []cli.Flag{
 		Name:     "node.add.script-args",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_SCRIPT_ARGS"),
-			cli.EnvVar("PACKAGES_NODE_SCRIPT_ARGS"),
 		),
 		Usage:       "Script arguments to append to the install command.",
 		Required:    false,
@@ -55,7 +52,6 @@ var Flags = []cli.Flag{
 		Name:     "node.add.cwd",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_ADD_CWD"),
-			cli.EnvVar("PACKAGES_NODE_CWD"),
 		),
 		Usage:       "Working directory for the add operation.",
 		Required:    false,
