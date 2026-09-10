@@ -2,3 +2,6 @@ minimumReleaseAge: 1440
 
 minimumReleaseAgeExclude:
   - "@cenk1cenk2/*"
+
+patchedDependencies:
+  "@anolilab/multi-semantic-release@4.4.11": patches/@anolilab__multi-semantic-release@4.4.11.patch
