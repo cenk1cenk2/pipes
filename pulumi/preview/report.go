@@ -169,8 +169,9 @@ func resourceSummary(urn string, plan apitype.ResourcePlanV1) terraform.Resource
 	}
 
 	return terraform.Resource{
-		Name: pulumiResourceName(resourceType, name),
-		Id:   urn,
+		Name:    pulumiResourceName(resourceType, name),
+		Id:      urn,
+		Changes: resourceChanges(plan.Goal),
 	}
 }
 

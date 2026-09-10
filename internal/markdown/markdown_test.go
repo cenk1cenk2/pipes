@@ -94,6 +94,27 @@ Only names, never values.
 		}
 	})
 
+	// the resources of a report fold on GitLab, and the log keeps the line the fold
+	// opens with and the diff it hides, indented under it.
+	It("strips a folded section down to its summary and the code block under it", func() {
+		body, err := markdown.Render(strings.TrimSpace(`
+<details>
+<summary><code>+</code> <code>aws_s3_bucket.this</code></summary>
+
+` + "```diff" + `
++ bucket: "logs"
+- acl: "private"
+` + "```" + `
+
+</details>
+`))
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(plain(body)).To(Equal("+ aws_s3_bucket.this\n  + bucket: \"logs\"\n  - acl: \"private\""))
+		Expect(body).To(ContainSubstring("\x1b[32m+ bucket: \"logs\"\x1b[0m"))
+		Expect(body).To(ContainSubstring("\x1b[31m- acl: \"private\"\x1b[0m"))
+	})
+
 	It("drops the styling when the environment asks for none", func() {
 		GinkgoT().Setenv("NO_COLOR", "1")
 

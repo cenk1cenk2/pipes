@@ -53,7 +53,8 @@ func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terrafo
 		}
 
 		resource := terraform.Resource{
-			Name: change.Address,
+			Name:    change.Address,
+			Changes: resourceChanges(change.Change),
 		}
 		if moved {
 			resource.PreviousName = change.PreviousAddress
