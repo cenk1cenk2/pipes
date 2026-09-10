@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/cenk1cenk2/plumber/v7 v7.0.0
-	github.com/charmbracelet/glamour v1.0.0
+	github.com/charmbracelet/glamour/v2 v2.0.1
 	github.com/go-playground/validator/v10 v10.30.4
 	github.com/muesli/termenv v0.16.0
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
