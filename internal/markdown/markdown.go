@@ -10,9 +10,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/charmbracelet/glamour"
-	"github.com/charmbracelet/glamour/ansi"
-	"github.com/muesli/termenv"
+	"charm.land/glamour/v2"
+	"charm.land/glamour/v2/ansi"
+	"github.com/charmbracelet/colorprofile"
 )
 
 const (
@@ -25,6 +25,9 @@ var (
 	// which a log viewer shows as noise where a terminal would have swallowed it.
 	trailing = regexp.MustCompile(`(?:\x1b\[[0-9;]*m|[ \t])+$`)
 	escapes  = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+	// the sequence a terminal turns into a clickable link, which a log viewer shows as
+	// the characters it is written with instead.
+	hyperlinks = regexp.MustCompile(`\x1b\]8;[^\a\x1b]*(?:\a|\x1b\\)`)
 )
 
 // The palette stays inside the sixteen colors that every log viewer agrees on, which is
@@ -75,8 +78,6 @@ var style = ansi.StyleConfig{
 
 // Render turns a markdown document into the styled text of a terminal.
 func Render(body string) (string, error) {
-	profile := colorProfile()
-
 	renderer, err := glamour.NewTermRenderer(
 		glamour.WithStyles(style),
 		// the document is read in a log viewer that never reflows it, so it keeps its
@@ -85,7 +86,6 @@ func Render(body string) (string, error) {
 		// the footnotes a table would otherwise collect are truncated against the word
 		// wrap, which leaves every one of them without its url once the wrap is off.
 		glamour.WithInlineTableLinks(true),
-		glamour.WithColorProfile(profile),
 		glamour.WithChromaFormatter("terminal16"),
 	)
 	if err != nil {
@@ -97,11 +97,16 @@ func Render(body string) (string, error) {
 		return "", fmt.Errorf("render markdown: %w", err)
 	}
 
-	// a profile without colors still leaves the attributes that carry none behind, and
-	// an environment that asked for no styling wants none of it.
-	if profile == termenv.Ascii {
-		rendered = escapes.ReplaceAllString(rendered, "")
+	rendered = hyperlinks.ReplaceAllString(rendered, "")
+
+	// the renderer writes the colors it is given and leaves what a terminal can show to
+	// its caller, so the palette the document reaches the log with is settled here.
+	downsampled := &strings.Builder{}
+	if _, err := (&colorprofile.Writer{Forward: downsampled, Profile: colorProfile()}).WriteString(rendered); err != nil {
+		return "", fmt.Errorf("downsample markdown colors: %w", err)
 	}
+
+	rendered = downsampled.String()
 
 	lines := strings.Split(strings.Trim(rendered, "\n"), "\n")
 	for index, line := range lines {
@@ -143,14 +148,14 @@ func Log(log *slog.Logger, body string) error {
 // Mirrors the logger of plumber, which forces the profile instead of detecting it
 // because the output of a pipe ends up in a pipeline log viewer that renders the escape
 // sequences although it is never a terminal.
-func colorProfile() termenv.Profile {
+func colorProfile() colorprofile.Profile {
 	if force := os.Getenv("CLICOLOR_FORCE"); force != "" && force != "0" {
-		return termenv.ANSI
+		return colorprofile.ANSI
 	}
 
 	if os.Getenv("NO_COLOR") != "" {
-		return termenv.Ascii
+		return colorprofile.NoTTY
 	}
 
-	return termenv.ANSI
+	return colorprofile.ANSI
 }

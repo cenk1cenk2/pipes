@@ -71,6 +71,15 @@ Only names, never values.
 		Expect(plain(body)).To(ContainSubstring("https://gitlab.example.test/project/-/jobs/1"))
 	})
 
+	// the renderer marks a link up as one a terminal makes clickable, which the log
+	// viewer of a pipeline does not read and prints as the sequence itself.
+	It("leaves out the hyperlink a log viewer cannot read", func() {
+		body, err := markdown.Render(document)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).NotTo(ContainSubstring("\x1b]8;"))
+	})
+
 	It("leaves no line padded out to the width of the document", func() {
 		body, err := markdown.Render(document)
 		Expect(err).NotTo(HaveOccurred())
