@@ -135,6 +135,9 @@ func newReportView(report Report) reportView {
 		resources := make([]resourceView, 0, len(action.Resources))
 		for _, resource := range action.Resources {
 			diff := RenderChanges(resource.Changes)
+			if diff == "" {
+				diff = NoAttributeChanges
+			}
 
 			resources = append(resources, resourceView{
 				Resource: resource,

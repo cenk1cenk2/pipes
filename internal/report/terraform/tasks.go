@@ -72,6 +72,8 @@ func LogTask(tl *TaskList, src *Source) *Task {
 				return err
 			}
 
+			t.Log.Info("Generating the plan report.")
+
 			return markdown.Log(t.Log, body)
 		})
 }

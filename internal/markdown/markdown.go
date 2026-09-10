@@ -44,22 +44,33 @@ var style = ansi.StyleConfig{
 	H5:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
 	H6:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
 	Code: ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Color: new("3")}},
-	// a code block sits under the line that opens its folded section, and chroma only
-	// takes hex colors: these two are the entries of its sixteen color table that come
-	// out as the plain red and green of the palette above.
+	// a code block sits under the line that opens its folded section. Chroma only takes
+	// hex colors and matches them against a table of its own, so these are the entries
+	// of its sixteen color table rather than the indexes used above; anything else is
+	// dropped rather than approximated.
 	CodeBlock: ansi.StyleCodeBlock{
 		StyleBlock: ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{BlockSuffix: "\n"}, Indent: new(uint(2))},
 		Chroma: &ansi.Chroma{
-			GenericInserted: ansi.StylePrimitive{Color: new("#007f00")},
-			GenericDeleted:  ansi.StylePrimitive{Color: new("#7f0000")},
+			GenericInserted:   ansi.StylePrimitive{Color: new("#007f00")},
+			GenericDeleted:    ansi.StylePrimitive{Color: new("#7f0000")},
+			GenericSubheading: ansi.StylePrimitive{Color: new("#7f7fe0")},
+			GenericStrong:     ansi.StylePrimitive{Color: new("#ff0000"), Bold: new(true)},
+			Keyword:           ansi.StylePrimitive{Color: new("#00007f")},
+			KeywordType:       ansi.StylePrimitive{Color: new("#007f7f")},
+			Error:             ansi.StylePrimitive{Color: new("#7f007f")},
+			Comment:           ansi.StylePrimitive{Color: new("#555555")},
 		},
 	},
-	Link:     ansi.StylePrimitive{Color: new("4"), Underline: new(true)},
-	LinkText: ansi.StylePrimitive{Color: new("4")},
-	List:     ansi.StyleList{LevelIndent: 2},
-	Item:     ansi.StylePrimitive{BlockPrefix: "- "},
-	Emph:     ansi.StylePrimitive{Italic: new(true)},
-	Strong:   ansi.StylePrimitive{Bold: new(true)},
+	// the line that opens a folded section reaches the terminal as the text of its own
+	// html, which carries no markup left to style: bold is what separates one resource
+	// from the block of attributes under it.
+	HTMLBlock: ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Bold: new(true)}},
+	Link:      ansi.StylePrimitive{Color: new("4"), Underline: new(true)},
+	LinkText:  ansi.StylePrimitive{Color: new("4")},
+	List:      ansi.StyleList{LevelIndent: 2},
+	Item:      ansi.StylePrimitive{BlockPrefix: "- "},
+	Emph:      ansi.StylePrimitive{Italic: new(true)},
+	Strong:    ansi.StylePrimitive{Bold: new(true)},
 }
 
 // Render turns a markdown document into the styled text of a terminal.
