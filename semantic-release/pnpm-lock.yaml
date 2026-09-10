@@ -4,13 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@anolilab/multi-semantic-release@4.4.11': 6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772
+
 importers:
 
   .:
     dependencies:
       '@anolilab/multi-semantic-release':
         specifier: ^4.4.11
-        version: 4.4.11(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@cenk1cenk2/semantic-release-config':
         specifier: ^4.0.1
         version: 4.0.1(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)
@@ -1563,7 +1566,7 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@anolilab/multi-semantic-release@4.4.11(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@anolilab/multi-semantic-release@4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@semrel-extra/topo': 1.14.1
       '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)
