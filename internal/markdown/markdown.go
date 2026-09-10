@@ -37,13 +37,23 @@ var style = ansi.StyleConfig{
 	},
 	// the levels only carry the number sign the renderer prefixes them with, which
 	// reads as markup rather than as a heading once the document is not markup anymore.
-	H1:       ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
-	H2:       ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
-	H3:       ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
-	H4:       ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
-	H5:       ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
-	H6:       ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
-	Code:     ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Color: new("3")}},
+	H1:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
+	H2:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
+	H3:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
+	H4:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
+	H5:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
+	H6:   ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Prefix: ""}},
+	Code: ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{Color: new("3")}},
+	// a code block sits under the line that opens its folded section, and chroma only
+	// takes hex colors: these two are the entries of its sixteen color table that come
+	// out as the plain red and green of the palette above.
+	CodeBlock: ansi.StyleCodeBlock{
+		StyleBlock: ansi.StyleBlock{StylePrimitive: ansi.StylePrimitive{BlockSuffix: "\n"}, Indent: new(uint(2))},
+		Chroma: &ansi.Chroma{
+			GenericInserted: ansi.StylePrimitive{Color: new("#007f00")},
+			GenericDeleted:  ansi.StylePrimitive{Color: new("#7f0000")},
+		},
+	},
 	Link:     ansi.StylePrimitive{Color: new("4"), Underline: new(true)},
 	LinkText: ansi.StylePrimitive{Color: new("4")},
 	List:     ansi.StyleList{LevelIndent: 2},
@@ -65,6 +75,7 @@ func Render(body string) (string, error) {
 		// wrap, which leaves every one of them without its url once the wrap is off.
 		glamour.WithInlineTableLinks(true),
 		glamour.WithColorProfile(profile),
+		glamour.WithChromaFormatter("terminal16"),
 	)
 	if err != nil {
 		return "", fmt.Errorf("create markdown renderer: %w", err)
@@ -92,6 +103,12 @@ func Render(body string) (string, error) {
 		}
 
 		lines[index] = line
+	}
+
+	// a block that closes the document leaves its padding on a line of its own, which
+	// only shows once the padding is gone.
+	for len(lines) > 0 && escapes.ReplaceAllString(lines[len(lines)-1], "") == "" {
+		lines = lines[:len(lines)-1]
 	}
 
 	return strings.Join(lines, "\n"), nil
