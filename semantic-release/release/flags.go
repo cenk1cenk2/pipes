@@ -33,7 +33,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("SEMANTIC_RELEASE_WORKSPACE"),
 		),
-		Usage:       "Use @qiwi/multi-semantic-release package to do a workspace release.",
+		Usage:       "Use @anolilab/multi-semantic-release package to do a workspace release.",
 		Required:    false,
 		Value:       false,
 		Destination: &P.SemanticRelease.Workspace,
