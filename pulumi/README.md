@@ -45,6 +45,12 @@ Preview the Pulumi changes.
 | `$CI_COMMIT_SHA` | Git commit sha to include in the plan report metadata. | `string` |  |
 | `$CI_COMMIT_SHORT_SHA` | Short git commit sha to include in the plan report metadata. | `string` |  |
 
+**Plan Report**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$PLAN_REPORT_LOG_ENABLED` | Write the plan report to the job log. | `bool` | `true` |
+
 **Preview**
 
 | Flag / Environment | Description | Type | Default |

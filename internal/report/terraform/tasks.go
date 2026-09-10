@@ -8,12 +8,13 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/markdown"
 )
 
 // Everything a plan report needs that differs between the tools. Read reaches for the
-// plan -- a command for one pipe, a file for the other -- so the two tasks below keep
-// one shape. The tasks take the pipe's own instance, which is only filled once its
-// flags have been parsed.
+// plan -- a command for one pipe, a file for the other -- so the tasks below keep one
+// shape. The tasks take the pipe's own instance, which is only filled once its flags
+// have been parsed.
 type Source struct {
 	Read          func(ctx context.Context, t *Task) (Report, error)
 	Summary       func(Report) Summary
@@ -25,6 +26,54 @@ type Source struct {
 	// request do not overwrite each other's note.
 	Discriminators func() []string
 	Metadata       Metadata
+	Log            LogConfig
+
+	// held between the tasks below, since reaching for the plan runs a command for one
+	// of the pipes and they run in sequence anyway.
+	cache *Report
+}
+
+func (s *Source) read(ctx context.Context, t *Task) (Report, error) {
+	if s.cache != nil {
+		return *s.cache, nil
+	}
+
+	report, err := s.Read(ctx, t)
+	if err != nil {
+		return Report{}, err
+	}
+
+	s.cache = &report
+
+	return report, nil
+}
+
+// LogTask writes the report into the job log, which is what a pipeline is read with
+// long before anyone opens the merge request the note goes on.
+func LogTask(tl *TaskList, src *Source) *Task {
+	return tl.CreateTask("report").
+		ShouldDisable(func(t *Task) bool {
+			if !src.Log.Enabled {
+				t.Log.Debug("Skipping the plan report in the job log because it is disabled.")
+
+				return true
+			}
+
+			return false
+		}).
+		Set(func(ctx context.Context, t *Task) error {
+			report, err := src.read(ctx, t)
+			if err != nil {
+				return err
+			}
+
+			body, err := RenderReport(report)
+			if err != nil {
+				return err
+			}
+
+			return markdown.Log(t.Log, body)
+		})
 }
 
 func SummaryTask(tl *TaskList, src *Source) *Task {
@@ -39,7 +88,7 @@ func SummaryTask(tl *TaskList, src *Source) *Task {
 			return false
 		}).
 		Set(func(ctx context.Context, t *Task) error {
-			report, err := src.Read(ctx, t)
+			report, err := src.read(ctx, t)
 			if err != nil {
 				return err
 			}
@@ -75,12 +124,12 @@ func MergeRequestReportTask(tl *TaskList, src *Source) *Task {
 			return false
 		}).
 		Set(func(ctx context.Context, t *Task) error {
-			report, err := src.Read(ctx, t)
+			report, err := src.read(ctx, t)
 			if err != nil {
 				return err
 			}
 
-			body, err := RenderMergeRequestReport(report)
+			body, err := RenderReport(report)
 			if err != nil {
 				return err
 			}

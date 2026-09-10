@@ -7,6 +7,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
 const CategoryPlan = "Plan"
@@ -110,4 +111,5 @@ var Flags = CombineFlags(
 	},
 	gitlab.NewFlags(gitlab.Options{Destination: &P.MergeRequestReport}),
 	ci.NewFlags(ci.Options{Destination: &P.ReportMetadata}),
+	terraform.NewFlags(terraform.Options{Destination: &P.ReportLog}),
 )

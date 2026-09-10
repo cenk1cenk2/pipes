@@ -65,7 +65,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 }
 `))
 
-		body, err := terraform.RenderMergeRequestReport(report)
+		body, err := terraform.RenderReport(report)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("## Pulumi preview report"))
 		Expect(body).To(ContainSubstring("| Stack | `dev` |"))
@@ -111,7 +111,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Delete: 1,
 		}))
 
-		body, err := terraform.RenderMergeRequestReport(report)
+		body, err := terraform.RenderReport(report)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("Plan schema version"))
 		Expect(body).NotTo(ContainSubstring("secret-arn-value"))

@@ -193,6 +193,12 @@ Plan terraform project.
 | `$TERRAFORM_PLAN_RETRY_DELAY`<br/>`$TF_PLAN_RETRY_DELAY` | Delay between retries for terraform plan command. | `duration` | `1m0s` |
 | `$TERRAFORM_PLAN_SUMMARY_OUTPUT`<br/>`$TERRAFORM_SUMMARY_OUTPUT` | Output file for terraform plan summary. Leave empty to skip summary generation. | `string` | `"terraform-summary.json"` |
 
+**Plan Report**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$PLAN_REPORT_LOG_ENABLED` | Write the plan report to the job log. | `bool` | `true` |
+
 <details>
 <summary>Project</summary>
 
