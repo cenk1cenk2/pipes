@@ -14,6 +14,15 @@
             "updates": {
               "arn": "secret-arn-value"
             }
+          },
+          "inputDiff": {
+            "updates": {
+              "runtime": "nodejs22.x",
+              "environment": {
+                "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                "ciphertext": "v1:secret-env-value"
+              }
+            }
           }
         },
         "steps": [

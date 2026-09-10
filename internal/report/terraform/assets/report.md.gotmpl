@@ -1,9 +1,9 @@
 {{- define "resource" -}}
-`{{ .Name }}`{{ if .Id }} (`{{ .Id }}`){{ end }}{{ if .PreviousName }} (moved from `{{ .PreviousName }}`){{ end }}
+<code>{{ .Name | html }}</code>{{ if .Id }} (<code>{{ .Id | html }}</code>){{ end }}{{ if .PreviousName }} (moved from <code>{{ .PreviousName | html }}</code>){{ end }}
 {{- end -}}
 ## {{ .Title }}
 
-This report includes only plan metadata, resource actions, resource identifiers and output names. It does not include input values, output values or diff payload values.
+This report carries the plan metadata, the action planned for every resource with the attribute values the plan proposes for it, and the names of the outputs that change. Values the tool marks as sensitive or secret are redacted, values only known after apply are marked as such, and output values are not included.
 
 {{- if .Metadata.Any }}
 
@@ -65,9 +65,20 @@ No changes detected.
 {{- if .Resources }}
 
 #### `{{ .Action }}` ({{ len .Resources }})
-
 {{- range .Resources }}
-- {{ template "resource" . }}
+
+<details>
+<summary><code>{{ .Glyph | html }}</code> {{ template "resource" . }}</summary>
+
+{{ if .Diff -}}
+{{ .Fence }}diff
+{{ .Diff }}
+{{ .Fence }}
+{{- else -}}
+No attribute changes.
+{{- end }}
+
+</details>
 {{- end }}
 {{- end }}
 {{- end }}

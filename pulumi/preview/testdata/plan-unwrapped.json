@@ -15,7 +15,24 @@
         "inputDiff": {
           "adds": {
             "acl": "private",
-            "token": "secret-input-value"
+            "token": {
+              "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+              "ciphertext": "v1:secret-input-value"
+            },
+            "tags": {
+              "env": "dev",
+              "owner": {
+                "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                "plaintext": "\"secret-owner-value\""
+              }
+            },
+            "region": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "rules": [
+              {
+                "name": "expire",
+                "days": 30
+              }
+            ]
           }
         },
         "outputDiff": {
@@ -38,11 +55,22 @@
         "name": "settings",
         "outputDiff": {
           "updates": {
-            "metadata": {
-              "old": "secret-old-value",
-              "new": "secret-new-value"
-            }
+            "metadata": "secret-new-value"
           }
+        },
+        "inputDiff": {
+          "updates": {
+            "data": {
+              "level": "debug",
+              "password": {
+                "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+                "ciphertext": "v1:secret-update-value"
+              }
+            }
+          },
+          "deletes": [
+            "immutable"
+          ]
         }
       },
       "steps": [

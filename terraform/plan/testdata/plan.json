@@ -7,34 +7,44 @@
       "address": "aws_s3_bucket.logs",
       "change": {
         "actions": ["create"],
-        "after": { "bucket": "secret-bucket-name" },
-        "after_sensitive": { "bucket": true }
+        "after": {
+          "bucket": "secret-bucket-name",
+          "force_destroy": false,
+          "tags": { "env": "dev", "team": "platform" },
+          "cors_rule": [{ "allowed_methods": ["GET"], "max_age_seconds": 300 }],
+          "lifecycle_rule": []
+        },
+        "after_unknown": { "arn": true, "id": true, "cors_rule": [{ "id": true }] },
+        "after_sensitive": { "bucket": true, "tags": {}, "cors_rule": [{}] }
       }
     },
     {
       "address": "aws_instance.web",
       "change": {
         "actions": ["update"],
-        "before": { "user_data": "secret-old-user-data" },
-        "after": { "user_data": "secret-new-user-data" },
-        "before_sensitive": { "user_data": true },
-        "after_sensitive": { "user_data": true }
+        "before": { "user_data": "secret-old-user-data", "instance_type": "t3.micro", "tags": { "env": "dev" } },
+        "after": { "user_data": "secret-new-user-data", "instance_type": "t3.small", "tags": { "env": "dev" } },
+        "before_sensitive": { "user_data": true, "tags": {} },
+        "after_sensitive": { "user_data": true, "tags": {} }
       }
     },
     {
       "address": "aws_db_instance.main",
       "change": {
         "actions": ["delete", "create"],
-        "before": { "password": "secret-old-password" },
-        "after": { "password": "secret-new-password" },
-        "sensitive_values": { "password": true }
+        "before": { "password": "secret-old-password", "engine": "postgres", "engine_version": "15" },
+        "after": { "password": "secret-new-password", "engine": "postgres", "engine_version": "16" },
+        "before_sensitive": { "password": true },
+        "after_sensitive": { "password": true },
+        "replace_paths": [["engine_version"]]
       }
     },
     {
       "address": "data.aws_caller_identity.current",
       "change": {
         "actions": ["read"],
-        "after": { "account_id": "secret-account-id" }
+        "after": { "account_id": "secret-account-id" },
+        "after_sensitive": { "account_id": true }
       }
     },
     {
@@ -49,6 +59,7 @@
       "previous_address": "aws_sqs_queue.legacy_jobs",
       "change": {
         "actions": ["no-op"],
+        "before": { "name": "secret-queue-name" },
         "after": { "name": "secret-queue-name" }
       }
     }
