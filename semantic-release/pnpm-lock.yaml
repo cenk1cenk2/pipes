@@ -15,8 +15,8 @@ importers:
         specifier: ^4.4.11
         version: 4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@cenk1cenk2/semantic-release-config':
-        specifier: ^4.0.1
-        version: 4.0.1(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)
+        specifier: ^5.0.0
+        version: 5.0.0(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)
       '@semantic-release/changelog':
         specifier: ^7.0.0
         version: 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
@@ -83,8 +83,8 @@ packages:
     resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
     engines: {node: '>=6.9.0'}
 
-  '@cenk1cenk2/semantic-release-config@4.0.1':
-    resolution: {integrity: sha512-iIfTLmzhe5DNZVFLbR3rbnwzggOj5k5mN+IiA6OLqYamvYmUKnBVkPaWPfGqpLfsD453Yu6TunL7RFnU2B4SFg==}
+  '@cenk1cenk2/semantic-release-config@5.0.0':
+    resolution: {integrity: sha512-j9JNzGD0I+C07Fn1KpPS9zZa8GOrdERn2dt6FmJ56W3GIktaBM6fwd1fCp1HeqxyTRa3MSU4c7TdkKZjrPRGNQ==}
     peerDependencies:
       semantic-release: '>= 24'
 
@@ -1632,7 +1632,7 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@cenk1cenk2/semantic-release-config@4.0.1(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)':
+  '@cenk1cenk2/semantic-release-config@5.0.0(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)':
     dependencies:
       '@anolilab/semantic-release-pnpm': 8.1.23(json5@2.2.3)(supports-color@7.2.0)(yaml@2.9.0)
       '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
