@@ -50,6 +50,6 @@ RUN \
   git config user.name probe && \
   git commit -q --allow-empty -m "chore: init" && \
   git remote add origin "$(pwd)" && \
-  echo '{ "extends": "@cenk1cenk2/semantic-release-config/flows/helm" }' > .releaserc.json && \
+  echo '{ "extends": "@cenk1cenk2/semantic-release-config/presets/helm" }' > .releaserc.json && \
   semantic-release --dry-run --no-ci && \
   cd / && rm -rf /tmp/extends-probe
