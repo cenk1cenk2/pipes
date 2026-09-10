@@ -54,4 +54,4 @@ Releases applications through the semantic-release library.
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
 | `$SEMANTIC_RELEASE_DRY_RUN` | Run semantic-release in dry mode without making changes. | `bool` | `false` |
-| `$SEMANTIC_RELEASE_WORKSPACE` | Use @qiwi/multi-semantic-release package to do a workspace release. | `bool` | `false` |
+| `$SEMANTIC_RELEASE_WORKSPACE` | Use @anolilab/multi-semantic-release package to do a workspace release. | `bool` | `false` |

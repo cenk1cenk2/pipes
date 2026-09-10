@@ -14,9 +14,15 @@ RUN \
   apk add --no-cache --no-progress git git-lfs openssh && \
   (command -v corepack > /dev/null 2>&1 || npm install --global corepack@latest) && \
   corepack enable && corepack prepare pnpm@latest --activate && \
-  mkdir -p ${SEMANTIC_RELEASE_HOME} && \
+  mkdir -p ${SEMANTIC_RELEASE_HOME}
+
+# the plugin set is a committed manifest instead of a bare `pnpm add` so the versions
+# baked into the image are reproducible and renovate can raise the bumps.
+COPY ./package.json ./pnpm-lock.yaml ${SEMANTIC_RELEASE_HOME}/
+
+RUN \
   cd ${SEMANTIC_RELEASE_HOME} && \
-  pnpm add semantic-release @qiwi/multi-semantic-release @semantic-release/github @semantic-release/npm @semantic-release/git @semantic-release/changelog @semantic-release/gitlab @semantic-release/exec semantic-release-docker semantic-release-replace-plugin && \
+  pnpm install --prod --frozen-lockfile && \
   pnpm store prune && \
   # # https://github.com/npm/cli/issues/4605
   # npm i -g npm@8.4
@@ -30,4 +36,5 @@ RUN \
   npm --version && \
   yarn --version && \
   pnpm --version && \
+  multi-semantic-release --version && \
   pipe --help

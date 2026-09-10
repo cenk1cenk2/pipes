@@ -19,7 +19,7 @@ func release(tl *TaskList) *Task {
 				C.Exe,
 			).
 				Set(func(_ context.Context, c *Command) error {
-					// --ignore-private-packages belongs to the original multi-semantic-release, not @qiwi/multi-semantic-release.
+					// --ignore-private-packages belongs to the original multi-semantic-release, not @anolilab/multi-semantic-release.
 
 					if P.SemanticRelease.DryRun {
 						c.AppendEnvironment(map[string]string{
