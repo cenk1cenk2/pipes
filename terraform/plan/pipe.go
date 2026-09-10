@@ -28,6 +28,7 @@ type (
 		Summary
 		MergeRequestReport gitlab.MergeRequestReportConfig
 		ReportMetadata     terraform.Metadata
+		ReportLog          terraform.LogConfig
 	}
 
 	Ctx struct {
@@ -59,6 +60,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				plan(tl).Job(),
+				terraform.LogTask(tl, &C.Report).Job(),
 				terraform.SummaryTask(tl, &C.Report).Job(),
 				terraform.MergeRequestReportTask(tl, &C.Report).Job(),
 				cleanup(tl).Job(),

@@ -1,6 +1,6 @@
-// Package terraform writes the GitLab artifacts:reports:terraform JSON and the
-// merge request note that goes with it. Pulumi previews report through it too,
-// since GitLab has no report kind of their own.
+// Package terraform writes the GitLab artifacts:reports:terraform JSON, the job log
+// copy of the plan and the merge request note that goes with them. Pulumi previews
+// report through it too, since GitLab has no report kind of their own.
 package terraform
 
 import (
@@ -13,8 +13,8 @@ import (
 	"text/template"
 )
 
-//go:embed assets/mr-report.md.gotmpl
-var mergeRequestReportTemplate string
+//go:embed assets/report.md.gotmpl
+var reportTemplate string
 
 // The plan report shared by the Terraform and Pulumi pipes; a pipe reporting on
 // something else brings its own model and template.
@@ -90,16 +90,16 @@ func (r Report) HasOutputs() bool {
 	})
 }
 
-func RenderMergeRequestReport(report Report) (string, error) {
-	tmpl, err := template.New("mr-report.md.gotmpl").
-		Parse(mergeRequestReportTemplate)
+func RenderReport(report Report) (string, error) {
+	tmpl, err := template.New("report.md.gotmpl").
+		Parse(reportTemplate)
 	if err != nil {
-		return "", fmt.Errorf("parse merge request report template: %w", err)
+		return "", fmt.Errorf("parse report template: %w", err)
 	}
 
 	var body bytes.Buffer
 	if err := tmpl.Execute(&body, report); err != nil {
-		return "", fmt.Errorf("render merge request report template: %w", err)
+		return "", fmt.Errorf("render report template: %w", err)
 	}
 
 	return strings.TrimRight(body.String(), "\n") + "\n", nil

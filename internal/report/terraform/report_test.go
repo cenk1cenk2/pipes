@@ -54,10 +54,10 @@ var _ = Describe("Terraform merge request report", func() {
 	// both pipes render through this template, so the section skeleton is the
 	// contract that keeps their reports readable side by side on one merge request.
 	It("keeps one structure whichever labels it renders", func() {
-		terraformBody, err := terraform.RenderMergeRequestReport(report(terraformLabels))
+		terraformBody, err := terraform.RenderReport(report(terraformLabels))
 		Expect(err).NotTo(HaveOccurred())
 
-		pulumiBody, err := terraform.RenderMergeRequestReport(report(pulumiLabels))
+		pulumiBody, err := terraform.RenderReport(report(pulumiLabels))
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(headings(terraformBody)).NotTo(BeEmpty())
@@ -65,7 +65,7 @@ var _ = Describe("Terraform merge request report", func() {
 	})
 
 	It("names the tool specific concepts from the labels", func() {
-		body, err := terraform.RenderMergeRequestReport(report(pulumiLabels))
+		body, err := terraform.RenderReport(report(pulumiLabels))
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("## Example report"))
@@ -78,7 +78,7 @@ var _ = Describe("Terraform merge request report", func() {
 	})
 
 	It("says so when there is nothing to report", func() {
-		body, err := terraform.RenderMergeRequestReport(terraform.Report{Title: "Example report"})
+		body, err := terraform.RenderReport(terraform.Report{Title: "Example report"})
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("No changes detected."))

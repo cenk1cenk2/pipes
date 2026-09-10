@@ -83,6 +83,7 @@ func reportSource() terraform.Source {
 		Notes:          gitlab.NewNotes,
 		Discriminators: terraformReportDiscriminators,
 		Metadata:       metadata,
+		Log:            P.ReportLog,
 	}
 }
 
