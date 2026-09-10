@@ -38,3 +38,18 @@ RUN \
   pnpm --version && \
   multi-semantic-release --version && \
   pipe --help
+
+# extends-probe: prove that the preset baked into ${SEMANTIC_RELEASE_HOME}/node_modules resolves
+# from a repository that ships none of its own node_modules (chart/tag/docker repos), the way
+# consumers of this image actually use it.
+RUN \
+  mkdir -p /tmp/extends-probe && \
+  cd /tmp/extends-probe && \
+  git init -q && \
+  git config user.email probe@pipe.local && \
+  git config user.name probe && \
+  git commit -q --allow-empty -m "chore: init" && \
+  git remote add origin "$(pwd)" && \
+  echo '{ "extends": "@cenk1cenk2/semantic-release-config/flows/helm" }' > .releaserc.json && \
+  semantic-release --dry-run --no-ci && \
+  cd / && rm -rf /tmp/extends-probe
