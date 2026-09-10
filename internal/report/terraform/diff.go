@@ -12,6 +12,10 @@ const (
 	ChangeCreate = "+"
 	ChangeDelete = "-"
 	ChangeUpdate = "~"
+
+	// What stands in a resource's block where the plan proposes no attribute of its
+	// own, so that the block a reader opens is never empty.
+	NoAttributeChanges = "No attribute changes."
 )
 
 type (

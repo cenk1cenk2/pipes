@@ -102,7 +102,9 @@ var _ = Describe("Terraform merge request report", func() {
 <details>
 <summary><code>&gt;</code> <code>two</code> (moved from <code>old-two</code>)</summary>
 
+` + "```diff" + `
 No attribute changes.
+` + "```" + `
 
 </details>
 `)))
