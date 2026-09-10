@@ -129,6 +129,8 @@ func packages(tl *TaskList) *Task {
 			C.Packages = nil
 
 			for _, module := range setup.C.Modules {
+				var output string
+
 				t.CreateCommand(
 					"go",
 					"list",
@@ -138,9 +140,9 @@ func packages(tl *TaskList) *Task {
 				).
 					SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
 					SetDir(module).
-					EnableStreamRecording().
+					CaptureStdout(&output).
 					ShouldRunAfter(func(_ context.Context, c *Command) error {
-						for _, dir := range c.GetStdoutStream() {
+						for _, dir := range strings.Split(output, "\n") {
 							if dir := strings.TrimSpace(dir); dir != "" {
 								C.Packages = append(C.Packages, dir)
 							}

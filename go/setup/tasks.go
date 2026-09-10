@@ -28,14 +28,12 @@ func version(tl *TaskList) *Task {
 		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand("go", "version").
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+				CaptureOutput(&C.Version).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
-					C.Version = strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
-
 					c.Log.Info(fmt.Sprintf("go version: %s", C.Version))
 
 					return nil
 				}).
-				EnableStreamRecording().
 				AddSelfToTheTask()
 
 			return nil
@@ -95,6 +93,8 @@ func modules(tl *TaskList) *Task {
 			return !C.Workspace
 		}).
 		Set(func(_ context.Context, t *Task) error {
+			var output string
+
 			t.CreateCommand(
 				"go",
 				"list",
@@ -104,11 +104,11 @@ func modules(tl *TaskList) *Task {
 			).
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
 				SetDir(C.Cwd).
-				EnableStreamRecording().
+				CaptureStdout(&output).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
 					C.Modules = nil
 
-					for _, module := range c.GetStdoutStream() {
+					for _, module := range strings.Split(output, "\n") {
 						if module := strings.TrimSpace(module); module != "" {
 							C.Modules = append(C.Modules, module)
 						}

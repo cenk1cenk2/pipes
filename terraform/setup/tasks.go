@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -25,11 +24,12 @@ func version(tl *TaskList) *Task {
 		Set(func(_ context.Context, t *Task) error {
 			pattern := regexp.MustCompile(`Terraform (v\d+\.\d+\.\d+)`)
 
+			var output string
+
 			t.CreateCommand("terraform", "version").
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+				CaptureOutput(&output).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
-					output := strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
-
 					// the banner is only ever logged, and terraform has already proven it
 					// runs by answering at all, so an unrecognised one is reported whole
 					// rather than treated as an error.
@@ -43,7 +43,6 @@ func version(tl *TaskList) *Task {
 
 					return nil
 				}).
-				EnableStreamRecording().
 				AddSelfToTheTask()
 
 			return nil

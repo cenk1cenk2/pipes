@@ -3,7 +3,6 @@ package setup
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -24,14 +23,12 @@ func version(tl *TaskList) *Task {
 		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand("buildah", "--version").
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+				CaptureOutput(&C.Version).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
-					C.Version = strings.TrimSpace(strings.Join(c.GetCombinedStream(), "\n"))
-
 					c.Log.Info(fmt.Sprintf("buildah version: %s", C.Version))
 
 					return nil
 				}).
-				EnableStreamRecording().
 				AddSelfToTheTask()
 
 			return nil
