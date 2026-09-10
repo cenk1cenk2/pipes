@@ -18,15 +18,18 @@ RUN \
 
 # the plugin set is a committed manifest instead of a bare `pnpm add` so the versions
 # baked into the image are reproducible and renovate can raise the bumps.
-COPY ./package.json ./pnpm-lock.yaml ${SEMANTIC_RELEASE_HOME}/
+COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ${SEMANTIC_RELEASE_HOME}/
+
+WORKDIR ${SEMANTIC_RELEASE_HOME}
 
 RUN \
-  cd ${SEMANTIC_RELEASE_HOME} && \
   pnpm install --prod --frozen-lockfile && \
   pnpm store prune && \
   # # https://github.com/npm/cli/issues/4605
   # npm i -g npm@8.4
   npm -g config set workspaces-update false
+
+WORKDIR /
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
