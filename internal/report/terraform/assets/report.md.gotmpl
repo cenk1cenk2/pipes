@@ -70,13 +70,9 @@ No changes detected.
 <details>
 <summary><code>{{ .Glyph | html }}</code> {{ template "resource" . }}</summary>
 
-{{ if .Diff -}}
 {{ .Fence }}diff
 {{ .Diff }}
 {{ .Fence }}
-{{- else -}}
-No attribute changes.
-{{- end }}
 
 </details>
 {{- end }}

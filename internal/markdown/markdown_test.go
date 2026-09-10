@@ -12,6 +12,9 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/markdown"
 )
 
+// what a reader sees as the color of a line.
+var escapes = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
 var _ = Describe("Markdown", func() {
 	// the shape the pipes report with: a heading per section, a table of metadata that
 	// carries a link, and the resources as a list.
@@ -40,8 +43,6 @@ Only names, never values.
 - ` + "`aws_s3_bucket.this`" + `
 - ` + "`aws_iam_role.this`" + ` (moved from ` + "`aws_iam_role.old`" + `)
 `)
-
-	escapes := regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 	plain := func(body string) string {
 		return escapes.ReplaceAllString(body, "")
@@ -134,5 +135,104 @@ Only names, never values.
 		Expect(markdown.Log(log, document)).To(Succeed())
 
 		Expect(strings.Count(out.String(), "\n")).To(Equal(strings.Count(body, "\n") + 1))
+	})
+})
+
+var _ = Describe("Plan diff lexer", func() {
+	const dimmed = "(sensitive value)"
+
+	BeforeEach(func() {
+		markdown.RegisterDiffLexer(dimmed, "No attribute changes.")
+	})
+
+	render := func(lines ...string) string {
+		body, err := markdown.Render("```diff\n" + strings.Join(lines, "\n") + "\n```\n")
+		Expect(err).NotTo(HaveOccurred())
+
+		return body
+	}
+
+	// the escape sequence a line carries is what a reader sees as its color; the specs
+	// below only care that two of them differ, never which color chroma settled on.
+	color := func(body string, contains string) string {
+		for line := range strings.SplitSeq(body, "\n") {
+			if !strings.Contains(line, contains) {
+				continue
+			}
+
+			if found := escapes.FindString(line); found != "" {
+				return found
+			}
+
+			return ""
+		}
+
+		Fail("no line carrying " + contains)
+
+		return ""
+	}
+
+	// chroma's own diff lexer reads every one of these as context and leaves them
+	// unstyled, which is what this lexer replaces it for.
+	It("colors a line by the glyph it opens with", func() {
+		body := render(`+ created: "a"`, `- deleted: "b"`, `~ changed: "c" -> "d"`)
+
+		created := color(body, "created")
+		deleted := color(body, "deleted")
+		changed := color(body, "changed")
+
+		Expect(created).NotTo(BeEmpty())
+		Expect(deleted).NotTo(BeEmpty())
+		Expect(changed).NotTo(BeEmpty())
+		Expect([]string{created, deleted, changed}).To(HaveLen(3))
+		Expect(created).NotTo(Equal(deleted))
+		Expect(created).NotTo(Equal(changed))
+		Expect(deleted).NotTo(Equal(changed))
+	})
+
+	It("dims what the pipe stands in for a value it will not show", func() {
+		body := render(`~ password: ` + dimmed + ` -> ` + dimmed)
+
+		line := ""
+		for candidate := range strings.SplitSeq(body, "\n") {
+			if strings.Contains(candidate, "password") {
+				line = candidate
+			}
+		}
+
+		Expect(escapes.FindAllString(line, -1)).To(ContainElement(Not(Equal(color(body, "password")))))
+		Expect(line).To(ContainSubstring(dimmed))
+	})
+
+	It("dims a resource that carries nothing to show", func() {
+		body := render("No attribute changes.")
+
+		Expect(color(body, "No attribute changes.")).NotTo(BeEmpty())
+	})
+
+	It("marks what forces a resource to be replaced", func() {
+		body := render(`~ engine: "15" -> "16" # forces replacement`)
+
+		line := ""
+		for candidate := range strings.SplitSeq(body, "\n") {
+			if strings.Contains(candidate, "engine") {
+				line = candidate
+			}
+		}
+
+		Expect(len(escapes.FindAllString(line, -1))).To(BeNumerically(">", 2))
+		Expect(line).To(ContainSubstring("# forces replacement"))
+	})
+
+	It("leaves a nested line to read as the one above it", func() {
+		body := render(`~ data:`, `    level: "debug"`)
+
+		Expect(color(body, "level")).To(BeEmpty())
+	})
+
+	It("drops the styling when the environment asks for none", func() {
+		GinkgoT().Setenv("NO_COLOR", "1")
+
+		Expect(render(`~ changed: "c" -> "d"`)).NotTo(ContainSubstring("\x1b"))
 	})
 })

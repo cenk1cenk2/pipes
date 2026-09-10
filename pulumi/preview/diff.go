@@ -6,6 +6,7 @@ import (
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/sig"
+	"gitlab.kilic.dev/devops/pipes/internal/markdown"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
@@ -15,7 +16,22 @@ const (
 
 	// what Pulumi writes into a plan where a property is only computed on apply.
 	computedValuePlaceholder = "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+
+	assetValue   = terraform.Marker("[asset]")
+	archiveValue = terraform.Marker("[archive]")
 )
+
+// The markers are the pipe's own, so the renderer only learns to dim what this pipe
+// actually writes.
+func init() {
+	markdown.RegisterDiffLexer(
+		terraform.NoAttributeChanges,
+		string(secretValue),
+		string(unknownValue),
+		string(assetValue),
+		string(archiveValue),
+	)
+}
 
 // The plan carries the inputs a resource is going to be given and no more: a
 // deleted property comes as its name alone and an updated one as its new value
@@ -70,9 +86,9 @@ func masked(value any) any {
 		case sig.ResourceReference:
 			return value["urn"]
 		case sig.AssetSig:
-			return terraform.Marker("[asset]")
+			return assetValue
 		case sig.ArchiveSig:
-			return terraform.Marker("[archive]")
+			return archiveValue
 		}
 
 		out := make(map[string]any, len(value))

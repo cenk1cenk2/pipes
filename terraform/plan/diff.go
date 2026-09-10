@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	tfjson "github.com/hashicorp/terraform-json"
+	"gitlab.kilic.dev/devops/pipes/internal/markdown"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
@@ -15,6 +16,16 @@ const (
 	sensitiveValue  = terraform.Marker("(sensitive value)")
 	knownAfterApply = terraform.Marker("(known after apply)")
 )
+
+// The markers are the pipe's own, so the renderer only learns to dim what this pipe
+// actually writes.
+func init() {
+	markdown.RegisterDiffLexer(
+		terraform.NoAttributeChanges,
+		string(sensitiveValue),
+		string(knownAfterApply),
+	)
+}
 
 // One half of a change next to the masks Terraform ships with it. A mask mirrors the
 // shape of its value with a true where a leaf is sensitive or unknown, or where a
