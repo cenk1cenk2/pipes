@@ -5,7 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@anolilab/multi-semantic-release@4.4.11': 6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772
+  '@anolilab/multi-semantic-release@4.4.11':
+    hash: 6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772
+    path: patches/@anolilab__multi-semantic-release@4.4.11.patch
 
 importers:
 
@@ -13,34 +15,34 @@ importers:
     dependencies:
       '@anolilab/multi-semantic-release':
         specifier: ^4.4.11
-        version: 4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)
       '@cenk1cenk2/semantic-release-config':
-        specifier: ^5.0.0
-        version: 5.0.0(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)
+        specifier: ^5.1.0
+        version: 5.1.0(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)
       '@semantic-release/changelog':
         specifier: ^7.0.0
-        version: 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
+        version: 7.0.0(semantic-release@25.0.9)
       '@semantic-release/exec':
         specifier: ^7.1.0
-        version: 7.1.0(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 7.1.0(semantic-release@25.0.9)
       '@semantic-release/git':
         specifier: ^11.0.1
-        version: 11.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 11.0.1(semantic-release@25.0.9)
       '@semantic-release/github':
         specifier: ^12.0.9
-        version: 12.0.9(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 12.0.9(semantic-release@25.0.9)
       '@semantic-release/gitlab':
         specifier: ^13.3.3
-        version: 13.3.3(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 13.3.3(semantic-release@25.0.9)
       '@semantic-release/npm':
         specifier: ^13.1.5
-        version: 13.1.5(semantic-release@25.0.9(supports-color@7.2.0))
+        version: 13.1.5(semantic-release@25.0.9)
       conventional-changelog-conventionalcommits:
         specifier: ^9.3.1
         version: 9.3.1
       semantic-release:
         specifier: ^25.0.9
-        version: 25.0.9(supports-color@7.2.0)
+        version: 25.0.9
 
 packages:
 
@@ -83,8 +85,8 @@ packages:
     resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
     engines: {node: '>=6.9.0'}
 
-  '@cenk1cenk2/semantic-release-config@5.0.0':
-    resolution: {integrity: sha512-j9JNzGD0I+C07Fn1KpPS9zZa8GOrdERn2dt6FmJ56W3GIktaBM6fwd1fCp1HeqxyTRa3MSU4c7TdkKZjrPRGNQ==}
+  '@cenk1cenk2/semantic-release-config@5.1.0':
+    resolution: {integrity: sha512-kCWhvdnd6+REYct9ruGylXUgmay8MIH42QitB1L26sOoXfGsuk1bnK6F1WLL7s1EI5iEYWhaE4oASJUEWeKRSQ==}
     peerDependencies:
       semantic-release: '>= 24'
 
@@ -1566,19 +1568,19 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@anolilab/multi-semantic-release@4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@anolilab/multi-semantic-release@4.4.11(patch_hash=6797a7729d0f1dcac99bafb6c8aa59c1c302dbd3a8f4dac152fe18dc2f1b5772)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)':
     dependencies:
       '@semrel-extra/topo': 1.14.1
       '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)
       '@visulima/path': 3.1.0
       cosmiconfig: 10.0.1
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       detect-indent: 7.0.2
       execa: 10.0.1
       git-log-parser: 1.2.1
       lodash-es: 4.18.1
       resolve-from: 5.0.0
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
       semver: 7.8.5
       signale: 1.4.0
       stream-buffers: 3.0.3
@@ -1596,7 +1598,7 @@ snapshots:
       ini: 7.0.0
       ts-deepmerge: 8.0.0
 
-  '@anolilab/semantic-release-pnpm@8.1.23(json5@2.2.3)(supports-color@7.2.0)(yaml@2.9.0)':
+  '@anolilab/semantic-release-pnpm@8.1.23(json5@2.2.3)(yaml@2.9.0)':
     dependencies:
       '@actions/core': 3.0.1
       '@anolilab/rc': 4.0.9
@@ -1604,7 +1606,7 @@ snapshots:
       '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)
       '@visulima/package': 5.0.11(ini@7.0.0)
       '@visulima/path': 3.1.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       detect-indent: 7.0.2
       env-ci: 11.2.0
       execa: 10.0.1
@@ -1632,20 +1634,20 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@cenk1cenk2/semantic-release-config@5.0.0(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)(yaml@2.9.0)':
+  '@cenk1cenk2/semantic-release-config@5.1.0(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)':
     dependencies:
-      '@anolilab/semantic-release-pnpm': 8.1.23(json5@2.2.3)(supports-color@7.2.0)(yaml@2.9.0)
-      '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
-      '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+      '@anolilab/semantic-release-pnpm': 8.1.23(json5@2.2.3)(yaml@2.9.0)
+      '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9)
+      '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9)
       '@semantic-release/error': 4.0.0
-      '@semantic-release/git': 11.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
-      '@semantic-release/npm': 13.1.5(semantic-release@25.0.9(supports-color@7.2.0))
-      '@semantic-release/release-notes-generator': 14.1.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+      '@semantic-release/git': 11.0.1(semantic-release@25.0.9)
+      '@semantic-release/npm': 13.1.5(semantic-release@25.0.9)
+      '@semantic-release/release-notes-generator': 14.1.1(semantic-release@25.0.9)
       conventional-changelog-conventionalcommits: 9.3.1
       nerf-dart: 1.0.0
       rc: 1.2.8
       registry-auth-token: 5.1.1
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
     transitivePeerDependencies:
       - json5
       - jsonc-parser
@@ -1756,56 +1758,56 @@ snapshots:
 
   '@sec-ant/readable-stream@0.4.1': {}
 
-  '@semantic-release/changelog@7.0.0(semantic-release@25.0.9(supports-color@7.2.0))':
+  '@semantic-release/changelog@7.0.0(semantic-release@25.0.9)':
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 5.0.0
       lodash-es: 4.18.1
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
 
-  '@semantic-release/commit-analyzer@13.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@semantic-release/commit-analyzer@13.0.1(semantic-release@25.0.9)':
     dependencies:
       conventional-changelog-angular: 8.3.1
       conventional-changelog-writer: 8.4.0
       conventional-commits-filter: 5.0.0
       conventional-commits-parser: 6.4.0
-      debug: 4.4.3(supports-color@7.2.0)
-      import-from-esm: 2.0.0(supports-color@7.2.0)
+      debug: 4.4.3
+      import-from-esm: 2.0.0
       lodash-es: 4.18.1
       micromatch: 4.0.8
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
     transitivePeerDependencies:
       - supports-color
 
   '@semantic-release/error@4.0.0': {}
 
-  '@semantic-release/exec@7.1.0(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@semantic-release/exec@7.1.0(semantic-release@25.0.9)':
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 3.1.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       execa: 9.6.1
       lodash-es: 4.18.1
       parse-json: 8.3.0
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
     transitivePeerDependencies:
       - supports-color
 
-  '@semantic-release/git@11.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@semantic-release/git@11.0.1(semantic-release@25.0.9)':
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 5.0.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       dir-glob: 3.0.1
       execa: 10.0.1
       lodash-es: 4.18.1
       micromatch: 4.0.8
       p-reduce: 3.0.0
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
     transitivePeerDependencies:
       - supports-color
 
-  '@semantic-release/github@12.0.9(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@semantic-release/github@12.0.9(semantic-release@25.0.9)':
     dependencies:
       '@octokit/core': 7.0.8
       '@octokit/plugin-paginate-rest': 14.0.0(@octokit/core@7.0.8)
@@ -1813,15 +1815,15 @@ snapshots:
       '@octokit/plugin-throttling': 11.0.5(@octokit/core@7.0.8)
       '@semantic-release/error': 4.0.0
       aggregate-error: 5.0.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       dir-glob: 3.0.1
-      http-proxy-agent: 9.1.0(supports-color@7.2.0)
-      https-proxy-agent: 9.1.0(supports-color@7.2.0)
+      http-proxy-agent: 9.1.0
+      https-proxy-agent: 9.1.0
       issue-parser: 7.0.2
       lodash-es: 4.18.1
       mime: 4.1.0
       p-filter: 4.1.0
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
       tinyglobby: 0.2.17
       undici: 7.29.1
       url-join: 5.0.0
@@ -1829,11 +1831,11 @@ snapshots:
       - kerberos
       - supports-color
 
-  '@semantic-release/gitlab@13.3.3(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@semantic-release/gitlab@13.3.3(semantic-release@25.0.9)':
     dependencies:
       '@semantic-release/error': 4.0.0
       aggregate-error: 5.0.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       dir-glob: 3.0.1
       escape-string-regexp: 5.0.0
       formdata-node: 6.0.3
@@ -1843,12 +1845,12 @@ snapshots:
       hpagent: 1.2.0
       lodash-es: 4.18.1
       parse-url: 10.0.3
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
       url-join: 4.0.1
     transitivePeerDependencies:
       - supports-color
 
-  '@semantic-release/npm@13.1.5(semantic-release@25.0.9(supports-color@7.2.0))':
+  '@semantic-release/npm@13.1.5(semantic-release@25.0.9)':
     dependencies:
       '@actions/core': 3.0.1
       '@semantic-release/error': 4.0.0
@@ -1863,21 +1865,21 @@ snapshots:
       rc: 1.2.8
       read-pkg: 10.1.0
       registry-auth-token: 5.1.1
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
       semver: 7.8.5
       tempy: 3.2.0
 
-  '@semantic-release/release-notes-generator@14.1.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@semantic-release/release-notes-generator@14.1.1(semantic-release@25.0.9)':
     dependencies:
       conventional-changelog-angular: 8.3.1
       conventional-changelog-writer: 8.4.0
       conventional-commits-filter: 5.0.0
       conventional-commits-parser: 6.4.0
-      debug: 4.4.3(supports-color@7.2.0)
-      import-from-esm: 2.0.0(supports-color@7.2.0)
+      debug: 4.4.3
+      import-from-esm: 2.0.0
       lodash-es: 4.18.1
       read-package-up: 11.0.0
-      semantic-release: 25.0.9(supports-color@7.2.0)
+      semantic-release: 25.0.9
     transitivePeerDependencies:
       - supports-color
 
@@ -2105,11 +2107,9 @@ snapshots:
     dependencies:
       type-fest: 1.4.0
 
-  debug@4.4.3(supports-color@7.2.0):
+  debug@4.4.3:
     dependencies:
       ms: 2.1.3
-    optionalDependencies:
-      supports-color: 7.2.0
 
   decompress-response@10.0.0:
     dependencies:
@@ -2337,10 +2337,10 @@ snapshots:
 
   http-cache-semantics@4.2.0: {}
 
-  http-proxy-agent@9.1.0(supports-color@7.2.0):
+  http-proxy-agent@9.1.0:
     dependencies:
       agent-base: 9.0.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       proxy-agent-negotiate: 1.1.0
     transitivePeerDependencies:
       - kerberos
@@ -2351,10 +2351,10 @@ snapshots:
       quick-lru: 5.1.1
       resolve-alpn: 1.2.1
 
-  https-proxy-agent@9.1.0(supports-color@7.2.0):
+  https-proxy-agent@9.1.0:
     dependencies:
       agent-base: 9.0.0
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       proxy-agent-negotiate: 1.1.0
     transitivePeerDependencies:
       - kerberos
@@ -2371,9 +2371,9 @@ snapshots:
       parent-module: 1.0.1
       resolve-from: 4.0.0
 
-  import-from-esm@2.0.0(supports-color@7.2.0):
+  import-from-esm@2.0.0:
     dependencies:
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       import-meta-resolve: 4.2.0
     transitivePeerDependencies:
       - supports-color
@@ -2762,16 +2762,16 @@ snapshots:
 
   safe-buffer@5.1.2: {}
 
-  semantic-release@25.0.9(supports-color@7.2.0):
+  semantic-release@25.0.9:
     dependencies:
-      '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+      '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9)
       '@semantic-release/error': 4.0.0
-      '@semantic-release/github': 12.0.9(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
-      '@semantic-release/npm': 13.1.5(semantic-release@25.0.9(supports-color@7.2.0))
-      '@semantic-release/release-notes-generator': 14.1.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+      '@semantic-release/github': 12.0.9(semantic-release@25.0.9)
+      '@semantic-release/npm': 13.1.5(semantic-release@25.0.9)
+      '@semantic-release/release-notes-generator': 14.1.1(semantic-release@25.0.9)
       aggregate-error: 5.0.0
       cosmiconfig: 9.0.2
-      debug: 4.4.3(supports-color@7.2.0)
+      debug: 4.4.3
       env-ci: 11.2.0
       execa: 9.6.1
       figures: 6.1.0
@@ -2780,7 +2780,7 @@ snapshots:
       git-log-parser: 1.2.1
       hook-std: 4.0.0
       hosted-git-info: 9.0.3
-      import-from-esm: 2.0.0(supports-color@7.2.0)
+      import-from-esm: 2.0.0
       lodash-es: 4.18.1
       marked: 15.0.12
       marked-terminal: 7.3.0(marked@15.0.12)
