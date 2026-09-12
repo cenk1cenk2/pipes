@@ -3,10 +3,10 @@ module gitlab.kilic.dev/devops/pipes/pulumi
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.0.0
+	github.com/cenk1cenk2/plumber/v7 v7.2.3
 	github.com/onsi/ginkgo/v2 v2.32.2
 	github.com/onsi/gomega v1.43.0
-	github.com/pulumi/pulumi/sdk/v3 v3.261.0
+	github.com/pulumi/pulumi/sdk/v3 v3.262.0
 	github.com/urfave/cli/v3 v3.11.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0

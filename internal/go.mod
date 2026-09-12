@@ -5,7 +5,7 @@ go 1.27.0
 require (
 	charm.land/glamour/v2 v2.0.1
 	github.com/alecthomas/chroma/v2 v2.27.0
-	github.com/cenk1cenk2/plumber/v7 v7.0.0
+	github.com/cenk1cenk2/plumber/v7 v7.2.3
 	github.com/charmbracelet/colorprofile v0.4.3
 	github.com/go-playground/validator/v10 v10.30.4
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.43.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.11.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.2.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.8.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 )
@@ -21,13 +21,10 @@ require (
 require (
 	charm.land/lipgloss/v2 v2.0.6 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
-	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/brunoga/deep v1.3.1 // indirect
-	github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260811164956-006e29f97886 // indirect
 	github.com/charmbracelet/x/ansi v0.11.8 // indirect
-	github.com/charmbracelet/x/cellbuf v0.0.15 // indirect
 	github.com/charmbracelet/x/exp/slice v0.0.0-20250327172914-2fdc97757edf // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
 	github.com/charmbracelet/x/termios v0.1.1 // indirect
@@ -70,7 +67,6 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
-	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect
