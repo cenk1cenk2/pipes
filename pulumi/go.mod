@@ -3,11 +3,11 @@ module gitlab.kilic.dev/devops/pipes/pulumi
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.5
-	github.com/onsi/ginkgo/v2 v2.32.2
-	github.com/onsi/gomega v1.43.0
-	github.com/pulumi/pulumi/sdk/v3 v3.262.0
-	github.com/urfave/cli/v3 v3.11.0
+	github.com/cenk1cenk2/plumber/v7 v7.2.6
+	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/gomega v1.43.1
+	github.com/pulumi/pulumi/sdk/v3 v3.263.0
+	github.com/urfave/cli/v3 v3.13.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 )
@@ -31,7 +31,7 @@ require (
 	github.com/charmbracelet/x/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
-	github.com/creasty/defaults v1.10.0 // indirect
+	github.com/creasty/defaults v1.11.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/deckarep/golang-set/v2 v2.9.0 // indirect
 	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.30.4 // indirect
+	github.com/go-playground/validator/v10 v10.30.5 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/golang/glog v1.2.5 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -67,7 +67,7 @@ require (
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect
-	gitlab.com/gitlab-org/api/client-go/v3 v3.9.0 // indirect
+	gitlab.com/gitlab-org/api/client-go/v3 v3.12.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.9 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.20.1 // indirect
