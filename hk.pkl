@@ -1,0 +1,45 @@
+amends "package://github.com/jdx/hk/releases/download/v2.0.1/hk@2.0.1#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v2.0.1/hk@2.0.1#/Builtins.pkl"
+
+hooks {
+  // Fix and format the staged Go files only, never fail the commit on a lint
+  // finding: linting belongs to pre-push. `golangci-lint fmt` takes explicit
+  // file paths and the formatters are file-scoped, so the one root invocation
+  // covers files from any module of the workspace.
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps {
+      ["golangci-lint-fmt"] = (Builtins.golangci_lint_fmt)
+    }
+  }
+  // Whole-repo gates, mirroring the `lint` and `test` tasks of the root
+  // Taskfile. `go vet` is covered by golangci-lint's standard linter set, so it
+  // is not a separate step.
+  ["pre-push"] {
+    steps {
+      // The workspace holds 13 modules and `golangci-lint run ./...` is
+      // per-module, which is why the Taskfile fans `module:lint` out over the
+      // `go.work` list. The builtin already does exactly that: it carries
+      // `workspace_indicator = "go.mod"` with `dir = "{{workspace}}"`, so hk
+      // groups the changed files by their nearest `go.mod` and runs one
+      // `golangci-lint run ./...` inside each module that actually changed.
+      // That keeps the module list discovered rather than written down — no
+      // per-module `hk.pkl` subproject and no 13 hand-maintained `dir` steps to
+      // drift from `go.work`.
+      ["golangci-lint"] = (Builtins.golangci_lint)
+      // Tests are the one thing the repo does NOT fan out: the root Taskfile
+      // excludes the shared `test` task and runs a single workspace-root ginkgo
+      // instead, which walks every module in one pass. Mirrored verbatim.
+      ["go-test"] {
+        glob = List("**/*.go", "**/go.mod", "**/go.sum", "go.work")
+        check = """
+          go tool ginkgo \
+          --cover --coverpkg=./... --coverprofile=coverage.out \
+          -vv --silence-skips --fail-fast -r \
+          ./...
+          """
+      }
+    }
+  }
+}
