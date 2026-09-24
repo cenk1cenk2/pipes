@@ -7,7 +7,7 @@ vars:
   # every pipe module the fan-out tasks iterate, space separated. The template comes
   # first, so the scaffold breaks before the published pipes do.
   PACKAGES: >-
-    template buildah go helm kustomize node pulumi select-env
+    template buildah github go helm kustomize node pulumi select-env
     semantic-release terraform update-docker-hub-readme
 
 env:
@@ -32,6 +32,9 @@ includes:
   # one place the pipe list stays written out.
   buildah:
     dir: ./buildah
+    taskfile: ./Taskfile.pipe.yml
+  github:
+    dir: ./github
     taskfile: ./Taskfile.pipe.yml
   go:
     dir: ./go

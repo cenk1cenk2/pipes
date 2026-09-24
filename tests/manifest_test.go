@@ -14,6 +14,7 @@ var published = []ReadmeMatrixEntry{
 	{Repository: "cenk1cenk2/pipe-node", File: "./node/README.md", Description: "Node.JS operations for pipelines."},
 	{Repository: "cenk1cenk2/pipe-pulumi", File: "./pulumi/README.md", Description: "Pulumi operations for pipelines."},
 	{Repository: "cenk1cenk2/pipe-go", File: "./go/README.md", Description: "Golang operations for pipelines."},
+	{Repository: "cenk1cenk2/pipe-github", File: "./github/README.md", Description: "GitHub App tokens and commit statuses for pipelines."},
 	{Repository: "cenk1cenk2/pipe-helm", File: "./helm/README.md", Description: "Helm operations for pipelines."},
 	{Repository: "cenk1cenk2/pipe-kustomize", File: "./kustomize/README.md", Description: "Kustomize operations for pipelines."},
 	{Repository: "cenk1cenk2/pipe-select-env", File: "./select-env/README.md", Description: "Selects an environment given on the conditions."},
