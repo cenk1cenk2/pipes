@@ -15,6 +15,12 @@ packages:
     interfaces:
       NotesAdapter:
       ModuleRegistryAdapter:
+  gitlab.kilic.dev/devops/pipes/github/client:
+    config:
+      dir: github/test/mocks/client
+      pkgname: mockclient
+    interfaces:
+      ApplicationClientAdapter:
   gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub:
     config:
       dir: update-docker-hub-readme/test/mocks/hub

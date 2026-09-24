@@ -13,6 +13,7 @@ Consumer-facing GitLab CI templates have moved to [`devops/pipelines`](https://g
 This repository still builds and publishes the pipe images used by `devops/pipelines`:
 
 - [`cenk1cenk2/pipe-buildah`](./buildah/README.md)
+- [`cenk1cenk2/pipe-github`](./github/README.md)
 - [`cenk1cenk2/pipe-go`](./go/README.md)
 - [`cenk1cenk2/pipe-helm`](./helm/README.md)
 - [`cenk1cenk2/pipe-kustomize`](./kustomize/README.md)
