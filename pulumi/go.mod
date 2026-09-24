@@ -5,7 +5,7 @@ go 1.27.0
 require (
 	github.com/cenk1cenk2/plumber/v7 v7.2.6
 	github.com/onsi/ginkgo/v2 v2.33.0
-	github.com/onsi/gomega v1.43.1
+	github.com/onsi/gomega v1.44.0
 	github.com/pulumi/pulumi/sdk/v3 v3.264.0
 	github.com/urfave/cli/v3 v3.13.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
@@ -68,7 +68,7 @@ require (
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect
-	gitlab.com/gitlab-org/api/client-go/v3 v3.13.0 // indirect
+	gitlab.com/gitlab-org/api/client-go/v3 v3.14.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.9 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.20.1 // indirect
