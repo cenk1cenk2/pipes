@@ -32,6 +32,12 @@ type (
 		Context     string `json:"context"`
 	}
 
+	// ResponseError is a request GitHub answered with anything but a success.
+	ResponseError struct {
+		StatusCode int
+		Message    string
+	}
+
 	ApplicationClientAdapter interface {
 		CreateInstallationToken(ctx context.Context, jwt, installation string, request TokenRequest) (string, error)
 		CreateCommitStatus(ctx context.Context, token, repository, sha string, status CommitStatus) error
@@ -141,8 +147,18 @@ func (c *applicationClient) do(ctx context.Context, address, token string, paylo
 		response := errorResponse{}
 		_ = json.Unmarshal(body, &response)
 
-		return nil, fmt.Errorf("GitHub responded with code: %d > %s", res.StatusCode, response.Message)
+		return nil, &ResponseError{StatusCode: res.StatusCode, Message: response.Message}
 	}
 
 	return body, nil
+}
+
+func (e *ResponseError) Error() string {
+	return fmt.Sprintf("GitHub responded with code: %d > %s", e.StatusCode, e.Message)
+}
+
+// CommitNotFound tells a commit GitHub does not have, as with a branch that only
+// exists on GitLab.
+func (e *ResponseError) CommitNotFound() bool {
+	return e.StatusCode == http.StatusUnprocessableEntity && strings.HasPrefix(e.Message, "No commit found for SHA")
 }

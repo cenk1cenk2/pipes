@@ -49,6 +49,8 @@ Post a commit status to GitHub.
 
 Given the GitHub App flags, the status mints its own token, narrowed to the repository and to writing statuses. That needs the private key in the status job as well, so prefer the token from the dotenv file and mint in place only where the pipeline can outlive the token.
 
+A commit GitHub does not have, as on a branch that only exists on GitLab, is skipped with a warning; every other failure fails the job.
+
 `pipe-github status [FLAGS]`
 
 #### Flags

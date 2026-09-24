@@ -2,6 +2,7 @@ package status
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v7"
@@ -42,11 +43,20 @@ func post(tl *TaskList) *Task {
 		Set(func(ctx context.Context, t *Task) error {
 			t.Log.Info(fmt.Sprintf("Posting commit status: %s@%s > %s", P.Status.Project, P.Status.Sha, P.Status.State))
 
-			return C.Client.CreateCommitStatus(ctx, C.Token, P.Status.Project, P.Status.Sha, client.CommitStatus{
+			err := C.Client.CreateCommitStatus(ctx, C.Token, P.Status.Project, P.Status.Sha, client.CommitStatus{
 				State:       P.Status.State,
 				TargetUrl:   P.Status.TargetUrl,
 				Description: P.Status.Description,
 				Context:     P.Status.Context,
 			})
+
+			var response *client.ResponseError
+			if errors.As(err, &response) && response.CommitNotFound() {
+				t.Log.Warn(fmt.Sprintf("Commit is not on GitHub, skipping status: %s@%s", P.Status.Project, P.Status.Sha))
+
+				return nil
+			}
+
+			return err
 		})
 }
