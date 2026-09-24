@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@anolilab/multi-semantic-release':
         specifier: ^4.4.15
-        version: 4.4.16(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)
+        version: 4.4.19(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)
       '@cenk1cenk2/semantic-release-config':
         specifier: ^5.1.2
-        version: 5.1.2(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)
+        version: 5.1.3(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)
       '@semantic-release/changelog':
         specifier: ^7.0.0
         version: 7.0.0(semantic-release@25.0.9)
@@ -53,8 +53,8 @@ packages:
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
-  '@anolilab/multi-semantic-release@4.4.16':
-    resolution: {integrity: sha512-hgP/XHNHh0TX1Sl3L8cfWMkTII2uLs+kDfsLpdW6yj8WZv6avn6XcAOIgI4ilvEe0nwqWnCe0V9Cp4wDnoz2aQ==}
+  '@anolilab/multi-semantic-release@4.4.19':
+    resolution: {integrity: sha512-dpoV8QaOJUnnhq5UewD4onB6rFB2y+k0+raNuPuILGgPHgGw8bIKLnbvCQ/nJ2h94nCkvfspsB+qQ7yppYQ5aA==}
     engines: {node: ^22.14.0 || >=24.10.0}
     os: [darwin, linux, win32]
     hasBin: true
@@ -65,8 +65,8 @@ packages:
     resolution: {integrity: sha512-e3KBrm9Fr2xCmSyKc17cWyL6jOwHJWciiSb6FbRveAmykn0vwYQT1Bf4BJNkuEhCUXNsJL1aN70czA5atzlGzw==}
     engines: {node: ^22.14.0 || >=24.10.0}
 
-  '@anolilab/semantic-release-pnpm@8.1.26':
-    resolution: {integrity: sha512-mzdxcf1RMwgwhVWDd9yGr6YfB2+yWWkWjdre3n70UbhgGhD3/vqU7ruE4JLNCnSSCK6ty3lPjUlf6Ak0z6gESg==}
+  '@anolilab/semantic-release-pnpm@8.1.29':
+    resolution: {integrity: sha512-5MckWA6cWlPqIfjgJ/GNjGaOZPZvaq63gWUj+XT5eq1ujPNnYhGSuKBQFFGBBLEjyH6up3WoQq4aB4pIAaTzJA==}
     engines: {node: ^22.14.0 || >=24.10.0}
 
   '@antfu/install-pkg@2.1.0':
@@ -80,8 +80,8 @@ packages:
     resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
     engines: {node: '>=6.9.0'}
 
-  '@cenk1cenk2/semantic-release-config@5.1.2':
-    resolution: {integrity: sha512-uM3tqJw3ZbVgJOnCpzm0YX86F6geucEO1XHX5QX9fG63P1GWKwet3qFil4tz1l+UYlWNon5rVHa47Tk8BM8jkw==}
+  '@cenk1cenk2/semantic-release-config@5.1.3':
+    resolution: {integrity: sha512-Qq+USpV043FvjK8cfgGXjWXREXT7lgN3wu9ILaGWEMN/nuob+zGcfxUouNrdECmJk/e5kwNs13BwwFLTYzvsOA==}
     peerDependencies:
       semantic-release: '>= 24'
 
@@ -628,8 +628,8 @@ packages:
     resolution: {integrity: sha512-8e1++BCiTzUno9v5IZ2J6bv4RU+3UKDmqWUQD0MIMVCd9AdhWkO1gw57oo1mNEX1dMq2EGI+FbWz4B92pscSQg==}
     engines: {node: '>= 18'}
 
-  fs-extra@11.4.0:
-    resolution: {integrity: sha512-EQsFzMUJkCKGr1ePqlYADkIUmHW1s3ZXr5Yqy6wbGrfUCphpl2maM/kyOIRA2HpP3AaFQTZXD4ldjek+nccddA==}
+  fs-extra@11.4.1:
+    resolution: {integrity: sha512-KYAb4c9BJQI6QqGKthV68OHe0badztdXJWKo0WtBA9IuCFPTKvE5ZdUBglP833aMjhaSPNO4A5j/EkzZtGlKjA==}
     engines: {node: '>=14.14'}
 
   function-timeout@1.0.2:
@@ -736,8 +736,8 @@ packages:
     resolution: {integrity: sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ==}
     engines: {node: '>=18.18.0'}
 
-  ignore@7.0.9:
-    resolution: {integrity: sha512-brTTsvFRt5C1gGHtPst/281UjPD5t9fBqbgoMPlVWy11ZLTPfu7HxK4ZYqO9H7o/yC9rSTCI85EaQ4OoY12qYw==}
+  ignore@7.0.10:
+    resolution: {integrity: sha512-HpbUakT7xp5miBUywCHf36ZEuAJNklBJDDsGpUIjMzOSmM8ELSfA9Sa/QDPeNeqeoN31u+UTCkL4klCOVvRm4Q==}
     engines: {node: '>= 4'}
 
   import-fresh@3.3.1:
@@ -991,8 +991,8 @@ packages:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
 
-  npm@11.19.1:
-    resolution: {integrity: sha512-ztsxKxt/kkIaAs+2i0GU6I+DRmUdrNasxTZKJe9TCdSjKxlhah/4r/hl5ygMD6XAg1qZ9c2TNomR4qgOydp10g==}
+  npm@11.20.0:
+    resolution: {integrity: sha512-dF3EDFwbYN+N5RUip+ZYDe0NeURK5BgqKOcvT1iNtUYhTMTl0FwWhBuXrS7KtXyduqyTMS5aaQaregnHDAxNgw==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     bundledDependencies:
@@ -1592,7 +1592,7 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@anolilab/multi-semantic-release@4.4.16(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)':
+  '@anolilab/multi-semantic-release@4.4.19(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)':
     dependencies:
       '@semrel-extra/topo': 1.14.1
       '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)
@@ -1622,7 +1622,7 @@ snapshots:
       ini: 7.0.0
       ts-deepmerge: 8.0.0
 
-  '@anolilab/semantic-release-pnpm@8.1.26(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.0)':
+  '@anolilab/semantic-release-pnpm@8.1.29(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.0)':
     dependencies:
       '@actions/core': 3.0.1
       '@anolilab/rc': 4.0.9
@@ -1659,9 +1659,9 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@cenk1cenk2/semantic-release-config@5.1.2(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)':
+  '@cenk1cenk2/semantic-release-config@5.1.3(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)':
     dependencies:
-      '@anolilab/semantic-release-pnpm': 8.1.26(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.0)
+      '@anolilab/semantic-release-pnpm': 8.1.29(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.0)
       '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9)
       '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9)
       '@semantic-release/error': 4.0.0
@@ -1859,7 +1859,7 @@ snapshots:
       dir-glob: 3.0.1
       escape-string-regexp: 5.0.0
       formdata-node: 6.0.3
-      fs-extra: 11.4.0
+      fs-extra: 11.4.1
       globby: 16.2.4
       got: 14.6.6
       hpagent: 1.2.0
@@ -1877,11 +1877,11 @@ snapshots:
       aggregate-error: 5.0.0
       env-ci: 11.2.0
       execa: 9.6.1
-      fs-extra: 11.4.0
+      fs-extra: 11.4.1
       lodash-es: 4.18.1
       nerf-dart: 1.0.0
       normalize-url: 9.0.1
-      npm: 11.19.1
+      npm: 11.20.0
       rc: 1.2.8
       read-pkg: 10.1.0
       registry-auth-token: 5.1.1
@@ -2274,7 +2274,7 @@ snapshots:
 
   formdata-node@6.0.3: {}
 
-  fs-extra@11.4.0:
+  fs-extra@11.4.1:
     dependencies:
       graceful-fs: 4.2.11
       jsonfile: 6.2.1
@@ -2312,7 +2312,7 @@ snapshots:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       fast-glob: 3.3.3
-      ignore: 7.0.9
+      ignore: 7.0.10
       is-path-inside: 4.0.0
       micromatch: 4.0.8
       slash: 5.1.0
@@ -2397,7 +2397,7 @@ snapshots:
 
   human-signals@8.0.1: {}
 
-  ignore@7.0.9: {}
+  ignore@7.0.10: {}
 
   import-fresh@3.3.1:
     dependencies:
@@ -2611,7 +2611,7 @@ snapshots:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
 
-  npm@11.19.1: {}
+  npm@11.20.0: {}
 
   object-assign@4.1.1: {}
 
