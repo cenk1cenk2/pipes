@@ -13,7 +13,7 @@ type (
 	Token struct {
 		Repositories           []string
 		Permissions            map[string]string
-		Variable               string `validate:"required"`
+		Variable               string
 		GitCredentialsVariable string
 		File                   string `validate:"required,filepath"`
 	}
@@ -46,6 +46,10 @@ func New(p *Plumber) *TaskList {
 
 			if !P.App.Enabled() {
 				return fmt.Errorf("GitHub App id, installation id and private key are required to mint a token.")
+			}
+
+			if P.Token.Variable == "" && P.Token.GitCredentialsVariable == "" {
+				return fmt.Errorf("Token variable or git credentials variable is required, otherwise nothing would be written.")
 			}
 
 			C.Client = client.NewApplicationClient(P.App.ApiUrl, p.Cli.Name)

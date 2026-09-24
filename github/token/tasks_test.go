@@ -151,6 +151,16 @@ var _ = Describe("GitHub App token", func() {
 
 			Expect(os.ReadFile(file)).To(BeEquivalentTo("GH_TOKEN=ghs_token\n"))
 		})
+
+		// a token job that only hands over the git credential, e.g. for semantic-release to push with.
+		It("writes only the git credential when the token variable is empty", func() {
+			P.Token.Variable = ""
+			P.Token.GitCredentialsVariable = "RELEASE_GIT_CREDENTIALS"
+
+			Expect(run(write)).To(Succeed())
+
+			Expect(os.ReadFile(file)).To(BeEquivalentTo("RELEASE_GIT_CREDENTIALS=x-access-token:ghs_token\n"))
+		})
 	})
 
 	Describe("New", func() {
@@ -229,6 +239,15 @@ var _ = Describe("GitHub App token", func() {
 			fixture := command(nil, nil)
 
 			Expect(fixture.Run()).To(MatchError("GitHub App id, installation id and private key are required to mint a token."))
+		})
+
+		It("refuses to run without a token variable or a git credentials variable", func() {
+			P.App.ApiUrl = server.URL
+			P.Token.Variable = ""
+
+			fixture := command(nil, nil)
+
+			Expect(fixture.Run()).To(MatchError("Token variable or git credentials variable is required, otherwise nothing would be written."))
 		})
 	})
 })
