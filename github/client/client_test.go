@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -169,5 +170,24 @@ var _ = Describe("Client", func() {
 			Expect(create(CommitStatus{State: "success", Context: "Gitlab CI"})).
 				To(MatchError("Can not create commit status: GitHub responded with code: 404 > Not Found"))
 		})
+
+		DescribeTable(
+			"tells a commit GitHub does not have apart from other rejections",
+			func(code int, message string, expected bool) {
+				answer = func(w http.ResponseWriter) {
+					w.WriteHeader(code)
+					_, _ = w.Write([]byte(`{"message":"` + message + `"}`))
+				}
+
+				var response *ResponseError
+				Expect(errors.As(create(CommitStatus{State: "success", Context: "Gitlab CI"}), &response)).To(BeTrue())
+
+				Expect(response.CommitNotFound()).To(Equal(expected))
+			},
+			Entry("missing commit", http.StatusUnprocessableEntity, "No commit found for SHA: abc123", true),
+			Entry("other validation", http.StatusUnprocessableEntity, "Validation Failed", false),
+			Entry("missing repository", http.StatusNotFound, "Not Found", false),
+			Entry("forbidden", http.StatusForbidden, "Resource not accessible by integration", false),
+		)
 	})
 })

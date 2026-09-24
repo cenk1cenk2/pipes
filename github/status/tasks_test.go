@@ -2,6 +2,7 @@ package status
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -109,6 +110,28 @@ var _ = Describe("GitHub commit status", func() {
 
 			Expect(run(post)).To(Succeed())
 		})
+
+		It("skips a commit GitHub does not have", func() {
+			adapter.EXPECT().
+				CreateCommitStatus(mock.Anything, mock.Anything, "burningforge/listr2", "abc123", mock.Anything).
+				Return(fmt.Errorf("Can not create commit status: %w", &client.ResponseError{
+					StatusCode: http.StatusUnprocessableEntity,
+					Message:    "No commit found for SHA: abc123",
+				}))
+
+			Expect(run(post)).To(Succeed())
+		})
+
+		It("fails on any other rejection", func() {
+			adapter.EXPECT().
+				CreateCommitStatus(mock.Anything, mock.Anything, "burningforge/listr2", "abc123", mock.Anything).
+				Return(fmt.Errorf("Can not create commit status: %w", &client.ResponseError{
+					StatusCode: http.StatusForbidden,
+					Message:    "Resource not accessible by integration",
+				}))
+
+			Expect(run(post)).To(MatchError(ContainSubstring("403 > Resource not accessible by integration")))
+		})
 	})
 
 	Describe("New", func() {
@@ -120,6 +143,7 @@ var _ = Describe("GitHub commit status", func() {
 
 		var (
 			requests []received
+			answer   func(w http.ResponseWriter)
 			plumber  *Plumber
 			output   *bytes.Buffer
 		)
@@ -127,6 +151,10 @@ var _ = Describe("GitHub commit status", func() {
 		BeforeEach(func() {
 			requests = []received{}
 			output = &bytes.Buffer{}
+			answer = func(w http.ResponseWriter) {
+				w.WriteHeader(http.StatusCreated)
+				_, _ = w.Write([]byte(`{"token":"ghs_minted"}`))
+			}
 
 			server := httptest.NewServer(
 				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -139,8 +167,7 @@ var _ = Describe("GitHub commit status", func() {
 						body:          string(body),
 					})
 
-					w.WriteHeader(http.StatusCreated)
-					_, _ = w.Write([]byte(`{"token":"ghs_minted"}`))
+					answer(w)
 				}),
 			)
 			DeferCleanup(server.Close)
@@ -226,6 +253,29 @@ var _ = Describe("GitHub commit status", func() {
 
 			plumber.Log.Info("posted with ghs_minted")
 			Expect(output.String()).NotTo(ContainSubstring("ghs_minted"))
+		})
+
+		It("warns and succeeds when GitHub does not have the commit", func() {
+			answer = func(w http.ResponseWriter) {
+				w.WriteHeader(http.StatusUnprocessableEntity)
+				_, _ = w.Write([]byte(`{"message":"No commit found for SHA: abc123"}`))
+			}
+
+			Expect(command(nil, nil).Run()).To(Succeed())
+
+			Expect(requests).To(HaveLen(1))
+			Expect(output.String()).To(ContainSubstring("Commit is not on GitHub, skipping status: burningforge/listr2@abc123"))
+		})
+
+		It("fails the job when GitHub rejects the status otherwise", func() {
+			answer = func(w http.ResponseWriter) {
+				w.WriteHeader(http.StatusUnauthorized)
+				_, _ = w.Write([]byte(`{"message":"Bad credentials"}`))
+			}
+
+			Expect(command(nil, nil).Run()).To(HaveOccurred())
+
+			Expect(output.String()).NotTo(ContainSubstring("skipping status"))
 		})
 
 		It("rejects a state GitHub does not know", func() {
