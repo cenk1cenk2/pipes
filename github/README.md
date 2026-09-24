@@ -40,7 +40,7 @@ The token lives for an hour. Expose the file as an artifacts:reports:dotenv repo
 | --- | --- | --- | --- |
 | `$GITHUB_TOKEN_REPOSITORIES` | Repository names, without the owner, to narrow the token down to. Left empty, the token covers every repository of the installation. | `string[]` |  |
 | `$GITHUB_TOKEN_PERMISSIONS` | Permissions to narrow the token down to, e.g. {"statuses":"write"}. Left empty, the token carries every permission of the installation. | `string`<br/>`format(json(map[string]string))` |  |
-| `$GITHUB_TOKEN_VARIABLE` | Variable name the token is written under in the dotenv file. | `string` | `"GH_TOKEN"` |
+| `$GITHUB_TOKEN_VARIABLE` | Variable name the token is written under in the dotenv file. Left empty, the token is not written. | `string` | `"GH_TOKEN"` |
 | `$GITHUB_TOKEN_GIT_CREDENTIALS_VARIABLE` | Variable name the token is written under as an x-access-token git credential in the dotenv file, for semantic-release to push with. Left empty, no git credential is written. | `string` | `"GIT_CREDENTIALS"` |
 | `$GITHUB_TOKEN_FILE` | Dotenv file the token is written into, for the job to expose as a dotenv report. Other variables in an existing file are kept. | `string` | `"github.env"` |
 

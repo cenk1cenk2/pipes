@@ -42,7 +42,7 @@ var Flags = append(client.NewFlags(client.Options{Destination: &P.App}), []cli.F
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GITHUB_TOKEN_VARIABLE"),
 		),
-		Usage:       "Variable name the token is written under in the dotenv file.",
+		Usage:       "Variable name the token is written under in the dotenv file. Left empty, the token is not written.",
 		Required:    false,
 		Value:       "GH_TOKEN",
 		Destination: &P.Token.Variable,
