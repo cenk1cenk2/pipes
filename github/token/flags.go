@@ -50,6 +50,18 @@ var Flags = append(client.NewFlags(client.Options{Destination: &P.App}), []cli.F
 
 	&cli.StringFlag{
 		Category: CategoryToken,
+		Name:     "token.git-credentials-variable",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GITHUB_TOKEN_GIT_CREDENTIALS_VARIABLE"),
+		),
+		Usage:       "Variable name the token is written under as an x-access-token git credential in the dotenv file, for semantic-release to push with. Left empty, no git credential is written.",
+		Required:    false,
+		Value:       "GIT_CREDENTIALS",
+		Destination: &P.Token.GitCredentialsVariable,
+	},
+
+	&cli.StringFlag{
+		Category: CategoryToken,
 		Name:     "token.file",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GITHUB_TOKEN_FILE"),

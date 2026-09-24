@@ -133,6 +133,24 @@ var _ = Describe("GitHub App token", func() {
 
 			Expect(os.ReadFile(file)).To(BeEquivalentTo("GH_TOKEN=ghs_token\n"))
 		})
+
+		// semantic-release pushes with GIT_CREDENTIALS verbatim, and an installation token is only accepted as the password of x-access-token.
+		It("writes the token as a git credential under the variable it was given", func() {
+			P.Token.GitCredentialsVariable = "RELEASE_GIT_CREDENTIALS"
+
+			Expect(run(write)).To(Succeed())
+
+			Expect(os.ReadFile(file)).To(BeEquivalentTo("GH_TOKEN=ghs_token\nRELEASE_GIT_CREDENTIALS=x-access-token:ghs_token\n"))
+		})
+
+		// a second token job for another app shares the dotenv report, and only one of them may hand over the git credential.
+		It("writes no git credential when its variable is empty", func() {
+			P.Token.GitCredentialsVariable = ""
+
+			Expect(run(write)).To(Succeed())
+
+			Expect(os.ReadFile(file)).To(BeEquivalentTo("GH_TOKEN=ghs_token\n"))
+		})
 	})
 
 	Describe("New", func() {
@@ -188,9 +206,9 @@ var _ = Describe("GitHub App token", func() {
 			Expect(fixture.Run()).To(Succeed())
 			Expect(fixture.ExitCodes()).To(BeEmpty())
 
-			Expect(os.ReadFile(file)).To(BeEquivalentTo("RELEASE_TOKEN=ghs_minted\n"))
+			Expect(os.ReadFile(file)).To(BeEquivalentTo("GIT_CREDENTIALS=x-access-token:ghs_minted\nRELEASE_TOKEN=ghs_minted\n"))
 
-			plumber.Log.Info("minted ghs_minted")
+			plumber.Log.Info("minted ghs_minted, pushing with x-access-token:ghs_minted")
 			Expect(output.String()).To(ContainSubstring("minted"))
 			Expect(output.String()).NotTo(ContainSubstring("ghs_minted"))
 		})

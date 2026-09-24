@@ -11,10 +11,11 @@ import (
 
 type (
 	Token struct {
-		Repositories []string
-		Permissions  map[string]string
-		Variable     string `validate:"required"`
-		File         string `validate:"required,filepath"`
+		Repositories           []string
+		Permissions            map[string]string
+		Variable               string `validate:"required"`
+		GitCredentialsVariable string
+		File                   string `validate:"required,filepath"`
 	}
 
 	Pipe struct {

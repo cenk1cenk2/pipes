@@ -50,6 +50,13 @@ func write(tl *TaskList) *Task {
 
 			env[P.Token.Variable] = C.Token
 
+			if P.Token.GitCredentialsVariable != "" {
+				credentials := fmt.Sprintf("x-access-token:%s", C.Token)
+				t.Plumber.AppendSecrets(credentials)
+
+				env[P.Token.GitCredentialsVariable] = credentials
+			}
+
 			content, err := marshal(env)
 
 			if err != nil {
@@ -69,6 +76,10 @@ func write(tl *TaskList) *Task {
 			}
 
 			t.Log.Info(fmt.Sprintf("Token written to dotenv file: %s > %s", P.Token.File, P.Token.Variable))
+
+			if P.Token.GitCredentialsVariable != "" {
+				t.Log.Info(fmt.Sprintf("Git credential written to dotenv file: %s > %s", P.Token.File, P.Token.GitCredentialsVariable))
+			}
 
 			return nil
 		})
