@@ -10,10 +10,10 @@ require (
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/onsi/ginkgo/v2 v2.33.0
-	github.com/onsi/gomega v1.43.1
+	github.com/onsi/gomega v1.44.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.13.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.13.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.14.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 )
