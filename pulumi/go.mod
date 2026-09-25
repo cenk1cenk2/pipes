@@ -3,7 +3,7 @@ module gitlab.kilic.dev/devops/pipes/pulumi
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.6
+	github.com/cenk1cenk2/plumber/v7 v7.2.7
 	github.com/onsi/ginkgo/v2 v2.33.0
 	github.com/onsi/gomega v1.44.0
 	github.com/pulumi/pulumi/sdk/v3 v3.264.0
@@ -64,7 +64,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect
-	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
+	github.com/xo/terminfo v1.0.0 // indirect
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect

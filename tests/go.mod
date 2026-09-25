@@ -3,7 +3,7 @@ module gitlab.kilic.dev/devops/pipes/tests
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.6
+	github.com/cenk1cenk2/plumber/v7 v7.2.7
 	github.com/onsi/ginkgo/v2 v2.33.0
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.13.0
@@ -40,7 +40,7 @@ require (
 	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/tidwall/gjson v1.19.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
-	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
+	github.com/xo/terminfo v1.0.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/mod v0.41.0 // indirect
@@ -49,7 +49,6 @@ require (
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/tools v0.50.0 // indirect
-	google.golang.org/protobuf v1.36.12 // indirect
 )
 
 tool github.com/onsi/ginkgo/v2/ginkgo
