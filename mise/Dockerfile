@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile-upstream:master-labs
-FROM docker.io/debian:trixie-slim
+ARG BASE_IMAGE
+
+FROM ${BASE_IMAGE}
 
 # renovate: datasource=github-releases depName=jdx/mise
 ARG MISE_VERSION=v2026.9.14
@@ -7,11 +9,16 @@ ARG MISE_VERSION=v2026.9.14
 ARG BUILDOS
 ARG BUILDARCH
 
-# most mise backends ship glibc builds, which is why this pipe is not on alpine.
+# the base decides the libc of every tool mise installs, so the published variants
+# have to match the libc of the jobs that consume the cache.
 RUN \
+  if command -v apk > /dev/null 2>&1; then \
+  apk add --no-cache --no-progress ca-certificates curl git; \
+  else \
   apt-get update && \
   apt-get install -y --no-install-recommends ca-certificates curl git && \
-  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/lib/apt/lists/*; \
+  fi && \
   curl -fsSL https://mise.run | MISE_VERSION=${MISE_VERSION} MISE_INSTALL_PATH=/usr/local/bin/mise sh
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe

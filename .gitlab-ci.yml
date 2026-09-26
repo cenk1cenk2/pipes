@@ -63,8 +63,14 @@ include:
       name: mise
       dir: mise
       container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            BASE_IMAGE: docker.io/alpine:3
+          CONTAINER_IMAGE_TAGS: |-
             latest
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            BASE_IMAGE: docker.io/debian:trixie-slim
+          CONTAINER_IMAGE_TAGS: |-
+            latest-glibc
   - local: .gitlab-ci.trigger.yml
     inputs:
       name: node
