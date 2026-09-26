@@ -8,6 +8,7 @@ use (
 	./helm
 	./internal
 	./kustomize
+	./mise
 	./node
 	./pulumi
 	./select-env
