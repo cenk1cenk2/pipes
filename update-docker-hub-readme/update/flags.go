@@ -18,6 +18,7 @@ var Flags = []cli.Flag{
 		Name:     "docker-hub.username",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_USERNAME"),
+			cli.EnvVar("DOCKERHUB_USERNAME"),
 			cli.EnvVar("DOCKER_USERNAME"),
 		),
 		Usage:       "DockerHub username for updating the README.",
@@ -30,9 +31,10 @@ var Flags = []cli.Flag{
 		Name:     "docker-hub.password",
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("DOCKER_HUB_PASSWORD"),
+			cli.EnvVar("DOCKERHUB_PASSWORD"),
 			cli.EnvVar("DOCKER_PASSWORD"),
 		),
-		Usage:       "DockerHub password for updating the README.",
+		Usage:       "DockerHub password or personal access token for updating the README.",
 		Required:    true,
 		Destination: &P.DockerHub.Password,
 	},
