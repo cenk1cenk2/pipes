@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@anolilab/multi-semantic-release':
-        specifier: ^4.4.15
+        specifier: ^4.4.16
         version: 4.4.19(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)
       '@cenk1cenk2/semantic-release-config':
         specifier: ^6.0.0
