@@ -60,6 +60,13 @@ include:
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
+      name: mise
+      dir: mise
+      container-matrix:
+        - CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
       name: node
       dir: node
       container-matrix:
@@ -307,6 +314,11 @@ update-docker-hub-readme:
           "repository": "cenk1cenk2/pipe-kustomize",
           "file": "./kustomize/README.md",
           "description": "Kustomize operations for pipelines."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-mise",
+          "file": "./mise/README.md",
+          "description": "mise tool installs for pipelines."
         },
         {
           "repository": "cenk1cenk2/pipe-select-env",
