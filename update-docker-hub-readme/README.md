@@ -17,8 +17,8 @@ Updates the readme file on DockerHub or any compatible API.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| **`$DOCKER_HUB_USERNAME`**<br/>**`$DOCKER_USERNAME`**\* | DockerHub username for updating the README. | `string` |  |
-| **`$DOCKER_HUB_PASSWORD`**<br/>**`$DOCKER_PASSWORD`**\* | DockerHub password for updating the README. | `string` |  |
+| **`$DOCKER_HUB_USERNAME`**<br/>**`$DOCKERHUB_USERNAME`**<br/>**`$DOCKER_USERNAME`**\* | DockerHub username for updating the README. | `string` |  |
+| **`$DOCKER_HUB_PASSWORD`**<br/>**`$DOCKERHUB_PASSWORD`**<br/>**`$DOCKER_PASSWORD`**\* | DockerHub password or personal access token for updating the README. | `string` |  |
 | `$DOCKER_HUB_ADDRESS` | HTTP address for the DockerHub-compatible service. | `string` | `"https://hub.docker.com/v2/repositories"` |
 
 \* required

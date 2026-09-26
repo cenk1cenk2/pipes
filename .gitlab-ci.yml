@@ -283,7 +283,7 @@ update-docker-hub-readme:
   dependencies: []
   variables:
     DOCKER_HUB_USERNAME: $DOCKERHUB_USERNAME
-    DOCKER_HUB_PASSWORD: $DOCKERHUB_API_PASSWORD
+    DOCKER_HUB_PASSWORD: $DOCKERHUB_PASSWORD
     DOCKER_HUB_README_MATRIX: |
       [
         {
