@@ -24,13 +24,13 @@ importers:
         specifier: ^11.0.1
         version: 11.0.1(semantic-release@25.0.9)
       '@semantic-release/github':
-        specifier: ^12.0.9
+        specifier: ^12.0.10
         version: 12.0.10(semantic-release@25.0.9)
       '@semantic-release/gitlab':
         specifier: ^13.3.3
         version: 13.3.3(semantic-release@25.0.9)
       '@semantic-release/npm':
-        specifier: ^13.1.5
+        specifier: ^13.2.0
         version: 13.2.0(semantic-release@25.0.9)
       conventional-changelog-conventionalcommits:
         specifier: ^9.3.1
