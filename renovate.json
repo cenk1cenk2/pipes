@@ -1,6 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [ "local>renovate/renovate-config:default/default" ],
+  "extends": [
+    "local>renovate/renovate-config:default/default",
+    "local>renovate/renovate-config:default/datasource-github-releases-automerge-minor(jdx/mise)",
+    "local>renovate/renovate-config:default/datasource-github-releases-automerge-major(jdx/mise)"
+  ],
   "customManagers": [
     {
       "customType": "regex",
