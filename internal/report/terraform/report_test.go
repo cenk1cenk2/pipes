@@ -297,6 +297,35 @@ No attribute changes.
 			}))
 		})
 
+		It("writes a string holding a JSON document out as the document", func() {
+			Expect(terraform.Expand(terraform.ChangeCreate, "values", `{"cm": {"url": "a"}}`)).To(Equal(terraform.Change{
+				Name:   "values",
+				Action: terraform.ChangeCreate,
+				Note:   terraform.JSONEncoded,
+				Children: []terraform.Change{
+					{Name: "cm", Action: terraform.ChangeCreate, Children: []terraform.Change{
+						{Name: "url", Action: terraform.ChangeCreate, After: `"a"`},
+					}},
+				},
+			}))
+		})
+
+		It("keeps a string holding a JSON scalar list or an invalid document as the string", func() {
+			Expect(terraform.Expand(terraform.ChangeCreate, "a", `["x"]`).After).To(Equal(`"[\"x\"]"`))
+			Expect(terraform.Expand(terraform.ChangeCreate, "b", `{broken`).After).To(Equal(`"{broken"`))
+		})
+
+		It("writes a list holding a value that spans lines one element per line", func() {
+			Expect(terraform.Expand(terraform.ChangeCreate, "lines", []any{"a", "b\nc"})).To(Equal(terraform.Change{
+				Name:   "lines",
+				Action: terraform.ChangeCreate,
+				Children: []terraform.Change{
+					{Name: "[0]", Action: terraform.ChangeCreate, After: `"a"`},
+					{Name: "[1]", Action: terraform.ChangeCreate, After: "<<-EOT\n  b\n  c\nEOT"},
+				},
+			}))
+		})
+
 		It("keeps the value of a deletion on the before side", func() {
 			Expect(terraform.Expand(terraform.ChangeDelete, "name", "x")).To(Equal(terraform.Change{
 				Name:   "name",

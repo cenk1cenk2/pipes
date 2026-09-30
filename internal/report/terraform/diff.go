@@ -17,6 +17,9 @@ const (
 	// own, so that the block a reader opens is never empty.
 	NoAttributeChanges = "No attribute changes."
 
+	// What a string value that holds a JSON document is written out structurally with.
+	JSONEncoded = "jsonencode"
+
 	heredocOpen  = "<<-EOT"
 	heredocClose = "EOT"
 
@@ -48,6 +51,13 @@ type (
 // value the plan shows only one side of, is written.
 func Expand(action string, name string, value any) Change {
 	change := Change{Name: name, Action: action}
+
+	if decoded, ok := DecodeJSON(value); ok {
+		change = Expand(action, name, decoded)
+		change.Note = JSONEncoded
+
+		return change
+	}
 
 	switch value := value.(type) {
 	case map[string]any:
@@ -81,17 +91,20 @@ func Expand(action string, name string, value any) Change {
 }
 
 // Expandable says whether a value is written out one child per line, which a
-// non-empty object always is and a list only is when its elements are not scalars:
-// a list of scalars reads better on one line than as a run of indexes.
+// non-empty object always is and a list only is when an element is not a scalar or
+// spans lines: a list of short scalars reads better on one line than as a run of
+// indexes.
 func Expandable(value any) bool {
 	switch value := value.(type) {
 	case map[string]any:
 		return len(value) > 0
 	case []any:
 		return slices.ContainsFunc(value, func(element any) bool {
-			switch element.(type) {
+			switch element := element.(type) {
 			case map[string]any, []any:
 				return true
+			case string:
+				return strings.Contains(element, "\n")
 			}
 
 			return false
@@ -99,6 +112,28 @@ func Expandable(value any) bool {
 	}
 
 	return false
+}
+
+// DecodeJSON reads a string holding a JSON document into the value it encodes, as
+// long as that value is written out one child per line; anything else stays the
+// string it is, since decoding it would only change how it is quoted.
+func DecodeJSON(value any) (any, bool) {
+	text, ok := value.(string)
+	if !ok {
+		return nil, false
+	}
+
+	trimmed := strings.TrimSpace(text)
+	if !strings.HasPrefix(trimmed, "{") && !strings.HasPrefix(trimmed, "[") {
+		return nil, false
+	}
+
+	var decoded any
+	if err := json.Unmarshal([]byte(trimmed), &decoded); err != nil || !Expandable(decoded) {
+		return nil, false
+	}
+
+	return decoded, true
 }
 
 // FormatValue writes a value the way its plan JSON carries it, with markers left bare
