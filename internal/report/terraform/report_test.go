@@ -110,6 +110,16 @@ No attribute changes.
 `)))
 	})
 
+	It("keeps a pipe in a metadata value inside its table cell", func() {
+		body, err := terraform.RenderReport(terraform.Report{
+			Title:    "Example report",
+			Metadata: terraform.Metadata{JobName: "plan: [a | b]"},
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).To(ContainSubstring("| Job | `plan: [a \\| b]` |"))
+	})
+
 	It("says so when there is nothing to report", func() {
 		body, err := terraform.RenderReport(terraform.Report{Title: "Example report"})
 		Expect(err).NotTo(HaveOccurred())
@@ -191,6 +201,68 @@ No attribute changes.
 			Expect(body).NotTo(ContainSubstring("more lines"))
 		})
 
+		It("writes a value that spans lines as a heredoc carrying the action on every line", func() {
+			body := render(terraform.Expand(terraform.ChangeCreate, "policy", "path \"a\" {\n  capabilities = [\"read\"]\n}\n"))
+
+			Expect(body).To(ContainSubstring(strings.TrimSpace(`
++ policy: <<-EOT
++   path "a" {
++     capabilities = ["read"]
++   }
++ EOT
+`)))
+		})
+
+		It("marks only the lines that changed between two values that span lines", func() {
+			body := render(terraform.Change{
+				Name:   "policy",
+				Action: terraform.ChangeUpdate,
+				Before: terraform.FormatValue("path \"a\" {\n  capabilities = [\"read\"]\n}\n"),
+				After:  terraform.FormatValue("path \"a\" {\n  capabilities = [\"read\", \"update\"]\n}\n"),
+				Note:   "forces replacement",
+			})
+
+			Expect(body).To(ContainSubstring(strings.TrimSpace(`
+~ policy: <<-EOT # forces replacement
+    path "a" {
+-     capabilities = ["read"]
++     capabilities = ["read", "update"]
+    }
+  EOT
+`)))
+		})
+
+		It("writes both sides whole when only one of them spans lines", func() {
+			body := render(terraform.Change{
+				Name:   "script",
+				Action: terraform.ChangeUpdate,
+				Before: terraform.FormatValue(nil),
+				After:  terraform.FormatValue("a\nb"),
+			})
+
+			Expect(body).To(ContainSubstring(strings.TrimSpace(`
+~ script:
+-   null
++   <<-EOT
++     a
++     b
++   EOT
+`)))
+		})
+
+		It("writes both sides whole when they are too long to line up", func() {
+			body := render(terraform.Change{
+				Name:   "blob",
+				Action: terraform.ChangeUpdate,
+				Before: terraform.FormatValue("shared\n" + strings.Repeat("a\n", 1100)),
+				After:  terraform.FormatValue("shared\n" + strings.Repeat("b\n", 1100)),
+			})
+
+			Expect(body).To(ContainSubstring("\n-   shared\n"))
+			Expect(body).To(ContainSubstring("\n+   shared\n"))
+			Expect(strings.LastIndex(body, "-   a")).To(BeNumerically("<", strings.Index(body, "+   shared")))
+		})
+
 		It("keeps a value with backticks inside the code block", func() {
 			body := render(terraform.Change{Name: "script", Action: terraform.ChangeCreate, After: "\"echo ```\""})
 
@@ -232,6 +304,10 @@ No attribute changes.
 				Before: `"x"`,
 			}))
 		})
+	})
+
+	It("keeps a string that spans lines escaped inside a nested value", func() {
+		Expect(terraform.FormatValue([]any{"a\nb"})).To(Equal(`["a\nb"]`))
 	})
 
 	It("writes a nested value on one line with its keys sorted and its markers bare", func() {

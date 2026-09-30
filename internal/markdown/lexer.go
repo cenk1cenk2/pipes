@@ -72,6 +72,19 @@ func RegisterDiffLexer(dimmed ...string) {
 		rules[state] = line(entry.token)
 	}
 
+	// an update line carries the value it had and the one it takes, which only read
+	// apart when each is colored as the side of the diff it stands for.
+	rules["glyph~"] = append([]chroma.Rule{{
+		Pattern: `([^\n]*?: )((?:(?! -> )[^\n])+)( -> )`,
+		Type:    chroma.ByGroups(chroma.GenericSubheading, chroma.UsingSelf("before"), chroma.GenericSubheading),
+		Mutator: chroma.Push("after"),
+	}}, rules["glyph~"]...)
+	rules["before"] = line(chroma.GenericDeleted)
+	rules["after"] = append(
+		[]chroma.Rule{{Pattern: `\n`, Type: chroma.Text, Mutator: chroma.Pop(2)}},
+		line(chroma.GenericInserted)[1:]...,
+	)
+
 	rules["root"] = append(rules["root"], chroma.Rule{Pattern: `\n`, Type: chroma.Text})
 	if dim != "" {
 		rules["root"] = append(rules["root"], chroma.Rule{Pattern: dim, Type: chroma.Comment})

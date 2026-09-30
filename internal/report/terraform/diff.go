@@ -16,6 +16,13 @@ const (
 	// What stands in a resource's block where the plan proposes no attribute of its
 	// own, so that the block a reader opens is never empty.
 	NoAttributeChanges = "No attribute changes."
+
+	heredocOpen  = "<<-EOT"
+	heredocClose = "EOT"
+
+	// past this many pairs of lines the table the line diff of two heredocs is worked
+	// out on grows too large, and the two are written out whole instead.
+	lineDiffLimit = 1 << 20
 )
 
 type (
@@ -95,8 +102,18 @@ func Expandable(value any) bool {
 }
 
 // FormatValue writes a value the way its plan JSON carries it, with markers left bare
-// and objects sorted by key so the same value always reads the same.
+// and objects sorted by key so the same value always reads the same. A string that
+// spans lines is written as a heredoc instead, the way the tools show it themselves,
+// since its escaped form runs a whole document onto one line.
 func FormatValue(value any) string {
+	if text, ok := value.(string); ok && strings.Contains(text, "\n") {
+		return heredoc(text)
+	}
+
+	return formatInline(value)
+}
+
+func formatInline(value any) string {
 	switch value := value.(type) {
 	case nil:
 		return "null"
@@ -105,14 +122,14 @@ func FormatValue(value any) string {
 	case map[string]any:
 		fields := make([]string, 0, len(value))
 		for _, key := range slices.Sorted(maps.Keys(value)) {
-			fields = append(fields, fmt.Sprintf("%q: %s", key, FormatValue(value[key])))
+			fields = append(fields, fmt.Sprintf("%q: %s", key, formatInline(value[key])))
 		}
 
 		return "{" + strings.Join(fields, ", ") + "}"
 	case []any:
 		elements := make([]string, 0, len(value))
 		for _, element := range value {
-			elements = append(elements, FormatValue(element))
+			elements = append(elements, formatInline(element))
 		}
 
 		return "[" + strings.Join(elements, ", ") + "]"
@@ -151,25 +168,64 @@ func Glyph(action string) string {
 }
 
 func (c Change) lines(depth int, out []string) []string {
-	prefix := "  "
-	if c.Action != "" {
-		prefix = c.Action + " "
-	}
-
-	line := prefix + strings.Repeat("  ", depth) + c.Name
-	switch value := c.value(); {
-	case len(c.Children) > 0:
-		line += ":"
-	case value != "":
-		line += ": " + value
-	}
+	indent := strings.Repeat("  ", depth)
+	head := sign(c.Action) + indent + c.Name
+	note := ""
 	if c.Note != "" {
-		line += " # " + c.Note
+		note = " # " + c.Note
 	}
 
-	out = append(out, line)
-	for _, child := range c.Children {
-		out = child.lines(depth+1, out)
+	if len(c.Children) > 0 {
+		out = append(out, head+":"+note)
+		for _, child := range c.Children {
+			out = child.lines(depth+1, out)
+		}
+
+		return out
+	}
+
+	if c.Action != ChangeDelete && c.Before != "" && c.After != "" &&
+		(strings.Contains(c.Before, "\n") || strings.Contains(c.After, "\n")) {
+		return c.multilineUpdate(head, note, indent, out)
+	}
+
+	value := c.value()
+	if value == "" {
+		return append(out, head+note)
+	}
+
+	// a heredoc carries its lines on, and every one of them keeps the action of the
+	// change so that it reads as part of it.
+	lines := strings.Split(value, "\n")
+	out = append(out, head+": "+lines[0]+note)
+	for _, line := range lines[1:] {
+		out = append(out, sign(c.Action)+indent+line)
+	}
+
+	return out
+}
+
+// multilineUpdate writes a change of a value that spans lines: between two heredocs it
+// marks the lines that changed in place, so a reader finds the one line an edit to a
+// long document touched; otherwise the old value is followed by the new one whole.
+func (c Change) multilineUpdate(head string, note string, indent string, out []string) []string {
+	before, after := strings.Split(c.Before, "\n"), strings.Split(c.After, "\n")
+
+	if len(before) > 1 && len(after) > 1 {
+		out = append(out, head+": "+heredocOpen+note)
+		for _, line := range diffLines(before[1:len(before)-1], after[1:len(after)-1]) {
+			out = append(out, sign(line.action)+indent+line.text)
+		}
+
+		return append(out, sign("")+indent+heredocClose)
+	}
+
+	out = append(out, head+":"+note)
+	for _, line := range before {
+		out = append(out, sign(ChangeDelete)+indent+"  "+line)
+	}
+	for _, line := range after {
+		out = append(out, sign(ChangeCreate)+indent+"  "+line)
 	}
 
 	return out
@@ -188,6 +244,78 @@ func (c Change) value() string {
 	}
 
 	return after
+}
+
+func sign(action string) string {
+	if action == "" {
+		return "  "
+	}
+
+	return action + " "
+}
+
+func heredoc(text string) string {
+	lines := strings.Split(strings.TrimSuffix(text, "\n"), "\n")
+	for index, line := range lines {
+		if line != "" {
+			lines[index] = "  " + line
+		}
+	}
+
+	return heredocOpen + "\n" + strings.Join(lines, "\n") + "\n" + heredocClose
+}
+
+type diffLine struct {
+	action string
+	text   string
+}
+
+// diffLines lines two versions of a text up along the longest run of lines they
+// share, leaving those unmarked and marking every other line as removed or added.
+func diffLines(before []string, after []string) []diffLine {
+	lines := []diffLine{}
+	index, other := 0, 0
+
+	if len(before)*len(after) <= lineDiffLimit {
+		// common[i][j] is how many lines before[i:] and after[j:] share in order.
+		common := make([][]int, len(before)+1)
+		for i := range common {
+			common[i] = make([]int, len(after)+1)
+		}
+		for i := len(before) - 1; i >= 0; i-- {
+			for j := len(after) - 1; j >= 0; j-- {
+				if before[i] == after[j] {
+					common[i][j] = common[i+1][j+1] + 1
+				} else {
+					common[i][j] = max(common[i+1][j], common[i][j+1])
+				}
+			}
+		}
+
+		for index < len(before) && other < len(after) {
+			switch {
+			case before[index] == after[other]:
+				lines = append(lines, diffLine{text: before[index]})
+				index++
+				other++
+			case common[index+1][other] >= common[index][other+1]:
+				lines = append(lines, diffLine{action: ChangeDelete, text: before[index]})
+				index++
+			default:
+				lines = append(lines, diffLine{action: ChangeCreate, text: after[other]})
+				other++
+			}
+		}
+	}
+
+	for ; index < len(before); index++ {
+		lines = append(lines, diffLine{action: ChangeDelete, text: before[index]})
+	}
+	for ; other < len(after); other++ {
+		lines = append(lines, diffLine{action: ChangeCreate, text: after[other]})
+	}
+
+	return lines
 }
 
 // RenderChanges writes a resource diff out, one attribute per line.

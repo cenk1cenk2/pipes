@@ -87,8 +87,8 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		settings := resource(report.Actions[1], "urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings")
 		Expect(settings.Changes).To(Equal([]terraform.Change{
 			{Name: "data", Action: terraform.ChangeUpdate, Children: []terraform.Change{
-				{Name: "level", After: `"debug"`},
-				{Name: "password", After: "[secret]"},
+				{Name: "level", Action: terraform.ChangeUpdate, After: `"debug"`},
+				{Name: "password", Action: terraform.ChangeUpdate, After: "[secret]"},
 			}},
 			{Name: "immutable", Action: terraform.ChangeDelete},
 		}))
