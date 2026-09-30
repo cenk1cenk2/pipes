@@ -57,9 +57,7 @@ func resourceChanges(goal *apitype.GoalV1) []terraform.Change {
 		}
 
 		if value, ok := diff.Updates[name]; ok {
-			change := terraform.Expand("", name, masked(value))
-			change.Action = terraform.ChangeUpdate
-			changes = append(changes, change)
+			changes = append(changes, terraform.Expand(terraform.ChangeUpdate, name, masked(value)))
 
 			continue
 		}

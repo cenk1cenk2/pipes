@@ -199,6 +199,31 @@ var _ = Describe("Plan diff lexer", func() {
 		Expect(deleted).NotTo(Equal(changed))
 	})
 
+	It("colors the old and the new value of an update apart", func() {
+		body := render(`~ size: 1 -> 2`)
+
+		opening := func(value string) string {
+			found := regexp.MustCompile(`(\x1b\[[0-9;]+m)` + value).FindStringSubmatch(body)
+			Expect(found).To(HaveLen(2))
+
+			return found[1]
+		}
+
+		before := opening("1")
+		after := opening("2")
+		changed := color(body, "size")
+
+		Expect(before).NotTo(Equal(after))
+		Expect(before).NotTo(Equal(changed))
+		Expect(after).NotTo(Equal(changed))
+	})
+
+	It("colors an update line without an old value as one", func() {
+		body := render(`~ policy: <<-EOT`)
+
+		Expect(escapes.FindAllString(body, -1)).To(HaveLen(2))
+	})
+
 	It("dims what the pipe stands in for a value it will not show", func() {
 		body := render(`~ password: ` + dimmed + ` -> ` + dimmed)
 

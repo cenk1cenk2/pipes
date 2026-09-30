@@ -12,34 +12,34 @@ This report carries the plan metadata, the action planned for every resource wit
 | Field | Value |
 | --- | --- |
 {{- if .Metadata.Target }}
-| {{ .Labels.Target }} | `{{ .Metadata.Target }}` |
+| {{ .Labels.Target }} | `{{ .Metadata.Target | cell }}` |
 {{- end }}
 {{- if .Metadata.Cwd }}
-| Working directory | `{{ .Metadata.Cwd }}` |
+| Working directory | `{{ .Metadata.Cwd | cell }}` |
 {{- end }}
 {{- if .Metadata.JobName }}
-| Job | {{ if .Metadata.JobUrl }}[{{ .Metadata.JobName }}]({{ .Metadata.JobUrl }}){{ else }}`{{ .Metadata.JobName }}`{{ end }} |
+| Job | {{ if .Metadata.JobUrl }}[{{ .Metadata.JobName | cell }}]({{ .Metadata.JobUrl | cell }}){{ else }}`{{ .Metadata.JobName | cell }}`{{ end }} |
 {{- else if .Metadata.JobUrl }}
-| Job | [{{ .Metadata.JobUrl }}]({{ .Metadata.JobUrl }}) |
+| Job | [{{ .Metadata.JobUrl | cell }}]({{ .Metadata.JobUrl | cell }}) |
 {{- end }}
 {{- if .Metadata.PipelineId }}
-| Pipeline | {{ if .Metadata.PipelineUrl }}[{{ .Metadata.PipelineId }}]({{ .Metadata.PipelineUrl }}){{ else }}`{{ .Metadata.PipelineId }}`{{ end }} |
+| Pipeline | {{ if .Metadata.PipelineUrl }}[{{ .Metadata.PipelineId | cell }}]({{ .Metadata.PipelineUrl | cell }}){{ else }}`{{ .Metadata.PipelineId | cell }}`{{ end }} |
 {{- else if .Metadata.PipelineUrl }}
-| Pipeline | [{{ .Metadata.PipelineUrl }}]({{ .Metadata.PipelineUrl }}) |
+| Pipeline | [{{ .Metadata.PipelineUrl | cell }}]({{ .Metadata.PipelineUrl | cell }}) |
 {{- end }}
 {{- if .Metadata.CommitShortSha }}
-| Commit | `{{ .Metadata.CommitShortSha }}` |
+| Commit | `{{ .Metadata.CommitShortSha | cell }}` |
 {{- else if .Metadata.CommitSha }}
-| Commit | `{{ .Metadata.CommitSha }}` |
+| Commit | `{{ .Metadata.CommitSha | cell }}` |
 {{- end }}
 {{- if .Metadata.ToolVersion }}
-| {{ .Labels.ToolVersion }} | `{{ .Metadata.ToolVersion }}` |
+| {{ .Labels.ToolVersion }} | `{{ .Metadata.ToolVersion | cell }}` |
 {{- end }}
 {{- if .Metadata.PlanTime }}
-| Plan time | `{{ .Metadata.PlanTime }}` |
+| Plan time | `{{ .Metadata.PlanTime | cell }}` |
 {{- end }}
 {{- if .Metadata.PlanSchema }}
-| Plan schema version | `{{ .Metadata.PlanSchema }}` |
+| Plan schema version | `{{ .Metadata.PlanSchema | cell }}` |
 {{- end }}
 {{- end }}
 

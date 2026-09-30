@@ -115,6 +115,7 @@ type (
 
 func RenderReport(report Report) (string, error) {
 	tmpl, err := template.New("report.md.gotmpl").
+		Funcs(template.FuncMap{"cell": cell}).
 		Parse(reportTemplate)
 	if err != nil {
 		return "", fmt.Errorf("parse report template: %w", err)
@@ -155,6 +156,12 @@ func newReportView(report Report) reportView {
 	}
 
 	return view
+}
+
+// A pipe in a value would end its table cell early and shift the rest of the row; an
+// escaped one stays part of the value, inside a code span as well.
+func cell(value string) string {
+	return strings.ReplaceAll(value, "|", `\|`)
 }
 
 // A value can carry a run of backticks of its own, which would close the code block
