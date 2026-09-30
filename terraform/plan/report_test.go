@@ -245,6 +245,59 @@ var _ = Describe("Terraform merge request report", func() {
 			}))
 		})
 
+		It("writes out what a value only known after apply replaces, attribute by attribute", func() {
+			changes := resourceChanges(&tfjson.Change{
+				Before: map[string]any{"metadata": map[string]any{
+					"notes":    "line one\nline two\n",
+					"revision": float64(146),
+					"values":   `{"global":{"level":"error"},"cm":{"policy.csv":"g, admin\np, mcp\n"}}`,
+				}},
+				After:        map[string]any{},
+				AfterUnknown: map[string]any{"metadata": true},
+			})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "metadata", Action: update, Children: []terraform.Change{
+					{Name: "notes", Action: update, Before: "<<-EOT\n  line one\n  line two\nEOT", After: "(known after apply)"},
+					{Name: "revision", Action: update, Before: "146", After: "(known after apply)"},
+					{Name: "values", Action: update, Note: terraform.JSONEncoded, Children: []terraform.Change{
+						{Name: "cm", Action: update, Children: []terraform.Change{
+							{Name: "policy.csv", Action: update, Before: "<<-EOT\n  g, admin\n  p, mcp\nEOT", After: "(known after apply)"},
+						}},
+						{Name: "global", Action: update, Children: []terraform.Change{
+							{Name: "level", Action: update, Before: `"error"`, After: "(known after apply)"},
+						}},
+					}},
+				}},
+			}))
+		})
+
+		It("compares a string holding a JSON document as the document", func() {
+			changes := resourceChanges(&tfjson.Change{
+				Before: map[string]any{"values": `{"replicas": 2, "url": "a"}`},
+				After:  map[string]any{"values": `{"replicas": 3, "url": "a"}`},
+			})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "values", Action: update, Note: terraform.JSONEncoded, Children: []terraform.Change{
+					{Name: "replicas", Action: update, Before: "2", After: "3"},
+				}},
+			}))
+		})
+
+		It("keeps a sensitive string holding a JSON document masked", func() {
+			changes := resourceChanges(&tfjson.Change{
+				Before:          map[string]any{"values": `{"password": "a"}`},
+				After:           map[string]any{"values": `{"password": "b"}`},
+				BeforeSensitive: map[string]any{"values": true},
+				AfterSensitive:  map[string]any{"values": true},
+			})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "values", Action: update, Before: "(sensitive value)", After: "(sensitive value)"},
+			}))
+		})
+
 		It("writes a value that changed its shape on one line", func() {
 			changes := resourceChanges(&tfjson.Change{
 				Before: map[string]any{"value": "x"},

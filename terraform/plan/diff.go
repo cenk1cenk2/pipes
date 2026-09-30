@@ -171,6 +171,39 @@ func (d changeDiff) compare(name string, path []any, before side, after side) (t
 
 	change := terraform.Change{Name: name, Action: terraform.ChangeUpdate}
 
+	// a string holding a JSON document is compared as the document, as long as the
+	// other side is one as well or is not known yet.
+	if !before.isSensitive() && !after.isSensitive() {
+		if decoded, ok := terraform.DecodeJSON(before.value); ok {
+			if other, ok := terraform.DecodeJSON(after.value); ok {
+				before.value, after.value = decoded, other
+				change.Note = terraform.JSONEncoded
+			} else if after.isUnknown() {
+				before.value = decoded
+				change.Note = terraform.JSONEncoded
+			}
+		}
+	}
+
+	// a value only known after apply still shows the one it replaces attribute by
+	// attribute, each of them going the same way.
+	if after.isUnknown() && !before.isSensitive() && terraform.Expandable(before.value) {
+		switch beforeValue := before.value.(type) {
+		case map[string]any:
+			for _, key := range slices.Sorted(maps.Keys(beforeValue)) {
+				child, _ := d.compare(key, append(path, key), before.child(key), after)
+				change.Children = append(change.Children, child)
+			}
+		case []any:
+			for index := range beforeValue {
+				child, _ := d.compare(fmt.Sprintf("[%d]", index), append(path, index), before.element(index), after)
+				change.Children = append(change.Children, child)
+			}
+		}
+
+		return d.note(path, change), true
+	}
+
 	// a side that is masked as a whole reads as one value, however deep it goes.
 	opaque := before.isSensitive() || after.isSensitive() || after.isUnknown()
 
