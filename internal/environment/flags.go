@@ -24,6 +24,9 @@ type Config struct {
 	FailOnNoReference bool
 	Strict            bool
 	Git               git.Refs
+	// Environ is what the variables are read from, in the KEY=value form of
+	// os.Environ, which is what is read when it is left nil.
+	Environ []string
 }
 
 // NewFlags builds the environment flags onto cfg. The git flags come first,

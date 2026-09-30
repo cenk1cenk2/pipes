@@ -2,6 +2,8 @@ package environment
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 
 	"gitlab.kilic.dev/devops/pipes/internal/git"
@@ -50,9 +52,10 @@ func Select(conditions []Condition, references []string) (string, error) {
 // reaches the pipe as TOKEN once stage is selected. Unprefixed variables are kept as
 // they are, and ENVIRONMENT names the selection itself.
 func Fetch(environ []string, environment string) map[string]string {
-	prefix := strings.ToUpper(environment) + "_"
+	prefix := prefix(environment)
 
 	vars := make(map[string]string, len(environ)+1)
+	selected := map[string]string{}
 
 	for _, v := range environ {
 		key, value, found := strings.Cut(v, "=")
@@ -61,12 +64,43 @@ func Fetch(environ []string, environment string) map[string]string {
 			continue
 		}
 
-		trimmed, _ := strings.CutPrefix(key, prefix)
+		// the prefixed value wins over the plain one wherever either sits in environ.
+		if trimmed, ok := strings.CutPrefix(key, prefix); ok {
+			selected[trimmed] = value
 
-		vars[trimmed] = value
+			continue
+		}
+
+		vars[key] = value
 	}
 
+	maps.Copy(vars, selected)
 	vars["ENVIRONMENT"] = environment
 
 	return vars
+}
+
+// Selected names the variables the environment brings in, as the pipe sees them once
+// their prefix is stripped.
+func Selected(environ []string, environment string) []string {
+	prefix := prefix(environment)
+
+	names := []string{}
+	for _, v := range environ {
+		key, _, found := strings.Cut(v, "=")
+		if !found {
+			continue
+		}
+
+		if name, ok := strings.CutPrefix(key, prefix); ok {
+			names = append(names, name)
+		}
+	}
+	slices.Sort(names)
+
+	return names
+}
+
+func prefix(environment string) string {
+	return strings.ToUpper(environment) + "_"
 }

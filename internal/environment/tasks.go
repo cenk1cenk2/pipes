@@ -34,7 +34,7 @@ func SetupTaskList(p *Plumber, cfg *Config, ctx *Ctx) *TaskList {
 				initReferences(tl, cfg, ctx).Job(),
 
 				environmentSelect(tl, cfg, ctx).Job(),
-				environmentFetch(tl, ctx).Job(),
+				environmentFetch(tl, cfg, ctx).Job(),
 			)
 		})
 }
@@ -83,15 +83,22 @@ func environmentSelect(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 		})
 }
 
-func environmentFetch(tl *TaskList, ctx *Ctx) *Task {
+func environmentFetch(tl *TaskList, cfg *Config, ctx *Ctx) *Task {
 	return tl.CreateTask("environment", "fetch").
 		ShouldDisable(func(_ *Task) bool {
 			return ctx.Environment == ""
 		}).
 		Set(func(_ context.Context, t *Task) error {
-			ctx.EnvVars = Fetch(os.Environ(), ctx.Environment)
+			environ := cfg.Environ
+			if environ == nil {
+				environ = os.Environ()
+			}
 
-			t.Log.Info(fmt.Sprintf("Environment variables that matches the current environment: %s -> %+v", ctx.Environment, ctx.EnvVars))
+			ctx.EnvVars = Fetch(environ, ctx.Environment)
+
+			// the variables are the secrets of the pipeline, so only the names the
+			// environment brings in reach the log, never a value.
+			t.Log.Info(fmt.Sprintf("Environment variables that match the current environment: %s -> %v", ctx.Environment, Selected(environ, ctx.Environment)))
 
 			return nil
 		})
