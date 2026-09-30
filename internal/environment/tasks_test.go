@@ -1,6 +1,9 @@
 package environment_test
 
 import (
+	"bytes"
+	"io"
+
 	. "github.com/cenk1cenk2/plumber/v7"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -16,22 +19,28 @@ var _ = Describe("SetupTaskList", func() {
 		{Match: `^heads/main$`, Environment: "develop"},
 	}
 
+	// the specs never read the environment of the process running them, which is
+	// whatever the machine or the runner holds, secrets included.
+	environ := []string{"DEVELOP_TOKEN=develop-token", "PATH=/usr/bin"}
+
+	var log *bytes.Buffer
+
 	run := func(cfg environment.Config) (environment.Ctx, error) {
 		GinkgoHelper()
 
 		ctx := environment.Ctx{}
+		cfg.Environ = environ
+		log = &bytes.Buffer{}
 
 		p := NewPlumber(func(_ *Plumber) *cli.Command {
 			return &cli.Command{Name: "test"}
 		})
-		p.SetLoggerOutput(GinkgoWriter)
+		p.SetLoggerOutput(io.MultiWriter(log, GinkgoWriter))
 
 		return ctx, p.RunJobs(environment.SetupTaskList(p, &cfg, &ctx).Job())
 	}
 
 	It("reads the variables of the selected environment into the context", func() {
-		GinkgoT().Setenv("DEVELOP_TOKEN", "develop-token")
-
 		ctx, err := run(environment.Config{
 			Enable:     true,
 			Conditions: conditions,
@@ -42,6 +51,20 @@ var _ = Describe("SetupTaskList", func() {
 		Expect(ctx.References).To(Equal([]string{"heads/main"}))
 		Expect(ctx.Environment).To(Equal("develop"))
 		Expect(ctx.EnvVars).To(HaveKeyWithValue("TOKEN", "develop-token"))
+		Expect(ctx.EnvVars).To(HaveKeyWithValue("PATH", "/usr/bin"))
+	})
+
+	It("names the variables it selected in the log and never their values", func() {
+		_, err := run(environment.Config{
+			Enable:     true,
+			Conditions: conditions,
+			Git:        git.Refs{Branch: "main"},
+		})
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(log.String()).To(ContainSubstring("develop -> [TOKEN]"))
+		Expect(log.String()).NotTo(ContainSubstring("develop-token"))
+		Expect(log.String()).NotTo(ContainSubstring("/usr/bin"))
 	})
 
 	// the pipes that only inject an environment on request ship the flag off, and a

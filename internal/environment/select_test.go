@@ -84,8 +84,10 @@ var _ = Describe("Fetch", func() {
 			To(HaveKeyWithValue("PATH", "/usr/bin"))
 	})
 
-	It("lets the prefixed value win over the plain one", func() {
+	It("lets the prefixed value win over the plain one wherever either sits", func() {
 		Expect(environment.Fetch([]string{"TOKEN=plain", "STAGE_TOKEN=stage-token"}, "stage")).
+			To(HaveKeyWithValue("TOKEN", "stage-token"))
+		Expect(environment.Fetch([]string{"STAGE_TOKEN=stage-token", "TOKEN=plain"}, "stage")).
 			To(HaveKeyWithValue("TOKEN", "stage-token"))
 	})
 
@@ -110,6 +112,13 @@ var _ = Describe("Fetch", func() {
 	It("skips an entry that is not a pair", func() {
 		Expect(environment.Fetch([]string{"NOT_A_PAIR"}, "stage")).
 			To(Equal(map[string]string{"ENVIRONMENT": "stage"}))
+	})
+})
+
+var _ = Describe("Selected", func() {
+	It("names the variables the environment brings in, without their prefix and in order", func() {
+		Expect(environment.Selected([]string{"STAGE_URL=u", "PATH=/usr/bin", "STAGE_TOKEN=t", "NOT_A_PAIR"}, "stage")).
+			To(Equal([]string{"TOKEN", "URL"}))
 	})
 })
 
