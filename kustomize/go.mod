@@ -8,8 +8,8 @@ require (
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.13.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
-	sigs.k8s.io/kustomize/api v0.21.1
-	sigs.k8s.io/kustomize/kyaml v0.21.1
+	sigs.k8s.io/kustomize/api v0.21.2
+	sigs.k8s.io/kustomize/kyaml v0.21.2
 )
 
 require (
@@ -25,7 +25,6 @@ require (
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/creasty/defaults v1.11.0 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
