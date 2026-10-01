@@ -50,7 +50,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 	create := terraform.ChangeCreate
 
 	It("summarizes an unwrapped Pulumi plan without rendering secrets", func() {
-		report, err := parsePulumiPlanReport(readFixture("plan-unwrapped.json"), metadata())
+		report, err := parsePulumiPlanReport(readFixture("plan-unwrapped.json"), nil, metadata())
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(report.Metadata.PlanSchema).To(BeEmpty())
@@ -130,7 +130,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 	})
 
 	It("summarizes a versioned Pulumi deployment plan wrapper", func() {
-		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), metadata())
+		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), nil, metadata())
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(report.Metadata.PlanSchema).To(Equal("1"))
@@ -187,7 +187,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 						},
 					},
 				},
-			})
+			}, nil)
 
 			Expect(changes).To(Equal([]terraform.Change{
 				{Name: "members", Action: create, After: `["a", [secret]]`},
@@ -195,8 +195,132 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			}))
 		})
 
-		It("carries nothing for a resource without a goal", func() {
-			Expect(resourceChanges(nil)).To(BeNil())
+		update := terraform.ChangeUpdate
+		remove := terraform.ChangeDelete
+
+		It("marks only the lines that changed in an update against the stack state", func() {
+			changes := resourceChanges(&apitype.GoalV1{
+				InputDiff: apitype.PlanDiffV1{Updates: map[string]any{
+					"policy": "path \"a\" {\n  capabilities = [\"read\"]\n}\npath \"b\" {\n  capabilities = [\"read\"]\n}\n",
+				}},
+			}, map[string]any{
+				"policy": "path \"a\" {\n  capabilities = [\"read\"]\n}\n",
+			})
+
+			Expect(changes).To(Equal([]terraform.Change{{
+				Name:   "policy",
+				Action: update,
+				Before: "<<-EOT\n  path \"a\" {\n    capabilities = [\"read\"]\n  }\nEOT",
+				After:  "<<-EOT\n  path \"a\" {\n    capabilities = [\"read\"]\n  }\n  path \"b\" {\n    capabilities = [\"read\"]\n  }\nEOT",
+			}}))
+
+			body, err := terraform.RenderReport(terraform.Report{Title: "x", Actions: []terraform.Action{{
+				Action:    "update",
+				Resources: []terraform.Resource{{Name: "policy", Changes: changes}},
+			}}})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(
+				body,
+			).To(ContainSubstring("~ policy: <<-EOT\n    path \"a\" {\n      capabilities = [\"read\"]\n    }\n+   path \"b\" {\n+     capabilities = [\"read\"]\n+   }\n  EOT"))
 		})
+
+		It("compares an updated object key by key against the stack state", func() {
+			changes := resourceChanges(&apitype.GoalV1{
+				InputDiff: apitype.PlanDiffV1{Updates: map[string]any{
+					"data": map[string]any{"level": "debug", "mode": "a"},
+				}},
+			}, map[string]any{"data": map[string]any{"level": "info", "mode": "a", "old": "x"}})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "data", Action: update, Children: []terraform.Change{
+					{Name: "level", Action: update, Before: `"info"`, After: `"debug"`},
+					{Name: "old", Action: remove, Before: `"x"`},
+				}},
+			}))
+		})
+
+		It("shows what a value only known after apply replaces", func() {
+			changes := resourceChanges(&apitype.GoalV1{
+				InputDiff: apitype.PlanDiffV1{Updates: map[string]any{"arn": computedValuePlaceholder}},
+			}, map[string]any{"arn": "arn:old"})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "arn", Action: update, Before: `"arn:old"`, After: "[unknown]"},
+			}))
+		})
+
+		It("keeps an update whose sides read the same once masked", func() {
+			secret := map[string]any{"4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270", "ciphertext": "v1:x"}
+
+			changes := resourceChanges(&apitype.GoalV1{
+				InputDiff: apitype.PlanDiffV1{Updates: map[string]any{"token": secret}},
+			}, map[string]any{"token": secret})
+
+			Expect(changes).To(Equal([]terraform.Change{{Name: "token", Action: update, After: "[secret]"}}))
+		})
+
+		It("writes a deleted property from the value the stack state holds", func() {
+			changes := resourceChanges(&apitype.GoalV1{
+				InputDiff: apitype.PlanDiffV1{Deletes: []string{"immutable", "unknown"}},
+			}, map[string]any{"immutable": true})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "immutable", Action: remove, Before: "true"},
+				{Name: "unknown", Action: remove},
+			}))
+		})
+
+		It("writes a deleted resource out from the stack state without the provider bookkeeping", func() {
+			changes := resourceChanges(nil, map[string]any{
+				"name":       "keel-system/default",
+				"__defaults": []any{},
+				"policies":   []any{"a"},
+			})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "name", Action: remove, Before: `"keel-system/default"`},
+				{Name: "policies", Action: remove, Before: `["a"]`},
+			}))
+		})
+
+		It("falls back to the plan values when the stack state does not know the resource", func() {
+			changes := resourceChanges(&apitype.GoalV1{
+				InputDiff: apitype.PlanDiffV1{Updates: map[string]any{"runtime": "nodejs22.x"}},
+			}, nil)
+
+			Expect(changes).To(Equal([]terraform.Change{{Name: "runtime", Action: update, After: `"nodejs22.x"`}}))
+		})
+
+		It("carries nothing for a resource without a goal", func() {
+			Expect(resourceChanges(nil, nil)).To(BeNil())
+		})
+	})
+})
+
+var _ = Describe("Pulumi stack state", func() {
+	It("reads the inputs of every resource by urn and skips the ones pending deletion", func() {
+		state, err := parseStackState([]byte(`{
+			"version": 3,
+			"deployment": {
+				"manifest": {"time": "2026-10-01T12:00:00Z"},
+				"resources": [
+					{"urn": "urn:a", "inputs": {"name": "new"}, "outputs": {"id": "1"}},
+					{"urn": "urn:a", "inputs": {"name": "old"}, "delete": true},
+					{"urn": "urn:b", "inputs": {"policy": "x"}}
+				]
+			}
+		}`))
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(state).To(Equal(map[string]map[string]any{
+			"urn:a": {"name": "new"},
+			"urn:b": {"policy": "x"},
+		}))
+	})
+
+	It("fails on a state that is not JSON", func() {
+		_, err := parseStackState([]byte("not json"))
+
+		Expect(err).To(MatchError(ContainSubstring("parse Pulumi stack state")))
 	})
 })

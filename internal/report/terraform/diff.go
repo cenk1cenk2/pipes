@@ -4,6 +4,7 @@ import (
 	json "encoding/json/v2"
 	"fmt"
 	"maps"
+	"reflect"
 	"slices"
 	"strings"
 )
@@ -88,6 +89,105 @@ func Expand(action string, name string, value any) Change {
 	}
 
 	return change
+}
+
+// Compare writes the change between two plain values, attribute by attribute where
+// both are objects or lists, and line by line where both are values that span lines;
+// it says nothing changed when the two are equal. A marker on the new side, a value
+// that is not known yet or not shown, still shows the value it replaces in full.
+func Compare(name string, before any, after any) (Change, bool) {
+	change := Change{Name: name, Action: ChangeUpdate}
+
+	if decoded, ok := DecodeJSON(before); ok {
+		if other, ok := DecodeJSON(after); ok {
+			before, after = decoded, other
+			change.Note = JSONEncoded
+		} else if _, ok := after.(Marker); ok {
+			before = decoded
+			change.Note = JSONEncoded
+		}
+	}
+
+	if _, ok := after.(Marker); ok && Expandable(before) {
+		switch before := before.(type) {
+		case map[string]any:
+			for _, key := range slices.Sorted(maps.Keys(before)) {
+				child, _ := Compare(key, before[key], after)
+				change.Children = append(change.Children, child)
+			}
+		case []any:
+			for index, element := range before {
+				child, _ := Compare(fmt.Sprintf("[%d]", index), element, after)
+				change.Children = append(change.Children, child)
+			}
+		}
+
+		return change, true
+	}
+
+	switch beforeValue := before.(type) {
+	case map[string]any:
+		afterValue, ok := after.(map[string]any)
+		if !ok {
+			break
+		}
+
+		keys := slices.Concat(slices.Collect(maps.Keys(beforeValue)), slices.Collect(maps.Keys(afterValue)))
+		slices.Sort(keys)
+
+		for _, key := range slices.Compact(keys) {
+			if child, changed := compareChild(key, beforeValue, afterValue); changed {
+				change.Children = append(change.Children, child)
+			}
+		}
+
+		return change, len(change.Children) > 0
+	case []any:
+		afterValue, ok := after.([]any)
+		if !ok || (!Expandable(beforeValue) && !Expandable(afterValue)) {
+			break
+		}
+
+		for index := range max(len(beforeValue), len(afterValue)) {
+			key := fmt.Sprintf("[%d]", index)
+			beforeElements, afterElements := map[string]any{}, map[string]any{}
+			if index < len(beforeValue) {
+				beforeElements[key] = beforeValue[index]
+			}
+			if index < len(afterValue) {
+				afterElements[key] = afterValue[index]
+			}
+
+			if child, changed := compareChild(key, beforeElements, afterElements); changed {
+				change.Children = append(change.Children, child)
+			}
+		}
+
+		return change, len(change.Children) > 0
+	}
+
+	if reflect.DeepEqual(before, after) {
+		return Change{}, false
+	}
+
+	change.Before = FormatValue(before)
+	change.After = FormatValue(after)
+
+	return change, true
+}
+
+func compareChild(key string, before map[string]any, after map[string]any) (Change, bool) {
+	beforeValue, inBefore := before[key]
+	afterValue, inAfter := after[key]
+
+	switch {
+	case !inBefore:
+		return Expand(ChangeCreate, key, afterValue), true
+	case !inAfter:
+		return Expand(ChangeDelete, key, beforeValue), true
+	}
+
+	return Compare(key, beforeValue, afterValue)
 }
 
 // Expandable says whether a value is written out one child per line, which a

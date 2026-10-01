@@ -270,6 +270,50 @@ No attribute changes.
 		})
 	})
 
+	Describe("Compare", func() {
+		update := terraform.ChangeUpdate
+
+		It("says nothing changed between equal values", func() {
+			_, changed := terraform.Compare("a", map[string]any{"b": "c"}, map[string]any{"b": "c"})
+
+			Expect(changed).To(BeFalse())
+		})
+
+		It("compares objects and lists of objects child by child", func() {
+			change, changed := terraform.Compare("root",
+				map[string]any{"keep": "x", "gone": "y", "rules": []any{map[string]any{"port": float64(80)}}},
+				map[string]any{"keep": "x", "new": "z", "rules": []any{map[string]any{"port": float64(443)}}},
+			)
+
+			Expect(changed).To(BeTrue())
+			Expect(change).To(Equal(terraform.Change{Name: "root", Action: update, Children: []terraform.Change{
+				{Name: "gone", Action: terraform.ChangeDelete, Before: `"y"`},
+				{Name: "new", Action: terraform.ChangeCreate, After: `"z"`},
+				{Name: "rules", Action: update, Children: []terraform.Change{
+					{Name: "[0]", Action: update, Children: []terraform.Change{
+						{Name: "port", Action: update, Before: "80", After: "443"},
+					}},
+				}},
+			}}))
+		})
+
+		It("compares two strings holding JSON documents as the documents", func() {
+			change, _ := terraform.Compare("values", `{"a": 1, "b": 2}`, `{"a": 1, "b": 3}`)
+
+			Expect(change).To(Equal(terraform.Change{Name: "values", Action: update, Note: terraform.JSONEncoded, Children: []terraform.Change{
+				{Name: "b", Action: update, Before: "2", After: "3"},
+			}}))
+		})
+
+		It("writes out what a marker replaces attribute by attribute", func() {
+			change, _ := terraform.Compare("meta", map[string]any{"a": "x"}, terraform.Marker("[unknown]"))
+
+			Expect(change).To(Equal(terraform.Change{Name: "meta", Action: update, Children: []terraform.Change{
+				{Name: "a", Action: update, Before: `"x"`, After: "[unknown]"},
+			}}))
+		})
+	})
+
 	Describe("Expand", func() {
 		It("writes objects and lists of objects out one child per line", func() {
 			change := terraform.Expand(terraform.ChangeCreate, "root", map[string]any{

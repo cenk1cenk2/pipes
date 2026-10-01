@@ -37,7 +37,9 @@ var pulumiPlanActionOrder = []string{
 	"remove-pending-replace",
 }
 
-func parsePulumiPlanReport(data []byte, metadata terraform.Metadata) (terraform.Report, error) {
+// state holds the inputs the stack state last gave each resource by urn, and may be
+// nil when the state could not be read.
+func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadata terraform.Metadata) (terraform.Report, error) {
 	plan, planVersion, err := parsePulumiPlan(data)
 	if err != nil {
 		return terraform.Report{}, err
@@ -60,7 +62,7 @@ func parsePulumiPlanReport(data []byte, metadata terraform.Metadata) (terraform.
 			continue
 		}
 
-		summary := resourceSummary(string(urn), resource)
+		summary := resourceSummary(string(urn), resource, state[string(urn)])
 		outputNames := resourceOutputNames(resource)
 
 		for _, action := range steps {
@@ -148,7 +150,7 @@ func resourceActions(resource apitype.ResourcePlanV1) []string {
 	return actions
 }
 
-func resourceSummary(urn string, plan apitype.ResourcePlanV1) terraform.Resource {
+func resourceSummary(urn string, plan apitype.ResourcePlanV1, old map[string]any) terraform.Resource {
 	resourceType := ""
 	name := ""
 
@@ -171,7 +173,7 @@ func resourceSummary(urn string, plan apitype.ResourcePlanV1) terraform.Resource
 	return terraform.Resource{
 		Name:    pulumiResourceName(resourceType, name),
 		Id:      urn,
-		Changes: resourceChanges(plan.Goal),
+		Changes: resourceChanges(plan.Goal, old),
 	}
 }
 

@@ -32,7 +32,7 @@ func reportSource() terraform.Source {
 	metadata.Cwd = setup.C.Cwd
 
 	return terraform.Source{
-		Read: func(_ context.Context, _ *Task) (terraform.Report, error) {
+		Read: func(ctx context.Context, t *Task) (terraform.Report, error) {
 			planPath := P.Plan
 			if !filepath.IsAbs(planPath) {
 				planPath = filepath.Join(setup.C.Cwd, planPath)
@@ -43,7 +43,7 @@ func reportSource() terraform.Source {
 				return terraform.Report{}, fmt.Errorf("read Pulumi plan file %s: %w", planPath, err)
 			}
 
-			return parsePulumiPlanReport(data, metadata)
+			return parsePulumiPlanReport(data, readStackState(ctx, t), metadata)
 		},
 		Summary:        terraform.Summarize,
 		SummaryOutput:  P.Summary.Output,
@@ -54,6 +54,22 @@ func reportSource() terraform.Source {
 		Metadata:       metadata,
 		Log:            P.ReportLog,
 	}
+}
+
+// The state is what turns a change into a comparison, but a report that only shows
+// what the plan carries beats no report, so failing to read it does not fail the job.
+func readStackState(ctx context.Context, t *Task) map[string]map[string]any {
+	data, err := exportStackState(ctx, setup.C.Cwd, stack.P.Stack)
+	if err == nil {
+		var state map[string]map[string]any
+		if state, err = parseStackState(data); err == nil {
+			return state
+		}
+	}
+
+	t.Log.Warn(fmt.Sprintf("Reporting only the values the plan carries, since the stack state is not readable: %s", err))
+
+	return nil
 }
 
 func plan(tl *TaskList) *Task {
