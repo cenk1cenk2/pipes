@@ -144,7 +144,7 @@ var _ = Describe("Terraform merge request report", func() {
 		report, err := parseTerraformShowPlan(readFixture("plan.json"), metadata())
 		Expect(err).NotTo(HaveOccurred())
 
-		body, err := terraform.RenderReport(report)
+		body, err := terraform.RenderReport(report, terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("## Terraform plan report"))

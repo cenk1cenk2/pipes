@@ -3,6 +3,7 @@ package preview
 import (
 	"maps"
 	"slices"
+	"strings"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/common/apitype"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/resource/sig"
@@ -19,6 +20,10 @@ const (
 
 	assetValue   = terraform.Marker("[asset]")
 	archiveValue = terraform.Marker("[archive]")
+
+	// what the inputs of a resource in the stack state carry for the provider's own
+	// bookkeeping, never as a property of the resource.
+	internalProperty = "__"
 )
 
 // The markers are the pipe's own, so the renderer only learns to dim what this pipe
@@ -35,10 +40,24 @@ func init() {
 
 // The plan carries the inputs a resource is going to be given and no more: a
 // deleted property comes as its name alone and an updated one as its new value
-// without the old.
-func resourceChanges(goal *apitype.GoalV1) []terraform.Change {
+// without the old. Old holds the inputs the stack state last gave the resource, which
+// is what an update is compared against and what a deletion shows; without it a
+// change shows only what the plan carries.
+func resourceChanges(goal *apitype.GoalV1, old map[string]any) []terraform.Change {
+	var changes []terraform.Change
+
+	// a resource that only goes away carries no goal, and what it goes away with is
+	// everything the state last gave it.
 	if goal == nil {
-		return nil
+		for _, name := range slices.Sorted(maps.Keys(old)) {
+			if strings.HasPrefix(name, internalProperty) {
+				continue
+			}
+
+			changes = append(changes, terraform.Expand(terraform.ChangeDelete, name, masked(old[name])))
+		}
+
+		return changes
 	}
 
 	diff := goal.InputDiff
@@ -48,8 +67,9 @@ func resourceChanges(goal *apitype.GoalV1) []terraform.Change {
 		slices.Collect(maps.Keys(diff.Updates)),
 	))
 
-	changes := make([]terraform.Change, 0, len(names))
 	for _, name := range names {
+		before, known := old[name]
+
 		if value, ok := diff.Adds[name]; ok {
 			changes = append(changes, terraform.Expand(terraform.ChangeCreate, name, masked(value)))
 
@@ -57,7 +77,23 @@ func resourceChanges(goal *apitype.GoalV1) []terraform.Change {
 		}
 
 		if value, ok := diff.Updates[name]; ok {
+			// two values that read the same once masked, a secret that changed, still
+			// went through an update the plan names.
+			if known {
+				if change, changed := terraform.Compare(name, masked(before), masked(value)); changed {
+					changes = append(changes, change)
+
+					continue
+				}
+			}
+
 			changes = append(changes, terraform.Expand(terraform.ChangeUpdate, name, masked(value)))
+
+			continue
+		}
+
+		if known {
+			changes = append(changes, terraform.Expand(terraform.ChangeDelete, name, masked(before)))
 
 			continue
 		}
