@@ -67,7 +67,7 @@ func LogTask(tl *TaskList, src *Source) *Task {
 				return err
 			}
 
-			body, err := RenderReport(report)
+			body, err := RenderReport(report, DiffPlan)
 			if err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func MergeRequestReportTask(tl *TaskList, src *Source) *Task {
 				return err
 			}
 
-			body, err := RenderReport(report)
+			body, err := RenderReport(report, DiffUnified)
 			if err != nil {
 				return err
 			}

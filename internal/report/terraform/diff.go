@@ -29,6 +29,18 @@ const (
 	lineDiffLimit = 1 << 20
 )
 
+// DiffLayout is how a resource diff is written out.
+type DiffLayout int
+
+const (
+	// DiffPlan writes the diff the way the plan output of the tools does, an update
+	// on one line marked with a tilde; the job log colors it with a lexer of its own.
+	DiffPlan DiffLayout = iota
+	// DiffUnified writes an update as its old line removed and its new line added,
+	// the only shape a code host highlights in a diff block.
+	DiffUnified
+)
+
 type (
 	// Change is one attribute of a resource diff, as far as the tool's plan carries
 	// it: a leaf holds the rendered values, a container holds its children. Before
@@ -302,25 +314,45 @@ func Glyph(action string) string {
 	return "?"
 }
 
-func (c Change) lines(depth int, out []string) []string {
+func (c Change) lines(depth int, layout DiffLayout, out []string) []string {
 	indent := strings.Repeat("  ", depth)
-	head := sign(c.Action) + indent + c.Name
 	note := ""
 	if c.Note != "" {
 		note = " # " + c.Note
 	}
 
+	multiline := c.Action != ChangeDelete && c.Before != "" && c.After != "" &&
+		(strings.Contains(c.Before, "\n") || strings.Contains(c.After, "\n"))
+
+	action := c.Action
+	if layout == DiffUnified && action == ChangeUpdate {
+		switch {
+		// what only changed inside reads as context around the lines that did.
+		case len(c.Children) > 0, multiline:
+			action = ""
+		case c.Before != "" && c.After != "":
+			out = append(out, sign(ChangeDelete)+indent+c.Name+": "+c.Before)
+
+			return append(out, sign(ChangeCreate)+indent+c.Name+": "+c.After+note)
+		case c.After == "" && c.Before != "":
+			action = ChangeDelete
+		default:
+			action = ChangeCreate
+		}
+	}
+
+	head := sign(action) + indent + c.Name
+
 	if len(c.Children) > 0 {
 		out = append(out, head+":"+note)
 		for _, child := range c.Children {
-			out = child.lines(depth+1, out)
+			out = child.lines(depth+1, layout, out)
 		}
 
 		return out
 	}
 
-	if c.Action != ChangeDelete && c.Before != "" && c.After != "" &&
-		(strings.Contains(c.Before, "\n") || strings.Contains(c.After, "\n")) {
+	if multiline {
 		return c.multilineUpdate(head, note, indent, out)
 	}
 
@@ -334,7 +366,7 @@ func (c Change) lines(depth int, out []string) []string {
 	lines := strings.Split(value, "\n")
 	out = append(out, head+": "+lines[0]+note)
 	for _, line := range lines[1:] {
-		out = append(out, sign(c.Action)+indent+line)
+		out = append(out, sign(action)+indent+line)
 	}
 
 	return out
@@ -454,10 +486,10 @@ func diffLines(before []string, after []string) []diffLine {
 }
 
 // RenderChanges writes a resource diff out, one attribute per line.
-func RenderChanges(changes []Change) string {
+func RenderChanges(changes []Change, layout DiffLayout) string {
 	lines := []string{}
 	for _, change := range changes {
-		lines = change.lines(0, lines)
+		lines = change.lines(0, layout, lines)
 	}
 
 	return strings.Join(lines, "\n")

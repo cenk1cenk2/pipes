@@ -107,7 +107,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 }
 `))
 
-		body, err := terraform.RenderReport(report)
+		body, err := terraform.RenderReport(report, terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("## Pulumi preview report"))
 		Expect(body).To(ContainSubstring("| Stack | `dev` |"))
@@ -160,7 +160,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Delete: 1,
 		}))
 
-		body, err := terraform.RenderReport(report)
+		body, err := terraform.RenderReport(report, terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(body).To(ContainSubstring("Plan schema version"))
 		Expect(body).To(ContainSubstring("~ runtime: \"nodejs22.x\""))
@@ -217,7 +217,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			body, err := terraform.RenderReport(terraform.Report{Title: "x", Actions: []terraform.Action{{
 				Action:    "update",
 				Resources: []terraform.Resource{{Name: "policy", Changes: changes}},
-			}}})
+			}}}, terraform.DiffPlan)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(
 				body,

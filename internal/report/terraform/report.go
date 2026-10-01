@@ -113,7 +113,7 @@ type (
 	}
 )
 
-func RenderReport(report Report) (string, error) {
+func RenderReport(report Report, layout DiffLayout) (string, error) {
 	tmpl, err := template.New("report.md.gotmpl").
 		Funcs(template.FuncMap{"cell": cell}).
 		Parse(reportTemplate)
@@ -122,20 +122,20 @@ func RenderReport(report Report) (string, error) {
 	}
 
 	var body bytes.Buffer
-	if err := tmpl.Execute(&body, newReportView(report)); err != nil {
+	if err := tmpl.Execute(&body, newReportView(report, layout)); err != nil {
 		return "", fmt.Errorf("render report template: %w", err)
 	}
 
 	return strings.TrimRight(body.String(), "\n") + "\n", nil
 }
 
-func newReportView(report Report) reportView {
+func newReportView(report Report, layout DiffLayout) reportView {
 	view := reportView{Report: report}
 
 	for _, action := range report.Actions {
 		resources := make([]resourceView, 0, len(action.Resources))
 		for _, resource := range action.Resources {
-			diff := RenderChanges(resource.Changes)
+			diff := RenderChanges(resource.Changes, layout)
 			if diff == "" {
 				diff = NoAttributeChanges
 			}

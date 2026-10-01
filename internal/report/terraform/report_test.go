@@ -60,10 +60,10 @@ var _ = Describe("Terraform merge request report", func() {
 	// both pipes render through this template, so the section skeleton is the
 	// contract that keeps their reports readable side by side on one merge request.
 	It("keeps one structure whichever labels it renders", func() {
-		terraformBody, err := terraform.RenderReport(report(terraformLabels))
+		terraformBody, err := terraform.RenderReport(report(terraformLabels), terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
-		pulumiBody, err := terraform.RenderReport(report(pulumiLabels))
+		pulumiBody, err := terraform.RenderReport(report(pulumiLabels), terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(headings(terraformBody)).NotTo(BeEmpty())
@@ -71,7 +71,7 @@ var _ = Describe("Terraform merge request report", func() {
 	})
 
 	It("names the tool specific concepts from the labels", func() {
-		body, err := terraform.RenderReport(report(pulumiLabels))
+		body, err := terraform.RenderReport(report(pulumiLabels), terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("## Example report"))
@@ -85,7 +85,7 @@ var _ = Describe("Terraform merge request report", func() {
 	// the note is read on GitLab, which folds the html, and in the job log, which
 	// strips it down to the summary line and the code block under it.
 	It("folds every resource into a section of its own", func() {
-		body, err := terraform.RenderReport(report(terraformLabels))
+		body, err := terraform.RenderReport(report(terraformLabels), terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring(strings.TrimSpace(`
@@ -114,14 +114,14 @@ No attribute changes.
 		body, err := terraform.RenderReport(terraform.Report{
 			Title:    "Example report",
 			Metadata: terraform.Metadata{JobName: "plan: [a | b]"},
-		})
+		}, terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("| Job | `plan: [a \\| b]` |"))
 	})
 
 	It("says so when there is nothing to report", func() {
-		body, err := terraform.RenderReport(terraform.Report{Title: "Example report"})
+		body, err := terraform.RenderReport(terraform.Report{Title: "Example report"}, terraform.DiffPlan)
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring("No changes detected."))
@@ -138,7 +138,7 @@ No attribute changes.
 					Action:    "update",
 					Resources: []terraform.Resource{{Name: "one", Changes: changes}},
 				}},
-			})
+			}, terraform.DiffPlan)
 			Expect(err).NotTo(HaveOccurred())
 
 			return body
@@ -170,6 +170,51 @@ No attribute changes.
 `)))
 		})
 
+		// a code host only highlights the lines of a diff block that open with a plus or
+		// a minus, which an update on one line marked with a tilde never does.
+		It("writes an update as its old line removed and its new line added for a code host", func() {
+			body, err := terraform.RenderReport(terraform.Report{
+				Title: "Example report",
+				Actions: []terraform.Action{{
+					Action: "update",
+					Resources: []terraform.Resource{{Name: "one", Changes: []terraform.Change{
+						{Name: "size", Action: terraform.ChangeUpdate, Before: "1", After: "2"},
+						{Name: "engine", Action: terraform.ChangeUpdate, Before: `"a"`, After: `"b"`, Note: "forces replacement"},
+						{Name: "data", Action: terraform.ChangeUpdate, Children: []terraform.Change{
+							{Name: "level", Action: terraform.ChangeUpdate, Before: `"info"`, After: `"debug"`},
+							{Name: "mode", Action: terraform.ChangeUpdate, After: `"a"`},
+						}},
+						{
+							Name:   "policy",
+							Action: terraform.ChangeUpdate,
+							Before: terraform.FormatValue("a\nb\n"),
+							After:  terraform.FormatValue("a\nc\n"),
+						},
+						{Name: "tags", Action: terraform.ChangeCreate, After: `"x"`},
+					}}},
+				}},
+			}, terraform.DiffUnified)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(body).To(ContainSubstring(strings.TrimSpace(`
+- size: 1
++ size: 2
+- engine: "a"
++ engine: "b" # forces replacement
+  data:
+-   level: "info"
++   level: "debug"
++   mode: "a"
+  policy: <<-EOT
+    a
+-   b
++   c
+  EOT
++ tags: "x"
+`)))
+			Expect(body).NotTo(MatchRegexp(`(?m)^~ `))
+		})
+
 		// the report is what a plan is read through, so a diff it shortened would send
 		// its reader back to the raw plan output for exactly the resource they came for.
 		It("writes a long value out whole", func() {
@@ -194,7 +239,7 @@ No attribute changes.
 			body, err := terraform.RenderReport(terraform.Report{
 				Title:   "Example report",
 				Actions: []terraform.Action{{Action: "create", Resources: resources}},
-			})
+			}, terraform.DiffPlan)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(strings.Count(body, "+ attr499: 1")).To(Equal(len(resources)))
