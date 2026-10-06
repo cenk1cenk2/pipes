@@ -17,6 +17,7 @@ Helm chart toolkit for pipelines.
 
 - [`pipe-helm install`](#pipe-helm-install)
 - [`pipe-helm lint`](#pipe-helm-lint)
+- [`pipe-helm test`](#pipe-helm-test)
 - [`pipe-helm publish`](#pipe-helm-publish)
 
 ### `pipe-helm install`
@@ -64,6 +65,33 @@ Lint Helm chart templates.
 | --- | --- | --- | --- |
 | `$HELM_LINT_KUBERNETES_VERSION`<br/>`$KUBERNETES_VERSION` | Kubernetes version to use for linting charts. | `string` |  |
 | `$HELM_LINT_SHOULD_TEMPLATE` | Template the chart while linting. | `bool` | `true` |
+
+### `pipe-helm test`
+
+Run helm-unittest suites of the Helm chart.
+
+`pipe-helm test [FLAGS]`
+
+#### Flags
+
+<details>
+<summary>Helm</summary>
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$HELM_CWD`<br/>`$HELM_ROOT` | Working directory for helm commands. | `string` | `"."` |
+
+</details>
+
+**Helm Test**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$HELM_TEST_FILES` | Test suite files relative to the chart, helm-unittest reads tests/*_test.yaml when none is given. | `string[]`<br/>`format(glob)` |  |
+| `$HELM_TEST_VALUES` | Values files overriding the chart values for every test suite. | `string[]`<br/>`format(glob)` |  |
+| `$HELM_TEST_STRICT` | Parse the test suites strictly, failing on unknown fields. | `bool` | `false` |
+| `$HELM_TEST_OUTPUT_FILE` | File to write the test results to. Leave empty to write no report. | `string` |  |
+| `$HELM_TEST_OUTPUT_TYPE` | Format of the test results file. | `string`<br/>`format(enum("JUnit", "NUnit", "XUnit", "Sonar"))` | `"JUnit"` |
 
 ### `pipe-helm publish`
 

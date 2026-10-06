@@ -11,6 +11,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/login"
 	"gitlab.kilic.dev/devops/pipes/helm/publish"
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
+	"gitlab.kilic.dev/devops/pipes/helm/test"
 )
 
 var version = "latest"
@@ -42,6 +43,17 @@ func main() {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							lint.New(p),
+						))
+					},
+				},
+				{
+					Name:        "test",
+					Description: "Run helm-unittest suites of the Helm chart.",
+					Flags:       CombineFlags(setup.Flags, test.Flags),
+					Action: func(_ context.Context, _ *cli.Command) error {
+						return p.RunJobs(CombineTaskLists(
+							setup.New(p),
+							test.New(p),
 						))
 					},
 				},
