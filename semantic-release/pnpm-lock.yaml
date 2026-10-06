@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@anolilab/multi-semantic-release':
         specifier: ^4.4.21
-        version: 4.4.21(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)
+        version: 4.4.23(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)
       '@cenk1cenk2/semantic-release-config':
         specifier: ^6.0.2
-        version: 6.0.2(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)
+        version: 6.0.2(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.1)
       '@semantic-release/changelog':
         specifier: ^7.0.0
         version: 7.0.0(semantic-release@25.0.9)
@@ -53,8 +53,8 @@ packages:
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
-  '@anolilab/multi-semantic-release@4.4.21':
-    resolution: {integrity: sha512-o9pKfrK59/ciIKcfjXI7Aw4WX3ZdGpQjKeozac7j73WI+UbNqvfR8QLanOGOWcps81Z0ld1jXRb9t///VAMaZw==}
+  '@anolilab/multi-semantic-release@4.4.23':
+    resolution: {integrity: sha512-tXie/iVGNAYXLDTwM5wZm4PaBeTrXKzvvRH/qQV6mQvNYdmFaD9csAglfzWCGCDx+OAk4MjrgiBopaK1gYZXhA==}
     engines: {node: ^22.14.0 || >=24.10.0}
     os: [darwin, linux, win32]
     hasBin: true
@@ -65,8 +65,8 @@ packages:
     resolution: {integrity: sha512-e3KBrm9Fr2xCmSyKc17cWyL6jOwHJWciiSb6FbRveAmykn0vwYQT1Bf4BJNkuEhCUXNsJL1aN70czA5atzlGzw==}
     engines: {node: ^22.14.0 || >=24.10.0}
 
-  '@anolilab/semantic-release-pnpm@8.1.31':
-    resolution: {integrity: sha512-GLPt0ND58mrRdu91DY9RbprXUgZaYirmdO+10WjbI8P4zF8cJLW8RDAR5cIzeG5itAGUzgaH4Mtk0e1xC4D8cQ==}
+  '@anolilab/semantic-release-pnpm@8.1.32':
+    resolution: {integrity: sha512-WPHFn44USBTtbKcnI/fOTYUeCSOYCYQ4v0IzCg0k5OMQGFlc3EUPEW2Ouic8w6cJSVlqnS2x7JEVtRd7gtq1Xg==}
     engines: {node: ^22.14.0 || >=24.10.0}
 
   '@antfu/install-pkg@2.1.0':
@@ -272,8 +272,8 @@ packages:
       yaml:
         optional: true
 
-  '@visulima/fs@6.0.8':
-    resolution: {integrity: sha512-BoVsr9dMAXrC9kjKUxPCblf5fVmbVNVIFdeVpJlUJmjj+lnC72ouHyHoS0KkWuDtQI01Of7rl1ArHCE3ppl+ew==}
+  '@visulima/fs@6.0.18':
+    resolution: {integrity: sha512-9i1ylvVpKwowZusVxFzD8BTNGbHdWfzC3mTqID8vrcvV5FQ5cHSu12tCa/33EdrxBM/N2iQrkrtyik2iCq9ddQ==}
     engines: {node: ^22.14.0 || >=24.10.0}
     os: [darwin, linux, win32]
     peerDependencies:
@@ -294,8 +294,8 @@ packages:
       smol-toml:
         optional: true
 
-  '@visulima/package@5.0.21':
-    resolution: {integrity: sha512-YX//NFvxxhSNZDKPVenbbcvWvEp+O9TKPp0MQNsU5IFhy4gIYJRKaYJa3P/OOEYYvd3MB12hbRwFO6Xbb5oOhQ==}
+  '@visulima/package@5.0.31':
+    resolution: {integrity: sha512-hth405IWJe+oikG46T0H5lwDsjkvCpLNjwVPZ+/Anct9/amDQ5Xzbv8MC4mGMuygjiPzv8eJ5OMn5M7U+YhpQQ==}
     engines: {node: ^22.14.0 || >=24.10.0}
     os: [darwin, linux, win32]
 
@@ -713,8 +713,8 @@ packages:
     resolution: {integrity: sha512-A91dYTeIB6NoXG+PxTQpCCDDnfHsW9kc06Lvpu1TEe9gnd6ZFeiBoRO9JvzEv6xK7EX97/dUE8g/vBMTqTS3CA==}
     engines: {node: '>=14'}
 
-  http-cache-semantics@4.2.0:
-    resolution: {integrity: sha512-dTxcvPXqPvXBQpq5dUr6mEMJX4oIEFv6bwom3FDwKRDsuIjjJGANqhBuoAn9c1RQJIdAKav33ED65E2ys+87QQ==}
+  http-cache-semantics@4.3.0:
+    resolution: {integrity: sha512-M5t5LlJpS1UHMjvwRQVdFHvPISGeLAxNcrWuJkeGh0KxsqCHZ1O3NXZU/8x7cD0BDcGW8kapxMKTvwlqrNkHkA==}
 
   http-proxy-agent@9.1.0:
     resolution: {integrity: sha512-2NxoveTT58mjYT4n3RPTEfCZGLMbidoO8XEieXfpSYxu+PQJ1qpx4ypwH6N+uF9twBPIvRRgvkvW5HUTYWENig==}
@@ -736,8 +736,8 @@ packages:
     resolution: {integrity: sha512-eKCa6bwnJhvxj14kZk5NCPc6Hb6BdsU9DZcOnmQKSnO1VKrfV0zCvtttPZUsBvjmNDn8rpcJfpwSYnHBjc95MQ==}
     engines: {node: '>=18.18.0'}
 
-  ignore@7.0.10:
-    resolution: {integrity: sha512-HpbUakT7xp5miBUywCHf36ZEuAJNklBJDDsGpUIjMzOSmM8ELSfA9Sa/QDPeNeqeoN31u+UTCkL4klCOVvRm4Q==}
+  ignore@7.0.12:
+    resolution: {integrity: sha512-/8UvqAPU9DGTI9k4mxtf49U37Isfwr8Uts96+SBHIkFxPJnHS0Ew4f00sM4Scd8V8EjM0jUNtVDdv1kPdt35lg==}
     engines: {node: '>= 4'}
 
   import-fresh@3.3.1:
@@ -991,8 +991,8 @@ packages:
     resolution: {integrity: sha512-9qny7Z9DsQU8Ou39ERsPU4OZQlSTP47ShQzuKZ6PRXpYLtIFgl/DEBYEXKlvcEa+9tHVcK8CF81Y2V72qaZhWA==}
     engines: {node: '>=18'}
 
-  npm@11.20.0:
-    resolution: {integrity: sha512-dF3EDFwbYN+N5RUip+ZYDe0NeURK5BgqKOcvT1iNtUYhTMTl0FwWhBuXrS7KtXyduqyTMS5aaQaregnHDAxNgw==}
+  npm@11.21.0:
+    resolution: {integrity: sha512-Zov8KhamNneiLdELtj5YALtNmJW4L4fCLTzjfpzXG2w6MSHcf0UxgdlK5uloCuksWT+7mGUU7wi79cO6RqivPg==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     bundledDependencies:
@@ -1550,6 +1550,11 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  yaml@2.9.1:
+    resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yargs-parser@20.2.9:
     resolution: {integrity: sha512-y11nGElTIV+CT3Zv9t7VKl+Q3hTQoT9a1Qzezhhl6Rp21gJ/IVTW7Z3y9EWXhuUBC2Shnf+DX0antecpAwSP8w==}
     engines: {node: '>=10'}
@@ -1561,10 +1566,6 @@ packages:
   yargs@16.2.2:
     resolution: {integrity: sha512-Nt9ZJjXTv5R8MHbqby/wXQ6Gi0Bb3TcYZkR1bzuL4yB2OxWPkXknz513gEF0GoA6tn00UpbPvERW8rzCuWCA6w==}
     engines: {node: '>=10'}
-
-  yargs@18.1.0:
-    resolution: {integrity: sha512-2rAgRKu54VsHkqI0/tYkmluGXHD4KW7yZoycuqDQ15QOTnc2VVfy0nN/1eMhnQLO00A+dwtK20xuCnc1YGeUyg==}
-    engines: {node: ^20.19.0 || ^22.12.0 || >=23}
 
   yargs@18.2.0:
     resolution: {integrity: sha512-9OpKOLeaoNFecEp7P6iYbzze/5CqWoH7N3SMs/6y1XF4nMvFMspEGZzJ6uFi9MmQwXhyzqYoSEKO3tvA3Z/o2w==}
@@ -1592,10 +1593,10 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@anolilab/multi-semantic-release@4.4.21(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)':
+  '@anolilab/multi-semantic-release@4.4.23(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9)':
     dependencies:
       '@semrel-extra/topo': 1.14.1
-      '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)
+      '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.1)
       '@visulima/path': 3.1.0
       cosmiconfig: 10.0.1
       debug: 4.4.3
@@ -1608,8 +1609,8 @@ snapshots:
       semver: 7.8.5
       signale: 1.4.0
       stream-buffers: 3.0.3
-      yaml: 2.9.0
-      yargs: 18.1.0
+      yaml: 2.9.1
+      yargs: 18.2.0
     transitivePeerDependencies:
       - ini
       - json5
@@ -1622,13 +1623,13 @@ snapshots:
       ini: 7.0.0
       ts-deepmerge: 8.0.0
 
-  '@anolilab/semantic-release-pnpm@8.1.31(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.0)':
+  '@anolilab/semantic-release-pnpm@8.1.32(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.1)':
     dependencies:
       '@actions/core': 3.0.1
       '@anolilab/rc': 4.0.9
       '@semantic-release/error': 4.0.0
-      '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)
-      '@visulima/package': 5.0.21(@visulima/yaml@1.0.0)(ini@7.0.0)
+      '@visulima/fs': 5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.1)
+      '@visulima/package': 5.0.31(@visulima/yaml@1.0.0)(ini@7.0.0)
       '@visulima/path': 3.1.0
       debug: 4.4.3
       detect-indent: 7.0.2
@@ -1659,9 +1660,9 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@cenk1cenk2/semantic-release-config@6.0.2(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.0)':
+  '@cenk1cenk2/semantic-release-config@6.0.2(json5@2.2.3)(semantic-release@25.0.9)(yaml@2.9.1)':
     dependencies:
-      '@anolilab/semantic-release-pnpm': 8.1.31(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.0)
+      '@anolilab/semantic-release-pnpm': 8.1.32(@visulima/yaml@1.0.0)(json5@2.2.3)(yaml@2.9.1)
       '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9)
       '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9)
       '@semantic-release/error': 4.0.0
@@ -1881,7 +1882,7 @@ snapshots:
       lodash-es: 4.18.1
       nerf-dart: 1.0.0
       normalize-url: 9.0.1
-      npm: 11.20.0
+      npm: 11.21.0
       rc: 1.2.8
       read-pkg: 10.1.0
       registry-auth-token: 5.1.1
@@ -1921,15 +1922,15 @@ snapshots:
 
   '@types/normalize-package-data@2.4.4': {}
 
-  '@visulima/fs@5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.0)':
+  '@visulima/fs@5.1.0(ini@7.0.0)(json5@2.2.3)(yaml@2.9.1)':
     dependencies:
       '@visulima/path': 3.1.0
     optionalDependencies:
       ini: 7.0.0
       json5: 2.2.3
-      yaml: 2.9.0
+      yaml: 2.9.1
 
-  '@visulima/fs@6.0.8(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)':
+  '@visulima/fs@6.0.18(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)':
     dependencies:
       '@visulima/path': 4.0.0
     optionalDependencies:
@@ -1937,10 +1938,10 @@ snapshots:
       ini: 7.0.0
       json5: 2.2.3
 
-  '@visulima/package@5.0.21(@visulima/yaml@1.0.0)(ini@7.0.0)':
+  '@visulima/package@5.0.31(@visulima/yaml@1.0.0)(ini@7.0.0)':
     dependencies:
       '@antfu/install-pkg': 2.1.0
-      '@visulima/fs': 6.0.8(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)
+      '@visulima/fs': 6.0.18(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)
       '@visulima/path': 4.0.0
       json5: 2.2.3
       normalize-package-data: 9.0.0
@@ -2011,7 +2012,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.2.0
       get-stream: 9.0.1
-      http-cache-semantics: 4.2.0
+      http-cache-semantics: 4.3.0
       keyv: 5.6.0
       mimic-response: 4.0.0
       normalize-url: 8.1.1
@@ -2312,7 +2313,7 @@ snapshots:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       fast-glob: 3.3.3
-      ignore: 7.0.10
+      ignore: 7.0.12
       is-path-inside: 4.0.0
       micromatch: 4.0.8
       slash: 5.1.0
@@ -2368,7 +2369,7 @@ snapshots:
 
   hpagent@1.2.0: {}
 
-  http-cache-semantics@4.2.0: {}
+  http-cache-semantics@4.3.0: {}
 
   http-proxy-agent@9.1.0:
     dependencies:
@@ -2397,7 +2398,7 @@ snapshots:
 
   human-signals@8.0.1: {}
 
-  ignore@7.0.10: {}
+  ignore@7.0.12: {}
 
   import-fresh@3.3.1:
     dependencies:
@@ -2611,7 +2612,7 @@ snapshots:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
 
-  npm@11.20.0: {}
+  npm@11.21.0: {}
 
   object-assign@4.1.1: {}
 
@@ -3058,6 +3059,8 @@ snapshots:
 
   yaml@2.9.0: {}
 
+  yaml@2.9.1: {}
+
   yargs-parser@20.2.9: {}
 
   yargs-parser@22.0.0: {}
@@ -3071,15 +3074,6 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 20.2.9
-
-  yargs@18.1.0:
-    dependencies:
-      cliui: 9.0.1
-      escalade: 3.2.0
-      get-caller-file: 2.0.5
-      string-width: 8.3.0
-      y18n: 5.0.8
-      yargs-parser: 22.0.0
 
   yargs@18.2.0:
     dependencies:
