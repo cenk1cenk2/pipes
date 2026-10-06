@@ -3,7 +3,10 @@ package install
 import (
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
+	"syscall"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/tests"
@@ -117,6 +120,52 @@ var _ = Describe("Mise binary", func() {
 		Expect(run(runner)).To(Succeed())
 
 		expectCopied()
+	})
+
+	It("leaves nothing but the binary in its directory", func() {
+		cached("cached")
+
+		Expect(run(fixtures.Runner(answers("2026.8.1 linux-x64 (2026-08-02)\n")))).To(Succeed())
+
+		entries, err := os.ReadDir(filepath.Dir(setup.C.Binary))
+		Expect(err).NotTo(HaveOccurred())
+
+		names := []string{}
+		for _, entry := range entries {
+			names = append(names, entry.Name())
+		}
+
+		Expect(names).To(Equal([]string{"mise"}))
+	})
+
+	// a runner node may still execute the copy restored from the cache, and
+	// linux refuses to open a binary for writing while it runs.
+	It("replaces a copy that is still running", func() {
+		if runtime.GOOS != "linux" {
+			Skip("text file busy is specific to linux")
+		}
+
+		sleep, err := exec.LookPath("sleep")
+		Expect(err).NotTo(HaveOccurred())
+
+		contents, err := os.ReadFile(sleep)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(os.MkdirAll(filepath.Dir(setup.C.Binary), 0o700)).To(Succeed())
+		Expect(os.WriteFile(setup.C.Binary, contents, 0o700)).To(Succeed())
+
+		// a multi-call binary picks the applet from the name it was started as.
+		cmd := &exec.Cmd{Path: setup.C.Binary, Args: []string{"sleep", "30"}}
+		Expect(cmd.Start()).To(Succeed())
+		DeferCleanup(func() {
+			_ = cmd.Process.Kill()
+			_ = cmd.Wait()
+		})
+
+		Expect(run(fixtures.Runner(answers("2026.8.1 linux-x64 (2026-08-02)\n")))).To(Succeed())
+
+		expectCopied()
+		Expect(cmd.Process.Signal(syscall.Signal(0))).To(Succeed())
 	})
 })
 

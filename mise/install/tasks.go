@@ -142,9 +142,12 @@ func list(tl *TaskList) *Task {
 		})
 }
 
-func copyBinary(source string, destination string) error {
-	if err := os.MkdirAll(filepath.Dir(destination), 0o755); err != nil {
-		return fmt.Errorf("Cannot create the directory of the mise binary: %s -> %w", filepath.Dir(destination), err)
+// The copy lands beside the binary and replaces it by rename, since a binary
+// that is still running cannot be opened for writing but can be replaced.
+func copyBinary(source string, destination string) (err error) {
+	dir := filepath.Dir(destination)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("Cannot create the directory of the mise binary: %s -> %w", dir, err)
 	}
 
 	src, err := os.Open(source)
@@ -153,20 +156,32 @@ func copyBinary(source string, destination string) error {
 	}
 	defer src.Close()
 
-	dst, err := os.OpenFile(destination, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o755)
+	dst, err := os.CreateTemp(dir, ".mise-*")
 	if err != nil {
 		return fmt.Errorf("Cannot create the mise binary: %s -> %w", destination, err)
 	}
-	defer dst.Close()
+	defer func() {
+		if err != nil {
+			_ = dst.Close()
+			_ = os.Remove(dst.Name())
+		}
+	}()
 
-	if _, err := io.Copy(dst, src); err != nil {
+	if _, err = io.Copy(dst, src); err != nil {
 		return fmt.Errorf("Cannot copy the mise binary: %s -> %w", destination, err)
 	}
 
-	// a file that already existed keeps its mode through the open above.
-	if err := dst.Chmod(0o755); err != nil {
+	if err = dst.Chmod(0o755); err != nil {
 		return fmt.Errorf("Cannot make the mise binary executable: %s -> %w", destination, err)
 	}
 
-	return dst.Close()
+	if err = dst.Close(); err != nil {
+		return fmt.Errorf("Cannot write the mise binary: %s -> %w", destination, err)
+	}
+
+	if err = os.Rename(dst.Name(), destination); err != nil {
+		return fmt.Errorf("Cannot replace the mise binary: %s -> %w", destination, err)
+	}
+
+	return nil
 }
