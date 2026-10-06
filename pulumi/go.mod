@@ -6,8 +6,8 @@ require (
 	github.com/cenk1cenk2/plumber/v7 v7.2.7
 	github.com/onsi/ginkgo/v2 v2.33.0
 	github.com/onsi/gomega v1.44.0
-	github.com/pulumi/pulumi/sdk/v3 v3.266.0
-	github.com/urfave/cli/v3 v3.13.0
+	github.com/pulumi/pulumi/sdk/v3 v3.267.0
+	github.com/urfave/cli/v3 v3.14.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 )
