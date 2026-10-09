@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile-upstream:master-labs
 FROM docker.io/alpine/helm:4 AS helm
-FROM registry.k8s.io/kustomize/kustomize:v5.8.1 AS kustomize
+FROM registry.k8s.io/kustomize/kustomize:v5.8.3 AS kustomize
 FROM docker.io/alpine:3
 
 ARG BUILDOS
