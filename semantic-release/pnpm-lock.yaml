@@ -568,8 +568,8 @@ packages:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
 
-  execa@10.0.1:
-    resolution: {integrity: sha512-ge98qjkRK4IB7tL7Ju/6qmm5LHoH1eEMt5FNZrz3f4UIYhF28lggX20z3FaX1sgc67msLEn0N0BscOs29iuwyw==}
+  execa@10.1.0:
+    resolution: {integrity: sha512-5HT/600HqXEtmkb9mK/PkTWw+bQSCzPnWiZ4/87wD3Hi0wFzCapOuNT9p4M08PDd+KLHdHvFhKjOWmNx/npRNQ==}
     engines: {node: '>=22'}
 
   execa@8.0.1:
@@ -1601,7 +1601,7 @@ snapshots:
       cosmiconfig: 10.0.1
       debug: 4.4.3
       detect-indent: 7.0.2
-      execa: 10.0.1
+      execa: 10.1.0
       git-log-parser: 1.2.1
       lodash-es: 4.18.1
       resolve-from: 5.0.0
@@ -1634,7 +1634,7 @@ snapshots:
       debug: 4.4.3
       detect-indent: 7.0.2
       env-ci: 11.2.0
-      execa: 10.0.1
+      execa: 10.1.0
       ini: 7.0.0
       normalize-url: 9.0.1
       registry-auth-token: 5.1.1
@@ -1820,7 +1820,7 @@ snapshots:
       aggregate-error: 5.0.0
       debug: 4.4.3
       dir-glob: 3.0.1
-      execa: 10.0.1
+      execa: 10.1.0
       lodash-es: 4.18.1
       micromatch: 4.0.8
       p-reduce: 3.0.0
@@ -2190,7 +2190,7 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  execa@10.0.1:
+  execa@10.1.0:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       figures: 6.1.0
