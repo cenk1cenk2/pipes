@@ -1,5 +1,5 @@
 {{- define "resource" -}}
-<code>{{ .Name | html }}</code>{{ if .Id }} (<code>{{ .Id | html }}</code>){{ end }}{{ if .PreviousName }} (moved from <code>{{ .PreviousName | html }}</code>){{ end }}
+<code>{{ .Name | html }}</code>{{ if .Id }} (<code>{{ .Id | html }}</code>){{ end }}{{ if .PreviousName }} (moved from <code>{{ .PreviousName | html }}</code>){{ end }}{{ if .Detail }} ({{ .Detail | html }}){{ end }}
 {{- end -}}
 ## {{ .Title }}
 
@@ -49,7 +49,7 @@ This report carries the plan metadata, the action planned for every resource wit
 | Action | Resources | {{ .Labels.Outputs }} |
 | --- | ---: | ---: |
 {{- range .Actions }}
-| `{{ .Action }}` | {{ len .Resources }} | {{ len .Outputs }} |
+| `{{ .Glyph }} {{ .Action }}` | {{ len .Resources }} | {{ len .Outputs }} |
 {{- end }}
 
 Total planned actions: {{ .Total }}.
@@ -61,16 +61,17 @@ No changes detected.
 
 ### Resources
 
-{{- range .Actions }}
+{{- range $action := .Actions }}
 {{- if .Resources }}
 
-#### `{{ .Action }}` ({{ len .Resources }})
+#### `{{ .Glyph }} {{ .Action }}` ({{ len .Resources }})
 {{- range .Resources }}
 
 <details>
-<summary><code>{{ .Glyph | html }}</code> {{ template "resource" . }}</summary>
+<summary><code>{{ $action.Glyph | html }} {{ $action.Action }}</code> {{ template "resource" . }}</summary>
 
 {{ .Fence }}diff
+{{ $action.Glyph }} {{ $action.Action }}
 {{ .Diff }}
 {{ .Fence }}
 
@@ -87,7 +88,7 @@ No changes detected.
 {{- range .Actions }}
 {{- if .Outputs }}
 
-#### `{{ .Action }}` ({{ len .Outputs }})
+#### `{{ .Glyph }} {{ .Action }}` ({{ len .Outputs }})
 
 {{- range .Outputs }}
 - `{{ .Name }}`{{ if .Fields }}: {{ range $index, $field := .Fields }}{{ if $index }}, {{ end }}`{{ $field }}`{{ end }}{{ end }}

@@ -42,16 +42,6 @@ func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terrafo
 		action := terraformChangeAction(change.Change.Actions)
 		moved := change.PreviousAddress != "" && change.PreviousAddress != change.Address
 
-		// a resource that only moved carries no-op actions, which would otherwise drop
-		// it from the report entirely.
-		if action == "no-op" {
-			if !moved {
-				continue
-			}
-
-			action = "move"
-		}
-
 		resource := terraform.Resource{
 			Name:    change.Address,
 			Changes: resourceChanges(change.Change),
@@ -60,7 +50,31 @@ func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terrafo
 			resource.PreviousName = change.PreviousAddress
 		}
 
-		resources[action] = append(resources[action], resource)
+		switch {
+		case change.Change.Actions.DestroyBeforeCreate():
+			resource.Detail = "destroy before create"
+		case change.Change.Actions.CreateBeforeDestroy():
+			resource.Detail = "create before destroy"
+		}
+
+		// an import and a move are operations of their own on top of the change the
+		// actions carry, the way Terraform counts an import next to the update it
+		// brings; a resource that only moved or is only imported carries no-op actions.
+		if importing := change.Change.Importing; importing != nil {
+			resource.Detail = "imported from " + importing.ID
+			if importing.ID == "" {
+				resource.Detail = "imported by identity " + terraform.FormatValue(importing.Identity)
+			}
+
+			resources["import"] = append(resources["import"], resource)
+		}
+		if moved {
+			resources["move"] = append(resources["move"], resource)
+		}
+
+		if action != "no-op" {
+			resources[action] = append(resources[action], resource)
+		}
 	}
 
 	outputs := map[string][]terraform.Output{}

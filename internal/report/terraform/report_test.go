@@ -90,9 +90,10 @@ var _ = Describe("Terraform merge request report", func() {
 
 		Expect(body).To(ContainSubstring(strings.TrimSpace(`
 <details>
-<summary><code>+</code> <code>one</code></summary>
+<summary><code>+ create</code> <code>one</code></summary>
 
 ` + "```diff" + `
++ create
 + name: "one"
 ` + "```" + `
 
@@ -100,9 +101,10 @@ var _ = Describe("Terraform merge request report", func() {
 `)))
 		Expect(body).To(ContainSubstring(strings.TrimSpace(`
 <details>
-<summary><code>&gt;</code> <code>two</code> (moved from <code>old-two</code>)</summary>
+<summary><code>&gt; move</code> <code>two</code> (moved from <code>old-two</code>)</summary>
 
 ` + "```diff" + `
+> move
 No attribute changes.
 ` + "```" + `
 
@@ -212,7 +214,7 @@ No attribute changes.
   EOT
 + tags: "x"
 `)))
-			Expect(body).NotTo(MatchRegexp(`(?m)^~ `))
+			Expect(body).NotTo(MatchRegexp(`(?m)^~ .*:`))
 		})
 
 		// the report is what a plan is read through, so a diff it shortened would send
@@ -311,7 +313,7 @@ No attribute changes.
 		It("keeps a value with backticks inside the code block", func() {
 			body := render(terraform.Change{Name: "script", Action: terraform.ChangeCreate, After: "\"echo ```\""})
 
-			Expect(body).To(ContainSubstring("````diff\n+ script: \"echo ```\"\n````"))
+			Expect(body).To(ContainSubstring("````diff\n~ update\n+ script: \"echo ```\"\n````"))
 		})
 	})
 
@@ -435,10 +437,50 @@ No attribute changes.
 		})).To(Equal(`{"a": [secret], "b": [true, 1.5, "x"]}`))
 	})
 
-	It("leads a resource with the sign of its action", func() {
-		Expect(terraform.Glyph("create")).To(Equal("+"))
-		Expect(terraform.Glyph("delete-replaced")).To(Equal("-"))
-		Expect(terraform.Glyph("replace")).To(Equal("-/+"))
-		Expect(terraform.Glyph("something-else")).To(Equal("?"))
+	DescribeTable("leads a resource with the sign of its action",
+		func(action string, glyph string) {
+			Expect(terraform.Glyph(action)).To(Equal(glyph))
+		},
+		Entry(nil, "create", "+"),
+		Entry(nil, "create-replacement", "+"),
+		Entry(nil, "create+forget", "+"),
+		Entry(nil, "update", "~"),
+		Entry(nil, "update-replacement", "~"),
+		Entry(nil, "delete", "-"),
+		Entry(nil, "delete-replaced", "-"),
+		Entry(nil, "discard", "-"),
+		Entry(nil, "discard-replaced", "-"),
+		Entry(nil, "remove-pending-replace", "-"),
+		Entry(nil, "replace", "-/+"),
+		Entry(nil, "import", "="),
+		Entry(nil, "import-replacement", "="),
+		Entry(nil, "read", "<="),
+		Entry(nil, "read-replacement", "<="),
+		Entry(nil, "refresh", "<="),
+		Entry(nil, "move", ">"),
+		Entry(nil, "forget", "."),
+		Entry(nil, "something-else", "?"),
+	)
+
+	It("labels every resource with its operation in the summary, its section and the diff it opens", func() {
+		body, err := terraform.RenderReport(terraform.Report{
+			Title: "Example report",
+			Actions: []terraform.Action{{
+				Action:    "replace",
+				Resources: []terraform.Resource{{Name: "one", Detail: "create before destroy"}},
+			}},
+		}, terraform.DiffUnified)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).To(ContainSubstring("| `-/+ replace` | 1 | 0 |"))
+		Expect(body).To(ContainSubstring("#### `-/+ replace` (1)"))
+		Expect(body).To(ContainSubstring(strings.TrimSpace(`
+<summary><code>-/+ replace</code> <code>one</code> (create before destroy)</summary>
+
+` + "```diff" + `
+-/+ replace
+No attribute changes.
+` + "```" + `
+`)))
 	})
 })

@@ -18,6 +18,7 @@ var diffGlyphs = []struct {
 	{"-/+", chroma.GenericStrong},
 	{"<=", chroma.Keyword},
 	{"+", chroma.GenericInserted},
+	{"=", chroma.GenericEmph},
 	{"-", chroma.GenericDeleted},
 	{"~", chroma.GenericSubheading},
 	{">", chroma.KeywordType},

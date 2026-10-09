@@ -168,6 +168,56 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Expect(body).NotTo(ContainSubstring("secret-env-value"))
 	})
 
+	DescribeTable("classifies every step the preview carries",
+		func(steps string, actions []string, detail string) {
+			report, err := parsePulumiPlanReport([]byte(`{
+				"manifest": {"time": "2026-05-31T12:00:00Z", "magic": "", "version": "3.187.0"},
+				"resourcePlans": {"urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs": {"steps": `+steps+`}}
+			}`), nil, metadata())
+			Expect(err).NotTo(HaveOccurred())
+
+			names := []string{}
+			for _, action := range report.Actions {
+				names = append(names, action.Action)
+				Expect(resource(action, "urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs").Detail).To(Equal(detail))
+			}
+
+			Expect(names).To(Equal(actions))
+		},
+		Entry("a create", `["create"]`, []string{"create"}, ""),
+		Entry("an update", `["update"]`, []string{"update"}, ""),
+		Entry("a delete", `["delete"]`, []string{"delete"}, ""),
+		Entry("a replacement that creates first", `["create-replacement", "replace", "delete-replaced"]`,
+			[]string{"replace", "create-replacement", "delete-replaced"}, "create before delete"),
+		Entry("a replacement that deletes first", `["delete-replaced", "replace", "create-replacement"]`,
+			[]string{"replace", "create-replacement", "delete-replaced"}, "delete before create"),
+		Entry("an import", `["import"]`, []string{"import"}, ""),
+		Entry("an import replacement", `["import-replacement"]`, []string{"import-replacement"}, ""),
+		Entry("a read", `["read"]`, []string{"read"}, ""),
+		Entry("a read replacement", `["read-replacement"]`, []string{"read-replacement"}, ""),
+		Entry("a refresh", `["refresh"]`, []string{"refresh"}, ""),
+		Entry("a discard", `["discard"]`, []string{"discard"}, ""),
+		Entry("a discarded replacement", `["discard-replaced"]`, []string{"discard-replaced"}, ""),
+		Entry("a pending replacement removed", `["remove-pending-replace"]`, []string{"remove-pending-replace"}, ""),
+		Entry("nothing to do", `["same"]`, []string{}, ""),
+	)
+
+	It("labels a replacement as destructive with the order it runs in", func() {
+		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), nil, metadata())
+		Expect(err).NotTo(HaveOccurred())
+
+		body, err := terraform.RenderReport(report, terraform.DiffPlan)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).To(ContainSubstring("| `-/+ replace` | 1 | 1 |"))
+		Expect(body).To(ContainSubstring(
+			"<summary><code>-/+ replace</code> <code>aws:lambda/function:Function/worker</code> " +
+				"(<code>urn:pulumi:stage::example::aws:lambda/function:Function::worker</code>) (create before delete)</summary>\n\n```diff\n-/+ replace\n",
+		))
+		Expect(body).To(ContainSubstring("<summary><code>+ create-replacement</code>"))
+		Expect(body).To(ContainSubstring("<summary><code>- delete-replaced</code>"))
+	})
+
 	Describe("attribute diff", func() {
 		It("masks a secret however deep it sits and keeps a resource reference as its urn", func() {
 			changes := resourceChanges(&apitype.GoalV1{

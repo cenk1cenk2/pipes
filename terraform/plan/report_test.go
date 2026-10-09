@@ -152,9 +152,12 @@ var _ = Describe("Terraform merge request report", func() {
 		Expect(body).To(ContainSubstring("| Terraform version | `1.9.8` |"))
 		Expect(body).To(ContainSubstring("[tf-plan](https://gitlab.example.test/project/-/jobs/1)"))
 		Expect(body).To(ContainSubstring("Total planned actions: 5."))
-		Expect(body).To(ContainSubstring("<summary><code>+</code> <code>aws_s3_bucket.logs</code></summary>"))
+		Expect(body).To(ContainSubstring("<summary><code>+ create</code> <code>aws_s3_bucket.logs</code></summary>"))
 		Expect(body).To(ContainSubstring(
-			"<summary><code>&gt;</code> <code>aws_sqs_queue.jobs</code> (moved from <code>aws_sqs_queue.legacy_jobs</code>)</summary>",
+			"<summary><code>&gt; move</code> <code>aws_sqs_queue.jobs</code> (moved from <code>aws_sqs_queue.legacy_jobs</code>)</summary>",
+		))
+		Expect(body).To(ContainSubstring(
+			"<summary><code>-/+ replace</code> <code>aws_db_instance.main</code> (destroy before create)</summary>\n\n```diff\n-/+ replace\n",
 		))
 		Expect(body).To(ContainSubstring("~ instance_type: \"t3.micro\" -> \"t3.small\""))
 		Expect(body).To(ContainSubstring("~ engine_version: \"15\" -> \"16\" # forces replacement"))
@@ -195,6 +198,77 @@ var _ = Describe("Terraform merge request report", func() {
   "delete": 1
 }
 `))
+	})
+
+	DescribeTable("classifies every resource operation the plan carries",
+		func(change string, actions []string, detail string, summary terraform.Summary) {
+			report, err := parseTerraformShowPlan([]byte(`{
+				"format_version": "1.2",
+				"resource_changes": [{"address": "aws_instance.web", `+change+`}]
+			}`), metadata())
+			Expect(err).NotTo(HaveOccurred())
+
+			names := []string{}
+			for _, action := range report.Actions {
+				names = append(names, action.Action)
+			}
+
+			Expect(names).To(Equal(actions))
+			Expect(resource(report, "aws_instance.web").Detail).To(Equal(detail))
+			Expect(terraform.Summarize(report)).To(Equal(summary))
+		},
+		Entry("a create", `"change": {"actions": ["create"]}`,
+			[]string{"create"}, "", terraform.Summary{Create: 1}),
+		Entry("an update", `"change": {"actions": ["update"]}`,
+			[]string{"update"}, "", terraform.Summary{Update: 1}),
+		Entry("a delete", `"change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "", terraform.Summary{Delete: 1}),
+		Entry("a replacement that destroys first", `"change": {"actions": ["delete", "create"]}`,
+			[]string{"replace"}, "destroy before create", terraform.Summary{Create: 1, Delete: 1}),
+		Entry("a replacement that creates first", `"change": {"actions": ["create", "delete"]}`,
+			[]string{"replace"}, "create before destroy", terraform.Summary{Create: 1, Delete: 1}),
+		Entry("a replacement that forgets the prior object", `"change": {"actions": ["create", "forget"]}`,
+			[]string{"create+forget"}, "", terraform.Summary{Create: 1}),
+		Entry("an import", `"change": {"actions": ["no-op"], "importing": {"id": "i-123"}}`,
+			[]string{"import"}, "imported from i-123", terraform.Summary{}),
+		Entry("an import by identity", `"change": {"actions": ["no-op"], "importing": {"identity": {"id": "i-123"}}}`,
+			[]string{"import"}, `imported by identity {"id": "i-123"}`, terraform.Summary{}),
+		Entry("an import that updates", `"change": {"actions": ["update"], "importing": {"id": "i-123"}}`,
+			[]string{"update", "import"}, "imported from i-123", terraform.Summary{Update: 1}),
+		Entry("a move", `"previous_address": "aws_instance.old", "change": {"actions": ["no-op"]}`,
+			[]string{"move"}, "", terraform.Summary{}),
+		Entry("a move that updates", `"previous_address": "aws_instance.old", "change": {"actions": ["update"]}`,
+			[]string{"update", "move"}, "", terraform.Summary{Update: 1}),
+		Entry("a read", `"change": {"actions": ["read"]}`,
+			[]string{"read"}, "", terraform.Summary{}),
+		Entry("a forget", `"change": {"actions": ["forget"]}`,
+			[]string{"forget"}, "", terraform.Summary{}),
+	)
+
+	It("labels an imported resource with its operation and where it comes from", func() {
+		report, err := parseTerraformShowPlan([]byte(`{
+			"format_version": "1.2",
+			"resource_changes": [{
+				"address": "aws_instance.web",
+				"change": {
+					"actions": ["update"],
+					"before": {"instance_type": "t3.micro"},
+					"after": {"instance_type": "t3.small"},
+					"importing": {"id": "i-123"}
+				}
+			}]
+		}`), metadata())
+		Expect(err).NotTo(HaveOccurred())
+
+		body, err := terraform.RenderReport(report, terraform.DiffPlan)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).To(ContainSubstring("| `= import` | 1 | 0 |"))
+		Expect(body).To(ContainSubstring("#### `= import` (1)"))
+		Expect(body).To(ContainSubstring(
+			"<summary><code>= import</code> <code>aws_instance.web</code> (imported from i-123)</summary>\n\n```diff\n= import\n~ instance_type: \"t3.micro\" -> \"t3.small\"\n```",
+		))
+		Expect(body).To(ContainSubstring("<summary><code>~ update</code> <code>aws_instance.web</code> (imported from i-123)</summary>"))
 	})
 
 	Describe("attribute diff", func() {
