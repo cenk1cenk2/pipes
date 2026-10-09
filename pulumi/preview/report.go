@@ -26,6 +26,8 @@ var pulumiPlanActionOrder = []string{
 	"read",
 	"create",
 	"import",
+	"import-replacement",
+	"refresh",
 	"update",
 	"replace",
 	"create-replacement",
@@ -34,6 +36,7 @@ var pulumiPlanActionOrder = []string{
 	"delete-replaced",
 	"delete",
 	"discard",
+	"discard-replaced",
 	"remove-pending-replace",
 }
 
@@ -63,6 +66,16 @@ func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadat
 		}
 
 		summary := resourceSummary(string(urn), resource, state[string(urn)])
+
+		// the steps of a replacement come in the order they run, which is how a
+		// replacement that deletes first tells itself apart.
+		if created, deleted := slices.Index(steps, "create-replacement"), slices.Index(steps, "delete-replaced"); created >= 0 && deleted >= 0 {
+			summary.Detail = "create before delete"
+			if deleted < created {
+				summary.Detail = "delete before create"
+			}
+		}
+
 		outputNames := resourceOutputNames(resource)
 
 		for _, action := range steps {

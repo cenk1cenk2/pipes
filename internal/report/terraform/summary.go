@@ -27,7 +27,7 @@ func Summarize(report Report) Summary {
 		count := len(action.Resources)
 
 		switch action.Action {
-		case "create", "create-replacement":
+		case "create", "create-replacement", "create+forget":
 			summary.Create += count
 		case "update", "update-replacement":
 			summary.Update += count

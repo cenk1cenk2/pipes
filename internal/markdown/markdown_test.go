@@ -199,6 +199,25 @@ var _ = Describe("Plan diff lexer", func() {
 		Expect(deleted).NotTo(Equal(changed))
 	})
 
+	// the line a resource diff opens with names its operation, and is the only place
+	// the job log can color it.
+	It("colors every operation apart, a replacement in bold", func() {
+		body := render("+ create", "~ update", "- delete", "-/+ replace", "= import", "> move", "<= read", ". forget")
+
+		colors := map[string]string{}
+		for line := range strings.SplitSeq(body, "\n") {
+			colors[strings.TrimSpace(escapes.ReplaceAllString(line, ""))] = strings.Join(escapes.FindAllString(line, -1), "")
+		}
+
+		seen := map[string]string{}
+		for _, operation := range []string{"+ create", "~ update", "- delete", "-/+ replace", "= import", "> move", "<= read", ". forget"} {
+			Expect(colors[operation]).NotTo(BeEmpty(), operation)
+			Expect(seen).NotTo(HaveKey(colors[operation]), operation)
+			seen[colors[operation]] = operation
+		}
+		Expect(colors["-/+ replace"]).To(ContainSubstring("\x1b[1m"))
+	})
+
 	It("colors the old and the new value of an update apart", func() {
 		body := render(`~ size: 1 -> 2`)
 

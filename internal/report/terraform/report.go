@@ -57,7 +57,10 @@ type (
 		Name         string
 		Id           string
 		PreviousName string
-		Changes      []Change
+		// qualifies the action the resource is listed under, such as the order a
+		// replacement runs in or what an import reads the resource from.
+		Detail  string
+		Changes []Change
 	}
 
 	Output struct {
@@ -101,13 +104,13 @@ type (
 
 	actionView struct {
 		Action    string
+		Glyph     string
 		Resources []resourceView
 		Outputs   []Output
 	}
 
 	resourceView struct {
 		Resource
-		Glyph string
 		Diff  string
 		Fence string
 	}
@@ -142,7 +145,6 @@ func newReportView(report Report, layout DiffLayout) reportView {
 
 			resources = append(resources, resourceView{
 				Resource: resource,
-				Glyph:    Glyph(action.Action),
 				Diff:     diff,
 				Fence:    fence(diff),
 			})
@@ -150,6 +152,7 @@ func newReportView(report Report, layout DiffLayout) reportView {
 
 		view.Actions = append(view.Actions, actionView{
 			Action:    action.Action,
+			Glyph:     Glyph(action.Action),
 			Resources: resources,
 			Outputs:   action.Outputs,
 		})

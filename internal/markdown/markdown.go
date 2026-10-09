@@ -58,6 +58,7 @@ var style = ansi.StyleConfig{
 			GenericDeleted:    ansi.StylePrimitive{Color: new("#7f0000")},
 			GenericSubheading: ansi.StylePrimitive{Color: new("#7f7fe0")},
 			GenericStrong:     ansi.StylePrimitive{Color: new("#ff0000"), Bold: new(true)},
+			GenericEmph:       ansi.StylePrimitive{Color: new("#ff00ff")},
 			Keyword:           ansi.StylePrimitive{Color: new("#0000ff")},
 			KeywordType:       ansi.StylePrimitive{Color: new("#007f7f")},
 			Error:             ansi.StylePrimitive{Color: new("#7f007f")},

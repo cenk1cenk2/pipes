@@ -295,15 +295,17 @@ func formatInline(value any) string {
 // output of the tools themselves.
 func Glyph(action string) string {
 	switch action {
-	case "create", "create-replacement", "import":
+	case "create", "create-replacement", "create+forget":
 		return "+"
 	case "update", "update-replacement":
 		return "~"
-	case "delete", "delete-replaced", "discard", "remove-pending-replace":
+	case "delete", "delete-replaced", "discard", "discard-replaced", "remove-pending-replace":
 		return "-"
 	case "replace":
 		return "-/+"
-	case "read", "read-replacement":
+	case "import", "import-replacement":
+		return "="
+	case "read", "read-replacement", "refresh":
 		return "<="
 	case "move":
 		return ">"
