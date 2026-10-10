@@ -134,6 +134,44 @@ var _ = Describe("Repository", func() {
 		Expect(staged(repository)).To(ConsistOf("A\tgenerated/sdk.txt"))
 	})
 
+	// a source that is absent leaves its destination empty, which git refuses as a
+	// pathspec matching nothing once the target never had it either.
+	It("leaves a destination that exists nowhere out of the stage", func(ctx SpecContext) {
+		repository := clone(ctx, "out", "workloads")
+		source := GinkgoT().TempDir()
+		write(filepath.Join(source, "kept.txt"), "changed")
+
+		Expect(git.Sync(fixtures.Task(), repository.Dir, []git.Path{
+			{Source: source, Destination: "out"},
+			{Source: filepath.Join(source, "missing"), Destination: "workloads"},
+		}, true)).To(Succeed())
+		Expect(repository.Stage(ctx, fixtures.Task(), []string{"out", "workloads"})).To(Succeed())
+
+		Expect(staged(repository)).To(ConsistOf("M\tout/kept.txt", "D\tout/removed.txt"))
+	})
+
+	It("stages a destination the target has as a deletion once its source is absent", func(ctx SpecContext) {
+		repository := clone(ctx, "out", "other")
+		source := GinkgoT().TempDir()
+		write(filepath.Join(source, "kept.txt"), "kept")
+		write(filepath.Join(source, "removed.txt"), "removed")
+
+		Expect(git.Sync(fixtures.Task(), repository.Dir, []git.Path{
+			{Source: source, Destination: "out"},
+			{Source: filepath.Join(source, "missing"), Destination: "other"},
+		}, true)).To(Succeed())
+		Expect(repository.Stage(ctx, fixtures.Task(), []string{"out", "other"})).To(Succeed())
+
+		Expect(staged(repository)).To(ConsistOf("D\tother/untouched.txt"))
+	})
+
+	It("fails to stage when none of the destinations exists", func(ctx SpecContext) {
+		repository := clone(ctx, "workloads", "generated")
+
+		Expect(repository.Stage(ctx, fixtures.Task(), []string{"workloads", "generated"})).
+			To(MatchError(And(ContainSubstring("workloads"), ContainSubstring("generated"))))
+	})
+
 	It("writes the staged changes as a patch that applies onto the target", func(ctx SpecContext) {
 		repository := clone(ctx, "out")
 		source := GinkgoT().TempDir()
@@ -265,6 +303,7 @@ var _ = Describe("Repository", func() {
 		p := tests.NewPlumber().Plumber.SetRuntime(Runtime{CommandRunner: runner.Runner()})
 		t := NewTaskList(p).CreateTask("git")
 		repository := git.Repository{Dir: GinkgoT().TempDir(), Token: token}
+		write(filepath.Join(repository.Dir, "out", "kept.txt"), "kept")
 
 		Expect(repository.Clone(ctx, t, "https://gitlab.example.com/group/project.git", "next", []string{"out"})).To(Succeed())
 		_, err := repository.Worktree(ctx, t, "origin", "next", GinkgoT().TempDir())
