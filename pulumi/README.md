@@ -15,6 +15,10 @@ Pulumi related tasks in the pipeline.
 
 ## Commands
 
+- [`pipe-pulumi preview`](#pipe-pulumi-preview)
+- [`pipe-pulumi up`](#pipe-pulumi-up)
+- [`pipe-pulumi generate`](#pipe-pulumi-generate)
+
 ### `pipe-pulumi preview`
 
 Preview the Pulumi changes.
@@ -105,3 +109,39 @@ Apply the Pulumi changes.
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
 | `$PULUMI_UP_PLAN`<br/>`$PULUMI_PLAN` | Input file for pulumi plan. | `string` | `"plan.json"` |
+
+### `pipe-pulumi generate`
+
+Generate the Pulumi sources into the working directory. Builds the program, verifies the stack uses the file:// backend of the working directory, removes the local state and the generated paths, then initializes the stack fresh and deploys it. The stack is initialized with an empty passphrase, which only holds when the environment does not set PULUMI_CONFIG_PASSPHRASE, so a generate stack must not carry secrets.
+
+`pipe-pulumi generate [FLAGS]`
+
+#### Flags
+
+**Generate**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$PULUMI_GENERATE_BUILD` | Shell command that builds the Pulumi program before the generation. | `string` |  |
+| `$PULUMI_GENERATE_PATHS` | Paths the generation writes, relative to the working directory, removed before every run so the files it no longer generates are gone. | `string`<br/>`format(yaml([]string))` | `"[]"` |
+| `$PULUMI_GENERATE_COMMAND` | Shell command that generates the sources against the selected stack. Defaults to deploying the stack. | `string` |  |
+
+<details>
+<summary>Pulumi</summary>
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$PULUMI_CWD` | Working directory for pulumi commands. | `string` | `"."` |
+
+</details>
+
+<details>
+<summary>Stack</summary>
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| **`$PULUMI_STACK`**\* | Stack name to use for pulumi commands. | `string` |  |
+
+\* required
+
+</details>
