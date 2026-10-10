@@ -107,13 +107,57 @@ func (r Repository) Push(ctx context.Context, t *Task, remote string, branch str
 // Stage forces the destinations into the index, since a destination the target
 // ignores would otherwise stage nothing and come out as an empty diff without an
 // error. A sparse clone refuses paths it considers outside its definition otherwise.
+// A destination neither on disk nor in the index, like one an absent source left
+// empty in a target that never had it, is a pathspec git refuses, so it is left out.
 func (r Repository) Stage(ctx context.Context, t *Task, destinations []string) error {
-	if err := r.command(t, r.Dir, append([]string{"add", "--sparse", "--all", "--force", "--"}, destinations...)...).
+	existing := []string{}
+
+	for _, destination := range destinations {
+		exists, err := r.exists(ctx, t, destination)
+		if err != nil {
+			return err
+		}
+
+		if !exists {
+			t.Log.Warn(fmt.Sprintf("Destination does not exist, leaving it out of the commit: %s", destination))
+
+			continue
+		}
+
+		existing = append(existing, destination)
+	}
+
+	if len(existing) == 0 {
+		return fmt.Errorf("None of the destinations exist, there is nothing to stage: %v", destinations)
+	}
+
+	if err := r.command(t, r.Dir, append([]string{"add", "--sparse", "--all", "--force", "--"}, existing...)...).
 		Run(ctx); err != nil {
-		return fmt.Errorf("Can not stage the destinations: %v -> %w", destinations, err)
+		return fmt.Errorf("Can not stage the destinations: %v -> %w", existing, err)
 	}
 
 	return nil
+}
+
+// A destination the sync removed from disk still exists while the index tracks it,
+// since staging it is what records the deletion.
+func (r Repository) exists(ctx context.Context, t *Task, destination string) (bool, error) {
+	if _, err := os.Lstat(filepath.Join(r.Dir, destination)); err == nil {
+		return true, nil
+	} else if !os.IsNotExist(err) {
+		return false, fmt.Errorf("Can not check the destination: %s -> %w", destination, err)
+	}
+
+	var output string
+
+	if err := r.command(t, r.Dir, "ls-files", "--", destination).
+		SetLogLevel(LogLevelDebug, LogLevelWarn, LogLevelDebug).
+		CaptureStdout(&output).
+		Run(ctx); err != nil {
+		return false, fmt.Errorf("Can not look up the destination in the index: %s -> %w", destination, err)
+	}
+
+	return strings.TrimSpace(output) != "", nil
 }
 
 // Patch writes the staged changes to path; an empty file means there is nothing to
