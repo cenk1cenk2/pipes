@@ -48,7 +48,7 @@ var _ = Describe("Login", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(request.Method).To(Equal(http.MethodPost))
 		Expect(request.Header.Get("Content-Type")).To(Equal(JSONRequest))
-		Expect(body).To(Equal(`{"identifier":"user","secret":"dckr_pat_secret"}`))
+		Expect(body).To(MatchJSON(`{"identifier":"user","secret":"dckr_pat_secret"}`))
 	})
 
 	It("hands back the token", func() {
@@ -144,7 +144,7 @@ var _ = Describe("UpdateReadme", func() {
 		_, err := update()
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(body).To(Equal(`{"description":"a pipe","full_description":"# Pipe"}`))
+		Expect(body).To(MatchJSON(`{"description":"a pipe","full_description":"# Pipe"}`))
 	})
 
 	It("authenticates with the token the login returned", func() {

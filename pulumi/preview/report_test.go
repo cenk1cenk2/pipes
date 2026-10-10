@@ -3,6 +3,8 @@ package preview
 import (
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -31,6 +33,12 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			CommitSha:      "0123456789abcdef",
 			CommitShortSha: "01234567",
 		}
+	}
+
+	actionRows := func(body string) []string {
+		return slices.DeleteFunc(strings.Split(body, "\n"), func(line string) bool {
+			return !strings.HasPrefix(line, "| `")
+		})
 	}
 
 	resource := func(action terraform.Action, id string) terraform.Resource {
@@ -100,7 +108,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			Delete: 0,
 		}))
 
-		Expect(terraform.RenderSummary(summary)).To(Equal(`{
+		Expect(terraform.RenderSummary(summary)).To(MatchJSON(`{
   "create": 1,
   "update": 1,
   "delete": 0
@@ -201,6 +209,70 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Entry("a pending replacement removed", `["remove-pending-replace"]`, []string{"remove-pending-replace"}, ""),
 		Entry("nothing to do", `["same"]`, []string{}, ""),
 	)
+
+	DescribeTable("renders a preview without updates that change nothing as it always has",
+		func(name string) {
+			report, err := parsePulumiPlanReport(readFixture(name+".json"), nil, terraform.Metadata{Target: "dev", JobName: "pulumi-preview"})
+			Expect(err).NotTo(HaveOccurred())
+
+			body, err := terraform.RenderReport(report, terraform.DiffUnified)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(body).To(Equal(string(readFixture(name + ".md"))))
+		},
+		Entry(nil, "plan-unwrapped"),
+		Entry(nil, "plan-versioned"),
+	)
+
+	It("groups an update that only takes a value known after the update apart from the ones that change a property", func() {
+		secret := `{"4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270", "ciphertext": "v1:secret-value"}`
+		report, err := parsePulumiPlanReport([]byte(`{
+			"manifest": {"time": "2026-05-31T12:00:00Z", "magic": "", "version": "3.187.0"},
+			"resourcePlans": {
+				"urn:pulumi:dev::example::kubernetes:core/v1:Secret::token": {
+					"goal": {"type": "kubernetes:core/v1:Secret", "name": "token", "inputDiff": {"updates": {"data": `+secret+`}}},
+					"steps": ["update"]
+				},
+				"urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings": {
+					"goal": {"type": "kubernetes:core/v1:ConfigMap", "name": "settings", "inputDiff": {"updates": {"level": "debug", "password": `+secret+`}}},
+					"steps": ["update"]
+				},
+				"urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::computed": {
+					"goal": {"type": "kubernetes:core/v1:ConfigMap", "name": "computed", "inputDiff": {"adds": {"arn": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"}}},
+					"steps": ["update"]
+				},
+				"urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::old": {
+					"steps": ["delete"]
+				}
+			}
+		}`), map[string]map[string]any{
+			"urn:pulumi:dev::example::kubernetes:core/v1:Secret::token": {"data": map[string]any{
+				"4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+				"ciphertext":                       "v1:secret-old-value",
+			}},
+			"urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings": {"level": "info"},
+		}, metadata())
+		Expect(err).NotTo(HaveOccurred())
+
+		update := report.Actions[0]
+		Expect(update.Action).To(Equal("update"))
+		Expect(resource(update, "urn:pulumi:dev::example::kubernetes:core/v1:Secret::token").HasPropertyChanges()).To(BeTrue())
+		Expect(resource(update, "urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::computed").HasPropertyChanges()).To(BeFalse())
+		Expect(resource(update, "urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings").HasPropertyChanges()).To(BeTrue())
+
+		body, err := terraform.RenderReport(report, terraform.DiffUnified)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(actionRows(body)).To(Equal([]string{
+			"| `~ update` | 2 | 0 |",
+			"| `~ update` without property changes | 1 | 0 |",
+			"| `- delete` | 1 | 0 |",
+		}))
+		Expect(body).NotTo(ContainSubstring("secret-value"))
+		Expect(body).NotTo(ContainSubstring("secret-old-value"))
+
+		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{Update: 3, Delete: 1, UpdateWithoutPropertyChanges: 1}))
+	})
 
 	It("labels a replacement as destructive with the order it runs in", func() {
 		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), nil, metadata())

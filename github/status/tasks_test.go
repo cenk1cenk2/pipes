@@ -247,7 +247,7 @@ var _ = Describe("GitHub commit status", func() {
 
 			Expect(requests).To(HaveLen(2))
 			Expect(requests[0].path).To(Equal("/app/installations/456/access_tokens"))
-			Expect(requests[0].body).To(Equal(`{"repositories":["listr2"],"permissions":{"statuses":"write"}}`))
+			Expect(requests[0].body).To(MatchJSON(`{"repositories":["listr2"],"permissions":{"statuses":"write"}}`))
 			Expect(requests[1].path).To(Equal("/repos/burningforge/listr2/statuses/abc123"))
 			Expect(requests[1].authorization).To(Equal("Bearer ghs_minted"))
 

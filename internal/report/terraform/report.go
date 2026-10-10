@@ -69,6 +69,27 @@ type (
 	}
 )
 
+// The actions that change a resource in place or replace it, whose resources are told
+// apart by whether the plan changes a property of theirs at all.
+var propertyChangeActions = []string{
+	"update",
+	"update-replacement",
+	"replace",
+	"create-replacement",
+	"delete-replaced",
+}
+
+var unknowns = map[string]bool{}
+
+// RegisterUnknowns names the markers a pipe writes in place of a value that is only
+// known after apply. A secret is not one of them: a plan only pairs a secret with
+// itself when its value changed.
+func RegisterUnknowns(markers ...Marker) {
+	for _, marker := range markers {
+		unknowns[string(marker)] = true
+	}
+}
+
 func (m Metadata) Any() bool {
 	return m != Metadata{}
 }
@@ -94,6 +115,28 @@ func (r Report) HasOutputs() bool {
 	})
 }
 
+// HasPropertyChanges says whether the plan changes a property of the resource, which
+// a change that only moves between values not known yet does not tell.
+func (r Resource) HasPropertyChanges() bool {
+	return slices.ContainsFunc(r.Changes, Change.changesProperty)
+}
+
+func (c Change) changesProperty() bool {
+	if c.Note == ForcesReplacement {
+		return true
+	}
+
+	if len(c.Children) > 0 {
+		return slices.ContainsFunc(c.Children, Change.changesProperty)
+	}
+
+	pending := func(value string) bool {
+		return value == "" || unknowns[value]
+	}
+
+	return !pending(c.Before) || !pending(c.After) || (!unknowns[c.Before] && !unknowns[c.After])
+}
+
 // What the template renders: the report with the attribute diff of every resource
 // written out in full.
 type (
@@ -103,10 +146,11 @@ type (
 	}
 
 	actionView struct {
-		Action    string
-		Glyph     string
-		Resources []resourceView
-		Outputs   []Output
+		Action                 string
+		Glyph                  string
+		WithoutPropertyChanges bool
+		Resources              []resourceView
+		Outputs                []Output
 	}
 
 	resourceView struct {
@@ -136,29 +180,52 @@ func newReportView(report Report, layout DiffLayout) reportView {
 	view := reportView{Report: report}
 
 	for _, action := range report.Actions {
-		resources := make([]resourceView, 0, len(action.Resources))
-		for _, resource := range action.Resources {
-			diff := RenderChanges(resource.Changes, layout)
-			if diff == "" {
-				diff = NoAttributeChanges
-			}
+		resources, unchanged := action.Resources, []Resource(nil)
+		if slices.Contains(propertyChangeActions, action.Action) {
+			resources = slices.DeleteFunc(slices.Clone(action.Resources), func(resource Resource) bool {
+				return !resource.HasPropertyChanges()
+			})
+			unchanged = slices.DeleteFunc(slices.Clone(action.Resources), Resource.HasPropertyChanges)
+		}
 
-			resources = append(resources, resourceView{
-				Resource: resource,
-				Diff:     diff,
-				Fence:    fence(diff),
+		if len(resources) > 0 || len(action.Outputs) > 0 || len(unchanged) == 0 {
+			view.Actions = append(view.Actions, actionView{
+				Action:    action.Action,
+				Glyph:     Glyph(action.Action),
+				Resources: newResourceViews(resources, layout),
+				Outputs:   action.Outputs,
 			})
 		}
 
-		view.Actions = append(view.Actions, actionView{
-			Action:    action.Action,
-			Glyph:     Glyph(action.Action),
-			Resources: resources,
-			Outputs:   action.Outputs,
-		})
+		if len(unchanged) > 0 {
+			view.Actions = append(view.Actions, actionView{
+				Action:                 action.Action,
+				Glyph:                  Glyph(action.Action),
+				WithoutPropertyChanges: true,
+				Resources:              newResourceViews(unchanged, layout),
+			})
+		}
 	}
 
 	return view
+}
+
+func newResourceViews(resources []Resource, layout DiffLayout) []resourceView {
+	views := make([]resourceView, 0, len(resources))
+	for _, resource := range resources {
+		diff := RenderChanges(resource.Changes, layout)
+		if diff == "" {
+			diff = NoAttributeChanges
+		}
+
+		views = append(views, resourceView{
+			Resource: resource,
+			Diff:     diff,
+			Fence:    fence(diff),
+		})
+	}
+
+	return views
 }
 
 // A pipe in a value would end its table cell early and shift the rest of the row; an

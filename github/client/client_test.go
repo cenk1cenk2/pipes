@@ -79,7 +79,7 @@ var _ = Describe("Client", func() {
 			})
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(body).To(Equal(`{"repositories":["listr2"],"permissions":{"statuses":"write"}}`))
+			Expect(body).To(MatchJSON(`{"repositories":["listr2"],"permissions":{"statuses":"write"}}`))
 		})
 
 		// an empty list would narrow the token down to no repository at all, while
@@ -88,7 +88,7 @@ var _ = Describe("Client", func() {
 			_, err := create(TokenRequest{})
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(body).To(Equal(`{}`))
+			Expect(body).To(MatchJSON(`{}`))
 		})
 
 		It("hands back the token", func() {

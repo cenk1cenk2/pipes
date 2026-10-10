@@ -3,6 +3,8 @@ package plan
 import (
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
@@ -31,6 +33,12 @@ var _ = Describe("Terraform merge request report", func() {
 			CommitSha:      "0123456789abcdef",
 			CommitShortSha: "01234567",
 		}
+	}
+
+	actionRows := func(body string) []string {
+		return slices.DeleteFunc(strings.Split(body, "\n"), func(line string) bool {
+			return !strings.HasPrefix(line, "| `")
+		})
 	}
 
 	resource := func(report terraform.Report, name string) terraform.Resource {
@@ -192,7 +200,7 @@ var _ = Describe("Terraform merge request report", func() {
 			Delete: 1,
 		}))
 
-		Expect(terraform.RenderSummary(summary)).To(Equal(`{
+		Expect(terraform.RenderSummary(summary)).To(MatchJSON(`{
   "create": 2,
   "update": 1,
   "delete": 1
@@ -220,7 +228,7 @@ var _ = Describe("Terraform merge request report", func() {
 		Entry("a create", `"change": {"actions": ["create"]}`,
 			[]string{"create"}, "", terraform.Summary{Create: 1}),
 		Entry("an update", `"change": {"actions": ["update"]}`,
-			[]string{"update"}, "", terraform.Summary{Update: 1}),
+			[]string{"update"}, "", terraform.Summary{Update: 1, UpdateWithoutPropertyChanges: 1}),
 		Entry("a delete", `"change": {"actions": ["delete"]}`,
 			[]string{"delete"}, "", terraform.Summary{Delete: 1}),
 		Entry("a replacement that destroys first", `"change": {"actions": ["delete", "create"]}`,
@@ -234,16 +242,155 @@ var _ = Describe("Terraform merge request report", func() {
 		Entry("an import by identity", `"change": {"actions": ["no-op"], "importing": {"identity": {"id": "i-123"}}}`,
 			[]string{"import"}, `imported by identity {"id": "i-123"}`, terraform.Summary{}),
 		Entry("an import that updates", `"change": {"actions": ["update"], "importing": {"id": "i-123"}}`,
-			[]string{"update", "import"}, "imported from i-123", terraform.Summary{Update: 1}),
+			[]string{"update", "import"}, "imported from i-123", terraform.Summary{Update: 1, UpdateWithoutPropertyChanges: 1}),
 		Entry("a move", `"previous_address": "aws_instance.old", "change": {"actions": ["no-op"]}`,
 			[]string{"move"}, "", terraform.Summary{}),
 		Entry("a move that updates", `"previous_address": "aws_instance.old", "change": {"actions": ["update"]}`,
-			[]string{"update", "move"}, "", terraform.Summary{Update: 1}),
+			[]string{"update", "move"}, "", terraform.Summary{Update: 1, UpdateWithoutPropertyChanges: 1}),
 		Entry("a read", `"change": {"actions": ["read"]}`,
 			[]string{"read"}, "", terraform.Summary{}),
 		Entry("a forget", `"change": {"actions": ["forget"]}`,
 			[]string{"forget"}, "", terraform.Summary{}),
 	)
+
+	It("renders a plan without updates that change nothing as it always has", func() {
+		report, err := parseTerraformShowPlan(readFixture("plan.json"), terraform.Metadata{Target: "production", JobName: "tf-plan"})
+		Expect(err).NotTo(HaveOccurred())
+
+		body, err := terraform.RenderReport(report, terraform.DiffUnified)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).To(Equal(string(readFixture("report.md"))))
+	})
+
+	DescribeTable("tells whether the plan changes a property of the resource",
+		func(change string, expected bool) {
+			report, err := parseTerraformShowPlan([]byte(`{
+				"format_version": "1.2",
+				"resource_changes": [{"address": "aws_instance.web", "change": `+change+`}]
+			}`), metadata())
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(resource(report, "aws_instance.web").HasPropertyChanges()).To(Equal(expected))
+		},
+		Entry("a visible value", `{"actions": ["update"], "before": {"size": "1"}, "after": {"size": "2"}}`, true),
+		Entry("a secret that changed on both sides", `{
+			"actions": ["update"],
+			"before": {"user_data": "a"}, "after": {"user_data": "b"},
+			"before_sensitive": {"user_data": true}, "after_sensitive": {"user_data": true}
+		}`, true),
+		Entry("a secret next to a visible value", `{
+			"actions": ["update"],
+			"before": {"user_data": "a"}, "after": {"user_data": "b"},
+			"before_sensitive": {"user_data": true}
+		}`, true),
+		Entry("a visible value turned into a secret", `{
+			"actions": ["update"],
+			"before": {"user_data": "a"}, "after": {"user_data": "a"},
+			"after_sensitive": {"user_data": true}
+		}`, true),
+		Entry("a secret turned into a visible value", `{
+			"actions": ["update"],
+			"before": {"user_data": "a"}, "after": {"user_data": "a"},
+			"before_sensitive": {"user_data": true}
+		}`, true),
+		Entry("a secret that becomes known after apply", `{
+			"actions": ["update"],
+			"before": {"user_data": "a"}, "after": {},
+			"before_sensitive": {"user_data": true}, "after_unknown": {"user_data": true}
+		}`, true),
+		Entry("a visible value that becomes known after apply", `{
+			"actions": ["update"],
+			"before": {"subnet_id": "subnet-old"}, "after": {},
+			"after_unknown": {"subnet_id": true}
+		}`, true),
+		Entry("a value that was never set and becomes known after apply", `{
+			"actions": ["update"],
+			"before": {"size": "1"}, "after": {"size": "1"},
+			"after_unknown": {"arn": true}
+		}`, false),
+		Entry("a replacement forced by a secret", `{
+			"actions": ["delete", "create"],
+			"before": {"password": "a"}, "after": {"password": "b"},
+			"before_sensitive": {"password": true}, "after_sensitive": {"password": true},
+			"replace_paths": [["password"]]
+		}`, true),
+		Entry("a replacement forced by a value known after apply", `{
+			"actions": ["create", "delete"],
+			"before": {"arn": "arn:old"}, "after": {},
+			"after_unknown": {"arn": true},
+			"replace_paths": [["arn"]]
+		}`, true),
+		Entry("a replacement that only touches values known after apply", `{
+			"actions": ["delete", "create"],
+			"before": {"size": "1"}, "after": {"size": "1"},
+			"after_unknown": {"arn": true}
+		}`, false),
+	)
+
+	It("groups the updates and replacements that change no property apart from the ones that do", func() {
+		report, err := parseTerraformShowPlan([]byte(`{
+			"format_version": "1.2",
+			"resource_changes": [
+				{"address": "aws_instance.web", "change": {
+					"actions": ["update"],
+					"before": {"size": "1"}, "after": {"size": "2"}
+				}},
+				{"address": "aws_instance.computed", "change": {
+					"actions": ["update"],
+					"before": {"size": "1"}, "after": {"size": "1"},
+					"after_unknown": {"arn": true}
+				}},
+				{"address": "aws_db_instance.main", "change": {
+					"actions": ["delete", "create"],
+					"before": {"password": "a"}, "after": {"password": "b"},
+					"before_sensitive": {"password": true}, "after_sensitive": {"password": true},
+					"replace_paths": [["password"]]
+				}},
+				{"address": "aws_db_instance.tainted", "change": {
+					"actions": ["delete", "create"],
+					"before": {"size": "1"}, "after": {"size": "1"},
+					"after_unknown": {"arn": true}
+				}},
+				{"address": "aws_s3_bucket.logs", "change": {
+					"actions": ["create"],
+					"after": {"bucket": "x"}, "after_sensitive": {"bucket": true}
+				}},
+				{"address": "aws_s3_bucket.old", "change": {"actions": ["delete"], "before": {"bucket": "x"}}}
+			]
+		}`), metadata())
+		Expect(err).NotTo(HaveOccurred())
+
+		body, err := terraform.RenderReport(report, terraform.DiffPlan)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(actionRows(body)).To(Equal([]string{
+			"| `+ create` | 1 | 0 |",
+			"| `~ update` | 1 | 0 |",
+			"| `~ update` without property changes | 1 | 0 |",
+			"| `- delete` | 1 | 0 |",
+			"| `-/+ replace` | 1 | 0 |",
+			"| `-/+ replace` without property changes | 1 | 0 |",
+		}))
+		Expect(body).To(ContainSubstring("Total planned actions: 6."))
+		Expect(body).To(ContainSubstring("#### `~ update` (1)\n\n<details>\n<summary><code>~ update</code> <code>aws_instance.web</code>"))
+		Expect(body).To(ContainSubstring(
+			"#### `~ update` without property changes (1)\n\n<details>\n<summary><code>~ update</code> <code>aws_instance.computed</code>",
+		))
+		Expect(body).To(ContainSubstring(
+			"#### `-/+ replace` (1)\n\n<details>\n<summary><code>-/+ replace</code> <code>aws_db_instance.main</code>",
+		))
+		Expect(body).To(ContainSubstring(
+			"#### `-/+ replace` without property changes (1)\n\n<details>\n<summary><code>-/+ replace</code> <code>aws_db_instance.tainted</code>",
+		))
+
+		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{
+			Create:                       3,
+			Update:                       2,
+			Delete:                       3,
+			UpdateWithoutPropertyChanges: 1,
+		}))
+	})
 
 	It("labels an imported resource with its operation and where it comes from", func() {
 		report, err := parseTerraformShowPlan([]byte(`{

@@ -25,6 +25,7 @@ func init() {
 		string(sensitiveValue),
 		string(knownAfterApply),
 	)
+	terraform.RegisterUnknowns(knownAfterApply)
 }
 
 // One half of a change next to the masks Terraform ships with it. A mask mirrors the
@@ -269,7 +270,7 @@ func (d changeDiff) compare(name string, path []any, before side, after side) (t
 
 func (d changeDiff) note(path []any, change terraform.Change) terraform.Change {
 	if d.replace[joinPath(path)] {
-		change.Note = "forces replacement"
+		change.Note = terraform.ForcesReplacement
 	}
 
 	return change
