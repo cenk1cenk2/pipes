@@ -20,6 +20,13 @@ include:
             latest
   - local: .gitlab-ci.trigger.yml
     inputs:
+      name: git
+      dir: git
+      container-matrix:
+        - CONTAINER_IMAGE_TAGS: |-
+            latest
+  - local: .gitlab-ci.trigger.yml
+    inputs:
       name: github
       dir: github
       container-matrix:
