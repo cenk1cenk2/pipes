@@ -130,16 +130,13 @@ func New(p *Plumber) *TaskList {
 			return nil
 		}).
 		Set(func(tl *TaskList) Job {
-			return JobIfNot(
-				selfTarget(tl),
-				JobSequence(
-					acquire(tl).Job(),
-					synchronize(tl).Job(),
-					stage(tl).Job(),
-					log(tl).Job(),
-					report(tl).Job(),
-					publish(tl).Job(),
-				),
+			return JobSequence(
+				acquire(tl).Job(),
+				synchronize(tl).Job(),
+				stage(tl).Job(),
+				log(tl).Job(),
+				report(tl).Job(),
+				publish(tl).Job(),
 			)
 		})
 }
