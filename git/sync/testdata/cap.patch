@@ -1,0 +1,35 @@
+diff --git a/many/file-1.yaml b/many/file-1.yaml
+index 96c5ca6..3c17982 100644
+--- a/many/file-1.yaml
++++ b/many/file-1.yaml
+@@ -1 +1 @@
+-value: 1
++value: 10
+diff --git a/many/file-2.yaml b/many/file-2.yaml
+index 98dc922..d44b313 100644
+--- a/many/file-2.yaml
++++ b/many/file-2.yaml
+@@ -1 +1 @@
+-value: 2
++value: 20
+diff --git a/many/file-3.yaml b/many/file-3.yaml
+index b94a2cd..abaf39f 100644
+--- a/many/file-3.yaml
++++ b/many/file-3.yaml
+@@ -1 +1 @@
+-value: 3
++value: 30
+diff --git a/many/file-4.yaml b/many/file-4.yaml
+index b2f5a13..9b9779e 100644
+--- a/many/file-4.yaml
++++ b/many/file-4.yaml
+@@ -1 +1 @@
+-value: 4
++value: 40
+diff --git a/many/file-5.yaml b/many/file-5.yaml
+index 93e384f..d84130a 100644
+--- a/many/file-5.yaml
++++ b/many/file-5.yaml
+@@ -1 +1 @@
+-value: 5
++value: 50
