@@ -293,7 +293,10 @@ var _ = Describe("Git sync tasks", func() {
 
 			Expect(notes.bodies).To(HaveKey(int64(7)))
 			Expect(notes.bodies[7]).To(ContainSubstring("## Sync into `group/project@next`"))
-			Expect(notes.bodies[7]).To(ContainSubstring("-removed"))
+			Expect(notes.bodies[7]).To(ContainSubstring("2 file(s) changed."))
+			Expect(notes.bodies[7]).To(ContainSubstring("\n`out/kept.txt`\n\n```diff\n@@ -1 +1 @@\n"))
+			Expect(notes.bodies[7]).To(ContainSubstring("\n`out/removed.txt`\n\n```diff\ndeleted file mode 100644\n@@ -1 +0,0 @@\n"))
+			Expect(notes.bodies[7]).To(ContainSubstring("-removed\n\\ No newline at end of file\n```\n"))
 			Expect(notes.bodies[7]).To(ContainSubstring("+changed"))
 
 			patch, err := os.ReadFile(p.Patch)
