@@ -17,7 +17,7 @@ Git related tasks in the pipeline.
 
 ### `pipe-git sync`
 
-Sync the paths a job generated into a branch of a GitLab project. Replaces every destination on the target branch with its source, writes the staged diff to a patch, logs it and reports it on the merge requests of the pipeline. In publish mode, the changes are committed onto the tip of the target branch, pushed to the sync branch and opened as a merge request against the target branch. A pipeline running on the target branch itself skips the sync, and a publish fails once the commit of the pipeline is no longer the head of the default branch.
+Sync the paths a job generated into a branch of a GitLab project. Replaces every destination on the target branch with its source, writes the staged diff to a patch, logs it and reports it on the merge requests of the pipeline. In publish mode, the changes are committed onto the tip of the target branch, pushed to the sync branch and opened as a merge request against the target branch. A pipeline running on the target branch itself syncs like any other, and stops at nothing to commit once the merged output regenerates unchanged. A publish fails once the commit of the pipeline is no longer the head of the default branch.
 
 `pipe-git sync [FLAGS]`
 

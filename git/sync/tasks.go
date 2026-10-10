@@ -15,20 +15,6 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/markdown"
 )
 
-// A job writing into the branch its own pipeline runs on would trigger itself again
-// with every commit it publishes, so it stops before touching anything instead.
-func selfTarget(tl *TaskList) Predicate {
-	return func() bool {
-		if P.Target.Project != P.Project.Path || P.Target.Branch != P.Refs.Branch {
-			return false
-		}
-
-		tl.Log.Info(fmt.Sprintf("Skipping the sync, since the pipeline runs on the target branch itself: %s@%s", P.Target.Project, P.Target.Branch))
-
-		return true
-	}
-}
-
 // The pipeline already has the project checked out, so the target branch of the same
 // project only costs a shallow fetch next to it, while another project is cloned with
 // nothing but the destinations.
@@ -41,6 +27,12 @@ func acquire(tl *TaskList) *Task {
 			}
 
 			if P.Target.Project == P.Project.Path {
+				// a merged sync merge request starts the next pipeline on the target, which
+				// regenerates the same output and stops at nothing to commit.
+				if P.Target.Branch == P.Refs.Branch {
+					t.Log.Info(fmt.Sprintf("Syncing into the branch the pipeline runs on, which stops once the merged output generates no changes: %s", P.Target.Branch))
+				}
+
 				t.Log.Info(fmt.Sprintf("Checking the target branch out next to the checkout of the pipeline: %s", P.Target.Branch))
 
 				C.Repository, err = git.Repository{Dir: P.Project.Dir, Token: P.Token}.Worktree(ctx, t, C.Remote, P.Target.Branch, dir)

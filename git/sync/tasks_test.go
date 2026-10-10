@@ -382,16 +382,6 @@ var _ = Describe("Git sync tasks", func() {
 		})
 	})
 
-	It("skips the sync when the pipeline runs on the target branch itself", func() {
-		p := pipe(ModePublish)
-		p.Refs.Branch = "next"
-
-		Expect(run(p)).To(Succeed())
-
-		Expect(runner.invocations).To(BeEmpty())
-		Expect(notes.bodies).To(BeEmpty())
-	})
-
 	It("reports no changes and leaves the merge request alone when the target already matches", func() {
 		write(filepath.Join(source, "kept.txt"), "kept")
 		write(filepath.Join(source, "removed.txt"), "removed")
@@ -507,6 +497,64 @@ var _ = Describe("Git sync tasks", func() {
 			Expect(runner.ran("commit")).To(BeFalse())
 			Expect(head("group/project", p.Branch)).To(BeEmpty())
 			Expect(mergeRequests.created).To(BeEmpty())
+		})
+
+		Describe("on the branch the pipeline runs on", func() {
+			self := func() Pipe {
+				p := pipe(ModePublish)
+				p.Target.Branch = "main"
+
+				return p
+			}
+
+			It("opens a merge request against the branch the pipeline runs on", func() {
+				p := self()
+				tip := head("group/project", "main")
+
+				Expect(run(p)).To(Succeed())
+
+				invoke(checkout, "fetch", "--quiet", "origin", p.Branch)
+				Expect(invoke(checkout, "rev-parse", "FETCH_HEAD^")).To(Equal(tip))
+				Expect(head("group/project", "main")).To(Equal(tip))
+
+				Expect(mergeRequests.created).To(HaveLen(1))
+				Expect(*mergeRequests.created[0].TargetBranch).To(Equal("main"))
+			})
+
+			It("publishes nothing once the merged merge request regenerates unchanged", func() {
+				first := self()
+				first.MergeRequestReport.Enabled = false
+
+				Expect(run(first)).To(Succeed())
+
+				invoke(checkout, "fetch", "--quiet", "origin", first.Branch)
+				invoke(checkout, "push", "--quiet", "origin", "FETCH_HEAD:refs/heads/main")
+
+				*C = Ctx{}
+				runner = &passthrough{}
+				mergeRequests = &fakeMergeRequests{}
+
+				second := self()
+				second.MergeRequestReport.MergeRequestIid = 7
+
+				Expect(run(second)).To(Succeed())
+
+				Expect(notes.bodies[7]).To(ContainSubstring("No changes."))
+				Expect(runner.ran("commit")).To(BeFalse())
+				Expect(runner.ran("push")).To(BeFalse())
+				Expect(mergeRequests.listed).To(BeEmpty())
+			})
+
+			It("fails the publish once a newer commit landed on the branch the pipeline runs on", func() {
+				p := self()
+				p.ReportMetadata.CommitSha = strings.Repeat("0", 40)
+
+				Expect(run(p)).To(MatchError(ContainSubstring("no longer the head")))
+
+				Expect(runner.ran("commit")).To(BeFalse())
+				Expect(head("group/project", p.Branch)).To(BeEmpty())
+				Expect(mergeRequests.created).To(BeEmpty())
+			})
 		})
 
 		It("needs a token to publish", func() {
