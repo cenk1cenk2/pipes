@@ -242,6 +242,8 @@ func upsertMergeRequest(ctx context.Context, t *Task) (*gitlab.MergeRequestResul
 		SourceBranch: P.Branch,
 		TargetBranch: P.Target.Branch,
 		Title:        strings.TrimSpace(subject),
+		Assignees:    P.Assignees,
+		Reviewers:    P.Reviewers,
 	}
 
 	mergeRequests, err := newMergeRequests(config)

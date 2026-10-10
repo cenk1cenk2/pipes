@@ -16,12 +16,32 @@ type fakeMergeRequests struct {
 	updated map[int64]*clientgitlab.UpdateMergeRequestOptions
 
 	open      []*clientgitlab.BasicMergeRequest
+	users     map[string]int64
 	listErr   error
 	createErr error
 	updateErr error
+	usersErr  error
 }
 
 var _ MergeRequestsAdapter = (*fakeMergeRequests)(nil)
+
+// answers the username filter the way the API does, with an empty list for a
+// username nobody has.
+func (f *fakeMergeRequests) ListUsers(
+	opt *clientgitlab.ListUsersOptions,
+	_ ...clientgitlab.RequestOptionFunc,
+) ([]*clientgitlab.User, *clientgitlab.Response, error) {
+	if f.usersErr != nil {
+		return nil, nil, f.usersErr
+	}
+
+	id, ok := f.users[*opt.Username]
+	if !ok {
+		return []*clientgitlab.User{}, &clientgitlab.Response{}, nil
+	}
+
+	return []*clientgitlab.User{{ID: id, Username: *opt.Username}}, &clientgitlab.Response{}, nil
+}
 
 // answers the listing the way the API filters it, so only merge requests in the
 // requested state ever reach the upsert.
@@ -170,5 +190,67 @@ var _ = Describe("Merge request upsert", func() {
 
 		_, err := upsert()
 		Expect(err).To(MatchError(ContainSubstring("update GitLab merge request")))
+	})
+
+	Describe("assignees and reviewers", func() {
+		BeforeEach(func() {
+			mergeRequests.users = map[string]int64{"alice": 11, "bob": 12, "carol": 13}
+		})
+
+		configured := func() (*MergeRequestResult, error) {
+			config := config
+			config.Assignees = []string{"alice", "bob"}
+			config.Reviewers = []string{"carol"}
+
+			return UpsertMergeRequest(context.Background(), mergeRequests, config, "sync body")
+		}
+
+		It("creates the merge request with the resolved users", func() {
+			_, err := configured()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(mergeRequests.created).To(HaveLen(1))
+			Expect(*mergeRequests.created[0].AssigneeIDs).To(Equal([]int64{11, 12}))
+			Expect(*mergeRequests.created[0].ReviewerIDs).To(Equal([]int64{13}))
+		})
+
+		It("replaces the users of the open merge request", func() {
+			mergeRequests.open = []*clientgitlab.BasicMergeRequest{mergeRequest(7, "opened")}
+
+			_, err := configured()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(*mergeRequests.updated[7].AssigneeIDs).To(Equal([]int64{11, 12}))
+			Expect(*mergeRequests.updated[7].ReviewerIDs).To(Equal([]int64{13}))
+		})
+
+		It("leaves the users alone when none are configured", func() {
+			_, err := upsert()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(mergeRequests.created[0].AssigneeIDs).To(BeNil())
+			Expect(mergeRequests.created[0].ReviewerIDs).To(BeNil())
+
+			mergeRequests.open = []*clientgitlab.BasicMergeRequest{mergeRequest(7, "opened")}
+
+			_, err = upsert()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(mergeRequests.updated[7].AssigneeIDs).To(BeNil())
+			Expect(mergeRequests.updated[7].ReviewerIDs).To(BeNil())
+		})
+
+		It("refuses a username nobody has, naming it", func() {
+			delete(mergeRequests.users, "carol")
+
+			_, err := configured()
+			Expect(err).To(MatchError(ContainSubstring("resolve GitLab user carol")))
+			Expect(mergeRequests.listed).To(BeEmpty())
+			Expect(mergeRequests.created).To(BeEmpty())
+		})
+
+		It("surfaces a lookup failure", func() {
+			mergeRequests.usersErr = fmt.Errorf("boom")
+
+			_, err := configured()
+			Expect(err).To(MatchError(ContainSubstring("resolve GitLab user alice: boom")))
+			Expect(mergeRequests.created).To(BeEmpty())
+		})
 	})
 })

@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	CategorySync     = "Sync"
-	CategoryIdentity = "Identity"
-	CategoryProject  = "GitLab Project"
+	CategorySync         = "Sync"
+	CategoryIdentity     = "Identity"
+	CategoryMergeRequest = "Merge Request"
+	CategoryProject      = "GitLab Project"
 )
 
 //revive:disable:line-length-limit
@@ -172,6 +173,30 @@ var Flags = CombineFlags(
 			Required:    false,
 			Value:       "",
 			Destination: &P.Committer.Email,
+		},
+
+		&cli.StringSliceFlag{
+			Category: CategoryMergeRequest,
+			Name:     "git.pipes.assignees",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("GIT_PIPES_ASSIGNEES"),
+			),
+			Usage:       "GitLab usernames assigned to the merge request, replacing its assignees on every publish. Leaves the assignees of the merge request as they are when empty.",
+			Required:    false,
+			Value:       []string{},
+			Destination: &P.Assignees,
+		},
+
+		&cli.StringSliceFlag{
+			Category: CategoryMergeRequest,
+			Name:     "git.pipes.reviewers",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("GIT_PIPES_REVIEWERS"),
+			),
+			Usage:       "GitLab usernames requested to review the merge request, replacing its reviewers on every publish. Leaves the reviewers of the merge request as they are when empty.",
+			Required:    false,
+			Value:       []string{},
+			Destination: &P.Reviewers,
 		},
 
 		&cli.StringFlag{

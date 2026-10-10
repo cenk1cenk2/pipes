@@ -74,6 +74,13 @@ Sync the paths a job generated into a branch of a GitLab project. Replaces every
 | `$GIT_PIPES_COMMITTER_NAME` | Name of the committer of the commit. Required in publish mode. | `string` |  |
 | `$GIT_PIPES_COMMITTER_EMAIL` | Email of the committer of the commit. Required in publish mode. | `string` |  |
 
+**Merge Request**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$GIT_PIPES_ASSIGNEES` | GitLab usernames assigned to the merge request, replacing its assignees on every publish. Leaves the assignees of the merge request as they are when empty. | `string[]` |  |
+| `$GIT_PIPES_REVIEWERS` | GitLab usernames requested to review the merge request, replacing its reviewers on every publish. Leaves the reviewers of the merge request as they are when empty. | `string[]` |  |
+
 **Sync**
 
 | Flag / Environment | Description | Type | Default |
