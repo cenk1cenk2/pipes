@@ -49,7 +49,7 @@ This report carries the plan metadata, the action planned for every resource wit
 | Action | Resources | {{ .Labels.Outputs }} |
 | --- | ---: | ---: |
 {{- range .Actions }}
-| `{{ .Glyph }} {{ .Action }}` | {{ len .Resources }} | {{ len .Outputs }} |
+| `{{ .Glyph }} {{ .Action }}`{{ if .WithoutPropertyChanges }} without property changes{{ end }} | {{ len .Resources }} | {{ len .Outputs }} |
 {{- end }}
 
 Total planned actions: {{ .Total }}.
@@ -64,7 +64,7 @@ No changes detected.
 {{- range $action := .Actions }}
 {{- if .Resources }}
 
-#### `{{ .Glyph }} {{ .Action }}` ({{ len .Resources }})
+#### `{{ .Glyph }} {{ .Action }}`{{ if .WithoutPropertyChanges }} without property changes{{ end }} ({{ len .Resources }})
 {{- range .Resources }}
 
 <details>

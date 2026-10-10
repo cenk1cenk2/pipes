@@ -36,6 +36,7 @@ func init() {
 		string(assetValue),
 		string(archiveValue),
 	)
+	terraform.RegisterUnknowns(unknownValue)
 }
 
 // The plan carries the inputs a resource is going to be given and no more: a

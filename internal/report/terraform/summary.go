@@ -12,6 +12,9 @@ type Summary struct {
 	Create int `json:"create"`
 	Update int `json:"update"`
 	Delete int `json:"delete"`
+	// the updates counted above that change no property of their resource, left out
+	// of the file while there are none.
+	UpdateWithoutPropertyChanges int `json:"update_without_property_changes,omitzero"`
 }
 
 // A replacement costs a create and a delete, but a tool that also reports the two
@@ -31,6 +34,11 @@ func Summarize(report Report) Summary {
 			summary.Create += count
 		case "update", "update-replacement":
 			summary.Update += count
+			for _, resource := range action.Resources {
+				if !resource.HasPropertyChanges() {
+					summary.UpdateWithoutPropertyChanges++
+				}
+			}
 		case "delete", "delete-replaced":
 			summary.Delete += count
 		case "replace":
@@ -45,7 +53,7 @@ func Summarize(report Report) Summary {
 }
 
 func RenderSummary(summary Summary) string {
-	// three ints behind a fixed set of tags leave the encoder nothing to fail on.
+	// a few ints behind a fixed set of tags leave the encoder nothing to fail on.
 	body, _ := json.Marshal(summary, jsontext.Multiline(true), jsontext.WithIndent("  "))
 
 	return string(body) + "\n"

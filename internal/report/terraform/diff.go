@@ -18,6 +18,9 @@ const (
 	// own, so that the block a reader opens is never empty.
 	NoAttributeChanges = "No attribute changes."
 
+	// The note of an attribute whose change decides the identity of its resource.
+	ForcesReplacement = "forces replacement"
+
 	// What a string value that holds a JSON document is written out structurally with.
 	JSONEncoded = "jsonencode"
 

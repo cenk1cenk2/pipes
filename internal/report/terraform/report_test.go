@@ -472,8 +472,8 @@ No attribute changes.
 		}, terraform.DiffUnified)
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(body).To(ContainSubstring("| `-/+ replace` | 1 | 0 |"))
-		Expect(body).To(ContainSubstring("#### `-/+ replace` (1)"))
+		Expect(body).To(ContainSubstring("| `-/+ replace` without property changes | 1 | 0 |"))
+		Expect(body).To(ContainSubstring("#### `-/+ replace` without property changes (1)"))
 		Expect(body).To(ContainSubstring(strings.TrimSpace(`
 <summary><code>-/+ replace</code> <code>one</code> (create before destroy)</summary>
 
