@@ -49,6 +49,8 @@ type (
 		Token              string
 		Author             Identity
 		Committer          Identity
+		Assignees          []string
+		Reviewers          []string
 		Project            Project
 		Refs               git.Refs
 		MergeRequestReport gitlab.MergeRequestReportConfig

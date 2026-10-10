@@ -6,9 +6,10 @@ import (
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 )
 
-// The three merge request calls the upsert makes, narrowed from the client so the
-// bookkeeping can be driven without a GitLab to talk to. Signatures mirror
-// clientgitlab.MergeRequestsService exactly.
+// The merge request calls the upsert makes and the user lookup that resolves its
+// assignees and reviewers, narrowed from the client so the bookkeeping can be driven
+// without a GitLab to talk to. Signatures mirror clientgitlab.MergeRequestsService
+// and clientgitlab.UsersService exactly.
 type MergeRequestsAdapter interface {
 	ListProjectMergeRequests(
 		pid any,
@@ -26,9 +27,18 @@ type MergeRequestsAdapter interface {
 		opt *clientgitlab.UpdateMergeRequestOptions,
 		options ...clientgitlab.RequestOptionFunc,
 	) (*clientgitlab.MergeRequest, *clientgitlab.Response, error)
+	ListUsers(
+		opt *clientgitlab.ListUsersOptions,
+		options ...clientgitlab.RequestOptionFunc,
+	) ([]*clientgitlab.User, *clientgitlab.Response, error)
 }
 
-var _ MergeRequestsAdapter = (*clientgitlab.MergeRequestsService)(nil)
+type mergeRequests struct {
+	clientgitlab.MergeRequestsServiceInterface
+	clientgitlab.UsersServiceInterface
+}
+
+var _ MergeRequestsAdapter = (*mergeRequests)(nil)
 
 // Dials only when a merge request is actually going to be written, so a pipe that
 // never reaches the publish task never needs a token that parses.
@@ -43,5 +53,8 @@ func NewMergeRequests(config MergeRequestConfig) (MergeRequestsAdapter, error) {
 		return nil, fmt.Errorf("create GitLab client: %w", err)
 	}
 
-	return client.MergeRequests, nil
+	return &mergeRequests{
+		MergeRequestsServiceInterface: client.MergeRequests,
+		UsersServiceInterface:         client.Users,
+	}, nil
 }

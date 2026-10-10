@@ -66,10 +66,23 @@ type fakeMergeRequests struct {
 	listed   []*clientgitlab.ListProjectMergeRequestsOptions
 	created  []*clientgitlab.CreateMergeRequestOptions
 	updated  []*clientgitlab.UpdateMergeRequestOptions
+	users    map[string]int64
 	conflict bool
 }
 
 var _ gitlab.MergeRequestsAdapter = (*fakeMergeRequests)(nil)
+
+func (f *fakeMergeRequests) ListUsers(
+	opt *clientgitlab.ListUsersOptions,
+	_ ...clientgitlab.RequestOptionFunc,
+) ([]*clientgitlab.User, *clientgitlab.Response, error) {
+	id, ok := f.users[*opt.Username]
+	if !ok {
+		return []*clientgitlab.User{}, &clientgitlab.Response{}, nil
+	}
+
+	return []*clientgitlab.User{{ID: id, Username: *opt.Username}}, &clientgitlab.Response{}, nil
+}
 
 func (f *fakeMergeRequests) ListProjectMergeRequests(
 	_ any,
@@ -457,6 +470,20 @@ var _ = Describe("Git sync tasks", func() {
 
 			Expect(head("group/project", p.Branch)).To(Equal(invoke(racer, "rev-parse", "HEAD")))
 			Expect(mergeRequests.created).To(BeEmpty())
+		})
+
+		It("opens the merge request with the configured assignees and reviewers", func() {
+			mergeRequests.users = map[string]int64{"alice": 11, "carol": 13}
+
+			p := pipe(ModePublish)
+			p.Assignees = []string{"alice"}
+			p.Reviewers = []string{"carol"}
+
+			Expect(run(p)).To(Succeed())
+
+			Expect(mergeRequests.created).To(HaveLen(1))
+			Expect(*mergeRequests.created[0].AssigneeIDs).To(Equal([]int64{11}))
+			Expect(*mergeRequests.created[0].ReviewerIDs).To(Equal([]int64{13}))
 		})
 
 		It("updates the merge request another run opened between the listing and the creation", func() {
