@@ -5,11 +5,11 @@ go 1.27.0
 require (
 	charm.land/glamour/v2 v2.0.1
 	github.com/alecthomas/chroma/v2 v2.27.0
-	github.com/cenk1cenk2/plumber/v7 v7.2.7
+	github.com/cenk1cenk2/plumber/v7 v7.2.9
 	github.com/charmbracelet/colorprofile v0.4.3
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.14.0
