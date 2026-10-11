@@ -101,6 +101,94 @@ var _ = Describe("Report", func() {
 		})
 	})
 
+	Context("with the branch of the pipeline to compare against", func() {
+		const a = "diff --git a/a b/a\n+a\n"
+		const b = "diff --git a/b b/b\n+b\n"
+
+		BeforeEach(func() {
+			P.Refs.Branch = "feature"
+		})
+
+		DescribeTable("groups the files by whether the branch already generated them",
+			func(diff string, pending map[string]bool, expected string) {
+				C.Diff = diff
+				C.Pending = pending
+
+				Expect(render()).To(HaveSuffix(expected))
+			},
+			Entry("leading with what the branch still lacks", a+b, map[string]bool{"b": true},
+				"### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`b`\n\n```diff\n+b\n```\n"+
+					"\n### Already generated on `feature`\n\n1 file(s) changed.\n\n`a`\n\n```diff\n+a\n```\n",
+			),
+			Entry("as one list once the branch generated none of them", a+b, map[string]bool{"a": true, "b": true},
+				"Commit: `abcdef01`\n\n2 file(s) changed.\n\n`a`\n\n```diff\n+a\n```\n\n`b`\n\n```diff\n+b\n```\n",
+			),
+			Entry("saying the branch lacks nothing once it generated all of them", a+b, map[string]bool{},
+				"### Not yet generated on `feature`\n\nNo changes beyond what `feature` already carries.\n"+
+					"\n### Already generated on `feature`\n\n2 file(s) changed.\n\n`a`\n\n```diff\n+a\n```\n\n`b`\n\n```diff\n+b\n```\n",
+			),
+			Entry("as one list without a branch to compare against", a+b, nil,
+				"Commit: `abcdef01`\n\n2 file(s) changed.\n\n`a`\n\n```diff\n+a\n```\n\n`b`\n\n```diff\n+b\n```\n",
+			),
+			Entry("with a rename the branch lacks the old name of", "diff --git a/old b/new\nrename from old\nrename to new\n"+b, map[string]bool{"old": true},
+				"### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`new`\n\n```diff\nrename from old\nrename to new\n```\n"+
+					"\n### Already generated on `feature`\n\n1 file(s) changed.\n\n`b`\n\n```diff\n+b\n```\n",
+			),
+			Entry("with a quoted name that can not be matched", "diff --git \"a/\\303\\251\" \"b/\\303\\251\"\n+e\n"+b, map[string]bool{},
+				"### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`\"a/\\303\\251\" \"b/\\303\\251\"`\n\n```diff\n+e\n```\n"+
+					"\n### Already generated on `feature`\n\n1 file(s) changed.\n\n`b`\n\n```diff\n+b\n```\n",
+			),
+		)
+
+		It("names the branch generically once the pipeline has none", func() {
+			P.Refs.Branch = ""
+			C.Diff = a + b
+			C.Pending = map[string]bool{"b": true}
+
+			Expect(render()).To(ContainSubstring("### Not yet generated on the branch\n"))
+			Expect(render()).To(ContainSubstring("### Already generated on the branch\n"))
+		})
+
+		Context("past the limit", func() {
+			BeforeEach(func() {
+				C.Diff = readFixture("cap.patch")
+
+				previous := reportDiffLimit
+				reportDiffLimit = 186
+				DeferCleanup(func() {
+					reportDiffLimit = previous
+				})
+			})
+
+			It("gives what the branch lacks the limit first and counts the rest of each group", func() {
+				C.Pending = map[string]bool{"many/file-1.yaml": true}
+
+				Expect(render()).To(Equal(readFixture("cap-groups.md")))
+			})
+
+			It("shows nothing of what the branch already generated once what it lacks is cut", func() {
+				C.Pending = map[string]bool{"many/file-1.yaml": true, "many/file-2.yaml": true, "many/file-3.yaml": true}
+
+				body := render()
+
+				Expect(body).To(ContainSubstring("\n### Already generated on `feature`\n\n2 file(s) changed.\n\n2 more file(s) are not shown.\n"))
+				Expect(body).NotTo(ContainSubstring("`many/file-4.yaml`"))
+				Expect(strings.Count(body, "The diff is truncated")).To(Equal(1))
+			})
+
+			It("points at the full patch once only what the branch already generated is cut", func() {
+				C.Pending = map[string]bool{"many/file-1.yaml": true}
+
+				body := render()
+
+				Expect(body).To(ContainSubstring("### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`many/file-1.yaml`\n"))
+				Expect(
+					body,
+				).To(HaveSuffix("The diff is truncated, the full patch `git-sync.patch` is in [the artifacts of the job](https://gitlab.test/group/project/-/jobs/1/artifacts/browse).\n"))
+			})
+		})
+	})
+
 	Context("at the size GitLab accepts", func() {
 		It("cuts a file GitLab would refuse at a line", func() {
 			line := "+" + strings.Repeat("x", 99) + "\n"

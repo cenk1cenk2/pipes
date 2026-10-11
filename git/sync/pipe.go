@@ -62,6 +62,9 @@ type (
 		Repository   git.Repository
 		Destinations []string
 		Diff         string
+		// the paths the output still changes against the checkout of the pipeline, and
+		// nil when the target is another project, which the checkout says nothing about.
+		Pending map[string]bool
 	}
 )
 

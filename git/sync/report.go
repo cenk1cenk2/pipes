@@ -67,11 +67,62 @@ func render() string {
 		diff = diff[end:]
 	}
 
+	// git quotes an unusual name differently in the header than in the list of changed
+	// paths, so such a file can not be matched and stays with what the branch lacks.
+	pending := []string{}
+	generated := []string{}
+	for _, file := range files {
+		if C.Pending == nil || strings.HasPrefix(file, "diff --git \"") || C.Pending[filename(file)] || C.Pending[previous(file)] {
+			pending = append(pending, file)
+		} else {
+			generated = append(generated, file)
+		}
+	}
+
+	truncated := false
+	if len(generated) == 0 {
+		_, truncated = sections(body, files, reportDiffLimit)
+	} else {
+		branch := "the branch"
+		if P.Refs.Branch != "" {
+			branch = fmt.Sprintf("`%s`", P.Refs.Branch)
+		}
+
+		// what the branch still lacks is what the next sync brings, so it leads and gets
+		// the limit first, while what the branch already carries only gets the rest.
+		limit := reportDiffLimit
+		fmt.Fprintf(body, "### Not yet generated on %s\n\n", branch)
+		if len(pending) == 0 {
+			fmt.Fprintf(body, "No changes beyond what %s already carries.\n", branch)
+		} else {
+			limit, truncated = sections(body, pending, limit)
+		}
+
+		fmt.Fprintf(body, "\n### Already generated on %s\n\n", branch)
+		_, cut := sections(body, generated, limit)
+		truncated = truncated || cut
+	}
+
+	if truncated {
+		artifacts := "the artifacts of the job"
+		if P.ReportMetadata.JobUrl != "" {
+			artifacts = link(artifacts, P.ReportMetadata.JobUrl+"/artifacts/browse")
+		}
+
+		fmt.Fprintf(body, "\nThe diff is truncated, the full patch `%s` is in %s.\n", P.Patch, artifacts)
+	}
+
+	return body.String()
+}
+
+// Renders the files as one section each within the limit, and returns what is left of
+// it together with whether any file did not fit. A file cut at a line ends the diff,
+// so nothing after it can make it look complete.
+func sections(body *strings.Builder, files []string, limit int) (int, bool) {
 	fmt.Fprintf(body, "%d file(s) changed.\n", len(files))
 
 	// the name and the fences of every file count against the limit as well, which a
 	// diff of many small files would otherwise outgrow.
-	limit := reportDiffLimit
 	shown := 0
 	cut := false
 	for _, file := range files {
@@ -98,6 +149,8 @@ func render() string {
 		shown++
 
 		if cut {
+			limit = 0
+
 			break
 		}
 	}
@@ -106,16 +159,7 @@ func render() string {
 		fmt.Fprintf(body, "\n%d more file(s) are not shown.\n", more)
 	}
 
-	if cut || shown < len(files) {
-		artifacts := "the artifacts of the job"
-		if P.ReportMetadata.JobUrl != "" {
-			artifacts = link(artifacts, P.ReportMetadata.JobUrl+"/artifacts/browse")
-		}
-
-		fmt.Fprintf(body, "\nThe diff is truncated, the full patch `%s` is in %s.\n", P.Patch, artifacts)
-	}
-
-	return body.String()
+	return limit, cut || shown < len(files)
 }
 
 // The name a file carries after the change, which is the one a rename ends up with.
@@ -124,6 +168,17 @@ func filename(diff string) string {
 	header = strings.TrimPrefix(header, "diff --git ")
 	if i := strings.LastIndex(header, " b/"); i >= 0 {
 		return header[i+len(" b/"):]
+	}
+
+	return header
+}
+
+// The name a file carries before the change, which a rename leaves behind.
+func previous(diff string) string {
+	header, _, _ := strings.Cut(diff, "\n")
+	header = strings.TrimPrefix(header, "diff --git a/")
+	if i := strings.LastIndex(header, " b/"); i >= 0 {
+		return header[:i]
 	}
 
 	return header

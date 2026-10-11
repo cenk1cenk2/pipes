@@ -306,8 +306,8 @@ var _ = Describe("Git sync tasks", func() {
 
 			Expect(notes.bodies).To(HaveKey(int64(7)))
 			Expect(notes.bodies[7]).To(ContainSubstring("## Sync into `group/project@next`"))
-			Expect(notes.bodies[7]).To(ContainSubstring("2 file(s) changed."))
-			Expect(notes.bodies[7]).To(ContainSubstring("\n`out/kept.txt`\n\n```diff\n@@ -1 +1 @@\n"))
+			Expect(notes.bodies[7]).To(ContainSubstring("### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`out/kept.txt`\n\n```diff\n@@ -1 +1 @@\n"))
+			Expect(notes.bodies[7]).To(ContainSubstring("### Already generated on `feature`\n\n1 file(s) changed.\n\n`out/removed.txt`\n"))
 			Expect(notes.bodies[7]).To(ContainSubstring("\n`out/removed.txt`\n\n```diff\ndeleted file mode 100644\n@@ -1 +0,0 @@\n"))
 			Expect(notes.bodies[7]).To(ContainSubstring("-removed\n\\ No newline at end of file\n```\n"))
 			Expect(notes.bodies[7]).To(ContainSubstring("+changed"))
@@ -318,6 +318,45 @@ var _ = Describe("Git sync tasks", func() {
 
 			Expect(filepath.Join(checkout, "out")).NotTo(BeAnExistingFile())
 			Expect(mergeRequests.created).To(BeEmpty())
+		})
+
+		// the checkout of the pipeline is the branch, which carries what an earlier sync
+		// merged into it without the target having it yet.
+		It("tells what the branch already generated apart from what it still lacks", func() {
+			write(filepath.Join(checkout, "out", "kept.txt"), "changed")
+			invoke(checkout, "add", "--all")
+			invoke(checkout, "commit", "--quiet", "--message", "generated")
+			write(filepath.Join(source, "added.txt"), "added")
+
+			p := pipe(ModeReport)
+			p.Refs.Branch = "feature"
+			p.MergeRequestReport.MergeRequestIid = 7
+
+			Expect(run(p)).To(Succeed())
+
+			body := notes.bodies[7]
+			pending := strings.Index(body, "### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`out/added.txt`\n")
+			generated := strings.Index(body, "### Already generated on `feature`\n\n2 file(s) changed.\n\n`out/kept.txt`\n")
+			Expect(pending).To(BeNumerically(">=", 0), body)
+			Expect(generated).To(BeNumerically(">", pending), body)
+			Expect(body[generated:]).To(ContainSubstring("\n`out/removed.txt`\n"))
+		})
+
+		It("says the branch lacks nothing once it already generated everything", func() {
+			write(filepath.Join(checkout, "out", "kept.txt"), "changed")
+			invoke(checkout, "add", "--all")
+			invoke(checkout, "commit", "--quiet", "--message", "generated")
+
+			p := pipe(ModeReport)
+			p.Refs.Branch = "feature"
+			p.MergeRequestReport.MergeRequestIid = 7
+
+			Expect(run(p)).To(Succeed())
+
+			Expect(notes.bodies[7]).To(ContainSubstring(
+				"### Not yet generated on `feature`\n\nNo changes beyond what `feature` already carries.\n" +
+					"\n### Already generated on `feature`\n\n2 file(s) changed.\n",
+			))
 		})
 
 		It("clones a target in another project with only the destinations", func() {
@@ -332,6 +371,8 @@ var _ = Describe("Git sync tasks", func() {
 			Expect(runner.ran("clone")).To(BeTrue())
 			Expect(runner.ran("worktree", "add")).To(BeFalse())
 			Expect(notes.bodies[7]).To(ContainSubstring("## Sync into `group/other@next`"))
+			Expect(notes.bodies[7]).To(ContainSubstring("\n2 file(s) changed.\n"))
+			Expect(notes.bodies[7]).NotTo(ContainSubstring("###"))
 			Expect(notes.bodies[7]).To(ContainSubstring("+changed"))
 		})
 
@@ -522,6 +563,8 @@ var _ = Describe("Git sync tasks", func() {
 
 				Expect(mergeRequests.created).To(HaveLen(1))
 				Expect(*mergeRequests.created[0].TargetBranch).To(Equal("main"))
+				Expect(*mergeRequests.created[0].Description).To(ContainSubstring("\n1 file(s) changed.\n"))
+				Expect(*mergeRequests.created[0].Description).NotTo(ContainSubstring("###"))
 			})
 
 			It("publishes nothing once the merged merge request regenerates unchanged", func() {

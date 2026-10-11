@@ -177,6 +177,43 @@ func (r Repository) Patch(ctx context.Context, t *Task, path string) error {
 	return nil
 }
 
+// Head is the commit the checkout is at.
+func (r Repository) Head(ctx context.Context, t *Task) (string, error) {
+	var output string
+
+	if err := r.command(t, r.Dir, "rev-parse", "HEAD").
+		SetLogLevel(LogLevelDebug, LogLevelWarn, LogLevelDebug).
+		CaptureStdout(&output).
+		Run(ctx); err != nil {
+		return "", fmt.Errorf("Can not resolve the head of the checkout: %s -> %w", r.Dir, err)
+	}
+
+	return strings.TrimSpace(output), nil
+}
+
+// Changed lists the paths under the destinations the staged changes differ in from
+// rev, which can be a commit of another worktree since every worktree shares the
+// objects. A rename lists both of its paths, since neither is the same on both sides.
+func (r Repository) Changed(ctx context.Context, t *Task, rev string, destinations []string) ([]string, error) {
+	var output string
+
+	if err := r.command(t, r.Dir, append([]string{"diff", "--cached", "--name-only", "--no-renames", rev, "--"}, destinations...)...).
+		SetLogLevel(LogLevelDebug, LogLevelWarn, LogLevelDebug).
+		CaptureStdout(&output).
+		Run(ctx); err != nil {
+		return nil, fmt.Errorf("Can not compare the staged changes: %s -> %w", rev, err)
+	}
+
+	paths := []string{}
+	for path := range strings.SplitSeq(output, "\n") {
+		if path != "" {
+			paths = append(paths, path)
+		}
+	}
+
+	return paths, nil
+}
+
 // The token travels as an extra header through the environment, since an argument or
 // a URL shows up in the process listing, the command log and the remote's config.
 func (r Repository) command(t *Task, dir string, args ...string) *Command {

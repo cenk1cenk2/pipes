@@ -75,6 +75,29 @@ func stage(tl *TaskList) *Task {
 
 			if C.Diff == "" {
 				t.Log.Info("Nothing changed in the target.")
+
+				return nil
+			}
+
+			// the branch of the pipeline can carry output an earlier sync merged into it,
+			// which only a checkout of the same project can tell apart from the rest.
+			if P.Target.Project != P.Project.Path {
+				return nil
+			}
+
+			head, err := git.Repository{Dir: P.Project.Dir}.Head(ctx, t)
+			if err != nil {
+				return err
+			}
+
+			changed, err := C.Repository.Changed(ctx, t, head, C.Destinations)
+			if err != nil {
+				return err
+			}
+
+			C.Pending = map[string]bool{}
+			for _, path := range changed {
+				C.Pending[path] = true
 			}
 
 			return nil
