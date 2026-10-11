@@ -23,6 +23,8 @@ stages:
 
 variables:
   GO_CWD: $[[inputs.cwd]]
+  GOPATH: $CI_PROJECT_DIR/.go
+  GOCACHE: $CI_PROJECT_DIR/.go/cache
 
 build:
   stage: build
@@ -42,7 +44,9 @@ build:
       - os: linux
         arch: amd64
   cache:
-    - key: $CI_JOB_NAME_SLUG
+    # warmed by the parent's test jobs, which run in an earlier stage.
+    - key: go-cache-v1
+      policy: pull
       paths:
         - .go/cache/
   artifacts:
@@ -64,9 +68,12 @@ lint:
       job: install
       artifacts: true
   cache:
-    - key: $CI_JOB_NAME_SLUG
+    - key: go-cache-v1
+      policy: pull
       paths:
         - .go/cache/
+    - key: $CI_JOB_NAME_SLUG
+      paths:
         - .go/golangci-lint/
   script:
     - pipe lint
@@ -84,7 +91,8 @@ test:
       job: install
       artifacts: true
   cache:
-    - key: $CI_JOB_NAME_SLUG
+    - key: go-cache-v1
+      policy: pull
       paths:
         - .go/cache/
   script:
