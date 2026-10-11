@@ -29,6 +29,11 @@ spec:
 ---
 "pipe-$[[inputs.name]]":
   stage: pipes
+  # global variables are forwarded to the child as trigger variables, expanded here
+  # where $CI_PROJECT_DIR is still empty, so the go paths would land at /.go and
+  # outrank the child's own definitions.
+  inherit:
+    variables: false
   variables:
     # a child pipeline cannot address the pipeline that started it, so the parent
     # id is handed down as a variable for the child's needs: block to point at.
@@ -38,6 +43,7 @@ spec:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          name: $[[inputs.name]]
           cwd: ./$[[inputs.dir]]
           container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
           container-matrix: $[[inputs.container-matrix]]
