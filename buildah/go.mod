@@ -3,7 +3,7 @@ module gitlab.kilic.dev/devops/pipes/buildah
 go 1.27.0
 
 require (
-	github.com/bmatcuk/doublestar/v4 v4.10.2
+	github.com/bmatcuk/doublestar/v4 v4.10.3
 	github.com/cenk1cenk2/plumber/v7 v7.2.9
 	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
