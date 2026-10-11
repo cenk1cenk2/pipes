@@ -3,8 +3,8 @@ module gitlab.kilic.dev/devops/pipes/pulumi
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.7
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/cenk1cenk2/plumber/v7 v7.2.9
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/pulumi/pulumi/sdk/v3 v3.268.0
 	github.com/urfave/cli/v3 v3.14.0
@@ -81,6 +81,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.46.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.59.0 // indirect

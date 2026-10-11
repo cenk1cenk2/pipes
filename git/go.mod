@@ -3,8 +3,8 @@ module gitlab.kilic.dev/devops/pipes/git
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.7
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/cenk1cenk2/plumber/v7 v7.2.9
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.14.0
 	gitlab.com/gitlab-org/api/client-go/v3 v3.17.0

@@ -3,9 +3,9 @@ module gitlab.kilic.dev/devops/pipes/github
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.7
+	github.com/cenk1cenk2/plumber/v7 v7.2.9
 	github.com/joho/godotenv v1.5.1
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.14.0
