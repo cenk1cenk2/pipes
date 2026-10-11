@@ -43,6 +43,7 @@ spec:
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
+          name: $[[inputs.name]]
           cwd: ./$[[inputs.dir]]
           container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
           container-matrix: $[[inputs.container-matrix]]

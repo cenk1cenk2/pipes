@@ -175,8 +175,8 @@ install:
     - rm -rf vendor/
     - pipe install
   artifacts:
-    # every child pipeline job reads this tree, and a retry after it expires falls back
-    # to downloading every module again.
+    # every child pipeline job reads this tree across the pipeline boundary, so it has to
+    # outlive a same-pipeline retry or a sibling child pipeline started inside the window.
     expire_in: 1 week
     paths:
       - vendor/
@@ -195,11 +195,14 @@ lint:
   needs:
     - install
   cache:
-    - key: go-cache-v1
+    - key:
+        prefix: go-build
+        files:
+          - go.work
       policy: pull
       paths:
         - .go/cache/
-    - key: $CI_JOB_NAME_SLUG-v2
+    - key: $CI_JOB_NAME_SLUG-golangci-lint
       paths:
         - .go/golangci-lint/
   parallel:
@@ -238,17 +241,22 @@ test:
   needs:
     - install
   cache:
-    # the only job saving the build cache that every lint, test and child pipeline job
-    # reads. go names cache entries by content, so the two legs saving over each other
-    # still converge on their union.
-    - key: go-cache-v1
+    # the only job saving the build cache that every other job here and in the child
+    # pipelines reads. A cache archive is uploaded whole and the last upload wins, so
+    # only the ./internal leg, which compiles the most of the workspace, saves it.
+    - key:
+        prefix: go-build
+        files:
+          - go.work
+      policy: $GO_CACHE_POLICY
       paths:
         - .go/cache/
   parallel:
     matrix:
-      - GO_CWD:
-          - ./internal
-          - ./tests
+      - GO_CWD: ./internal
+        GO_CACHE_POLICY: pull-push
+      - GO_CWD: ./tests
+        GO_CACHE_POLICY: pull
   script:
     - pipe test
   tags:
@@ -262,7 +270,11 @@ docs:
   needs:
     - install
   cache:
-    - key: $CI_JOB_NAME_SLUG-v2
+    - key:
+        prefix: go-build
+        files:
+          - go.work
+      policy: pull
       paths:
         - .go/cache/
   variables:
@@ -283,6 +295,14 @@ build:template:
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
+  cache:
+    - key:
+        prefix: go-build
+        files:
+          - go.work
+      policy: pull
+      paths:
+        - .go/cache/
   variables:
     GO_CWD: _template
     GO_BUILD_BINARY_NAME: pipe
