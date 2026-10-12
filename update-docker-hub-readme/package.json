@@ -1,0 +1,10 @@
+{
+  "name": "update-docker-hub-readme",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "internal": "workspace:*"
+  }
+}

@@ -15,12 +15,12 @@ spec:
     container-matrix:
       type: array
       description: A matrix of containers for building images.
-    container-rules:
-      type: array
-      description: Rules for container publishing.
-      default:
-        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-        - if: $CI_COMMIT_TAG
+    release-variable:
+      type: string
+      description: >-
+        The variable the release hands the tag of this pipe over in. The parent
+        forwards the release's dotenv report to this pipeline as trigger
+        variables, so it is already known when the rules are evaluated.
 ---
 stages:
   - build
@@ -158,7 +158,14 @@ container:
     matrix: $[[inputs.container-matrix]]
   script:
     - pipe build
-  rules: $[[inputs.container-rules]]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $$[[inputs.release-variable]]
+    # a change the release does not tag, like one outside every pipe directory, or a
+    # tag whose own pipeline never built the pipe, is published by playing this job
+    # on the latest pipeline of the default branch.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
   tags:
     - amd64
     - docker

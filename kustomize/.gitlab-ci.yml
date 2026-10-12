@@ -1,0 +1,10 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: kustomize
+      dir: kustomize
+      release-variable: SEMANTIC_RELEASE_TAG_KUSTOMIZE
+      container-matrix:
+        - CONTAINER_IMAGE_TAGS: |-
+            latest

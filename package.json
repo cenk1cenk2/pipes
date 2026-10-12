@@ -1,0 +1,12 @@
+{
+  "name": "pipes",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "workspaces": {
+    "packages": [
+      "*"
+    ]
+  }
+}

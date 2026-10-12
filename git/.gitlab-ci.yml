@@ -1,0 +1,10 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: git
+      dir: git
+      release-variable: SEMANTIC_RELEASE_TAG_GIT
+      container-matrix:
+        - CONTAINER_IMAGE_TAGS: |-
+            latest

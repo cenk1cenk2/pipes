@@ -20,12 +20,12 @@ spec:
     container-matrix:
       type: array
       description: A matrix of containers for building images.
-    container-rules:
-      type: array
-      description: Rules for container publishing.
-      default:
-        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-        - if: $CI_COMMIT_TAG
+    release-variable:
+      type: string
+      description: >-
+        The variable the release hands the tag of this pipe over in, which the
+        release job only sets when it tagged the pipe. The pipe is published on
+        its own when it arrives, and only by hand otherwise.
 ---
 "pipe-$[[inputs.name]]":
   stage: pipes
@@ -40,6 +40,11 @@ spec:
     CI_PARENT_PIPELINE_ID: $CI_PIPELINE_ID
   trigger:
     strategy: depend
+    # the release job's dotenv report is what tells the child whether this pipe was
+    # tagged, and only reaches it as trigger variables when pipeline variables are
+    # forwarded.
+    forward:
+      pipeline_variables: true
     include:
       - local: .gitlab-ci.pipe.yml
         inputs:
@@ -47,7 +52,7 @@ spec:
           cwd: ./$[[inputs.dir]]
           container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
           container-matrix: $[[inputs.container-matrix]]
-          container-rules: $[[inputs.container-rules]]
+          release-variable: $[[inputs.release-variable]]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
@@ -64,4 +69,3 @@ spec:
       changes:
         paths: *changes-paths
         compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
-    - if: $CI_COMMIT_TAG

@@ -1,0 +1,10 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: helm
+      dir: helm
+      release-variable: SEMANTIC_RELEASE_TAG_HELM
+      container-matrix:
+        - CONTAINER_IMAGE_TAGS: |-
+            latest

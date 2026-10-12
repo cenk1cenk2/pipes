@@ -1,0 +1,22 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: go
+      dir: go
+      release-variable: SEMANTIC_RELEASE_TAG_GO
+      container-matrix:
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            GO_VERSION: '{{ env "GO_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "GO_VERSION" }}
+          GO_VERSION:
+            - 1.25-alpine
+            - 1.26-alpine
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            GO_VERSION: '{{ env "GO_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "GO_VERSION" }}
+          CONTAINER_IMAGE_TAGS_AS_LATEST: '["^heads/main$"]'
+          GO_VERSION:
+            - 1.27-alpine

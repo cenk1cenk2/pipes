@@ -1,0 +1,12 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: semantic-release
+      dir: semantic-release
+      release-variable: SEMANTIC_RELEASE_TAG_SEMANTIC_RELEASE
+      container-matrix:
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            NODE_VERSION: 26-alpine
+          CONTAINER_IMAGE_TAGS: |-
+            latest

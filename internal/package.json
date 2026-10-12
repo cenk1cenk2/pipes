@@ -1,0 +1,7 @@
+{
+  "name": "internal",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
