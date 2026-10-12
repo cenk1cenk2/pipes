@@ -53,7 +53,10 @@ func env(tl *TaskList) *Task {
 				}
 
 				C.Env["GOPATH"] = cache
+				// the GOPATH of the image wins over this one, so the module cache is pinned on its own.
+				C.Env["GOMODCACHE"] = filepath.Join(cache, "pkg", "mod")
 				C.Env["GOCACHE"] = filepath.Join(cache, "go-build")
+				C.Env["GOFLAGS"] = "-modcacherw"
 				C.Env["GOLANGCI_LINT_CACHE"] = filepath.Join(cache, "golangci-lint")
 			}
 

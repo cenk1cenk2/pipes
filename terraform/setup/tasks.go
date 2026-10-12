@@ -3,6 +3,8 @@ package setup
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
 
 	. "github.com/cenk1cenk2/plumber/v7"
@@ -63,6 +65,20 @@ func environment(tl *TaskList) *Task {
 			C.Env["TF_VAR_CI_PROJECT_ID"] = P.CiVariables.ProjectId
 
 			t.Log.Debug(fmt.Sprintf("Generated following environment variables for terraform to consume: %+v", C.Env))
+
+			// terraform refuses a plugin cache directory that does not exist, and reads
+			// a relative one from the directory it runs in.
+			if dir := os.Getenv("TF_PLUGIN_CACHE_DIR"); dir != "" {
+				if !filepath.IsAbs(dir) {
+					dir = filepath.Join(C.Cwd, dir)
+				}
+
+				if err := os.MkdirAll(dir, 0o755); err != nil {
+					return fmt.Errorf("Cannot create the plugin cache dir: %s -> %w", dir, err)
+				}
+
+				t.Log.Debug(fmt.Sprintf("Plugin cache directory: %s", dir))
+			}
 
 			return nil
 		})
