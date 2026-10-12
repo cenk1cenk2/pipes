@@ -55,3 +55,6 @@ Releases applications through the semantic-release library.
 | --- | --- | --- | --- |
 | `$SEMANTIC_RELEASE_DRY_RUN` | Run semantic-release in dry mode without making changes. | `bool` | `false` |
 | `$SEMANTIC_RELEASE_WORKSPACE` | Use @anolilab/multi-semantic-release package to do a workspace release. | `bool` | `false` |
+| `$TAGS_FILE` | File the release writes its tag into, which is handed over to the later jobs as a dotenv report. | `string` | `".tags"` |
+| `$SEMANTIC_RELEASE_ENV_FILE` | Dotenv report the released tags are written into for the later jobs. | `string` | `"semantic-release.env"` |
+| `$SEMANTIC_RELEASE_ENV_VARIABLE` | Variable the released tag is handed over in, suffixed with the package name of every released package in a workspace. | `string` | `"SEMANTIC_RELEASE_TAG"` |
