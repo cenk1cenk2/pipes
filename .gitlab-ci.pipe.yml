@@ -15,12 +15,6 @@ spec:
     container-matrix:
       type: array
       description: A matrix of containers for building images.
-    release-variable:
-      type: string
-      description: >-
-        The variable the release hands the tag of this pipe over in. The parent
-        forwards the release's dotenv report to this pipeline as trigger
-        variables, so it is already known when the rules are evaluated.
 ---
 stages:
   - build
@@ -154,15 +148,21 @@ container:
     CONTAINER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
     CONTAINER_FILE_CONTEXT: $[[inputs.cwd]]
     CONTAINER_IMAGE_NAME: $[[inputs.container-image-name]]
+    # the version of a <pipe>@<version> tag is published next to the tags of the
+    # matrix. A leg publishing more than one flavour overrides the template to keep
+    # the version of every flavour apart.
+    TAGS_FROM_ENVIRONMENT: CI_COMMIT_TAG
+    CONTAINER_IMAGE_TAGS_TEMPLATE: |-
+      - match: ^[^@]+@(.+)$
+        template: v{{ index $ 1 }}
   parallel:
     matrix: $[[inputs.container-matrix]]
   script:
     - pipe build
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $$[[inputs.release-variable]]
-    # a change the release does not tag, like one outside every pipe directory, or a
-    # tag whose own pipeline never built the pipe, is published by playing this job
-    # on the latest pipeline of the default branch.
+    - if: $CI_COMMIT_TAG
+    # the default branch only builds a pipe in a pipeline started by hand, which
+    # publishes from that commit when this job is played.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
       allow_failure: true

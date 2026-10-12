@@ -4,7 +4,6 @@ include:
     inputs:
       name: buildah
       dir: buildah
-      release-variable: SEMANTIC_RELEASE_TAG_BUILDAH
       container-matrix:
         - CONTAINER_IMAGE_TAGS: |-
             latest

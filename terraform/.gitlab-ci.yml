@@ -4,7 +4,6 @@ include:
     inputs:
       name: terraform
       dir: terraform
-      release-variable: SEMANTIC_RELEASE_TAG_TERRAFORM
       container-matrix:
         - CONTAINER_IMAGE_TAGS: |-
             latest

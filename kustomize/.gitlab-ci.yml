@@ -4,7 +4,7 @@ include:
     inputs:
       name: kustomize
       dir: kustomize
-      release-variable: SEMANTIC_RELEASE_TAG_KUSTOMIZE
+      changes: []
       container-matrix:
         - CONTAINER_IMAGE_TAGS: |-
             latest

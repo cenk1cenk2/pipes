@@ -33,12 +33,6 @@ include:
   - local: terraform/.gitlab-ci.yml
   - local: update-docker-hub-readme/.gitlab-ci.yml
 
-.rules-default:
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      interruptible: true
-
 bootstrap:
   stage: bootstrap
   trigger:
@@ -49,18 +43,20 @@ bootstrap:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
-          - .gitlab-ci.yml
           - .gitlab-ci.bootstrap.yml
+          # bootstrap vendors and verifies every module and lints with the shared
+          # configuration, so those break it as much as what goes into its images.
+          - .golangci.yml
           - go.work
           - go.work.sum
+          - "*/go.{mod,sum}"
           - internal/**/*
-          - go/**/*
-          - buildah/**/*
-          - semantic-release/**/*
+          - "{go,buildah,semantic-release}/**/*.go"
+          - "{go,buildah,semantic-release}/Dockerfile"
+          - semantic-release/rootfs/**/*
 
 install:
   stage: install
-  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   script:
     # a restored vendor tree belongs to whatever dependency graph produced it, and go
@@ -78,13 +74,19 @@ install:
     - key: $CI_JOB_NAME_SLUG-v2
       paths:
         - .go/
+  # every job that needs the tree is gated on its own paths, so this one runs whenever
+  # any of them could, and a tag of internal has no pipe to build.
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG !~ /^internal@/
   tags:
     - amd64
     - docker
 
-lint:
+.lint:
   stage: test
-  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -99,21 +101,69 @@ lint:
     - key: $CI_JOB_NAME_SLUG-golangci-lint
       paths:
         - .go/golangci-lint/
-  parallel:
-    matrix:
-      - GO_CWD:
-          - ./internal
-          - ./tests
-          - ./_template
   script:
     - pipe lint
   tags:
     - amd64
     - docker
 
+lint:internal:
+  extends: .lint
+  variables:
+    GO_CWD: ./internal
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: &internal-paths
+        - internal/**/*
+        - go.work
+        - go.work.sum
+        - .golangci.yml
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *internal-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
+lint:tests:
+  extends: .lint
+  variables:
+    GO_CWD: ./tests
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: &tests-paths
+        - tests/**/*
+        - go.work
+        - go.work.sum
+        - .golangci.yml
+        # the specs read the readme matrix of this file and every readme it names.
+        - .gitlab-ci.yml
+        - "*/README.md"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *tests-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
+lint:template:
+  extends: .lint
+  variables:
+    GO_CWD: ./_template
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: &template-paths
+        - _template/**/*
+        - internal/**/*
+        - go.work
+        - go.work.sum
+        - .golangci.yml
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *template-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
 generate:
   stage: test
-  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -124,20 +174,31 @@ generate:
     - git status --porcelain -- '**/test/mocks/**'
     - |-
       test -z "$(git status --porcelain -- '**/test/mocks/**')" || (echo "mocks are stale, run: task generate" && exit 1)
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: &generate-paths
+        - .mockery.yaml
+        - Taskfile.yml
+        - go.work
+        - go.work.sum
+        - internal/**/*
+        - github/**/*
+        - update-docker-hub-readme/**/*
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *generate-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   tags:
     - amd64
     - docker
 
-test:
+.test:
   stage: test
-  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
   cache:
-    # the only job saving the build cache that every other job here and in the child
-    # pipelines reads. A cache archive is uploaded whole and the last upload wins, so
-    # only the ./internal leg, which compiles the most of the workspace, saves it.
     - key:
         prefix: go-build
         files:
@@ -145,21 +206,45 @@ test:
       policy: $GO_CACHE_POLICY
       paths:
         - .go/cache/
-  parallel:
-    matrix:
-      - GO_CWD: ./internal
-        GO_CACHE_POLICY: pull-push
-      - GO_CWD: ./tests
-        GO_CACHE_POLICY: pull
   script:
     - pipe test
   tags:
     - amd64
     - docker
 
+test:internal:
+  extends: .test
+  variables:
+    GO_CWD: ./internal
+    # the only job saving the build cache that every other job here and in the child
+    # pipelines reads. A cache archive is uploaded whole and the last upload wins, so
+    # only this one, which compiles the most of the workspace, saves it.
+    GO_CACHE_POLICY: pull-push
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: *internal-paths
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *internal-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
+test:tests:
+  extends: .test
+  variables:
+    GO_CWD: ./tests
+    GO_CACHE_POLICY: pull
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: *tests-paths
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *tests-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+
 docs:
   stage: test
-  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -179,13 +264,25 @@ docs:
     - task docs
     - |-
       git diff --exit-code -- '**/README.md' || (echo "readmes are stale, run: task docs" && exit 1)
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: &docs-paths
+        - "**/*.go"
+        - "**/go.mod"
+        - "**/README.md"
+        - Taskfile.yml
+        - Taskfile.pipe.yml
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *docs-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   tags:
     - amd64
     - docker
 
 build:template:
   stage: test
-  extends: .rules-default
   image: cenk1cenk2/pipe-go:bootstrap
   needs:
     - install
@@ -204,6 +301,14 @@ build:template:
     # the scaffold ships no image and gets no trigger child pipeline, so this is the
     # only job that keeps it compiling against the workspace.
     - pipe build
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes: *template-paths
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      interruptible: true
+      changes:
+        paths: *template-paths
+        compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   tags:
     - amd64
     - docker
