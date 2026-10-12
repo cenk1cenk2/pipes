@@ -1,0 +1,16 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: pulumi
+      dir: pulumi
+      release-variable: SEMANTIC_RELEASE_TAG_PULUMI
+      container-matrix:
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            PULUMI_VERSION: '{{ env "PULUMI_VERSION" }}'
+            NODE_VERSION: '{{ env "NODE_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "PULUMI_VERSION" }}-node
+          PULUMI_VERSION:
+            - latest
+          NODE_VERSION: 26-alpine

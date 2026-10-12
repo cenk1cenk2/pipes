@@ -1,0 +1,7 @@
+{
+  "name": "mise",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

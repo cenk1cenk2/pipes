@@ -29,6 +29,14 @@ This repository still builds and publishes the pipe images used by `devops/pipel
 
 The `_template` directory contains the scaffold for creating a pipe, and every pipe lives in its own directory at the repository root. Pipes use the [plumber](https://gitlab.kilic.dev/libraries/plumber) framework to create a CLI and execute commands in a specific order.
 
+### Releases
+
+Every pipe, and `internal`, is a package of the workspace in the root `package.json` and is versioned on its own by [multi-semantic-release](https://github.com/anolilab/multi-semantic-release), tagged as `<pipe>@x.y.z`. A commit releases the packages whose directory it touches, and a release of `internal` patches every pipe that depends on it. Next to the usual types, `chore(deps)` releases a patch, since a dependency bump changes what the image ships.
+
+The image of a pipe is published as `latest` on the default branch only when the release tagged it, so a change to a pipe, its `Dockerfile` or its build matrix in `<pipe>/.gitlab-ci.yml` ships through a releasing commit type, and a `ci` or `docs` commit does not. Anything else, like a change outside every pipe directory, is published by playing the manual `container` job of that pipe on the latest default branch pipeline, which a manual run of the pipeline starts for every pipe.
+
+A new pipe needs a `package.json` naming it, a `<pipe>/.gitlab-ci.yml` including `.gitlab-ci.trigger.yml` with its build matrix, that file in the includes of the root `.gitlab-ci.yml`, and its module in `go.work`.
+
 ### Flag descriptions
 
 The `Usage` of a flag is one or more plain sentences. Whenever the Go type of the value does not describe the payload, a single annotation closes the description and documents what the validator accepts:

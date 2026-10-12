@@ -3,6 +3,7 @@ stages:
   - bootstrap
   - install
   - test
+  - release
   - pipes
   - post
 
@@ -11,132 +12,32 @@ variables:
   GOCACHE: $CI_PROJECT_DIR/.go/cache
 
 include:
-  - local: .gitlab-ci.trigger.yml
+  - project: devops/pipelines
+    ref: semantic-release@2.5.1
+    file: /semantic-release/publish.gitlab-ci.yml
     inputs:
-      name: buildah
-      dir: buildah
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: git
-      dir: git
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: github
-      dir: github
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: go
-      dir: go
-      container-matrix:
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            GO_VERSION: '{{ env "GO_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
-            {{ env "GO_VERSION" }}
-          GO_VERSION:
-            - 1.25-alpine
-            - 1.26-alpine
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            GO_VERSION: '{{ env "GO_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
-            {{ env "GO_VERSION" }}
-          CONTAINER_IMAGE_TAGS_AS_LATEST: '["^heads/main$", "^tags/.*"]'
-          GO_VERSION:
-            - 1.27-alpine
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: helm
-      dir: helm
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: kustomize
-      dir: kustomize
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: mise
-      dir: mise
-      container-matrix:
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            BASE_IMAGE: docker.io/alpine:3
-          CONTAINER_IMAGE_TAGS: |-
-            latest
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            BASE_IMAGE: docker.io/debian:trixie-slim
-          CONTAINER_IMAGE_TAGS: |-
-            latest-glibc
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: node
-      dir: node
-      container-matrix:
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            NODE_VERSION: '{{ env "NODE_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
-            {{ env "NODE_VERSION" }}
-          NODE_VERSION:
-            - 22
-            - 22-alpine
-            - 24
-            - 24-alpine
-            - 26
-            - 26-alpine
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: pulumi
-      dir: pulumi
-      container-matrix:
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            PULUMI_VERSION: '{{ env "PULUMI_VERSION" }}'
-            NODE_VERSION: '{{ env "NODE_VERSION" }}'
-          CONTAINER_IMAGE_TAGS: |-
-            {{ env "PULUMI_VERSION" }}-node
-          PULUMI_VERSION:
-            - latest
-          NODE_VERSION: 26-alpine
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: semantic-release
-      dir: semantic-release
-      container-matrix:
-        - CONTAINER_IMAGE_BUILD_ARGS: |-
-            NODE_VERSION: 26-alpine
-          CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: terraform
-      dir: terraform
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
-      name: update-docker-hub-readme
-      dir: update-docker-hub-readme
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
+      version: bootstrap
+      tags:
+        - amd64
+        - docker
+  - local: buildah/.gitlab-ci.yml
+  - local: git/.gitlab-ci.yml
+  - local: github/.gitlab-ci.yml
+  - local: go/.gitlab-ci.yml
+  - local: helm/.gitlab-ci.yml
+  - local: kustomize/.gitlab-ci.yml
+  - local: mise/.gitlab-ci.yml
+  - local: node/.gitlab-ci.yml
+  - local: pulumi/.gitlab-ci.yml
+  - local: semantic-release/.gitlab-ci.yml
+  - local: terraform/.gitlab-ci.yml
+  - local: update-docker-hub-readme/.gitlab-ci.yml
 
 .rules-default:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       interruptible: true
-    - if: $CI_COMMIT_TAG
 
 bootstrap:
   stage: bootstrap
@@ -155,7 +56,7 @@ bootstrap:
           - internal/**/*
           - go/**/*
           - buildah/**/*
-    - if: $CI_COMMIT_TAG
+          - semantic-release/**/*
 
 install:
   stage: install
@@ -307,6 +208,13 @@ build:template:
     - amd64
     - docker
 
+semantic-release:
+  stage: release
+  extends: .semantic-release
+  dependencies: []
+  variables:
+    SEMANTIC_RELEASE_WORKSPACE: "true"
+
 update-docker-hub-readme:
   stage: post
   image: cenk1cenk2/pipe-update-docker-hub-readme:latest
@@ -381,4 +289,3 @@ update-docker-hub-readme:
       changes:
         paths:
           - "**/README.md"
-    - if: $CI_COMMIT_TAG

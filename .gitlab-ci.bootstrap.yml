@@ -28,8 +28,10 @@ build:
     - GO_CWD=./internal ./go/dist/pipe-bootstrap lint
     - GO_CWD=./go ./go/dist/pipe-bootstrap lint
     - GO_CWD=./buildah ./go/dist/pipe-bootstrap lint
+    - GO_CWD=./semantic-release ./go/dist/pipe-bootstrap lint
     - GO_CWD=./go ./go/dist/pipe-bootstrap build
     - GO_CWD=./buildah ./go/dist/pipe-bootstrap build
+    - GO_CWD=./semantic-release ./go/dist/pipe-bootstrap build
   cache:
     - key: bootstrap-build
       paths:
@@ -39,6 +41,7 @@ build:
     paths:
       - go/dist/
       - buildah/dist/
+      - semantic-release/dist/
   tags:
     - amd64
     - docker
@@ -51,7 +54,7 @@ container:
     CONTAINER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
     CONTAINER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
   script:
-    # the buildah pipe built one stage ago is what builds both bootstrap images:
+    # the buildah pipe built one stage ago is what builds every bootstrap image:
     # the published :bootstrap image is what this run is about to replace, so
     # reaching for it here would build the new images with the old binary.
     - ./buildah/dist/pipe-linux-amd64 build
@@ -65,6 +68,10 @@ container:
         CONTAINER_IMAGE_NAME: cenk1cenk2/pipe-buildah
         CONTAINER_IMAGE_BUILD_ARGS: |-
           BUILDAH_VERSION: latest
+      - CONTAINER_FILE_CONTEXT: ./semantic-release
+        CONTAINER_IMAGE_NAME: cenk1cenk2/pipe-semantic-release
+        CONTAINER_IMAGE_BUILD_ARGS: |-
+          NODE_VERSION: 26-alpine
   tags:
     - amd64
     - docker

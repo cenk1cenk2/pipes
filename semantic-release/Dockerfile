@@ -18,7 +18,7 @@ RUN \
 
 # the plugin set is a committed manifest instead of a bare `pnpm add` so the versions
 # baked into the image are reproducible and renovate can raise the bumps.
-COPY ./package.json ./pnpm-lock.yaml ./pnpm-workspace.yaml ${SEMANTIC_RELEASE_HOME}/
+COPY ./rootfs/ /
 
 WORKDIR ${SEMANTIC_RELEASE_HOME}
 

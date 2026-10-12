@@ -1,0 +1,19 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: node
+      dir: node
+      release-variable: SEMANTIC_RELEASE_TAG_NODE
+      container-matrix:
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            NODE_VERSION: '{{ env "NODE_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "NODE_VERSION" }}
+          NODE_VERSION:
+            - 22
+            - 22-alpine
+            - 24
+            - 24-alpine
+            - 26
+            - 26-alpine

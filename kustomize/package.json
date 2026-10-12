@@ -1,0 +1,7 @@
+{
+  "name": "kustomize",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
