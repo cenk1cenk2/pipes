@@ -7,20 +7,16 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
-	"gitlab.kilic.dev/devops/pipes/helm/setup"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
-// The collector reads the parsed flags and the resolved working directory, so it is only built from inside a task list.
+// The collector reads the parsed flags, so it is only built from inside a task list.
 func versionsCollector() *versions.Collector {
 	return &versions.Collector{
 		Name: "versions",
 
-		FromUser: P.Chart.Versions,
-
-		File:       P.Chart.VersionFile,
-		FileStrict: P.Chart.VersionFileStrict,
-		FileDir:    setup.C.Cwd,
+		FromUser:        P.Chart.Versions,
+		FromEnvironment: P.Chart.VersionsFromEnvironment,
 
 		Templates: P.Chart.VersionsTemplate,
 		Sanitize:  P.Chart.VersionsSanitize,
@@ -34,10 +30,8 @@ func versionsTask(tl *TaskList) *Task {
 	return tl.CreateTask("versions").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobSequence(
-				JobParallel(
-					collector.UserTask(tl, &C.Versions).Job(),
-					collector.FileTask(tl, &C.Versions).Job(),
-				),
+				collector.UserTask(tl, &C.Versions).Job(),
+				collector.EnvironmentTask(tl, &C.Versions).Job(),
 				job,
 			)
 		}).

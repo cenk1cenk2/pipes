@@ -64,7 +64,7 @@ Build container images.
 | --- | --- | --- | --- |
 | `$BUILDAH_BUILD_IMAGE_PLATFORMS`<br/>`$CONTAINER_IMAGE_PLATFORMS` | Container image platforms to be built. | `string[]` |  |
 | **`$BUILDAH_BUILD_IMAGE_NAME`**<br/>**`$CONTAINER_IMAGE_NAME`**\* | Image name for the container image to be built. | `string` |  |
-| **`$BUILDAH_BUILD_IMAGE_TAGS`**<br/>**`$CONTAINER_IMAGE_TAGS`**\* | Image tags for the container image to be built. | `string[]` |  |
+| `$BUILDAH_BUILD_IMAGE_TAGS`<br/>`$CONTAINER_IMAGE_TAGS` | Image tags for the container image to be built. | `string[]` |  |
 | `$BUILDAH_BUILD_IMAGE_TAGS_TEMPLATE`<br/>`$CONTAINER_IMAGE_TAGS_TEMPLATE` | Modifies every tag that matches a certain condition.<br/>Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `"[]"` |
 | `$BUILDAH_BUILD_IMAGE_TAGS_SANITIZE`<br/>`$CONTAINER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.<br/>Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `"[\n    { \"match\": \"([^/]*)/(.*)\", \"template\": \"{{ index $ 1 \| upper }}_{{ index $ 2 }}\" }\n]"` |
 | `$BUILDAH_BUILD_IMAGE_TAG_AS_LATEST`<br/>`$CONTAINER_IMAGE_TAGS_AS_LATEST` | Regex pattern to tag the image as latest.<br/>Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `string`<br/>`format(yaml([]RegExp))` | `"[ \"^tags/v?\\\\d+.\\\\d+.\\\\d+$\" ]"` |
@@ -82,8 +82,10 @@ Build container images.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
+| `$CONTAINER_MANIFEST_VARIABLE_PREFIX` | Prefix of the dotenv variables the build jobs hand their published images over to the manifest job in. | `string` | `"CONTAINER_MANIFEST_PUBLISHED_"` |
 | `$BUILDAH_BUILD_MANIFEST_TARGET`<br/>`$CONTAINER_MANIFEST_TARGET` | Target image names for patching the manifest. | `string`<br/>`format(Template([]string))` |  |
-| `$BUILDAH_BUILD_MANIFEST_FILE`<br/>`$CONTAINER_MANIFEST_FILE` | Write all the published images into a file for later use. | `string`<br/>`format(Template([]string))` | `".published-container-images_{{ $ \| join \",\" \| sha256sum }}"` |
+| `$BUILDAH_BUILD_MANIFEST_JOB`<br/>`$CI_JOB_NAME_SLUG` | Job name that keys the published images in the dotenv report. | `string` |  |
+| `$BUILDAH_BUILD_MANIFEST_ENV_FILE`<br/>`$CONTAINER_MANIFEST_ENV_FILE` | Dotenv report the published images are written into for the manifest job. | `string` | `"container-manifest.env"` |
 
 <details>
 <summary>Container Registry</summary>
@@ -110,12 +112,11 @@ Build container images.
 | `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `string` |  |
 | `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `string` |  |
 
-**Tags File**
+**Tags From Environment**
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$TAGS_FILE` | Read tags from a comma separated file. | `string` |  |
-| `$TAGS_FILE_STRICT` | Fail on missing tags file. | `bool` | `false` |
+| `$TAGS_FROM_ENVIRONMENT` | Environment variables to read tags from, where a name ending in "*" reads every variable under that prefix. An unset or empty variable is skipped. | `string[]` |  |
 
 ### `pipe-buildah manifest`
 
@@ -138,7 +139,7 @@ Update manifests of the container images.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$BUILDAH_MANIFEST_FILES`<br/>`$CONTAINER_MANIFEST_FILES` | Read published tags from a file. | `string[]`<br/>`format(glob)` | `"**/.published-container-images*"` |
+| `$CONTAINER_MANIFEST_VARIABLE_PREFIX` | Prefix of the dotenv variables the build jobs hand their published images over to the manifest job in. | `string` | `"CONTAINER_MANIFEST_PUBLISHED_"` |
 | `$BUILDAH_MANIFEST_TARGET`<br/>`$CONTAINER_MANIFEST_TARGET` | Target image names for patching the manifest. | `string`<br/>`format(Template())` |  |
 | `$BUILDAH_MANIFEST_IMAGES`<br/>`$CONTAINER_MANIFEST_IMAGES` | Image names for patching the manifest with the given target. | `string[]` |  |
 | `$BUILDAH_MANIFEST_MATRIX`<br/>`$CONTAINER_MANIFEST_MATRIX` | Matrix of all the images that should be manifested. | `string`<br/>`format(yaml([]struct{ target: string, images: []string }))` |  |

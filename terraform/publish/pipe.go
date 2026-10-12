@@ -10,10 +10,11 @@ import (
 
 type (
 	Module struct {
-		TagsFile string
-		Name     string
-		Cwd      string
-		System   string
+		Tags                []string
+		TagsFromEnvironment []string
+		Name                string
+		Cwd                 string
+		System              string
 	}
 
 	Registry struct {

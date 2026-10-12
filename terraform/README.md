@@ -311,6 +311,7 @@ Publish terraform project.
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
 | **`$TERRAFORM_PUBLISH_MODULE_NAME`**<br/>**`$TF_MODULE_NAME`**<br/>**`$CI_PROJECT_NAME`**\* | Name for the module that will be published. | `string` |  |
+| `$TERRAFORM_PUBLISH_MODULE_TAGS`<br/>`$TF_MODULE_TAGS`<br/>`$CI_COMMIT_TAG` | Versions for the module to be published. | `string[]` |  |
 | `$TERRAFORM_PUBLISH_MODULE_CWD`<br/>`$TF_MODULE_CWD`<br/>`$TF_ROOT` | Directory for the module that will be published. | `string` | `"."` |
 | `$TERRAFORM_PUBLISH_MODULE_SYSTEM`<br/>`$TF_MODULE_SYSTEM` | Module system for the module that will be published. | `string` | `"local"` |
 
@@ -330,8 +331,8 @@ Publish terraform project.
 | `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_PROJECT_ID`<br/>`$CI_PROJECT_ID` | GitLab project id for the publish call. | `string` |  |
 | `$TERRAFORM_PUBLISH_REGISTRY_GITLAB_TOKEN`<br/>`$CI_JOB_TOKEN` | GitLab API token for the publish call. | `string` |  |
 
-**Tags File**
+**Tags From Environment**
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$TAGS_FILE` | Read tags from a comma separated file. | `string` | `".tags"` |
+| `$TAGS_FROM_ENVIRONMENT` | Environment variables to read tags from, where a name ending in "*" reads every variable under that prefix. An unset or empty variable is skipped. | `string[]` |  |

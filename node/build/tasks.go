@@ -5,7 +5,6 @@ import (
 	"os"
 
 	. "github.com/cenk1cenk2/plumber/v7"
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
@@ -16,15 +15,10 @@ func build(tl *TaskList) *Task {
 				setup.NodeCtx.PackageManager.Exe,
 			).
 				Set(func(_ context.Context, c *Command) error {
-					ctx := environment.Template{
-						Environment: setup.EnvironmentCtx.Environment,
-						EnvVars:     setup.EnvironmentCtx.EnvVars,
-					}
-
 					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.Run...)
 
 					if P.Build.Script != "" {
-						tmpl, err := InlineTemplate(P.Build.Script, ctx)
+						tmpl, err := InlineTemplate[any](P.Build.Script, nil)
 
 						if err != nil {
 							return err
@@ -36,7 +30,7 @@ func build(tl *TaskList) *Task {
 					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.RunDelimiter...)
 
 					if P.Build.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(P.Build.ScriptArgs, ctx)
+						tmpl, err := InlineTemplate[any](P.Build.ScriptArgs, nil)
 
 						if err != nil {
 							return err
@@ -47,8 +41,7 @@ func build(tl *TaskList) *Task {
 
 					c.SetDir(P.Build.Cwd)
 
-					c.AppendDirectEnvironment(os.Environ()...).
-						AppendEnvironment(setup.EnvironmentCtx.EnvVars)
+					c.AppendDirectEnvironment(os.Environ()...)
 
 					return nil
 				}).

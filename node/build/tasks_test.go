@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -19,10 +18,6 @@ var _ = Describe("Node build", func() {
 			Exe:      packageManager,
 			Commands: node.PackageManagers[packageManager],
 		}}
-		*setup.EnvironmentCtx = environment.Ctx{
-			Environment: "production",
-			EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-		}
 	}
 
 	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
@@ -80,12 +75,12 @@ var _ = Describe("Node build", func() {
 		Expect(invocation.Args).To(Equal([]string{"run", "build", "--", "--verbose"}))
 	})
 
-	It("templates the script and its arguments against the selected environment", func() {
+	It("renders the script and its arguments as templates", func() {
 		runner := fixtures.Runner()
 
 		p := pipe()
-		p.Build.Script = "build:{{ .Environment }}"
-		p.Build.ScriptArgs = "--url {{ index .EnvVars \"API_URL\" }}"
+		p.Build.Script = `build:{{ "production" }}`
+		p.Build.ScriptArgs = `--url {{ "https://api.example.com" }}`
 
 		Expect(run(runner, p, "pnpm")).To(Succeed())
 
@@ -93,15 +88,5 @@ var _ = Describe("Node build", func() {
 		Expect(ok).To(BeTrue())
 		Expect(invocation.Args).
 			To(Equal([]string{"run", "build:production", "--url https://api.example.com"}))
-	})
-
-	It("hands the environment variables to the build process", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, pipe(), "pnpm")).To(Succeed())
-
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Env).To(ContainElement("API_URL=https://api.example.com"))
 	})
 })

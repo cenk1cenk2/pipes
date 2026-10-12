@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
@@ -19,10 +18,6 @@ var _ = Describe("Node run", func() {
 			Exe:      packageManager,
 			Commands: node.PackageManagers[packageManager],
 		}}
-		*setup.EnvironmentCtx = environment.Ctx{
-			Environment: "production",
-			EnvVars:     map[string]string{"API_URL": "https://api.example.com"},
-		}
 	}
 
 	// the whole task list runs rather than the task alone, since what the script
@@ -74,11 +69,11 @@ var _ = Describe("Node run", func() {
 
 	// the cut happens before the templating, so the script half of the flag has to
 	// be written without a space in it for the two to survive as one action each.
-	It("templates the script against the selected environment", func() {
+	It("renders the script as a template", func() {
 		runner := fixtures.Runner()
 
 		Expect(runScript(runner, Pipe{
-			Run: Run{Script: "deploy:{{.Environment}} {{ index .EnvVars \"API_URL\" }}", Cwd: "."},
+			Run: Run{Script: `deploy:{{"production"}} {{ "https://api.example.com" }}`, Cwd: "."},
 		})).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()

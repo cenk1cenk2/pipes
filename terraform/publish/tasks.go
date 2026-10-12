@@ -4,27 +4,36 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path"
+	"slices"
 
 	. "github.com/cenk1cenk2/plumber/v7"
-	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
+// The collector reads the parsed flags, so it is only built from inside a task list.
 func tags(tl *TaskList) *Task {
+	collector := &versions.Collector{
+		Name: "tags",
+
+		FromUser:        P.Module.Tags,
+		FromEnvironment: P.Module.TagsFromEnvironment,
+	}
+
 	return tl.CreateTask("tags").
+		SetJobWrapper(func(job Job, t *Task) Job {
+			return JobSequence(
+				collector.UserTask(tl, &C.Tags).Job(),
+				collector.EnvironmentTask(tl, &C.Tags).Job(),
+				job,
+			)
+		}).
 		Set(func(_ context.Context, t *Task) error {
-			parsed, err := tagsfile.Parse(t, path.Join(P.Module.Cwd, P.Module.TagsFile), false)
-
-			if err != nil {
-				return err
-			}
-
-			C.Tags = parsed
+			C.Tags = slices.Compact(C.Tags)
 
 			if len(C.Tags) > 0 {
-				t.Log.Info(fmt.Sprintf("Tags file has been parsed: %+v", C.Tags))
+				t.Log.Info(fmt.Sprintf("Module tags: %+v", C.Tags))
 			} else {
-				t.Log.Warn("Tags file does not contain any tags, doing nothing.")
+				t.Log.Warn("No tags to publish the module with, doing nothing.")
 			}
 
 			return nil

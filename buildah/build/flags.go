@@ -4,9 +4,10 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v3"
+	buildahmanifest "gitlab.kilic.dev/devops/pipes/buildah/manifest"
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
-	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -26,7 +27,8 @@ const (
 
 var Flags = CombineFlags(
 	git.NewFlags(git.Options{Destination: &P.Git}),
-	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Image.TagsFile, Strict: &P.Image.TagsFileStrict}),
+	versions.NewEnvironmentFlags(versions.EnvironmentOptions{Destination: &P.Image.TagsFromEnvironment}),
+	buildahmanifest.NewPublishedFlags(buildahmanifest.PublishedOptions{Destination: &P.Manifest.PublishedPrefix}),
 	[]cli.Flag{
 
 		// CategoryContainerImage
@@ -64,7 +66,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_TAGS"),
 			),
 			Usage:       "Image tags for the container image to be built.",
-			Required:    true,
+			Required:    false,
 			Destination: &P.Image.Tags,
 		},
 
@@ -259,13 +261,26 @@ format(yaml(map[string]Template()))
 
 		&cli.StringFlag{
 			Category: CategoryContainerManifest,
-			Name:     "buildah.build.manifest.file",
+			Name:     "buildah.build.manifest.job",
 			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("BUILDAH_BUILD_MANIFEST_FILE"),
-				cli.EnvVar("CONTAINER_MANIFEST_FILE"),
+				cli.EnvVar("BUILDAH_BUILD_MANIFEST_JOB"),
+				cli.EnvVar("CI_JOB_NAME_SLUG"),
 			),
-			Usage:       "Write all the published images into a file for later use. format(Template([]string))",
-			Value:       `.published-container-images_{{ $ | join "," | sha256sum }}`,
-			Destination: &P.Manifest.File,
+			Usage:       "Job name that keys the published images in the dotenv report.",
+			Required:    false,
+			Destination: &P.Manifest.Job,
+		},
+
+		&cli.StringFlag{
+			Category: CategoryContainerManifest,
+			Name:     "buildah.build.manifest.env-file",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("BUILDAH_BUILD_MANIFEST_ENV_FILE"),
+				cli.EnvVar("CONTAINER_MANIFEST_ENV_FILE"),
+			),
+			Usage:       "Dotenv report the published images are written into for the manifest job.",
+			Required:    false,
+			Value:       "container-manifest.env",
+			Destination: &P.Manifest.EnvFile,
 		},
 	})

@@ -2,8 +2,6 @@ package versions_test
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	. "github.com/onsi/ginkgo/v2"
@@ -134,9 +132,8 @@ var _ = Describe("Collector", func() {
 	// compacts and reports what they collected; these specs stand in for that parent.
 	Describe("Sources", func() {
 		var (
-			p   *Plumber
-			tl  *TaskList
-			dir string
+			p  *Plumber
+			tl *TaskList
 		)
 
 		BeforeEach(func() {
@@ -147,20 +144,20 @@ var _ = Describe("Collector", func() {
 
 			tl = &TaskList{}
 			tl.New(p)
-
-			dir = GinkgoT().TempDir()
 		})
+
+		run := func(collector *versions.Collector, out *[]string) error {
+			return p.RunJobs(JobSequence(
+				collector.UserTask(tl, out).Job(),
+				collector.EnvironmentTask(tl, out).Job(),
+				collector.LatestTask(tl, out).Job(),
+			))
+		}
 
 		collect := func(collector *versions.Collector) []string {
 			out := []string{}
 
-			Expect(p.RunJobs(JobSequence(
-				JobParallel(
-					collector.UserTask(tl, &out).Job(),
-					collector.FileTask(tl, &out).Job(),
-				),
-				collector.LatestTask(tl, &out).Job(),
-			))).To(Succeed())
+			Expect(run(collector, &out)).To(Succeed())
 
 			return out
 		}
@@ -175,6 +172,52 @@ var _ = Describe("Collector", func() {
 			Expect(out).To(Equal([]string{"v1.2.3", "main"}))
 		})
 
+		It("refuses an empty value the user gave", func() {
+			out := []string{}
+
+			Expect(run(&versions.Collector{Name: "tags", FromUser: []string{"latest", ""}}, &out)).
+				To(MatchError(ContainSubstring("Can not add empty tag to list.")))
+		})
+
+		Describe("from the environment", func() {
+			It("collects the value of a variable named", func() {
+				GinkgoT().Setenv("RELEASED_TAG", "v1.2.3")
+
+				Expect(collect(&versions.Collector{Name: "tags", FromEnvironment: []string{"RELEASED_TAG"}})).
+					To(Equal([]string{"v1.2.3"}))
+			})
+
+			It("collects every variable under a prefix, in the order of their names", func() {
+				GinkgoT().Setenv("RELEASED_TAG_B", "v2.0.0")
+				GinkgoT().Setenv("RELEASED_TAG_A", "v1.0.0")
+				GinkgoT().Setenv("RELEASED_TAGS", "v3.0.0")
+
+				Expect(collect(&versions.Collector{Name: "tags", FromEnvironment: []string{"RELEASED_TAG_*"}})).
+					To(Equal([]string{"v1.0.0", "v2.0.0"}))
+			})
+
+			// a job that released nothing hands no tag over, which is not a failure.
+			It("skips a variable that is unset or empty", func() {
+				GinkgoT().Setenv("RELEASED_TAG", "")
+
+				Expect(collect(&versions.Collector{
+					Name:            "tags",
+					FromUser:        []string{"latest"},
+					FromEnvironment: []string{"RELEASED_TAG", "RELEASED_UNSET", "RELEASED_UNSET_*"},
+				})).To(Equal([]string{"latest"}))
+			})
+
+			It("processes the value like any other", func() {
+				GinkgoT().Setenv("RELEASED_TAG", "feature/foo")
+
+				Expect(collect(&versions.Collector{
+					Name:            "tags",
+					FromEnvironment: []string{"RELEASED_TAG"},
+					Sanitize:        defaultSanitize,
+				})).To(Equal([]string{"FEATURE_foo"}))
+			})
+		})
+
 		// the user tags are a package level flag destination shared with the rest of
 		// the pipe, so collecting must not truncate them.
 		It("leaves the user values alone", func() {
@@ -183,29 +226,6 @@ var _ = Describe("Collector", func() {
 			collect(&versions.Collector{Name: "tags", FromUser: user})
 
 			Expect(user).To(Equal([]string{"v1.2.3", "v1.2.3", "main"}))
-		})
-
-		It("collects the comma separated values out of the file", func() {
-			Expect(os.WriteFile(filepath.Join(dir, "tags"), []byte("from-file-a,from-file-b\n"), 0600)).To(Succeed())
-
-			out := collect(&versions.Collector{Name: "tags", File: "tags", FileDir: dir})
-
-			Expect(out).To(ConsistOf("from-file-a", "from-file-b"))
-		})
-
-		// the user and the file source run in parallel, so which of them lands first
-		// is not something a pipe may depend on.
-		It("collects both sources at once", func() {
-			Expect(os.WriteFile(filepath.Join(dir, "tags"), []byte("from-file"), 0600)).To(Succeed())
-
-			out := collect(&versions.Collector{
-				Name:     "tags",
-				FromUser: []string{"v1.2.3"},
-				File:     "tags",
-				FileDir:  dir,
-			})
-
-			Expect(out).To(ConsistOf("v1.2.3", "from-file"))
 		})
 
 		It("adds the latest value when a reference matches", func() {

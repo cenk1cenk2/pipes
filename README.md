@@ -21,7 +21,6 @@ This repository still builds and publishes the pipe images used by `devops/pipel
 - [`cenk1cenk2/pipe-mise`](./mise/README.md)
 - [`cenk1cenk2/pipe-node`](./node/README.md)
 - [`cenk1cenk2/pipe-pulumi`](./pulumi/README.md)
-- [`cenk1cenk2/pipe-select-env`](./select-env/README.md)
 - [`cenk1cenk2/pipe-semantic-release`](./semantic-release/README.md)
 - [`cenk1cenk2/pipe-terraform`](./terraform/README.md)
 - [`cenk1cenk2/pipe-update-docker-hub-readme`](./update-docker-hub-readme/README.md)

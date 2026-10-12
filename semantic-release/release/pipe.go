@@ -12,8 +12,11 @@ type (
 	}
 
 	SemanticRelease struct {
-		DryRun    bool
-		Workspace bool
+		DryRun      bool
+		Workspace   bool
+		TagsFile    string
+		EnvFile     string
+		EnvVariable string
 	}
 
 	Pipe struct {
@@ -41,6 +44,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				release(tl).Job(),
+				tags(tl).Job(),
 			)
 		})
 }

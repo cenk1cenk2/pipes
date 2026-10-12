@@ -1,4 +1,4 @@
-package environment_test
+package manifest
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestEnvironment(t *testing.T) {
+func TestManifest(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Environment Suite")
+	RunSpecs(t, "Buildah Manifest Suite")
 }

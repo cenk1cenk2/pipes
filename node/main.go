@@ -18,17 +18,6 @@ var version = "latest"
 
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
-		// the environment is opt-in here, and the flags are shared package level values,
-		// so this runs before the command tree reads them.
-		OverwriteCliFlag(setup.EnvironmentFlags, func(f *cli.BoolFlag) bool {
-			return f.Name == "environment.enable"
-		}, func(f *cli.BoolFlag) *cli.BoolFlag {
-			f.Hidden = false
-			f.Value = false
-
-			return f
-		})
-
 		return &cli.Command{
 			Name:        "pipe-node",
 			Version:     version,
@@ -71,11 +60,10 @@ func main() {
 				{
 					Name:        "build",
 					Description: "",
-					Flags:       CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, build.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, build.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
-							setup.NewEnvironment(p),
 							build.New(p),
 						))
 					},
@@ -83,12 +71,11 @@ func main() {
 				{
 					Name:        "run",
 					Description: "",
-					Flags:       CombineFlags(setup.NodeFlags, setup.EnvironmentFlags, run.Flags),
+					Flags:       CombineFlags(setup.NodeFlags, run.Flags),
 					Arguments:   run.Arguments,
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
-							setup.NewEnvironment(p),
 							run.New(p),
 						))
 					},

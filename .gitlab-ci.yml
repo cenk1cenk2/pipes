@@ -109,13 +109,6 @@ include:
           NODE_VERSION: 26-alpine
   - local: .gitlab-ci.trigger.yml
     inputs:
-      name: select-env
-      dir: select-env
-      container-matrix:
-        - CONTAINER_IMAGE_TAGS: |-
-            latest
-  - local: .gitlab-ci.trigger.yml
-    inputs:
       name: semantic-release
       dir: semantic-release
       container-matrix:
@@ -362,11 +355,6 @@ update-docker-hub-readme:
           "repository": "cenk1cenk2/pipe-mise",
           "file": "./mise/README.md",
           "description": "mise tool installs for pipelines."
-        },
-        {
-          "repository": "cenk1cenk2/pipe-select-env",
-          "file": "./select-env/README.md",
-          "description": "Selects an environment given on the conditions."
         },
         {
           "repository": "cenk1cenk2/pipe-semantic-release",

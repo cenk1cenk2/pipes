@@ -1,10 +1,7 @@
 package run
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
 //revive:disable:line-length-limit
@@ -24,10 +21,7 @@ var Flags = []cli.Flag{
 			cli.EnvVar("NODE_RUN_SCRIPT"),
 			cli.EnvVar("NODE_COMMAND_SCRIPT"),
 		),
-		Usage: fmt.Sprintf(
-			"package.json script for the given command operation. %s",
-			environment.HelpFormatTemplate,
-		),
+		Usage:       "package.json script for the given command operation. format(Template())",
 		Required:    false,
 		Destination: &P.Run.Script,
 	},

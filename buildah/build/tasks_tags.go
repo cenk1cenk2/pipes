@@ -3,15 +3,12 @@ package build
 import (
 	"context"
 	"fmt"
-	"os"
 	"slices"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/buildah/login"
-	"gitlab.kilic.dev/devops/pipes/buildah/manifest"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
-	"go.yaml.in/yaml/v4"
 )
 
 // The collector reads the parsed flags, so it is only built from inside a task list.
@@ -19,11 +16,8 @@ func tagsCollector() *versions.Collector {
 	return &versions.Collector{
 		Name: "tags",
 
-		FromUser: P.Image.Tags,
-
-		File:       P.Image.TagsFile,
-		FileStrict: P.Image.TagsFileStrict,
-		FileDir:    P.File.Context,
+		FromUser:        P.Image.Tags,
+		FromEnvironment: P.Image.TagsFromEnvironment,
 
 		LatestWhen:  P.Image.TagAsLatest,
 		LatestValue: P.Image.LatestTag,
@@ -42,69 +36,26 @@ func tagsCollector() *versions.Collector {
 	}
 }
 
-// The manifest write hangs off the parent, so it only sees a fully collected tag list.
 func tags(tl *TaskList) *Task {
 	collector := tagsCollector()
 
 	return tl.CreateTask("tags").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobSequence(
-				JobParallel(
-					collector.UserTask(tl, &C.Tags).Job(),
-					collector.FileTask(tl, &C.Tags).Job(),
-				),
+				collector.UserTask(tl, &C.Tags).Job(),
+				collector.EnvironmentTask(tl, &C.Tags).Job(),
 				collector.LatestTask(tl, &C.Tags).Job(),
 				job,
-				tagsManifest(tl, collector).Job(),
 			)
 		}).
 		Set(func(_ context.Context, t *Task) error {
 			C.Tags = slices.Compact(C.Tags)
 
+			if len(C.Tags) == 0 {
+				return fmt.Errorf("Can not build the image without any tags.")
+			}
+
 			t.Log.Info(fmt.Sprintf("Image tags: %s", strings.Join(C.Tags, ", ")))
-
-			return nil
-		})
-}
-
-func tagsManifest(tl *TaskList, collector *versions.Collector) *Task {
-	return tl.CreateTask("tags", "manifest").
-		ShouldDisable(func(t *Task) bool {
-			return P.Manifest.File == "" || P.Manifest.Target == ""
-		}).
-		Set(func(ctx context.Context, t *Task) error {
-			target, err := InlineTemplate(P.Manifest.Target, C.Tags)
-			if err != nil {
-				return err
-			}
-
-			image, err := collector.Process(ctx, t, target)
-			if err != nil {
-				return err
-			}
-
-			tags, err := yaml.Marshal(&manifest.ManifestMatrix{
-				Target: image,
-				Images: C.Tags,
-			})
-
-			if err != nil {
-				return err
-			}
-
-			filename, err := InlineTemplate(P.Manifest.File, C.Tags)
-
-			t.Log.Debug(fmt.Sprintf("Filename for outputting the tags to: %s", filename))
-
-			if err != nil {
-				return err
-			}
-
-			if err := os.WriteFile(filename, tags, 0600); err != nil {
-				return err
-			}
-
-			t.Log.Info(fmt.Sprintf("Wrote image manifest to file for later use: %s", filename))
 
 			return nil
 		})

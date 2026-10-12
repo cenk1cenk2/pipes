@@ -3,14 +3,15 @@ package versions
 import (
 	"context"
 	"fmt"
-	"path"
+	"maps"
+	"os"
 	"regexp"
 	"slices"
+	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/logger"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
-	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
 // Collector gathers the tags or the versions a pipe publishes under. Every source is
@@ -23,9 +24,9 @@ type Collector struct {
 
 	FromUser []string
 
-	File       string
-	FileStrict bool
-	FileDir    string
+	// FromEnvironment names the variables a value is read out of, where a name that
+	// ends in a "*" stands for every variable under that prefix.
+	FromEnvironment []string
 
 	// LatestWhen are the patterns matched against References; the first one that
 	// matches adds LatestValue to the result. A nil slice leaves the task out.
@@ -60,32 +61,44 @@ func (c *Collector) UserTask(tl *TaskList, out *[]string) *Task {
 		})
 }
 
-// FileTask collects what the file the pipeline pointed at names, which is how a
-// job passes values to the one after it.
-func (c *Collector) FileTask(tl *TaskList, out *[]string) *Task {
-	return tl.CreateTask(c.Name, "file").
+// EnvironmentTask collects what an earlier job handed over in a variable. A variable
+// that is unset or empty is skipped, since a job that released nothing hands nothing
+// over.
+func (c *Collector) EnvironmentTask(tl *TaskList, out *[]string) *Task {
+	return tl.CreateTask(c.Name, "environment").
 		ShouldDisable(func(_ *Task) bool {
-			return c.File == ""
+			return len(c.FromEnvironment) == 0
 		}).
 		Set(func(ctx context.Context, t *Task) error {
-			values, err := tagsfile.Parse(t, path.Join(c.FileDir, c.File), c.FileStrict)
-
-			if err != nil {
-				return err
+			environ := map[string]string{}
+			for _, env := range os.Environ() {
+				key, value, _ := strings.Cut(env, "=")
+				environ[key] = value
 			}
 
-			for _, v := range values {
-				t.CreateSubtask(v).
-					Set(func(ctx context.Context, t *Task) error {
-						return c.add(ctx, t, out, v)
-					}).
-					AddSelfToTheParentAsParallel()
+			for _, name := range c.FromEnvironment {
+				prefix, wildcard := strings.CutSuffix(name, "*")
+
+				for _, key := range slices.Sorted(maps.Keys(environ)) {
+					if (wildcard && !strings.HasPrefix(key, prefix)) || (!wildcard && key != name) {
+						continue
+					}
+
+					if environ[key] == "" {
+						t.Log.Debug(fmt.Sprintf("Skipping the empty variable: %s", key))
+
+						continue
+					}
+
+					t.Log.Debug(fmt.Sprintf("Found value in variable: %s -> %s", key, environ[key]))
+
+					if err := c.add(ctx, t, out, environ[key]); err != nil {
+						return err
+					}
+				}
 			}
 
 			return nil
-		}).
-		ShouldRunAfter(func(ctx context.Context, t *Task) error {
-			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -119,7 +132,7 @@ func (c *Collector) LatestTask(tl *TaskList, out *[]string) *Task {
 		})
 }
 
-// The file source appends from parallel subtasks, which is why the append is
+// A pipe is free to compose the sources in parallel, which is why the append is
 // taken under the task list lock rather than a lock of the collector's own.
 func (c *Collector) add(ctx context.Context, t *Task, out *[]string, value string) error {
 	processed, err := c.Process(ctx, t, value)
