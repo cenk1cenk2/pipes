@@ -45,6 +45,51 @@ var _ = Describe("Go version", func() {
 	})
 })
 
+var _ = Describe("Go environment", func() {
+	run := func(cache string) error {
+		GinkgoHelper()
+
+		*P = Pipe{Cache: cache}
+		*C = Ctx{Env: map[string]string{}}
+
+		return fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
+			AppName:     "pipe-go",
+			CommandName: "setup",
+			TaskLists: []tests.TaskListFactory{
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
+
+					return tl.New(p).
+						SetRuntimeDepth(3).
+						Set(func(tl *TaskList) Job {
+							return JobSequence(env(tl).Job())
+						})
+				},
+			},
+		}).Run()
+	}
+
+	It("lands every cache of the toolchain under the cache directory", func() {
+		cache := GinkgoT().TempDir()
+
+		Expect(run(cache)).To(Succeed())
+
+		Expect(C.Env).To(Equal(map[string]string{
+			"GOPATH":              cache,
+			"GOMODCACHE":          filepath.Join(cache, "pkg", "mod"),
+			"GOCACHE":             filepath.Join(cache, "go-build"),
+			"GOFLAGS":             "-modcacherw",
+			"GOLANGCI_LINT_CACHE": filepath.Join(cache, "golangci-lint"),
+		}))
+	})
+
+	It("leaves the environment of the image alone without a cache directory", func() {
+		Expect(run("")).To(Succeed())
+
+		Expect(C.Env).To(BeEmpty())
+	})
+})
+
 var _ = Describe("Go workspace", func() {
 	// the workspace is deliberately not reset, so a run overwrites what the last one decided.
 	run := func(cwd string) error {
