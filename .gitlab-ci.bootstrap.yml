@@ -33,9 +33,9 @@ build:
     - GO_CWD=./buildah ./go/dist/pipe-bootstrap build
     - GO_CWD=./semantic-release ./go/dist/pipe-bootstrap build
   cache:
-    - key: bootstrap-build
+    # the job vendors the workspace anew on every run, so only the go caches are kept.
+    - key: bootstrap
       paths:
-        - vendor/
         - .go/
   artifacts:
     paths:

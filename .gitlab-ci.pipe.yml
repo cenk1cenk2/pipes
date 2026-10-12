@@ -43,19 +43,11 @@ build:
       - os: linux
         arch: amd64
   cache:
-    # warmed by the parent's test job, which runs in an earlier stage.
-    - key:
-        prefix: go-build
-        files:
-          - go.work
-      policy: pull
-      paths:
-        - .go/cache/
-    # warmed by this pipe's own test job on an earlier run.
-    - key:
-        prefix: go-build-$[[inputs.name]]
-        files:
-          - go.work
+    # saved by this pipe's own test job on an earlier run, and until there is one, by the
+    # parent's test job, which compiles the packages every pipe shares.
+    - key: go-build-$[[inputs.name]]
+      fallback_keys:
+        - go-build
       policy: pull
       paths:
         - .go/cache/
@@ -78,22 +70,13 @@ lint:
       job: install
       artifacts: true
   cache:
-    - key:
-        prefix: go-build
-        files:
-          - go.work
+    - key: go-build-$[[inputs.name]]
+      fallback_keys:
+        - go-build
       policy: pull
       paths:
         - .go/cache/
-    - key:
-        prefix: go-build-$[[inputs.name]]
-        files:
-          - go.work
-      policy: pull
-      paths:
-        - .go/cache/
-    - key: $CI_JOB_NAME_SLUG-golangci-lint-$[[inputs.name]]
-      policy: pull
+    - key: lint-$[[inputs.name]]
       paths:
         - .go/golangci-lint/
   script:
@@ -112,20 +95,11 @@ test:
       job: install
       artifacts: true
   cache:
-    - key:
-        prefix: go-build
-        files:
-          - go.work
-      policy: pull
-      paths:
-        - .go/cache/
     # the shared cache only covers the parent's packages, so this pipe's own ones are
-    # saved under a key of their own.
-    - key:
-        prefix: go-build-$[[inputs.name]]
-        files:
-          - go.work
-      policy: pull-push
+    # saved under a key of their own, which the build and lint jobs read.
+    - key: go-build-$[[inputs.name]]
+      fallback_keys:
+        - go-build
       paths:
         - .go/cache/
   script:
