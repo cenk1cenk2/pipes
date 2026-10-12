@@ -168,6 +168,15 @@ var _ = Describe("Container manifest dotenv report", func() {
 		Expect(string(content)).To(HavePrefix(fmt.Sprintf("PUBLISHED_BUILD_AMD64_%s=", hash("group/image:v1.0.0-amd64"))))
 	})
 
+	It("collapses the separators of a matrix job slug into one", func() {
+		p := pipe()
+		p.Manifest.Job = "container---dockerfile--amd64"
+
+		Expect(run(fixtures.Runner(), p, tags, push, manifest)).To(Succeed())
+
+		Expect(report()).To(HavePrefix(fmt.Sprintf("CONTAINER_MANIFEST_PUBLISHED_CONTAINER_DOCKERFILE_AMD64_%s=", hash("group/image:v1.0.0-amd64"))))
+	})
+
 	// a local run has no job name, and the tags alone still keep two builds apart.
 	It("keys the images by the tags alone without a job", func() {
 		p := pipe()

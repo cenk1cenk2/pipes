@@ -60,7 +60,9 @@ func manifestKey() string {
 		return P.Manifest.PublishedPrefix + hash
 	}
 
-	job := regexp.MustCompile(`[^A-Z0-9]`).ReplaceAllString(strings.ToUpper(P.Manifest.Job), "_")
+	// GitLab slugs every character outside [a-z0-9] on its own, so a matrix job like
+	// "container: [Dockerfile, amd64]" arrives as "container---dockerfile--amd64".
+	job := strings.Trim(regexp.MustCompile(`[^A-Z0-9]+`).ReplaceAllString(strings.ToUpper(P.Manifest.Job), "_"), "_")
 
 	return fmt.Sprintf("%s%s_%s", P.Manifest.PublishedPrefix, job, hash)
 }
