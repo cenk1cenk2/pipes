@@ -1,6 +1,8 @@
 package setup
 
 import (
+	"path/filepath"
+
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
@@ -53,5 +55,48 @@ var _ = Describe("Terraform version", func() {
 
 	It("trims the surrounding whitespace", func() {
 		Expect(probe("  Terraform v1.9.8  \n\n")).To(Equal("v1.9.8"))
+	})
+})
+
+var _ = Describe("Terraform environment", func() {
+	run := func(cwd string) error {
+		GinkgoHelper()
+
+		*P = Pipe{}
+		*C = Ctx{Cwd: cwd, Env: map[string]string{}}
+
+		return fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
+			AppName:     "pipe-terraform",
+			CommandName: "setup",
+			TaskLists: []tests.TaskListFactory{
+				func(p *Plumber, _ *cli.Command) *TaskList {
+					tl := &TaskList{}
+
+					return tl.New(p).
+						SetRuntimeDepth(3).
+						Set(func(tl *TaskList) Job {
+							return JobSequence(environment(tl).Job())
+						})
+				},
+			},
+		}).Run()
+	}
+
+	It("creates the plugin cache directory terraform was pointed at", func() {
+		dir := filepath.Join(GinkgoT().TempDir(), "terraform", "plugins")
+		GinkgoT().Setenv("TF_PLUGIN_CACHE_DIR", dir)
+
+		Expect(run("")).To(Succeed())
+
+		Expect(dir).To(BeADirectory())
+	})
+
+	It("creates a relative plugin cache directory under the working directory", func() {
+		cwd := GinkgoT().TempDir()
+		GinkgoT().Setenv("TF_PLUGIN_CACHE_DIR", filepath.Join(".terraform.d", "plugins"))
+
+		Expect(run(cwd)).To(Succeed())
+
+		Expect(filepath.Join(cwd, ".terraform.d", "plugins")).To(BeADirectory())
 	})
 })
