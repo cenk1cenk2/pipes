@@ -13,6 +13,13 @@ export default {
         }
       }
     ],
-    "@semantic-release/gitlab"
+    [
+      "@semantic-release/gitlab",
+      {
+        // every package of the workspace would comment on the same merge requests, and
+        // a first release on all of them at once, which the instance cuts off midway.
+        successCommentCondition: false
+      }
+    ]
   ]
 }
