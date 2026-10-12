@@ -60,6 +60,23 @@ var _ = Describe("GoProfileConverter", func() {
 		Expect(filenames).To(ConsistOf("pkg/a.go", "example.com/other/b.go"))
 	})
 
+	// a suite under the root module, such as test/e2e, has no go.mod of its own and its
+	// package may carry no statements at all.
+	It("sources the report from the module the directory is under", func() {
+		write("go.mod", "module example.com/mod\n")
+		pkg := filepath.Join(dir, "test", "e2e")
+		Expect(os.MkdirAll(pkg, 0o755)).To(Succeed())
+		input := filepath.Join(pkg, "coverage.out")
+		Expect(os.WriteFile(input, []byte("mode: atomic\n"), 0o600)).To(Succeed())
+		output := filepath.Join(pkg, "cobertura.xml")
+
+		Expect(cobertura.GoProfileConverter{}.Convert(input, output, pkg)).To(Succeed())
+
+		coverage := read(output)
+		Expect(coverage.Sources.Sources).To(Equal([]string{dir}))
+		Expect(coverage.Packages).To(BeEmpty())
+	})
+
 	It("fails when the directory is not a module", func() {
 		input := write("coverage.out", "mode: set\nexample.com/mod/a.go:1.1,2.2 1 1\n")
 

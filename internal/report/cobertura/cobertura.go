@@ -24,8 +24,8 @@ type ConverterAdapter interface {
 }
 
 // GoProfileConverter converts a Go coverage profile. The profile names files by import
-// path, while GitLab matches them against the repository, so dir is the module the
-// profile was written for: it is the source of the report and every file under its
+// path, while GitLab matches them against the repository, so the module dir is in, the
+// nearest go.mod up from it, is the source of the report and every file under its
 // module path is named relative to it.
 type GoProfileConverter struct{}
 
@@ -37,7 +37,15 @@ func (GoProfileConverter) Convert(input string, output string, dir string) error
 		return fmt.Errorf("resolve module directory %s: %w", dir, err)
 	}
 
-	mod, err := os.ReadFile(filepath.Join(source, "go.mod"))
+	var mod []byte
+	for {
+		mod, err = os.ReadFile(filepath.Join(source, "go.mod"))
+		if err == nil || !errors.Is(err, os.ErrNotExist) || filepath.Dir(source) == source {
+			break
+		}
+
+		source = filepath.Dir(source)
+	}
 	if err != nil {
 		return fmt.Errorf("read module of the coverage profile: %w", err)
 	}
