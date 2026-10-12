@@ -4,16 +4,29 @@ include:
     inputs:
       name: node
       dir: node
-      release-variable: SEMANTIC_RELEASE_TAG_NODE
       container-matrix:
         - CONTAINER_IMAGE_BUILD_ARGS: |-
             NODE_VERSION: '{{ env "NODE_VERSION" }}'
           CONTAINER_IMAGE_TAGS: |-
             {{ env "NODE_VERSION" }}
+          CONTAINER_IMAGE_TAGS_TEMPLATE: |-
+            - match: ^[^@]+@(.+)$
+              template: '{{ env "NODE_VERSION" }}-v{{ index $ 1 }}'
           NODE_VERSION:
             - 22
             - 22-alpine
             - 24
             - 24-alpine
             - 26
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            NODE_VERSION: '{{ env "NODE_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "NODE_VERSION" }}
+          CONTAINER_IMAGE_TAGS_TEMPLATE: |-
+            - match: ^[^@]+@(.+)$
+              template: '{{ env "NODE_VERSION" }}-v{{ index $ 1 }}'
+          CONTAINER_IMAGE_TAGS_AS_LATEST: |-
+            - ^tags/node@
+            - ^heads/main$
+          NODE_VERSION:
             - 26-alpine

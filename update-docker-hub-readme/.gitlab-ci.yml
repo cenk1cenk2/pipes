@@ -4,7 +4,6 @@ include:
     inputs:
       name: update-docker-hub-readme
       dir: update-docker-hub-readme
-      release-variable: SEMANTIC_RELEASE_TAG_UPDATE_DOCKER_HUB_README
       container-matrix:
         - CONTAINER_IMAGE_TAGS: |-
             latest

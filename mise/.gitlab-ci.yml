@@ -4,7 +4,7 @@ include:
     inputs:
       name: mise
       dir: mise
-      release-variable: SEMANTIC_RELEASE_TAG_MISE
+      changes: []
       container-matrix:
         - CONTAINER_IMAGE_BUILD_ARGS: |-
             BASE_IMAGE: docker.io/alpine:3
@@ -14,3 +14,6 @@ include:
             BASE_IMAGE: docker.io/debian:trixie-slim
           CONTAINER_IMAGE_TAGS: |-
             latest-glibc
+          CONTAINER_IMAGE_TAGS_TEMPLATE: |-
+            - match: ^[^@]+@(.+)$
+              template: 'latest-glibc-v{{ index $ 1 }}'
