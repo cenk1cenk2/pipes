@@ -7,6 +7,7 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -27,6 +28,7 @@ const (
 var Flags = CombineFlags(
 	git.NewFlags(git.Options{Destination: &P.Git}),
 	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Image.TagsFile, Strict: &P.Image.TagsFileStrict}),
+	versions.NewEnvironmentFlags(versions.EnvironmentOptions{Destination: &P.Image.TagsFromEnvironment}),
 	[]cli.Flag{
 
 		// CategoryContainerImage
@@ -64,7 +66,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("CONTAINER_IMAGE_TAGS"),
 			),
 			Usage:       "Image tags for the container image to be built.",
-			Required:    true,
+			Required:    false,
 			Destination: &P.Image.Tags,
 		},
 

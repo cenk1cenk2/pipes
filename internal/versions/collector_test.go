@@ -151,16 +151,21 @@ var _ = Describe("Collector", func() {
 			dir = GinkgoT().TempDir()
 		})
 
+		run := func(collector *versions.Collector, out *[]string) error {
+			return p.RunJobs(JobSequence(
+				JobParallel(
+					collector.UserTask(tl, out).Job(),
+					collector.FileTask(tl, out).Job(),
+				),
+				collector.EnvironmentTask(tl, out).Job(),
+				collector.LatestTask(tl, out).Job(),
+			))
+		}
+
 		collect := func(collector *versions.Collector) []string {
 			out := []string{}
 
-			Expect(p.RunJobs(JobSequence(
-				JobParallel(
-					collector.UserTask(tl, &out).Job(),
-					collector.FileTask(tl, &out).Job(),
-				),
-				collector.LatestTask(tl, &out).Job(),
-			))).To(Succeed())
+			Expect(run(collector, &out)).To(Succeed())
 
 			return out
 		}
@@ -173,6 +178,52 @@ var _ = Describe("Collector", func() {
 			})
 
 			Expect(out).To(Equal([]string{"v1.2.3", "main"}))
+		})
+
+		It("refuses an empty value the user gave", func() {
+			out := []string{}
+
+			Expect(run(&versions.Collector{Name: "tags", FromUser: []string{"latest", ""}}, &out)).
+				To(MatchError(ContainSubstring("Can not add empty tag to list.")))
+		})
+
+		Describe("from the environment", func() {
+			It("collects the value of a variable named", func() {
+				GinkgoT().Setenv("RELEASED_TAG", "v1.2.3")
+
+				Expect(collect(&versions.Collector{Name: "tags", FromEnvironment: []string{"RELEASED_TAG"}})).
+					To(Equal([]string{"v1.2.3"}))
+			})
+
+			It("collects every variable under a prefix, in the order of their names", func() {
+				GinkgoT().Setenv("RELEASED_TAG_B", "v2.0.0")
+				GinkgoT().Setenv("RELEASED_TAG_A", "v1.0.0")
+				GinkgoT().Setenv("RELEASED_TAGS", "v3.0.0")
+
+				Expect(collect(&versions.Collector{Name: "tags", FromEnvironment: []string{"RELEASED_TAG_*"}})).
+					To(Equal([]string{"v1.0.0", "v2.0.0"}))
+			})
+
+			// a job that released nothing hands no tag over, which is not a failure.
+			It("skips a variable that is unset or empty", func() {
+				GinkgoT().Setenv("RELEASED_TAG", "")
+
+				Expect(collect(&versions.Collector{
+					Name:            "tags",
+					FromUser:        []string{"latest"},
+					FromEnvironment: []string{"RELEASED_TAG", "RELEASED_UNSET", "RELEASED_UNSET_*"},
+				})).To(Equal([]string{"latest"}))
+			})
+
+			It("processes the value like any other", func() {
+				GinkgoT().Setenv("RELEASED_TAG", "feature/foo")
+
+				Expect(collect(&versions.Collector{
+					Name:            "tags",
+					FromEnvironment: []string{"RELEASED_TAG"},
+					Sanitize:        defaultSanitize,
+				})).To(Equal([]string{"FEATURE_foo"}))
+			})
 		})
 
 		// the user tags are a package level flag destination shared with the rest of

@@ -3,9 +3,12 @@ package versions
 import (
 	"context"
 	"fmt"
+	"maps"
+	"os"
 	"path"
 	"regexp"
 	"slices"
+	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/logger"
@@ -26,6 +29,10 @@ type Collector struct {
 	File       string
 	FileStrict bool
 	FileDir    string
+
+	// FromEnvironment names the variables a value is read out of, where a name that
+	// ends in a "*" stands for every variable under that prefix.
+	FromEnvironment []string
 
 	// LatestWhen are the patterns matched against References; the first one that
 	// matches adds LatestValue to the result. A nil slice leaves the task out.
@@ -86,6 +93,47 @@ func (c *Collector) FileTask(tl *TaskList, out *[]string) *Task {
 		}).
 		ShouldRunAfter(func(ctx context.Context, t *Task) error {
 			return t.RunSubtasks(ctx)
+		})
+}
+
+// EnvironmentTask collects what an earlier job handed over in a variable. A variable
+// that is unset or empty is skipped, since a job that released nothing hands nothing
+// over.
+func (c *Collector) EnvironmentTask(tl *TaskList, out *[]string) *Task {
+	return tl.CreateTask(c.Name, "environment").
+		ShouldDisable(func(_ *Task) bool {
+			return len(c.FromEnvironment) == 0
+		}).
+		Set(func(ctx context.Context, t *Task) error {
+			environ := map[string]string{}
+			for _, env := range os.Environ() {
+				key, value, _ := strings.Cut(env, "=")
+				environ[key] = value
+			}
+
+			for _, name := range c.FromEnvironment {
+				prefix, wildcard := strings.CutSuffix(name, "*")
+
+				for _, key := range slices.Sorted(maps.Keys(environ)) {
+					if (wildcard && !strings.HasPrefix(key, prefix)) || (!wildcard && key != name) {
+						continue
+					}
+
+					if environ[key] == "" {
+						t.Log.Debug(fmt.Sprintf("Skipping the empty variable: %s", key))
+
+						continue
+					}
+
+					t.Log.Debug(fmt.Sprintf("Found value in variable: %s -> %s", key, environ[key]))
+
+					if err := c.add(ctx, t, out, environ[key]); err != nil {
+						return err
+					}
+				}
+			}
+
+			return nil
 		})
 }
 

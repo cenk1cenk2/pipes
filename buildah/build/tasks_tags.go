@@ -19,7 +19,8 @@ func tagsCollector() *versions.Collector {
 	return &versions.Collector{
 		Name: "tags",
 
-		FromUser: P.Image.Tags,
+		FromUser:        P.Image.Tags,
+		FromEnvironment: P.Image.TagsFromEnvironment,
 
 		File:       P.Image.TagsFile,
 		FileStrict: P.Image.TagsFileStrict,
@@ -53,6 +54,7 @@ func tags(tl *TaskList) *Task {
 					collector.UserTask(tl, &C.Tags).Job(),
 					collector.FileTask(tl, &C.Tags).Job(),
 				),
+				collector.EnvironmentTask(tl, &C.Tags).Job(),
 				collector.LatestTask(tl, &C.Tags).Job(),
 				job,
 				tagsManifest(tl, collector).Job(),
@@ -60,6 +62,10 @@ func tags(tl *TaskList) *Task {
 		}).
 		Set(func(_ context.Context, t *Task) error {
 			C.Tags = slices.Compact(C.Tags)
+
+			if len(C.Tags) == 0 {
+				return fmt.Errorf("Can not build the image without any tags.")
+			}
 
 			t.Log.Info(fmt.Sprintf("Image tags: %s", strings.Join(C.Tags, ", ")))
 

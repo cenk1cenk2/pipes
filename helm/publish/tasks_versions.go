@@ -16,7 +16,8 @@ func versionsCollector() *versions.Collector {
 	return &versions.Collector{
 		Name: "versions",
 
-		FromUser: P.Chart.Versions,
+		FromUser:        P.Chart.Versions,
+		FromEnvironment: P.Chart.VersionsFromEnvironment,
 
 		File:       P.Chart.VersionFile,
 		FileStrict: P.Chart.VersionFileStrict,
@@ -27,7 +28,7 @@ func versionsCollector() *versions.Collector {
 	}
 }
 
-// A chart has no notion of a latest version, so the parent waits on the other two sources only.
+// A chart has no notion of a latest version, so the parent waits on the other sources only.
 func versionsTask(tl *TaskList) *Task {
 	collector := versionsCollector()
 
@@ -38,6 +39,7 @@ func versionsTask(tl *TaskList) *Task {
 					collector.UserTask(tl, &C.Versions).Job(),
 					collector.FileTask(tl, &C.Versions).Job(),
 				),
+				collector.EnvironmentTask(tl, &C.Versions).Job(),
 				job,
 			)
 		}).

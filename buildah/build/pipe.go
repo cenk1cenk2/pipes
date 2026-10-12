@@ -10,21 +10,22 @@ import (
 
 type (
 	Image struct {
-		Platforms      []string
-		Name           string
-		Tags           []string
-		TagAsLatest    []string
-		TagsFile       string
-		TagsFileStrict bool
-		TagsSanitize   []versions.Match
-		TagsTemplate   []versions.Match
-		Pull           bool
-		Push           bool
-		BuildArgs      map[string]string
-		LatestTag      string
-		Cache          string `validate:"omitempty,dirpath"`
-		Format         string `validate:"oneof=oci docker"`
-		StorageDriver  string `validate:"oneof=overlay overlay2 vfs"`
+		Platforms           []string
+		Name                string
+		Tags                []string
+		TagsFromEnvironment []string
+		TagAsLatest         []string
+		TagsFile            string
+		TagsFileStrict      bool
+		TagsSanitize        []versions.Match
+		TagsTemplate        []versions.Match
+		Pull                bool
+		Push                bool
+		BuildArgs           map[string]string
+		LatestTag           string
+		Cache               string `validate:"omitempty,dirpath"`
+		Format              string `validate:"oneof=oci docker"`
+		StorageDriver       string `validate:"oneof=overlay overlay2 vfs"`
 	}
 
 	File struct {

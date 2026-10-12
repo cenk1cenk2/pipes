@@ -64,7 +64,7 @@ Build container images.
 | --- | --- | --- | --- |
 | `$BUILDAH_BUILD_IMAGE_PLATFORMS`<br/>`$CONTAINER_IMAGE_PLATFORMS` | Container image platforms to be built. | `string[]` |  |
 | **`$BUILDAH_BUILD_IMAGE_NAME`**<br/>**`$CONTAINER_IMAGE_NAME`**\* | Image name for the container image to be built. | `string` |  |
-| **`$BUILDAH_BUILD_IMAGE_TAGS`**<br/>**`$CONTAINER_IMAGE_TAGS`**\* | Image tags for the container image to be built. | `string[]` |  |
+| `$BUILDAH_BUILD_IMAGE_TAGS`<br/>`$CONTAINER_IMAGE_TAGS` | Image tags for the container image to be built. | `string[]` |  |
 | `$BUILDAH_BUILD_IMAGE_TAGS_TEMPLATE`<br/>`$CONTAINER_IMAGE_TAGS_TEMPLATE` | Modifies every tag that matches a certain condition.<br/>Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `"[]"` |
 | `$BUILDAH_BUILD_IMAGE_TAGS_SANITIZE`<br/>`$CONTAINER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.<br/>Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `"[\n    { \"match\": \"([^/]*)/(.*)\", \"template\": \"{{ index $ 1 \| upper }}_{{ index $ 2 }}\" }\n]"` |
 | `$BUILDAH_BUILD_IMAGE_TAG_AS_LATEST`<br/>`$CONTAINER_IMAGE_TAGS_AS_LATEST` | Regex pattern to tag the image as latest.<br/>Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `string`<br/>`format(yaml([]RegExp))` | `"[ \"^tags/v?\\\\d+.\\\\d+.\\\\d+$\" ]"` |
@@ -116,6 +116,12 @@ Build container images.
 | --- | --- | --- | --- |
 | `$TAGS_FILE` | Read tags from a comma separated file. | `string` |  |
 | `$TAGS_FILE_STRICT` | Fail on missing tags file. | `bool` | `false` |
+
+**Tags From Environment**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$TAGS_FROM_ENVIRONMENT` | Environment variables to read tags from, where a name ending in "*" reads every variable under that prefix. An unset or empty variable is skipped. | `string[]` |  |
 
 ### `pipe-buildah manifest`
 

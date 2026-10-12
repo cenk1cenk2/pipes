@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/flags"
 	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -22,6 +23,7 @@ const (
 
 var Flags = CombineFlags(
 	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Chart.VersionFile, Strict: &P.Chart.VersionFileStrict}),
+	versions.NewEnvironmentFlags(versions.EnvironmentOptions{Destination: &P.Chart.VersionsFromEnvironment}),
 	[]cli.Flag{
 		&cli.StringFlag{
 			Category: CategoryHelmChart,

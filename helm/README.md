@@ -140,3 +140,9 @@ Publish Helm chart templates.
 | --- | --- | --- | --- |
 | `$TAGS_FILE` | Read tags from a comma separated file. | `string` |  |
 | `$TAGS_FILE_STRICT` | Fail on missing tags file. | `bool` | `false` |
+
+**Tags From Environment**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$TAGS_FROM_ENVIRONMENT` | Environment variables to read tags from, where a name ending in "*" reads every variable under that prefix. An unset or empty variable is skipped. | `string[]` |  |
