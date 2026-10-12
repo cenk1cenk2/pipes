@@ -41,9 +41,33 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("GO_TEST_COVERAGE"),
 		),
-		Usage:       "Coverage profile to write. Leave empty to skip coverage.",
+		Usage:       "Coverage profile to write, relative to every module of a workspace. Leave empty to skip coverage.",
 		Required:    false,
 		Value:       "coverage.out",
 		Destination: &P.Coverage,
+	},
+
+	&cli.StringFlag{
+		Category: CategoryTest,
+		Name:     "go.test.junit",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_TEST_JUNIT"),
+		),
+		Usage:       "JUnit report to write, relative to every module of a workspace. Leave empty to skip the JUnit report.",
+		Required:    false,
+		Value:       "junit.xml",
+		Destination: &P.JUnit,
+	},
+
+	&cli.StringFlag{
+		Category: CategoryTest,
+		Name:     "go.test.cobertura",
+		Sources: cli.NewValueSourceChain(
+			cli.EnvVar("GO_TEST_COBERTURA"),
+		),
+		Usage:       "Cobertura report to convert the coverage profile into, relative to every module of a workspace. Leave empty to skip the Cobertura report.",
+		Required:    false,
+		Value:       "cobertura.xml",
+		Destination: &P.Cobertura,
 	},
 }

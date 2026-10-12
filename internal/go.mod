@@ -4,6 +4,7 @@ go 1.27.0
 
 require (
 	charm.land/glamour/v2 v2.0.1
+	github.com/aereal/gobertura v0.1.0
 	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/cenk1cenk2/plumber/v7 v7.2.9
 	github.com/charmbracelet/colorprofile v0.4.3
@@ -16,6 +17,7 @@ require (
 	gitlab.com/gitlab-org/api/client-go/v3 v3.17.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
+	golang.org/x/mod v0.41.0
 )
 
 require (
@@ -82,7 +84,6 @@ require (
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f // indirect
-	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect

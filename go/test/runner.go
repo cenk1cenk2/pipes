@@ -14,30 +14,47 @@ const (
 func command() (string, []string) {
 	switch Runner(P.Runner) {
 	case RunnerGo:
-		return "go", arguments([]string{"test"}, []string{"-coverpkg=./...", "-coverprofile=" + P.Coverage}, []string{"-v", "-failfast"})
+		args := []string{"test"}
+		if P.JUnit != "" {
+			// go test has no JUnit writer of its own, so gotestsum runs it and writes one.
+			args = []string{"--junitfile=" + P.JUnit, "--format=standard-verbose", "--"}
+		}
+
+		if P.Coverage != "" {
+			args = append(args, "-coverpkg=./...", "-coverprofile="+P.Coverage)
+		}
+
+		args = append(args, "-v", "-failfast")
+
+		if P.Args != "" {
+			args = append(args, strings.Split(P.Args, " ")...)
+		}
+
+		args = append(args, "./...")
+
+		if P.JUnit != "" {
+			return "gotestsum", args
+		}
+
+		return "go", args
 	case RunnerGinkgo:
 		fallthrough
 	default:
-		return "go", arguments(
-			[]string{"tool", "ginkgo"},
-			[]string{"--cover", "--coverpkg=./...", "--coverprofile=" + P.Coverage},
-			[]string{"-vv", "--silence-skips", "--fail-fast", "-r"},
-		)
+		args := []string{"tool", "ginkgo"}
+		if P.JUnit != "" {
+			args = append(args, "--junit-report="+P.JUnit)
+		}
+
+		if P.Coverage != "" {
+			args = append(args, "--cover", "--coverpkg=./...", "--coverprofile="+P.Coverage)
+		}
+
+		args = append(args, "-vv", "--silence-skips", "--fail-fast", "-r")
+
+		if P.Args != "" {
+			args = append(args, strings.Split(P.Args, " ")...)
+		}
+
+		return "go", append(args, "./...")
 	}
-}
-
-func arguments(prefix, coverage, always []string) []string {
-	args := prefix
-
-	if P.Coverage != "" {
-		args = append(args, coverage...)
-	}
-
-	args = append(args, always...)
-
-	if P.Args != "" {
-		args = append(args, strings.Split(P.Args, " ")...)
-	}
-
-	return append(args, "./...")
 }
