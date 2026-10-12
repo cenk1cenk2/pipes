@@ -25,8 +25,6 @@ WORKDIR ${SEMANTIC_RELEASE_HOME}
 RUN \
   pnpm install --prod --frozen-lockfile && \
   pnpm store prune && \
-  # # https://github.com/npm/cli/issues/4605
-  # npm i -g npm@8.4
   npm -g config set workspaces-update false
 
 WORKDIR /
