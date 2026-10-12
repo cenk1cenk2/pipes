@@ -1,8 +1,6 @@
 package plan
 
 import (
-	"time"
-
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/urfave/cli/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/ci"
@@ -68,32 +66,6 @@ var Flags = CombineFlags(
 			Required:    false,
 			Value:       "",
 			Destination: &P.Plan.PipelineSource,
-		},
-
-		&cli.Uint32Flag{
-			Category: CategoryPlan,
-			Name:     "terraform.plan.retry-tries",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TERRAFORM_PLAN_RETRY_TRIES"),
-				cli.EnvVar("TF_PLAN_RETRY_TRIES"),
-			),
-			Usage:       "Number of retries for terraform plan command.",
-			Required:    false,
-			Value:       5,
-			Destination: &P.Plan.RetryTries,
-		},
-
-		&cli.DurationFlag{
-			Category: CategoryPlan,
-			Name:     "terraform.plan.retry-delay",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar("TERRAFORM_PLAN_RETRY_DELAY"),
-				cli.EnvVar("TF_PLAN_RETRY_DELAY"),
-			),
-			Usage:       "Delay between retries for terraform plan command.",
-			Required:    false,
-			Value:       60 * time.Second,
-			Destination: &P.Plan.RetryDelay,
 		},
 
 		&cli.StringFlag{

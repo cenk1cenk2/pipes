@@ -189,8 +189,6 @@ Plan terraform project.
 | `$TERRAFORM_PLAN_ARGS`<br/>`$TF_PLAN_ARGS` | Additional arguments for terraform plan. | `string` |  |
 | `$TERRAFORM_PLAN_PREVIEW_FOR_MERGE_REQUESTS`<br/>`$TF_PLAN_PREVIEW_FOR_MRS` | Run merge request terraform plans as previews without state locking. | `bool` | `true` |
 | `$TERRAFORM_PLAN_PIPELINE_SOURCE`<br/>`$CI_PIPELINE_SOURCE` | GitLab CI pipeline source used to detect merge request pipelines. | `string` |  |
-| `$TERRAFORM_PLAN_RETRY_TRIES`<br/>`$TF_PLAN_RETRY_TRIES` | Number of retries for terraform plan command. | `uint` | `5` |
-| `$TERRAFORM_PLAN_RETRY_DELAY`<br/>`$TF_PLAN_RETRY_DELAY` | Delay between retries for terraform plan command. | `duration` | `1m0s` |
 | `$TERRAFORM_PLAN_SUMMARY_OUTPUT`<br/>`$TERRAFORM_SUMMARY_OUTPUT` | Output file for terraform plan summary. Leave empty to skip summary generation. | `string` | `"terraform-summary.json"` |
 
 **Plan Report**
