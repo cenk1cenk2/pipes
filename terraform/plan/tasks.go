@@ -113,10 +113,6 @@ func plan(tl *TaskList) *Task {
 				}).
 				SetDir(setup.C.Cwd).
 				AppendEnvironment(setup.C.Env).
-				SetRetries(&CommandRetry{
-					Tries: P.Plan.RetryTries,
-					Delay: P.Plan.RetryDelay,
-				}).
 				AddSelfToTheTask()
 
 			return nil

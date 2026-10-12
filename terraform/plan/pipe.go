@@ -2,7 +2,6 @@ package plan
 
 import (
 	"context"
-	"time"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
@@ -15,8 +14,6 @@ type (
 		Output                  string
 		PipelineSource          string
 		PreviewForMergeRequests bool
-		RetryDelay              time.Duration
-		RetryTries              uint32
 	}
 
 	Summary struct {
