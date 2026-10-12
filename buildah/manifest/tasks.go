@@ -2,97 +2,46 @@ package manifest
 
 import (
 	"context"
+	json "encoding/json/v2"
 	"fmt"
 	"os"
 	"slices"
 	"strings"
 
-	glob "github.com/bmatcuk/doublestar/v4"
 	. "github.com/cenk1cenk2/plumber/v7"
-	"go.yaml.in/yaml/v4"
 )
 
-func discoverFile(tl *TaskList) *Task {
-	return tl.CreateTask("discover", "file").
-		ShouldDisable(func(t *Task) bool {
-			return len(P.Manifest.Files) == 0
-		}).
+// Every build job of the pipeline hands the images it pushed over in a dotenv
+// variable of its own, which GitLab exports into this job.
+func fetchEnv(tl *TaskList) *Task {
+	return tl.CreateTask("fetch", "env").
 		Set(func(_ context.Context, t *Task) error {
-			cwd, err := os.Getwd()
+			for _, env := range os.Environ() {
+				key, value, _ := strings.Cut(env, "=")
 
-			if err != nil {
-				return err
-			}
-
-			fs := os.DirFS(cwd)
-
-			matches := []string{}
-
-			for _, v := range P.Manifest.Files {
-				match, err := glob.Glob(fs, v)
-
-				if err != nil {
-					return err
+				if !strings.HasPrefix(key, P.Manifest.PublishedPrefix) {
+					continue
 				}
 
-				matches = append(matches, match...)
+				parsed := []ManifestMatrix{}
+				if err := json.Unmarshal([]byte(value), &parsed); err != nil {
+					return fmt.Errorf("Can not unmarshal container manifest matrix: %s -> %w", key, err)
+				}
+
+				for _, entry := range parsed {
+					if entry.Target == "" {
+						continue
+					}
+
+					t.Lock.Lock()
+					C.ManifestedImages[entry.Target] = append(C.ManifestedImages[entry.Target], entry.Images...)
+					t.Lock.Unlock()
+
+					t.Log.Debug(fmt.Sprintf("Found published images: %v for %s in %s", entry.Images, entry.Target, key))
+				}
 			}
-
-			if len(matches) == 0 {
-				t.Log.Warn(fmt.Sprintf("Can not match any files with the given pattern: %s",
-					strings.Join(P.Manifest.Files, ", ")),
-				)
-
-				return nil
-			}
-
-			matches = slices.Compact(slices.Sorted(slices.Values(matches)))
-
-			t.Log.Debug(fmt.Sprintf("Paths matched for given pattern: %s", strings.Join(matches, ", ")))
-
-			C.Matches = matches
 
 			return nil
-		})
-}
-
-func fetchFile(tl *TaskList) *Task {
-	return tl.CreateTask("fetch", "file").
-		ShouldDisable(func(t *Task) bool {
-			return len(C.Matches) == 0
-		}).
-		Set(func(_ context.Context, t *Task) error {
-			for _, f := range C.Matches {
-				t.CreateSubtask(f).
-					Set(func(_ context.Context, t *Task) error {
-						content, err := os.ReadFile(f)
-						if err != nil {
-							return err
-						}
-
-						parsed := &ManifestMatrix{}
-						if err := yaml.Unmarshal(content, parsed); err != nil {
-							return fmt.Errorf("Can not unmarshal container manifest matrix: %w", err)
-						}
-
-						if parsed.Target == "" {
-							return nil
-						}
-
-						t.Log.Debug(fmt.Sprintf("Found published images: %v for %s in %s", parsed.Images, parsed.Target, f))
-
-						t.Lock.Lock()
-						C.ManifestedImages[parsed.Target] = append(C.ManifestedImages[parsed.Target], parsed.Images...)
-						t.Lock.Unlock()
-
-						return nil
-					}).
-					AddSelfToTheParentAsParallel()
-			}
-			return nil
-		}).
-		ShouldRunAfter(func(ctx context.Context, t *Task) error {
-			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -130,6 +79,19 @@ func fetchUser(tl *TaskList) *Task {
 func manifest(tl *TaskList) *Task {
 	return tl.CreateTask("manifest").
 		Set(func(ctx context.Context, t *Task) error {
+			count := 0
+
+			// the fetchers run in parallel and may each carry the same images, so they are
+			// only deduplicated once all of them are in.
+			for target, images := range C.ManifestedImages {
+				C.ManifestedImages[target] = slices.Compact(slices.Sorted(slices.Values(images)))
+				count += len(C.ManifestedImages[target])
+			}
+
+			if count == 0 {
+				return fmt.Errorf("Can not find any published images to manifest.")
+			}
+
 			for target, images := range C.ManifestedImages {
 				t.CreateSubtask(target).
 					Set(func(_ context.Context, t *Task) error {

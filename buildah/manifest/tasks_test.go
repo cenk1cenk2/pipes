@@ -2,9 +2,13 @@ package manifest
 
 import (
 	. "github.com/cenk1cenk2/plumber/v7"
+	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
+
+	"gitlab.kilic.dev/devops/pipes/buildah/login"
+	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
 var _ = Describe("Container manifest", func() {
@@ -53,6 +57,102 @@ var _ = Describe("Container manifest", func() {
 			Expect(p.RunJobs(fetchUser(tl).Job())).NotTo(Succeed())
 
 			Expect(tl.Lock.TryLock()).To(BeTrue())
+		})
+	})
+
+	Describe("published images", func() {
+		// a package level flag reads its environment only on the first parse, so the pipe is seeded.
+		run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
+			GinkgoHelper()
+
+			*P = pipe
+			login.P.Uri = ""
+
+			return fixtures.Cli(runner, tests.TaskListCli{
+				AppName:     "pipe-buildah",
+				CommandName: "manifest",
+				TaskLists: []tests.TaskListFactory{
+					func(p *Plumber, _ *cli.Command) *TaskList {
+						return New(p)
+					},
+				},
+			}).Run()
+		}
+
+		published := func(manifest Manifest) Pipe {
+			manifest.PublishedPrefix = "CONTAINER_MANIFEST_PUBLISHED_"
+
+			return Pipe{Manifest: manifest}
+		}
+
+		commands := func(runner *tests.TestingCommandRunner) [][]string {
+			args := [][]string{}
+			for _, invocation := range runner.Invocations() {
+				args = append(args, invocation.Args)
+			}
+
+			return args
+		}
+
+		It("manifests the images every build job handed over", func() {
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_ARM64_4E5F6A7B", `[{"target":"group/image:v1","images":["group/image:v1-arm64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_OTHER", "not a matrix")
+
+			runner := fixtures.Runner()
+
+			Expect(run(runner, published(Manifest{}))).To(Succeed())
+
+			Expect(commands(runner)).To(Equal([][]string{
+				{"manifest", "create", "group/image:v1"},
+				{"manifest", "add", "group/image:v1", "group/image:v1-amd64"},
+				{"manifest", "add", "group/image:v1", "group/image:v1-arm64"},
+				{"manifest", "push", "--rm", "group/image:v1"},
+			}))
+		})
+
+		It("reads the variables under the prefix the pipeline asks for", func() {
+			GinkgoT().Setenv("PUBLISHED_BUILD_AMD64", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+
+			runner := fixtures.Runner()
+
+			Expect(run(runner, Pipe{Manifest: Manifest{PublishedPrefix: "PUBLISHED_"}})).To(Succeed())
+
+			Expect(commands(runner)).To(ContainElement([]string{"manifest", "add", "group/image:v1", "group/image:v1-amd64"}))
+		})
+
+		It("adds an image handed over twice only once", func() {
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_4E5F6A7B", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+
+			runner := fixtures.Runner()
+
+			Expect(run(runner, published(Manifest{
+				Target: "group/image:v1",
+				Images: []string{"group/image:v1-amd64"},
+			}))).To(Succeed())
+
+			Expect(commands(runner)).To(Equal([][]string{
+				{"manifest", "create", "group/image:v1"},
+				{"manifest", "add", "group/image:v1", "group/image:v1-amd64"},
+				{"manifest", "push", "--rm", "group/image:v1"},
+			}))
+		})
+
+		It("reports a variable that does not hold a matrix", func() {
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", "not a matrix")
+
+			Expect(run(fixtures.Runner(), published(Manifest{}))).
+				To(MatchError(ContainSubstring("Can not unmarshal container manifest matrix")))
+		})
+
+		// a build job whose component does not upload the report hands nothing over,
+		// which would otherwise pass as a manifest with nothing to do.
+		It("fails without any image to manifest", func() {
+			runner := fixtures.Runner()
+
+			Expect(run(runner, published(Manifest{}))).To(MatchError(ContainSubstring("Can not find any published images to manifest.")))
+			Expect(runner.Invocations()).To(BeEmpty())
 		})
 	})
 })

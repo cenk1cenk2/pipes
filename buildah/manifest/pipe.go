@@ -10,10 +10,10 @@ import (
 
 type (
 	Manifest struct {
-		Target string
-		Images []string
-		Files  []string
-		Matrix []ManifestMatrix
+		Target          string
+		Images          []string
+		Matrix          []ManifestMatrix
+		PublishedPrefix string
 	}
 
 	ManifestMatrix struct {
@@ -27,7 +27,6 @@ type (
 
 	Ctx struct {
 		ManifestedImages map[string][]string
-		Matches          []string
 	}
 )
 
@@ -57,10 +56,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				JobParallel(
-					JobSequence(
-						discoverFile(tl).Job(),
-						fetchFile(tl).Job(),
-					),
+					fetchEnv(tl).Job(),
 					fetchUser(tl).Job(),
 				),
 				manifest(tl).Job(),

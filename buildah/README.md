@@ -139,7 +139,7 @@ Update manifests of the container images.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$BUILDAH_MANIFEST_FILES`<br/>`$CONTAINER_MANIFEST_FILES` | Read published tags from a file. | `string[]`<br/>`format(glob)` | `"**/.published-container-images*"` |
+| `$CONTAINER_MANIFEST_VARIABLE_PREFIX` | Prefix of the dotenv variables the build jobs hand their published images over to the manifest job in. | `string` | `"CONTAINER_MANIFEST_PUBLISHED_"` |
 | `$BUILDAH_MANIFEST_TARGET`<br/>`$CONTAINER_MANIFEST_TARGET` | Target image names for patching the manifest. | `string`<br/>`format(Template())` |  |
 | `$BUILDAH_MANIFEST_IMAGES`<br/>`$CONTAINER_MANIFEST_IMAGES` | Image names for patching the manifest with the given target. | `string[]` |  |
 | `$BUILDAH_MANIFEST_MATRIX`<br/>`$CONTAINER_MANIFEST_MATRIX` | Matrix of all the images that should be manifested. | `string`<br/>`format(yaml([]struct{ target: string, images: []string }))` |  |
