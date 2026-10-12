@@ -5,6 +5,7 @@ stages:
 
 variables:
   GOPATH: $CI_PROJECT_DIR/.go
+  GOCACHE: $CI_PROJECT_DIR/.go/go-build
 
 build:
   stage: build

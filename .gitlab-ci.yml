@@ -35,6 +35,10 @@ include:
 
 bootstrap:
   stage: bootstrap
+  # the global go paths would reach the child expanded here, where $CI_PROJECT_DIR is
+  # still empty, and land its caches at /.go outside the checkout.
+  inherit:
+    variables: false
   trigger:
     strategy: depend
     include:
