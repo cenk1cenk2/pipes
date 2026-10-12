@@ -2,7 +2,6 @@ package environment
 
 import (
 	"fmt"
-	"maps"
 	"slices"
 	"strings"
 
@@ -48,14 +47,13 @@ func Select(conditions []Condition, references []string) (string, error) {
 	return conditions[matched].Environment, nil
 }
 
-// Fetch strips the environment prefix off every variable in environ, so STAGE_TOKEN
-// reaches the pipe as TOKEN once stage is selected. Unprefixed variables are kept as
-// they are, and ENVIRONMENT names the selection itself.
+// Fetch returns only the variables in environ that carry the environment prefix, with
+// the prefix stripped, so STAGE_TOKEN reaches the pipe as TOKEN once stage is selected.
+// ENVIRONMENT names the selection itself.
 func Fetch(environ []string, environment string) map[string]string {
 	prefix := prefix(environment)
 
-	vars := make(map[string]string, len(environ)+1)
-	selected := map[string]string{}
+	vars := map[string]string{}
 
 	for _, v := range environ {
 		key, value, found := strings.Cut(v, "=")
@@ -64,17 +62,11 @@ func Fetch(environ []string, environment string) map[string]string {
 			continue
 		}
 
-		// the prefixed value wins over the plain one wherever either sits in environ.
 		if trimmed, ok := strings.CutPrefix(key, prefix); ok {
-			selected[trimmed] = value
-
-			continue
+			vars[trimmed] = value
 		}
-
-		vars[key] = value
 	}
 
-	maps.Copy(vars, selected)
 	vars["ENVIRONMENT"] = environment
 
 	return vars
