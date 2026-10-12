@@ -124,7 +124,9 @@ Run ginkgo on the project.
 | --- | --- | --- | --- |
 | `$GO_TEST_RUNNER` | Test runner for the test command. | `string`<br/>`format(enum("ginkgo", "go"))` | `"ginkgo"` |
 | `$GO_TEST_ARGS` | Arguments to append to the test command. | `string` |  |
-| `$GO_TEST_COVERAGE` | Coverage profile to write. Leave empty to skip coverage. | `string` | `"coverage.out"` |
+| `$GO_TEST_COVERAGE` | Coverage profile to write, relative to every module of a workspace. Leave empty to skip coverage. | `string` | `"coverage.out"` |
+| `$GO_TEST_JUNIT` | JUnit report to write, relative to every module of a workspace. Leave empty to skip the JUnit report. | `string` | `"junit.xml"` |
+| `$GO_TEST_COBERTURA` | Cobertura report to convert the coverage profile into, relative to every module of a workspace. Leave empty to skip the Cobertura report. | `string` | `"cobertura.xml"` |
 
 ### `pipe-go tool`
 
