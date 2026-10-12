@@ -9,6 +9,8 @@ The image ships in two variants, and the variant decides the libc of every tool 
 | latest | alpine (musl), the default | musl-amd64 |
 | latest-glibc | debian (glibc), for glibc consumers | glibc-amd64 |
 
+Every release also publishes each variant pinned to its version, as vX.Y.Z and latest-glibc-vX.Y.Z.
+
 The flavor has to match the libc of the image that consumes the cache: a musl cache only serves static or musl-linked tools on a glibc consumer, and a glibc cache serves nothing on alpine. The flavor is part of the cache key, so the two variants never share a cache.
 
 `pipe-mise [GLOBAL FLAGS] [COMMAND] [FLAGS]`
