@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"maps"
 	"os"
-	"path"
 	"regexp"
 	"slices"
 	"strings"
@@ -13,7 +12,6 @@ import (
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/logger"
 	"gitlab.kilic.dev/devops/pipes/internal/git"
-	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
 )
 
 // Collector gathers the tags or the versions a pipe publishes under. Every source is
@@ -25,10 +23,6 @@ type Collector struct {
 	Name string
 
 	FromUser []string
-
-	File       string
-	FileStrict bool
-	FileDir    string
 
 	// FromEnvironment names the variables a value is read out of, where a name that
 	// ends in a "*" stands for every variable under that prefix.
@@ -64,35 +58,6 @@ func (c *Collector) UserTask(tl *TaskList, out *[]string) *Task {
 			}
 
 			return nil
-		})
-}
-
-// FileTask collects what the file the pipeline pointed at names, which is how a
-// job passes values to the one after it.
-func (c *Collector) FileTask(tl *TaskList, out *[]string) *Task {
-	return tl.CreateTask(c.Name, "file").
-		ShouldDisable(func(_ *Task) bool {
-			return c.File == ""
-		}).
-		Set(func(ctx context.Context, t *Task) error {
-			values, err := tagsfile.Parse(t, path.Join(c.FileDir, c.File), c.FileStrict)
-
-			if err != nil {
-				return err
-			}
-
-			for _, v := range values {
-				t.CreateSubtask(v).
-					Set(func(ctx context.Context, t *Task) error {
-						return c.add(ctx, t, out, v)
-					}).
-					AddSelfToTheParentAsParallel()
-			}
-
-			return nil
-		}).
-		ShouldRunAfter(func(ctx context.Context, t *Task) error {
-			return t.RunSubtasks(ctx)
 		})
 }
 
@@ -167,7 +132,7 @@ func (c *Collector) LatestTask(tl *TaskList, out *[]string) *Task {
 		})
 }
 
-// The file source appends from parallel subtasks, which is why the append is
+// A pipe is free to compose the sources in parallel, which is why the append is
 // taken under the task list lock rather than a lock of the collector's own.
 func (c *Collector) add(ctx context.Context, t *Task, out *[]string, value string) error {
 	processed, err := c.Process(ctx, t, value)

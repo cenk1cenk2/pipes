@@ -3,7 +3,7 @@ package publish
 import (
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/tagsfile"
+	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
 //revive:disable:line-length-limit
@@ -15,7 +15,7 @@ const (
 )
 
 var Flags = CombineFlags(
-	tagsfile.NewFlags(tagsfile.Options{Destination: &P.Module.TagsFile, Value: ".tags"}),
+	versions.NewEnvironmentFlags(versions.EnvironmentOptions{Destination: &P.Module.TagsFromEnvironment}),
 	[]cli.Flag{
 		// CategoryModule
 
@@ -31,6 +31,19 @@ var Flags = CombineFlags(
 			Required:    true,
 			Value:       "",
 			Destination: &P.Module.Name,
+		},
+
+		&cli.StringSliceFlag{
+			Category: CategoryModule,
+			Name:     "terraform.publish.module.tags",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("TERRAFORM_PUBLISH_MODULE_TAGS"),
+				cli.EnvVar("TF_MODULE_TAGS"),
+				cli.EnvVar("CI_COMMIT_TAG"),
+			),
+			Usage:       "Versions for the module to be published.",
+			Required:    false,
+			Destination: &P.Module.Tags,
 		},
 
 		&cli.StringFlag{

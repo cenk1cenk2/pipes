@@ -15,8 +15,6 @@ type (
 		Tags                []string
 		TagsFromEnvironment []string
 		TagAsLatest         []string
-		TagsFile            string
-		TagsFileStrict      bool
 		TagsSanitize        []versions.Match
 		TagsTemplate        []versions.Match
 		Pull                bool

@@ -2,8 +2,6 @@ package versions_test
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	. "github.com/onsi/ginkgo/v2"
@@ -134,9 +132,8 @@ var _ = Describe("Collector", func() {
 	// compacts and reports what they collected; these specs stand in for that parent.
 	Describe("Sources", func() {
 		var (
-			p   *Plumber
-			tl  *TaskList
-			dir string
+			p  *Plumber
+			tl *TaskList
 		)
 
 		BeforeEach(func() {
@@ -147,16 +144,11 @@ var _ = Describe("Collector", func() {
 
 			tl = &TaskList{}
 			tl.New(p)
-
-			dir = GinkgoT().TempDir()
 		})
 
 		run := func(collector *versions.Collector, out *[]string) error {
 			return p.RunJobs(JobSequence(
-				JobParallel(
-					collector.UserTask(tl, out).Job(),
-					collector.FileTask(tl, out).Job(),
-				),
+				collector.UserTask(tl, out).Job(),
 				collector.EnvironmentTask(tl, out).Job(),
 				collector.LatestTask(tl, out).Job(),
 			))
@@ -234,29 +226,6 @@ var _ = Describe("Collector", func() {
 			collect(&versions.Collector{Name: "tags", FromUser: user})
 
 			Expect(user).To(Equal([]string{"v1.2.3", "v1.2.3", "main"}))
-		})
-
-		It("collects the comma separated values out of the file", func() {
-			Expect(os.WriteFile(filepath.Join(dir, "tags"), []byte("from-file-a,from-file-b\n"), 0600)).To(Succeed())
-
-			out := collect(&versions.Collector{Name: "tags", File: "tags", FileDir: dir})
-
-			Expect(out).To(ConsistOf("from-file-a", "from-file-b"))
-		})
-
-		// the user and the file source run in parallel, so which of them lands first
-		// is not something a pipe may depend on.
-		It("collects both sources at once", func() {
-			Expect(os.WriteFile(filepath.Join(dir, "tags"), []byte("from-file"), 0600)).To(Succeed())
-
-			out := collect(&versions.Collector{
-				Name:     "tags",
-				FromUser: []string{"v1.2.3"},
-				File:     "tags",
-				FileDir:  dir,
-			})
-
-			Expect(out).To(ConsistOf("v1.2.3", "from-file"))
 		})
 
 		It("adds the latest value when a reference matches", func() {

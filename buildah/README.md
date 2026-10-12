@@ -110,13 +110,6 @@ Build container images.
 | `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `string` |  |
 | `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `string` |  |
 
-**Tags File**
-
-| Flag / Environment | Description | Type | Default |
-| --- | --- | --- | --- |
-| `$TAGS_FILE` | Read tags from a comma separated file. | `string` |  |
-| `$TAGS_FILE_STRICT` | Fail on missing tags file. | `bool` | `false` |
-
 **Tags From Environment**
 
 | Flag / Environment | Description | Type | Default |

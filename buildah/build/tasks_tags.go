@@ -22,10 +22,6 @@ func tagsCollector() *versions.Collector {
 		FromUser:        P.Image.Tags,
 		FromEnvironment: P.Image.TagsFromEnvironment,
 
-		File:       P.Image.TagsFile,
-		FileStrict: P.Image.TagsFileStrict,
-		FileDir:    P.File.Context,
-
 		LatestWhen:  P.Image.TagAsLatest,
 		LatestValue: P.Image.LatestTag,
 		References:  P.Git.References(),
@@ -50,10 +46,7 @@ func tags(tl *TaskList) *Task {
 	return tl.CreateTask("tags").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobSequence(
-				JobParallel(
-					collector.UserTask(tl, &C.Tags).Job(),
-					collector.FileTask(tl, &C.Tags).Job(),
-				),
+				collector.UserTask(tl, &C.Tags).Job(),
 				collector.EnvironmentTask(tl, &C.Tags).Job(),
 				collector.LatestTask(tl, &C.Tags).Job(),
 				job,

@@ -12,8 +12,6 @@ type (
 		Target                  string
 		Versions                []string
 		VersionsFromEnvironment []string
-		VersionFile             string
-		VersionFileStrict       bool
 		VersionsSanitize        []versions.Match
 		VersionsTemplate        []versions.Match
 		Destination             string `validate:"dirpath"`

@@ -134,13 +134,6 @@ Publish Helm chart templates.
 
 </details>
 
-**Tags File**
-
-| Flag / Environment | Description | Type | Default |
-| --- | --- | --- | --- |
-| `$TAGS_FILE` | Read tags from a comma separated file. | `string` |  |
-| `$TAGS_FILE_STRICT` | Fail on missing tags file. | `bool` | `false` |
-
 **Tags From Environment**
 
 | Flag / Environment | Description | Type | Default |
