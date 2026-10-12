@@ -32,8 +32,10 @@ type (
 	}
 
 	Manifest struct {
-		Target string
-		File   string
+		Target          string
+		Job             string
+		EnvFile         string
+		PublishedPrefix string
 	}
 
 	Pipe struct {
@@ -64,6 +66,7 @@ func New(p *Plumber) *TaskList {
 				tags(tl).Job(),
 				build(tl).Job(),
 				push(tl).Job(),
+				manifest(tl).Job(),
 			)
 		})
 }

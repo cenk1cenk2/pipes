@@ -82,8 +82,10 @@ Build container images.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
+| `$CONTAINER_MANIFEST_VARIABLE_PREFIX` | Prefix of the dotenv variables the build jobs hand their published images over to the manifest job in. | `string` | `"CONTAINER_MANIFEST_PUBLISHED_"` |
 | `$BUILDAH_BUILD_MANIFEST_TARGET`<br/>`$CONTAINER_MANIFEST_TARGET` | Target image names for patching the manifest. | `string`<br/>`format(Template([]string))` |  |
-| `$BUILDAH_BUILD_MANIFEST_FILE`<br/>`$CONTAINER_MANIFEST_FILE` | Write all the published images into a file for later use. | `string`<br/>`format(Template([]string))` | `".published-container-images_{{ $ \| join \",\" \| sha256sum }}"` |
+| `$BUILDAH_BUILD_MANIFEST_JOB`<br/>`$CI_JOB_NAME_SLUG` | Job name that keys the published images in the dotenv report. | `string` |  |
+| `$BUILDAH_BUILD_MANIFEST_ENV_FILE`<br/>`$CONTAINER_MANIFEST_ENV_FILE` | Dotenv report the published images are written into for the manifest job. | `string` | `"container-manifest.env"` |
 
 <details>
 <summary>Container Registry</summary>
