@@ -72,7 +72,8 @@ install:
     # produced it, and go refuses to read an inconsistent one.
     - key: go-mod
       paths:
-        - .go/pkg/mod/
+        # the downloaded archives alone; go extracts the modules from them when it vendors.
+        - .go/pkg/mod/cache/download/
   # every job that needs the tree is gated on its own paths, so this one runs whenever
   # any of them could, and a tag of internal has no pipe to build.
   rules:
