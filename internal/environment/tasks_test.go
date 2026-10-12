@@ -50,8 +50,7 @@ var _ = Describe("SetupTaskList", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(ctx.References).To(Equal([]string{"heads/main"}))
 		Expect(ctx.Environment).To(Equal("develop"))
-		Expect(ctx.EnvVars).To(HaveKeyWithValue("TOKEN", "develop-token"))
-		Expect(ctx.EnvVars).To(HaveKeyWithValue("PATH", "/usr/bin"))
+		Expect(ctx.EnvVars).To(Equal(map[string]string{"TOKEN": "develop-token", "ENVIRONMENT": "develop"}))
 	})
 
 	It("names the variables it selected in the log and never their values", func() {

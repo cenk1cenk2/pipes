@@ -77,18 +77,14 @@ var _ = Describe("Fetch", func() {
 			To(HaveKeyWithValue("TOKEN", "stage-token"))
 	})
 
-	// an environment is expected to override only the few variables it cares about,
-	// so everything else has to reach the pipe untouched.
-	It("keeps the variables without the prefix as they are", func() {
-		Expect(environment.Fetch([]string{"PATH=/usr/bin"}, "stage")).
-			To(HaveKeyWithValue("PATH", "/usr/bin"))
+	It("leaves out the variables without the prefix", func() {
+		Expect(environment.Fetch([]string{"PATH=/usr/bin", "TOKEN=plain", "STAGE_TOKEN=stage-token"}, "stage")).
+			To(Equal(map[string]string{"TOKEN": "stage-token", "ENVIRONMENT": "stage"}))
 	})
 
-	It("lets the prefixed value win over the plain one wherever either sits", func() {
-		Expect(environment.Fetch([]string{"TOKEN=plain", "STAGE_TOKEN=stage-token"}, "stage")).
-			To(HaveKeyWithValue("TOKEN", "stage-token"))
-		Expect(environment.Fetch([]string{"STAGE_TOKEN=stage-token", "TOKEN=plain"}, "stage")).
-			To(HaveKeyWithValue("TOKEN", "stage-token"))
+	It("leaves out the variables of another environment", func() {
+		Expect(environment.Fetch([]string{"PRODUCTION_TOKEN=production-token", "STAGE_TOKEN=stage-token"}, "stage")).
+			To(Equal(map[string]string{"TOKEN": "stage-token", "ENVIRONMENT": "stage"}))
 	})
 
 	It("matches the prefix case insensitively against the selection", func() {
