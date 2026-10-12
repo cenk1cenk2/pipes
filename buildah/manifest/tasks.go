@@ -99,20 +99,20 @@ func fetchFile(tl *TaskList) *Task {
 func fetchUser(tl *TaskList) *Task {
 	return tl.CreateTask("fetch", "user").
 		ShouldDisable(func(t *Task) bool {
-			return len(P.Manifest.Images) == 0
+			return len(P.Manifest.Images) == 0 && len(P.Manifest.Matrix) == 0
 		}).
 		Set(func(_ context.Context, t *Task) error {
 			if P.Manifest.Target != "" && len(P.Manifest.Images) > 0 {
-				t.Lock.Lock()
-				var err error
-				if P.Manifest.Target, err = InlineTemplate[any](P.Manifest.Target, nil); err != nil {
+				target, err := InlineTemplate[any](P.Manifest.Target, nil)
+				if err != nil {
 					return err
 				}
 
-				C.ManifestedImages[P.Manifest.Target] = append(C.ManifestedImages[P.Manifest.Target], P.Manifest.Images...)
+				t.Lock.Lock()
+				C.ManifestedImages[target] = append(C.ManifestedImages[target], P.Manifest.Images...)
 				t.Lock.Unlock()
 
-				t.Log.Debug(fmt.Sprintf("Fetched direct image: %s -> %v", P.Manifest.Target, P.Manifest.Images))
+				t.Log.Debug(fmt.Sprintf("Fetched direct image: %s -> %v", target, P.Manifest.Images))
 			}
 
 			for _, entry := range P.Manifest.Matrix {
