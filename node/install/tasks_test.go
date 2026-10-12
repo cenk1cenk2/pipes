@@ -37,7 +37,7 @@ var _ = Describe("Node install", func() {
 					return tl.New(p).
 						SetRuntimeDepth(3).
 						Set(func(tl *TaskList) Job {
-							return JobSequence(install(tl).Job())
+							return JobSequence(install(tl).Job(), prune(tl).Job())
 						})
 				},
 			},
@@ -87,4 +87,44 @@ var _ = Describe("Node install", func() {
 		Expect(ok).To(BeTrue())
 		Expect(invocation.Args).To(Equal([]string{"install", "--foo", "--prefer-offline", "--cache-folder", ".yarn"}))
 	})
+
+	It("prunes the pnpm store it installed into", func() {
+		runner := fixtures.Runner()
+
+		p := pipe()
+		p.Install.Cache = true
+
+		Expect(run(runner, p, "pnpm")).To(Succeed())
+
+		Expect(runner.InvocationNames()).To(Equal([]string{"pnpm", "pnpm"}))
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).To(Equal([]string{"store", "prune", "--store-dir", ".pnpm"}))
+		Expect(invocation.Dir).To(Equal("projects/web"))
+	})
+
+	It("leaves the pnpm store alone when nothing is cached", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, pipe(), "pnpm")).To(Succeed())
+
+		Expect(runner.InvocationNames()).To(Equal([]string{"pnpm"}))
+	})
+
+	// only pnpm prunes what nothing references, the other caches are left as they are.
+	DescribeTable("leaves the cache of the other package managers alone",
+		func(packageManager string) {
+			runner := fixtures.Runner()
+
+			p := pipe()
+			p.Install.Cache = true
+
+			Expect(run(runner, p, packageManager)).To(Succeed())
+
+			Expect(runner.InvocationNames()).To(Equal([]string{packageManager}))
+		},
+		Entry("npm", "npm"),
+		Entry("yarn", "yarn"),
+	)
 })

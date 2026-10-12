@@ -53,3 +53,29 @@ func install(tl *TaskList) *Task {
 			return t.RunCommandJobAsJobSequence(ctx)
 		})
 }
+
+// pnpm keeps every version it ever fetched in its store, so the cached store only
+// stays the size of the project when it drops what nothing references anymore.
+func prune(tl *TaskList) *Task {
+	return tl.CreateTask("prune").
+		ShouldDisable(func(_ *Task) bool {
+			return !P.Install.Cache || setup.NodeCtx.PackageManager.Exe != "pnpm"
+		}).
+		Set(func(_ context.Context, t *Task) error {
+			t.CreateCommand(
+				"pnpm",
+				"store",
+				"prune",
+				"--store-dir",
+				".pnpm",
+			).
+				SetDir(P.Install.Cwd).
+				AppendDirectEnvironment(os.Environ()...).
+				AddSelfToTheTask()
+
+			return nil
+		}).
+		ShouldRunAfter(func(ctx context.Context, t *Task) error {
+			return t.RunCommandJobAsJobSequence(ctx)
+		})
+}

@@ -32,6 +32,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				install(tl).Job(),
+				prune(tl).Job(),
 			)
 		})
 }
