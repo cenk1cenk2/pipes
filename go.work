@@ -12,7 +12,6 @@ use (
 	./mise
 	./node
 	./pulumi
-	./select-env
 	./semantic-release
 	./terraform
 	./tests

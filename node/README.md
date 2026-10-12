@@ -118,25 +118,9 @@ Install node packages with the given package manager.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$NODE_BUILD_SCRIPT` | package.json script for the build operation. | `string`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` | `"build"` |
-| `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for the build operation. | `string`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` |  |
+| `$NODE_BUILD_SCRIPT` | package.json script for the build operation. | `string`<br/>`format(Template())` | `"build"` |
+| `$NODE_BUILD_SCRIPT_ARGS` | package.json script arguments for the build operation. | `string`<br/>`format(Template())` |  |
 | `$NODE_BUILD_CWD` | Working directory for the build operation. | `string` | `"."` |
-
-**Environment**
-
-| Flag / Environment | Description | Type | Default |
-| --- | --- | --- | --- |
-| `$ENVIRONMENT_ENABLE` | Enable environment injection. | `bool` | `false` |
-| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br/>Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `string`<br/>`format(json([]struct{ match: RegExp, environment: string }))` | `"[\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+$\", \"environment\": \"production\" },\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+-.*\\\\.\\\\d+$\", \"environment\": \"stage\" },\n    { \"match\" :\"^heads/main$\", \"environment\": \"develop\" },\n    { \"match\": \"^heads/master$\", \"environment\": \"develop\" }\n]"` |
-| `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `bool` | `true` |
-| `$ENVIRONMENT_STRICT` | Fail when no environment is selected. | `bool` | `true` |
-
-**GIT**
-
-| Flag / Environment | Description | Type | Default |
-| --- | --- | --- | --- |
-| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `string` |  |
-| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `string` |  |
 
 <details>
 <summary>Package Manager</summary>
@@ -163,30 +147,8 @@ Install node packages with the given package manager.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$NODE_RUN_SCRIPT`<br/>`$NODE_COMMAND_SCRIPT` | package.json script for the given command operation. | `string`<br/>`format(Template(struct{ Environment: string, EnvVars: map[string]string }))` |  |
+| `$NODE_RUN_SCRIPT`<br/>`$NODE_COMMAND_SCRIPT` | package.json script for the given command operation. | `string`<br/>`format(Template())` |  |
 | `$NODE_RUN_CWD`<br/>`$NODE_COMMAND_CWD` | Working directory for the given command operation. | `string` | `"."` |
-
-<details>
-<summary>Environment</summary>
-
-| Flag / Environment | Description | Type | Default |
-| --- | --- | --- | --- |
-| `$ENVIRONMENT_ENABLE` | Enable environment injection. | `bool` | `false` |
-| `$ENVIRONMENT_CONDITIONS` | Regex pattern to select an environment.<br/>Use either "heads/" for narrowing the search to branches or "tags/" for narrowing the search to tags. | `string`<br/>`format(json([]struct{ match: RegExp, environment: string }))` | `"[\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+$\", \"environment\": \"production\" },\n    { \"match\": \"^tags/v?\\\\d+.\\\\d+.\\\\d+-.*\\\\.\\\\d+$\", \"environment\": \"stage\" },\n    { \"match\" :\"^heads/main$\", \"environment\": \"develop\" },\n    { \"match\": \"^heads/master$\", \"environment\": \"develop\" }\n]"` |
-| `$ENVIRONMENT_FAIL_ON_NO_REFERENCE` | Fail on missing environment references. | `bool` | `true` |
-| `$ENVIRONMENT_STRICT` | Fail when no environment is selected. | `bool` | `true` |
-
-</details>
-
-<details>
-<summary>GIT</summary>
-
-| Flag / Environment | Description | Type | Default |
-| --- | --- | --- | --- |
-| `$CI_COMMIT_REF_NAME`<br/>`$BITBUCKET_BRANCH` | Source control branch. | `string` |  |
-| `$CI_COMMIT_TAG`<br/>`$BITBUCKET_TAG` | Source control tag. | `string` |  |
-
-</details>
 
 <details>
 <summary>Package Manager</summary>

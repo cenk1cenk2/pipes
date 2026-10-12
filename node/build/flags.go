@@ -1,10 +1,7 @@
 package build
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v3"
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 )
 
 //revive:disable:line-length-limit
@@ -22,7 +19,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_SCRIPT"),
 		),
-		Usage:       fmt.Sprintf("package.json script for the build operation. %s", environment.HelpFormatTemplate),
+		Usage:       "package.json script for the build operation. format(Template())",
 		Required:    false,
 		Value:       "build",
 		Destination: &P.Build.Script,
@@ -34,7 +31,7 @@ var Flags = []cli.Flag{
 		Sources: cli.NewValueSourceChain(
 			cli.EnvVar("NODE_BUILD_SCRIPT_ARGS"),
 		),
-		Usage:       fmt.Sprintf("package.json script arguments for the build operation. %s", environment.HelpFormatTemplate),
+		Usage:       "package.json script arguments for the build operation. format(Template())",
 		Required:    false,
 		Value:       "",
 		Destination: &P.Build.ScriptArgs,

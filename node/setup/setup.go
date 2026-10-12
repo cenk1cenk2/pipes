@@ -5,14 +5,10 @@ package setup
 
 import (
 	. "github.com/cenk1cenk2/plumber/v7"
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/internal/node"
 )
 
 var (
-	Environment    = &environment.Config{}
-	EnvironmentCtx = &environment.Ctx{}
-
 	NodeConfig = &node.Config{}
 	NodeCtx    = &node.Ctx{}
 )
@@ -20,10 +16,4 @@ var (
 // New resolves the package manager every node command runs through.
 func New(p *Plumber) *TaskList {
 	return node.SetupTaskList(p, NodeConfig, NodeCtx)
-}
-
-// NewEnvironment selects the environment the scripts are templated against and
-// run with.
-func NewEnvironment(p *Plumber) *TaskList {
-	return environment.SetupTaskList(p, Environment, EnvironmentCtx)
 }

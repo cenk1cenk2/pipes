@@ -4,7 +4,6 @@ import (
 	"context"
 
 	. "github.com/cenk1cenk2/plumber/v7"
-	"gitlab.kilic.dev/devops/pipes/internal/environment"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
@@ -15,15 +14,10 @@ func run(tl *TaskList) *Task {
 				setup.NodeCtx.PackageManager.Exe,
 			).
 				Set(func(_ context.Context, c *Command) error {
-					ctx := environment.Template{
-						Environment: setup.EnvironmentCtx.Environment,
-						EnvVars:     setup.EnvironmentCtx.EnvVars,
-					}
-
 					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.Run...)
 
 					if C.Script != "" {
-						tmpl, err := InlineTemplate(C.Script, ctx)
+						tmpl, err := InlineTemplate[any](C.Script, nil)
 
 						if err != nil {
 							return err
@@ -35,7 +29,7 @@ func run(tl *TaskList) *Task {
 					c.AppendArgs(setup.NodeCtx.PackageManager.Commands.RunDelimiter...)
 
 					if C.ScriptArgs != "" {
-						tmpl, err := InlineTemplate(C.ScriptArgs, ctx)
+						tmpl, err := InlineTemplate[any](C.ScriptArgs, nil)
 
 						if err != nil {
 							return err
