@@ -57,10 +57,21 @@ func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadat
 	accumulators := map[string]*actionAccumulator{}
 
 	for urn, resource := range plan.ResourcePlans {
+		if isDefaultProvider(string(urn)) {
+			continue
+		}
+
 		steps := resourceActions(resource)
 		steps = slices.DeleteFunc(steps, func(action string) bool {
 			return action == "same"
 		})
+
+		// the plan never records the import step, so an import without changes carries
+		// no step at all.
+		if isImport(resource.Goal, state[string(urn)]) && !slices.Contains(steps, "import") {
+			steps = slices.Insert(steps, 0, "import")
+		}
+
 		if len(steps) == 0 {
 			continue
 		}
@@ -257,6 +268,13 @@ func sortedUniqueStrings(values []string) []string {
 	slices.Sort(values)
 
 	return slices.Compact(values)
+}
+
+// Pulumi leaves the providers it registers on its own out of its summary.
+func isDefaultProvider(urn string) bool {
+	resourceType, name := splitPulumiUrn(urn)
+
+	return strings.HasPrefix(resourceType, "pulumi:providers:") && strings.HasPrefix(name, "default")
 }
 
 func splitPulumiUrn(urn string) (string, string) {

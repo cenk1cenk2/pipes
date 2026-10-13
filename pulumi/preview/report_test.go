@@ -274,6 +274,35 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{Update: 3, Delete: 1, UpdateWithoutPropertyChanges: 1}))
 	})
 
+	It("reports an imported resource as an import with only the changes the update makes and leaves the default provider out", func() {
+		report, err := parsePulumiPlanReport(readFixture("plan-import.json"), map[string]map[string]any{}, terraform.Metadata{Target: "default", JobName: "pulumi-preview"})
+		Expect(err).NotTo(HaveOccurred())
+
+		names := []string{}
+		for _, action := range report.Actions {
+			names = append(names, action.Action)
+		}
+		Expect(names).To(Equal([]string{"create", "import", "update"}))
+
+		project := "urn:pulumi:default::gitlab::gitlab:index/project:Project::project-11"
+		for _, action := range report.Actions[1:] {
+			Expect(resource(action, project).Changes).To(Equal([]terraform.Change{
+				{Name: "archiveOnDestroy", Action: create, After: "true"},
+				{Name: "resourceGroupDefaultProcessMode", Action: terraform.ChangeUpdate, After: `"oldest_first"`},
+				{Name: "squashCommitTemplate", Action: create, After: "<<-EOT\n  %{title}\n\n  %{all_commits}\nEOT"},
+			}))
+		}
+
+		// an import without changes records no step at all.
+		Expect(resource(report.Actions[1], "urn:pulumi:default::gitlab::gitlab:index/project:Project::project-12").Changes).To(BeEmpty())
+
+		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{Create: 1, Update: 1}))
+
+		body, err := terraform.RenderReport(report, terraform.DiffUnified)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(body).To(Equal(string(readFixture("plan-import.md"))))
+	})
+
 	It("labels a replacement as destructive with the order it runs in", func() {
 		report, err := parsePulumiPlanReport(readFixture("plan-versioned.json"), nil, metadata())
 		Expect(err).NotTo(HaveOccurred())
@@ -411,6 +440,18 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			}, nil)
 
 			Expect(changes).To(Equal([]terraform.Change{{Name: "runtime", Action: update, After: `"nodejs22.x"`}}))
+		})
+
+		It("compares an update against the stack state once the imported resource is in it", func() {
+			changes := resourceChanges(&apitype.GoalV1{
+				ID:        "11",
+				InputDiff: apitype.PlanDiffV1{Adds: map[string]any{"ciConfigPath": ""}, Deletes: []string{"defaultBranch"}},
+			}, map[string]any{"defaultBranch": "main"})
+
+			Expect(changes).To(Equal([]terraform.Change{
+				{Name: "ciConfigPath", Action: create, After: `""`},
+				{Name: "defaultBranch", Action: remove, Before: `"main"`},
+			}))
 		})
 
 		It("carries nothing for a resource without a goal", func() {

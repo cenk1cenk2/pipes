@@ -68,10 +68,19 @@ func resourceChanges(goal *apitype.GoalV1, old map[string]any) []terraform.Chang
 		slices.Collect(maps.Keys(diff.Updates)),
 	))
 
+	// an import is diffed against the inputs read back from the live resource: a
+	// property missing from them is unset there, and one the program leaves out keeps
+	// its live value.
+	imported := isImport(goal, old)
+
 	for _, name := range names {
 		before, known := old[name]
 
 		if value, ok := diff.Adds[name]; ok {
+			if imported && isZero(value) {
+				continue
+			}
+
 			changes = append(changes, terraform.Expand(terraform.ChangeCreate, name, masked(value)))
 
 			continue
@@ -99,10 +108,39 @@ func resourceChanges(goal *apitype.GoalV1, old map[string]any) []terraform.Chang
 			continue
 		}
 
+		if imported {
+			continue
+		}
+
 		changes = append(changes, terraform.Change{Name: name, Action: terraform.ChangeDelete})
 	}
 
 	return changes
+}
+
+// A goal carries an id only for a resource the program imports, which is an import
+// as long as the stack state does not know the resource yet.
+func isImport(goal *apitype.GoalV1, old map[string]any) bool {
+	return goal != nil && goal.ID != "" && old == nil
+}
+
+func isZero(value any) bool {
+	switch value := value.(type) {
+	case nil:
+		return true
+	case string:
+		return value == ""
+	case bool:
+		return !value
+	case float64:
+		return value == 0
+	case []any:
+		return len(value) == 0
+	case map[string]any:
+		return len(value) == 0
+	}
+
+	return false
 }
 
 // masked is the value with every secret replaced by its marker, whichever way the
