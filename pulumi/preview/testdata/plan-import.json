@@ -1,0 +1,130 @@
+{
+  "manifest": {
+    "time": "2026-10-13T11:42:37.013668476Z",
+    "magic": "9a855bcb621a22a207f70669dab3c8533fb667eeff636e7d0301661e70d79222",
+    "version": "v3.268.0"
+  },
+  "resourcePlans": {
+    "urn:pulumi:default::gitlab::gitlab:index/project:Project::project-11": {
+      "goal": {
+        "type": "gitlab:index/project:Project",
+        "name": "project-11",
+        "custom": true,
+        "inputDiff": {
+          "adds": {
+            "archiveOnDestroy": true,
+            "ciConfigPath": "",
+            "externalAuthorizationClassificationLabel": "",
+            "issueBranchTemplate": "",
+            "issuesTemplate": "",
+            "mergeCommitTemplate": "",
+            "mergeRequestsTemplate": "",
+            "mrDefaultTitleTemplate": "",
+            "resolveOutdatedDiffDiscussions": false,
+            "squashCommitTemplate": "%{title}\n\n%{all_commits}",
+            "suggestionCommitMessage": ""
+          },
+          "deletes": [
+            "modelExperimentsAccessLevel",
+            "ciForwardDeploymentEnabled",
+            "requestAccessEnabled",
+            "publicJobs",
+            "autocloseReferencedIssues",
+            "sharedRunnersEnabled",
+            "printingMergeRequestLinkEnabled",
+            "emailsEnabled",
+            "ciIdTokenSubClaimComponents",
+            "wikiAccessLevel",
+            "namespaceId",
+            "forkingAccessLevel",
+            "mergeRequestsAccessLevel",
+            "visibilityLevel",
+            "ciForwardDeploymentRollbackAllowed",
+            "removeSourceBranchAfterMerge",
+            "monitorAccessLevel",
+            "ciDefaultGitDepth",
+            "infrastructureAccessLevel",
+            "featureFlagsAccessLevel",
+            "groupRunnersEnabled",
+            "securityAndComplianceAccessLevel",
+            "environmentsAccessLevel",
+            "repositoryStorage",
+            "containerExpirationPolicy",
+            "packageRegistryAccessLevel",
+            "packagesEnabled",
+            "ciSeparatedCaches",
+            "pagesAccessLevel",
+            "repositoryAccessLevel",
+            "analyticsAccessLevel",
+            "ciPipelineVariablesMinimumOverrideRole",
+            "buildTimeout",
+            "releasesAccessLevel",
+            "buildsAccessLevel",
+            "mergeMethod",
+            "autoCancelPendingPipelines",
+            "squashOption",
+            "issuesAccessLevel",
+            "lfsEnabled",
+            "defaultBranch",
+            "snippetsAccessLevel",
+            "autoDevopsDeployStrategy",
+            "modelRegistryAccessLevel",
+            "buildGitStrategy",
+            "containerRegistryAccessLevel"
+          ],
+          "updates": {
+            "resourceGroupDefaultProcessMode": "oldest_first"
+          }
+        },
+        "outputDiff": {},
+        "protect": false,
+        "provider": "urn:pulumi:default::gitlab::pulumi:providers:gitlab::gitlab::4f9af614-723b-4998-a401-4007b26b2dab",
+        "id": "11"
+      },
+      "steps": [
+        "update"
+      ],
+      "seed": "ujxdqY+VQZhdjgJR5KpGPWCGOBsfhmS6Wfqp8dmK1dQ="
+    },
+    "urn:pulumi:default::gitlab::pulumi-nodejs:dynamic/gitlab:ResourceGroup::resource-group-12-9544a30e": {
+      "goal": {
+        "type": "pulumi-nodejs:dynamic/gitlab:ResourceGroup",
+        "name": "resource-group-12-9544a30e",
+        "custom": true,
+        "inputDiff": {
+          "adds": {
+            "key": "semantic-release",
+            "processMode": "oldest_first",
+            "project": 12,
+            "token": {
+              "4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
+              "ciphertext": "v1:secret-token-value"
+            },
+            "url": "https://gitlab.kilic.dev/api/v4"
+          }
+        },
+        "outputDiff": {},
+        "protect": false,
+        "provider": "urn:pulumi:default::gitlab::pulumi:providers:pulumi-nodejs::default::04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+      },
+      "steps": [
+        "create"
+      ],
+      "seed": "VLN+ZcHsKD7T/D3jM9EBMRp2/C9HAsdgSFDumNSNS6g="
+    },
+    "urn:pulumi:default::gitlab::pulumi:providers:pulumi-nodejs::default": {
+      "goal": {
+        "type": "pulumi:providers:pulumi-nodejs",
+        "name": "default",
+        "custom": true,
+        "inputDiff": {},
+        "outputDiff": {},
+        "protect": false
+      },
+      "steps": [
+        "create"
+      ],
+      "seed": "RSLUFRWw33Ufhk4DEJZCZ403WOUlmniqILQwgjk/cjY="
+    }
+  }
+}
