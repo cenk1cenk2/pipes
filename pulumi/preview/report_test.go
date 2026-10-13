@@ -293,6 +293,9 @@ var _ = Describe("Pulumi plan merge request report", func() {
 			}))
 		}
 
+		// an import without changes records no step at all.
+		Expect(resource(report.Actions[1], "urn:pulumi:default::gitlab::gitlab:index/project:Project::project-12").Changes).To(BeEmpty())
+
 		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{Create: 1, Update: 1}))
 
 		body, err := terraform.RenderReport(report, terraform.DiffUnified)

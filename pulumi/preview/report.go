@@ -65,13 +65,15 @@ func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadat
 		steps = slices.DeleteFunc(steps, func(action string) bool {
 			return action == "same"
 		})
-		if len(steps) == 0 {
-			continue
-		}
 
-		// the plan never records the import step that runs ahead of the update.
+		// the plan never records the import step, so an import without changes carries
+		// no step at all.
 		if isImport(resource.Goal, state[string(urn)]) && !slices.Contains(steps, "import") {
 			steps = slices.Insert(steps, 0, "import")
+		}
+
+		if len(steps) == 0 {
+			continue
 		}
 
 		summary := resourceSummary(string(urn), resource, state[string(urn)])

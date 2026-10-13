@@ -86,6 +86,19 @@
       ],
       "seed": "ujxdqY+VQZhdjgJR5KpGPWCGOBsfhmS6Wfqp8dmK1dQ="
     },
+    "urn:pulumi:default::gitlab::gitlab:index/project:Project::project-12": {
+      "goal": {
+        "type": "gitlab:index/project:Project",
+        "name": "project-12",
+        "custom": true,
+        "inputDiff": {},
+        "outputDiff": {},
+        "protect": false,
+        "provider": "urn:pulumi:default::gitlab::pulumi:providers:gitlab::gitlab::4f9af614-723b-4998-a401-4007b26b2dab",
+        "id": "12"
+      },
+      "seed": "Hk0vYp3mB2c9Q1sXW7aZr4TnU8eJfLdG6yNqVhCiOwE="
+    },
     "urn:pulumi:default::gitlab::pulumi-nodejs:dynamic/gitlab:ResourceGroup::resource-group-12-9544a30e": {
       "goal": {
         "type": "pulumi-nodejs:dynamic/gitlab:ResourceGroup",

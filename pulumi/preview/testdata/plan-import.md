@@ -16,10 +16,10 @@ This report carries the plan metadata, the action planned for every resource wit
 | Action | Resources | Output properties |
 | --- | ---: | ---: |
 | `+ create` | 1 | 0 |
-| `= import` | 1 | 0 |
+| `= import` | 2 | 0 |
 | `~ update` | 1 | 0 |
 
-Total planned actions: 3.
+Total planned actions: 4.
 
 ### Resources
 
@@ -39,7 +39,7 @@ Total planned actions: 3.
 
 </details>
 
-#### `= import` (1)
+#### `= import` (2)
 
 <details>
 <summary><code>= import</code> <code>gitlab:index/project:Project/project-11</code> (<code>urn:pulumi:default::gitlab::gitlab:index/project:Project::project-11</code>)</summary>
@@ -53,6 +53,16 @@ Total planned actions: 3.
 + 
 +   %{all_commits}
 + EOT
+```
+
+</details>
+
+<details>
+<summary><code>= import</code> <code>gitlab:index/project:Project/project-12</code> (<code>urn:pulumi:default::gitlab::gitlab:index/project:Project::project-12</code>)</summary>
+
+```diff
+= import
+No attribute changes.
 ```
 
 </details>
