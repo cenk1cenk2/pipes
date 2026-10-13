@@ -13,7 +13,7 @@ variables:
 
 include:
   - project: devops/pipelines
-    ref: semantic-release@2.5.1
+    ref: semantic-release@2.5.2
     file: /semantic-release/publish.gitlab-ci.yml
     inputs:
       version: bootstrap
