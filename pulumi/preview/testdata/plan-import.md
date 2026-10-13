@@ -25,7 +25,7 @@ Total planned actions: 4.
 
 #### `+ create` (1)
 
-<details>
+<details open>
 <summary><code>+ create</code> <code>pulumi-nodejs:dynamic/gitlab:ResourceGroup/resource-group-12-9544a30e</code> (<code>urn:pulumi:default::gitlab::pulumi-nodejs:dynamic/gitlab:ResourceGroup::resource-group-12-9544a30e</code>)</summary>
 
 ```diff
@@ -41,7 +41,7 @@ Total planned actions: 4.
 
 #### `= import` (2)
 
-<details>
+<details open>
 <summary><code>= import</code> <code>gitlab:index/project:Project/project-11</code> (<code>urn:pulumi:default::gitlab::gitlab:index/project:Project::project-11</code>)</summary>
 
 ```diff
@@ -57,7 +57,7 @@ Total planned actions: 4.
 
 </details>
 
-<details>
+<details open>
 <summary><code>= import</code> <code>gitlab:index/project:Project/project-12</code> (<code>urn:pulumi:default::gitlab::gitlab:index/project:Project::project-12</code>)</summary>
 
 ```diff
@@ -69,7 +69,7 @@ No attribute changes.
 
 #### `~ update` (1)
 
-<details>
+<details open>
 <summary><code>~ update</code> <code>gitlab:index/project:Project/project-11</code> (<code>urn:pulumi:default::gitlab::gitlab:index/project:Project::project-11</code>)</summary>
 
 ```diff

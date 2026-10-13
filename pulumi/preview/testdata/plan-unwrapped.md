@@ -24,7 +24,7 @@ Total planned actions: 2.
 
 #### `+ create` (1)
 
-<details>
+<details open>
 <summary><code>+ create</code> <code>aws:s3/bucket:Bucket/logs</code> (<code>urn:pulumi:dev::example::aws:s3/bucket:Bucket::logs</code>)</summary>
 
 ```diff
@@ -45,7 +45,7 @@ Total planned actions: 2.
 
 #### `~ update` (1)
 
-<details>
+<details open>
 <summary><code>~ update</code> <code>kubernetes:core/v1:ConfigMap/settings</code> (<code>urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings</code>)</summary>
 
 ```diff

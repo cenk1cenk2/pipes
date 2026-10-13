@@ -67,7 +67,7 @@ No changes detected.
 #### `{{ .Glyph }} {{ .Action }}`{{ if .WithoutPropertyChanges }} without property changes{{ end }} ({{ len .Resources }})
 {{- range .Resources }}
 
-<details>
+<details open>
 <summary><code>{{ $action.Glyph | html }} {{ $action.Action }}</code> {{ template "resource" . }}</summary>
 
 {{ .Fence }}diff

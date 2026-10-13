@@ -108,7 +108,7 @@ Only names, never values.
 	// opens with and the diff it hides, indented under it.
 	It("strips a folded section down to its summary and the code block under it", func() {
 		body, err := markdown.Render(strings.TrimSpace(`
-<details>
+<details open>
 <summary><code>+</code> <code>aws_s3_bucket.this</code></summary>
 
 ` + "```diff" + `
