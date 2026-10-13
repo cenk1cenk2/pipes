@@ -373,15 +373,15 @@ var _ = Describe("Terraform merge request report", func() {
 			"| `-/+ replace` without property changes | 1 | 0 |",
 		}))
 		Expect(body).To(ContainSubstring("Total planned actions: 6."))
-		Expect(body).To(ContainSubstring("#### `~ update` (1)\n\n<details>\n<summary><code>~ update</code> <code>aws_instance.web</code>"))
+		Expect(body).To(ContainSubstring("#### `~ update` (1)\n\n<details open>\n<summary><code>~ update</code> <code>aws_instance.web</code>"))
 		Expect(body).To(ContainSubstring(
-			"#### `~ update` without property changes (1)\n\n<details>\n<summary><code>~ update</code> <code>aws_instance.computed</code>",
+			"#### `~ update` without property changes (1)\n\n<details open>\n<summary><code>~ update</code> <code>aws_instance.computed</code>",
 		))
 		Expect(body).To(ContainSubstring(
-			"#### `-/+ replace` (1)\n\n<details>\n<summary><code>-/+ replace</code> <code>aws_db_instance.main</code>",
+			"#### `-/+ replace` (1)\n\n<details open>\n<summary><code>-/+ replace</code> <code>aws_db_instance.main</code>",
 		))
 		Expect(body).To(ContainSubstring(
-			"#### `-/+ replace` without property changes (1)\n\n<details>\n<summary><code>-/+ replace</code> <code>aws_db_instance.tainted</code>",
+			"#### `-/+ replace` without property changes (1)\n\n<details open>\n<summary><code>-/+ replace</code> <code>aws_db_instance.tainted</code>",
 		))
 
 		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{

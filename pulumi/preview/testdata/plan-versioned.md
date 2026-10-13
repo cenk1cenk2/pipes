@@ -26,7 +26,7 @@ Total planned actions: 3.
 
 #### `-/+ replace` (1)
 
-<details>
+<details open>
 <summary><code>-/+ replace</code> <code>aws:lambda/function:Function/worker</code> (<code>urn:pulumi:stage::example::aws:lambda/function:Function::worker</code>) (create before delete)</summary>
 
 ```diff
@@ -39,7 +39,7 @@ Total planned actions: 3.
 
 #### `+ create-replacement` (1)
 
-<details>
+<details open>
 <summary><code>+ create-replacement</code> <code>aws:lambda/function:Function/worker</code> (<code>urn:pulumi:stage::example::aws:lambda/function:Function::worker</code>) (create before delete)</summary>
 
 ```diff
@@ -52,7 +52,7 @@ Total planned actions: 3.
 
 #### `- delete-replaced` (1)
 
-<details>
+<details open>
 <summary><code>- delete-replaced</code> <code>aws:lambda/function:Function/worker</code> (<code>urn:pulumi:stage::example::aws:lambda/function:Function::worker</code>) (create before delete)</summary>
 
 ```diff

@@ -106,9 +106,9 @@ var _ = Describe("Resources without property changes", func() {
 
 		Expect(actionRows(body)).To(Equal([]string{"| `~ update` | 1 | 1 |", "| `~ update` without property changes | 2 | 0 |"}))
 		Expect(body).To(ContainSubstring("Total planned actions: 3."))
-		Expect(body).To(ContainSubstring("#### `~ update` (1)\n\n<details>\n<summary><code>~ update</code> <code>changed</code></summary>"))
+		Expect(body).To(ContainSubstring("#### `~ update` (1)\n\n<details open>\n<summary><code>~ update</code> <code>changed</code></summary>"))
 		Expect(body).To(ContainSubstring(
-			"#### `~ update` without property changes (2)\n\n<details>\n<summary><code>~ update</code> <code>pending</code></summary>",
+			"#### `~ update` without property changes (2)\n\n<details open>\n<summary><code>~ update</code> <code>pending</code></summary>",
 		))
 		Expect(body).To(ContainSubstring("<summary><code>~ update</code> <code>empty</code></summary>"))
 		Expect(body).To(ContainSubstring("#### `~ update` (1)\n- `endpoint`"))

@@ -89,7 +89,7 @@ var _ = Describe("Terraform merge request report", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Expect(body).To(ContainSubstring(strings.TrimSpace(`
-<details>
+<details open>
 <summary><code>+ create</code> <code>one</code></summary>
 
 ` + "```diff" + `
@@ -100,7 +100,7 @@ var _ = Describe("Terraform merge request report", func() {
 </details>
 `)))
 		Expect(body).To(ContainSubstring(strings.TrimSpace(`
-<details>
+<details open>
 <summary><code>&gt; move</code> <code>two</code> (moved from <code>old-two</code>)</summary>
 
 ` + "```diff" + `

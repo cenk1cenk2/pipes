@@ -29,7 +29,7 @@ Total planned actions: 5.
 
 #### `+ create` (1)
 
-<details>
+<details open>
 <summary><code>+ create</code> <code>aws_s3_bucket.logs</code></summary>
 
 ```diff
@@ -53,7 +53,7 @@ Total planned actions: 5.
 
 #### `~ update` (1)
 
-<details>
+<details open>
 <summary><code>~ update</code> <code>aws_instance.web</code></summary>
 
 ```diff
@@ -68,7 +68,7 @@ Total planned actions: 5.
 
 #### `-/+ replace` (1)
 
-<details>
+<details open>
 <summary><code>-/+ replace</code> <code>aws_db_instance.main</code> (destroy before create)</summary>
 
 ```diff
@@ -83,7 +83,7 @@ Total planned actions: 5.
 
 #### `> move` (1)
 
-<details>
+<details open>
 <summary><code>&gt; move</code> <code>aws_sqs_queue.jobs</code> (moved from <code>aws_sqs_queue.legacy_jobs</code>)</summary>
 
 ```diff
@@ -95,7 +95,7 @@ No attribute changes.
 
 #### `<= read` (1)
 
-<details>
+<details open>
 <summary><code>&lt;= read</code> <code>data.aws_caller_identity.current</code></summary>
 
 ```diff
