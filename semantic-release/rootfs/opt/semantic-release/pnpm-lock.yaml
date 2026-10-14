@@ -568,8 +568,8 @@ packages:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
 
-  execa@10.1.0:
-    resolution: {integrity: sha512-5HT/600HqXEtmkb9mK/PkTWw+bQSCzPnWiZ4/87wD3Hi0wFzCapOuNT9p4M08PDd+KLHdHvFhKjOWmNx/npRNQ==}
+  execa@10.1.1:
+    resolution: {integrity: sha512-yJAC9ulsE6fU0K6wzJBIH+wI+KAtMeu6Ck8rs23OVzvEhqXjGADdI6K+YNIDAjcQQ6AwXTD96cKExJo6xFJXyg==}
     engines: {node: '>=22'}
 
   execa@8.0.1:
@@ -1503,8 +1503,8 @@ packages:
   url-join@4.0.1:
     resolution: {integrity: sha512-jk1+QP6ZJqyOiuEI9AEWQfju/nB2Pw466kbA0LEZljHwKeMgd9WrAEgEGxjPDD2+TNbbb37rTyhEfrCXfuKXnA==}
 
-  url-join@5.0.0:
-    resolution: {integrity: sha512-n2huDr9h9yzd6exQVnH/jU5mr+Pfx08LRXXZhkLLetAMESRj+anQsTAh940iMrIetKAmry9coFuZQ2jY8/p3WA==}
+  url-join@5.1.0:
+    resolution: {integrity: sha512-eoBT8wyeuK0x1fQLmdUY3wbBZ3NtSbt98aT7dMoMORbBtZ8tKnunHO/4bZiuOhzR7tjme9JJaCP+yQkqmUzEBA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   util-deprecate@1.0.2:
@@ -1601,7 +1601,7 @@ snapshots:
       cosmiconfig: 10.0.1
       debug: 4.4.3
       detect-indent: 7.0.2
-      execa: 10.1.0
+      execa: 10.1.1
       git-log-parser: 1.2.1
       lodash-es: 4.18.1
       resolve-from: 5.0.0
@@ -1634,7 +1634,7 @@ snapshots:
       debug: 4.4.3
       detect-indent: 7.0.2
       env-ci: 11.2.0
-      execa: 10.1.0
+      execa: 10.1.1
       ini: 7.0.0
       normalize-url: 9.0.1
       registry-auth-token: 5.1.1
@@ -1820,7 +1820,7 @@ snapshots:
       aggregate-error: 5.0.0
       debug: 4.4.3
       dir-glob: 3.0.1
-      execa: 10.1.0
+      execa: 10.1.1
       lodash-es: 4.18.1
       micromatch: 4.0.8
       p-reduce: 3.0.0
@@ -1847,7 +1847,7 @@ snapshots:
       semantic-release: 25.0.9
       tinyglobby: 0.2.17
       undici: 7.30.0
-      url-join: 5.0.0
+      url-join: 5.1.0
     transitivePeerDependencies:
       - kerberos
       - supports-color
@@ -2190,7 +2190,7 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  execa@10.1.0:
+  execa@10.1.1:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       figures: 6.1.0
@@ -3022,7 +3022,7 @@ snapshots:
 
   url-join@4.0.1: {}
 
-  url-join@5.0.0: {}
+  url-join@5.1.0: {}
 
   util-deprecate@1.0.2: {}
 
