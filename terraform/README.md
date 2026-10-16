@@ -54,7 +54,7 @@ Install terraform project.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS`<br/>`$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`format(json([]struct{ registry: string, token: string }))` |  |
+| `$TERRAFORM_LOGIN` | Terraform registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, token: string }))` |  |
 
 **Project**
 
@@ -177,7 +177,7 @@ Plan terraform project.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS`<br/>`$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`format(json([]struct{ registry: string, token: string }))` |  |
+| `$TERRAFORM_LOGIN` | Terraform registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, token: string }))` |  |
 
 </details>
 
@@ -264,7 +264,7 @@ Apply terraform project.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$TERRAFORM_LOGIN_REGISTRY_CREDENTIALS`<br/>`$TF_REGISTRY_CREDENTIALS` | Terraform registry credentials. | `string`<br/>`format(json([]struct{ registry: string, token: string }))` |  |
+| `$TERRAFORM_LOGIN` | Terraform registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, token: string }))` |  |
 
 </details>
 

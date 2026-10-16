@@ -23,6 +23,12 @@ Build and validate Kustomize overlays.
 
 #### Flags
 
+**Container Registry**
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$KUSTOMIZE_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
+
 **Kustomize**
 
 | Flag / Environment | Description | Type | Default |

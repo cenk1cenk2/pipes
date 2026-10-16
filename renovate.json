@@ -14,6 +14,13 @@
       ]
     }
   ],
+  "packageRules": [
+    {
+      "description": "kustomize v0.21.3 pulls a kube-openapi on structured-merge-diff/v7, which the workspace unifies into helm while k8s.io/apimachinery v0.37 still builds on v6. Lift once a stable apimachinery moves to v7.",
+      "matchPackageNames": [ "sigs.k8s.io/kustomize/api", "sigs.k8s.io/kustomize/kyaml" ],
+      "allowedVersions": "<0.21.3"
+    }
+  ],
   "lockFileMaintenance": {
     "commitMessageSuffix": ""
   },
