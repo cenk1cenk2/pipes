@@ -5,7 +5,17 @@ import (
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
+
+func image(tl *TaskList) *Task {
+	return tl.CreateTask("image").
+		Set(func(_ context.Context, _ *Task) error {
+			_, err := registry.ParseImage(P.Image.Name)
+
+			return err
+		})
+}
 
 func build(tl *TaskList) *Task {
 	return tl.CreateTask("build").

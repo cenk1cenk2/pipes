@@ -37,10 +37,7 @@ Login to the given container registries.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$BUILDAH_LOGIN_REGISTRY_URI`<br/>`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `"docker.io"` |
-| `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br/>`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` |  |
-| `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br/>`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` |  |
-| `$BUILDAH_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
+| `$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 ### `pipe-buildah build`
 
@@ -64,7 +61,7 @@ Build container images.
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
 | `$BUILDAH_BUILD_IMAGE_PLATFORMS`<br/>`$CONTAINER_IMAGE_PLATFORMS` | Container image platforms to be built. | `string[]` |  |
-| **`$BUILDAH_BUILD_IMAGE_NAME`**<br/>**`$CONTAINER_IMAGE_NAME`**\* | Image name for the container image to be built. | `string` |  |
+| **`$BUILDAH_BUILD_IMAGE_NAME`**<br/>**`$CONTAINER_IMAGE_NAME`**\* | Fully qualified image name for the container image to be built, starting with the registry host. | `string` |  |
 | `$BUILDAH_BUILD_IMAGE_TAGS`<br/>`$CONTAINER_IMAGE_TAGS` | Image tags for the container image to be built. | `string[]` |  |
 | `$BUILDAH_BUILD_IMAGE_TAGS_TEMPLATE`<br/>`$CONTAINER_IMAGE_TAGS_TEMPLATE` | Modifies every tag that matches a certain condition.<br/>Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `"[]"` |
 | `$BUILDAH_BUILD_IMAGE_TAGS_SANITIZE`<br/>`$CONTAINER_IMAGE_SANITIZE_TAGS` | Sanitizes the given regex pattern out of tag name.<br/>Template is interpolated with the given matches in the regular expression. | `string`<br/>`format(yaml([]struct{ match: RegExp, template: Template(match) }))` | `"[\n    { \"match\": \"([^/]*)/(.*)\", \"template\": \"{{ index $ 1 \| upper }}_{{ index $ 2 }}\" }\n]"` |
@@ -93,10 +90,7 @@ Build container images.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$BUILDAH_LOGIN_REGISTRY_URI`<br/>`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `"docker.io"` |
-| `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br/>`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` |  |
-| `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br/>`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` |  |
-| `$BUILDAH_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
+| `$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 </details>
 
@@ -142,7 +136,7 @@ Update manifests of the container images.
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
 | `$CONTAINER_MANIFEST_VARIABLE_PREFIX` | Prefix of the dotenv variables the build jobs hand their published images over to the manifest job in. | `string` | `"CONTAINER_MANIFEST_PUBLISHED_"` |
-| `$BUILDAH_MANIFEST_TARGET`<br/>`$CONTAINER_MANIFEST_TARGET` | Target image names for patching the manifest. | `string`<br/>`format(Template())` |  |
+| `$BUILDAH_MANIFEST_TARGET`<br/>`$CONTAINER_MANIFEST_TARGET` | Fully qualified target image name for patching the manifest, starting with the registry host. | `string`<br/>`format(Template())` |  |
 | `$BUILDAH_MANIFEST_IMAGES`<br/>`$CONTAINER_MANIFEST_IMAGES` | Image names for patching the manifest with the given target. | `string[]` |  |
 | `$BUILDAH_MANIFEST_MATRIX`<br/>`$CONTAINER_MANIFEST_MATRIX` | Matrix of all the images that should be manifested. | `string`<br/>`format(yaml([]struct{ target: string, images: []string }))` |  |
 
@@ -151,9 +145,6 @@ Update manifests of the container images.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$BUILDAH_LOGIN_REGISTRY_URI`<br/>`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `"docker.io"` |
-| `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br/>`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` |  |
-| `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br/>`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` |  |
-| `$BUILDAH_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
+| `$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 </details>

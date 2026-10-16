@@ -17,8 +17,6 @@ import (
 
 var _ = Describe("Container registry login", func() {
 	newLogin := func(opts registry.LoginOptions) *registry.Login {
-		opts.Category = "Container Registry"
-		opts.Alias = "PIPE_CONTAINER_LOGIN"
 		if opts.Command == nil {
 			opts.Command = []string{"helm", "registry", "login"}
 		}
@@ -26,10 +24,17 @@ var _ = Describe("Container registry login", func() {
 		return registry.NewLogin(opts)
 	}
 
-	parse := func(l *registry.Login, value string) error {
+	parse := func(value string) ([]registry.LoginEntry, error) {
 		GinkgoHelper()
 
-		return l.Flags[0].(*cli.StringFlag).Validator(value)
+		entries := []registry.LoginEntry{}
+		flags := registry.NewLoginFlags(registry.LoginFlagsOptions{
+			Category:    "Container Registry",
+			Alias:       "PIPE_CONTAINER_LOGIN",
+			Destination: &entries,
+		})
+
+		return entries, flags[0].(*cli.StringFlag).Validator(value)
 	}
 
 	run := func(runner *tests.TestingCommandRunner, l *registry.Login) error {
@@ -40,7 +45,12 @@ var _ = Describe("Container registry login", func() {
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
 				func(p *Plumber, _ *cli.Command) *TaskList {
-					return l.New(p)
+					tl := &TaskList{}
+
+					return tl.New(p).
+						Set(func(tl *TaskList) Job {
+							return JobSequence(l.Job(tl))
+						})
 				},
 			},
 		}).Run()
@@ -48,25 +58,23 @@ var _ = Describe("Container registry login", func() {
 
 	Describe("parsing", func() {
 		It("reads a list of entries", func() {
-			l := newLogin(registry.LoginOptions{})
-
-			Expect(parse(l, "- uri: ghcr.io\n  username: user\n  password: secret\n")).To(Succeed())
-			Expect(l.Entries).To(Equal([]registry.LoginEntry{{Uri: "ghcr.io", Username: "user", Password: "secret"}}))
+			Expect(parse("- uri: ghcr.io\n  username: user\n  password: secret\n")).
+				To(Equal([]registry.LoginEntry{{Uri: "ghcr.io", Username: "user", Password: "secret"}}))
 		})
 
 		// the template default composes the list as JSON, which only works because
 		// YAML is a superset of it.
 		It("reads a JSON list of entries", func() {
-			l := newLogin(registry.LoginOptions{})
-
-			Expect(parse(l, `[{ "uri": "docker.io", "username": "user", "password": "secret" }]`)).To(Succeed())
-			Expect(l.Entries).To(Equal([]registry.LoginEntry{{Uri: "docker.io", Username: "user", Password: "secret"}}))
+			Expect(parse(`[{ "uri": "docker.io", "username": "user", "password": "secret" }]`)).
+				To(Equal([]registry.LoginEntry{{Uri: "docker.io", Username: "user", Password: "secret"}}))
 		})
 
 		DescribeTable(
 			"rejects anything but a list",
 			func(value string) {
-				Expect(parse(newLogin(registry.LoginOptions{}), value)).To(MatchError(ContainSubstring("container.login")))
+				_, err := parse(value)
+
+				Expect(err).To(MatchError(ContainSubstring("container.login")))
 			},
 			Entry("a single entry", "uri: ghcr.io\nusername: user\npassword: secret\n"),
 			Entry("a JSON object", `{ "username": "user", "password": "secret" }`),
@@ -93,13 +101,12 @@ var _ = Describe("Container registry login", func() {
 		})
 
 		credentials := func(opts registry.LoginOptions) *registry.Login {
-			l := newLogin(opts)
-			l.Entries = []registry.LoginEntry{
+			opts.Entries = []registry.LoginEntry{
 				{Uri: "docker.io", Username: "user", Password: "secret"},
 				{Uri: "ghcr.io", Username: "other", Password: "token"},
 			}
 
-			return l
+			return newLogin(opts)
 		}
 
 		It("logs in to every entry with the pipe's command", func() {
@@ -145,7 +152,12 @@ var _ = Describe("Container registry login", func() {
 					func(p *Plumber, _ *cli.Command) *TaskList {
 						plumber = p.SetLoggerOutput(output)
 
-						return l.New(p)
+						tl := &TaskList{}
+
+						return tl.New(p).
+							Set(func(tl *TaskList) Job {
+								return JobSequence(l.Job(tl))
+							})
 					},
 				},
 			}).Run()).To(Succeed())
@@ -165,8 +177,7 @@ var _ = Describe("Container registry login", func() {
 		// the registry is spelled out on every entry, there is no default to fall
 		// back to.
 		It("fails on an entry without a uri", func() {
-			l := newLogin(registry.LoginOptions{})
-			l.Entries = []registry.LoginEntry{{Username: "user", Password: "secret"}}
+			l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Username: "user", Password: "secret"}}})
 			runner := fixtures.Runner()
 
 			Expect(run(runner, l)).NotTo(Succeed())
@@ -178,8 +189,7 @@ var _ = Describe("Container registry login", func() {
 		DescribeTable(
 			"hands an entry to the login command as written",
 			func(entry registry.LoginEntry) {
-				l := newLogin(registry.LoginOptions{})
-				l.Entries = []registry.LoginEntry{entry}
+				l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{entry}})
 				runner := fixtures.Runner()
 
 				Expect(run(runner, l)).To(Succeed())
@@ -216,20 +226,52 @@ var _ = Describe("Container registry login", func() {
 		})
 	})
 
-	// buildah publishes under a target the login has to stand in for.
+	// buildah publishes under an image the login has to stand in for.
 	DescribeTable(
-		"covers a target on its host or a path above it",
-		func(target string, uri string, expected bool) {
-			l := newLogin(registry.LoginOptions{})
-			l.Entries = []registry.LoginEntry{{Uri: uri, Username: "user", Password: "secret"}}
+		"covers an image on its host or a path above it",
+		func(name string, uri string, expected bool) {
+			image, err := registry.ParseImage(name)
+			Expect(err).NotTo(HaveOccurred())
 
-			Expect(l.Covers(target)).To(Equal(expected))
+			l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Uri: uri, Username: "user", Password: "secret"}}})
+
+			Expect(l.Covers(image)).To(Equal(expected))
 		},
-		Entry("the same host", "registry.example.com", "registry.example.com", true),
+		Entry("the same host", "registry.example.com/image", "registry.example.com", true),
 		Entry("the host of a path", "registry.example.com/group/project", "registry.example.com", true),
 		Entry("a parent path", "registry.example.com/group/project", "registry.example.com/group", true),
-		Entry("another host", "registry.example.com", "docker.io", false),
-		Entry("a host sharing the prefix", "registry.example.com.evil", "registry.example.com", false),
-		Entry("a deeper path than the target", "registry.example.com", "registry.example.com/group", false),
+		Entry("another host", "registry.example.com/image", "docker.io", false),
+		Entry("a host sharing the prefix", "registry.example.com.evil/image", "registry.example.com", false),
+		Entry("a deeper path than the image", "registry.example.com/group", "registry.example.com/group/project", false),
+	)
+})
+
+var _ = Describe("Container image name", func() {
+	DescribeTable(
+		"splits a fully qualified image name at its registry host",
+		func(name string, expected registry.Image) {
+			image, err := registry.ParseImage(name)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(*image).To(Equal(expected))
+			Expect(image.String()).To(Equal(name))
+		},
+		Entry("a registry host", "docker.io/cenk1cenk2/pipe-buildah", registry.Image{Host: "docker.io", Path: "cenk1cenk2/pipe-buildah"}),
+		Entry("a registry with a port", "registry.example.com:5000/image", registry.Image{Host: "registry.example.com:5000", Path: "image"}),
+		Entry("a nested project path", "registry.example.com/group/project/image:v1", registry.Image{Host: "registry.example.com", Path: "group/project/image:v1"}),
+		Entry("localhost", "localhost/image", registry.Image{Host: "localhost", Path: "image"}),
+	)
+
+	// the login no longer names the images, so a name without its registry would
+	// leave the container tooling to guess one from its short-name configuration.
+	DescribeTable(
+		"fails on an image name without the registry host",
+		func(name string) {
+			_, err := registry.ParseImage(name)
+
+			Expect(err).To(MatchError(ContainSubstring("Image name is not fully qualified")))
+		},
+		Entry("a bare name", "image"),
+		Entry("a docker hub shorthand", "cenk1cenk2/pipe-buildah"),
+		Entry("a project path", "group/project/image"),
 	)
 })

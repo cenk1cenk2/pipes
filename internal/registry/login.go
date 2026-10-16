@@ -23,96 +23,91 @@ type (
 		Password string `yaml:"password"`
 	}
 
+	// LoginFlagsOptions is what a pipe builds the flags of its container registry login onto.
+	LoginFlagsOptions struct {
+		Category string
+		// Alias is the pipe specific variable, read before the shared one when a pipe has one.
+		Alias       string
+		Destination *[]LoginEntry
+	}
+
 	// LoginOptions is what a pipe builds its container registry login onto.
 	LoginOptions struct {
-		Category string
-		// Alias is the pipe specific variable, read before the shared one.
-		Alias string
 		// Command is the login command of the pipe, called with the uri and the credentials.
 		Command []string
+		Entries []LoginEntry
 		// HelmRegistryConfig pins HELM_REGISTRY_CONFIG for the process when it is unset.
 		HelmRegistryConfig string
 	}
 
-	// Login is the container registry login of a pipe, its flags and the entries they fill.
+	// Login is the container registry login of a pipe, run as a task of the task list it is part of.
 	Login struct {
-		Flags   []cli.Flag
-		Entries []LoginEntry
-
 		options LoginOptions
 	}
 )
 
-func NewLogin(opts LoginOptions) *Login {
-	l := &Login{options: opts}
+func NewLoginFlags(opts LoginFlagsOptions) []cli.Flag {
+	envs := []string{"CONTAINER_LOGIN"}
+	if opts.Alias != "" {
+		envs = slices.Insert(envs, 0, opts.Alias)
+	}
 
-	l.Flags = []cli.Flag{
-		flags.YAMLFlag(&l.Entries, &cli.StringFlag{
+	return []cli.Flag{
+		flags.YAMLFlag(opts.Destination, &cli.StringFlag{
 			Category: opts.Category,
 			Name:     "container.login",
-			Sources: cli.NewValueSourceChain(
-				cli.EnvVar(opts.Alias),
-				cli.EnvVar("CONTAINER_LOGIN"),
-			),
+			Sources:  cli.EnvVars(envs...),
 			Usage:    "Container registries to login to. format(yaml([]struct{ uri: string, username: string, password: string }))",
 			Required: false,
 		}),
 	}
-
-	return l
 }
 
-// Covers reports whether an entry logs in to the target, either the registry
-// host itself or a path the target lives under.
-func (l *Login) Covers(target string) bool {
-	return slices.ContainsFunc(l.Entries, func(e LoginEntry) bool {
+func NewLogin(opts LoginOptions) *Login {
+	return &Login{options: opts}
+}
+
+// Covers reports whether an entry logs in to the image, either the registry
+// host itself or a path the image lives under.
+func (l *Login) Covers(image *Image) bool {
+	target := image.String()
+
+	return slices.ContainsFunc(l.options.Entries, func(e LoginEntry) bool {
 		return target == e.Uri || strings.HasPrefix(target, e.Uri+"/")
 	})
 }
 
-func (l *Login) New(p *Plumber) *TaskList {
-	tl := &TaskList{}
+// Job is the login of the pipe as a task of the task list it runs in.
+func (l *Login) Job(tl *TaskList) Job {
+	return l.login(tl).Job()
+}
 
-	return tl.New(p).
-		SetRuntimeDepth(3).
-		ShouldRunBefore(func(_ context.Context, _ *TaskList) error {
-			for i := range l.Entries {
-				if err := p.Validate(&l.Entries[i]); err != nil {
+func (l *Login) login(tl *TaskList) *Task {
+	return tl.CreateTask("login", "container").
+		ShouldDisable(func(_ *Task) bool {
+			return len(l.options.Entries) == 0
+		}).
+		ShouldRunBefore(func(_ context.Context, t *Task) error {
+			for i := range l.options.Entries {
+				if err := t.Plumber.Validate(&l.options.Entries[i]); err != nil {
 					return err
 				}
+
+				t.Plumber.AppendSecrets(l.options.Entries[i].Password)
 			}
 
 			// kustomize runs helm with a temporary HELM_CONFIG_HOME, which hides the
 			// registry config a login writes by default. It never overrides
 			// HELM_REGISTRY_CONFIG though, and the build runs in this process, so
 			// pinning it here is what the chart pulls read the login back from.
-			if _, ok := os.LookupEnv("HELM_REGISTRY_CONFIG"); l.options.HelmRegistryConfig != "" && len(l.Entries) > 0 && !ok {
+			if _, ok := os.LookupEnv("HELM_REGISTRY_CONFIG"); l.options.HelmRegistryConfig != "" && !ok {
 				return os.Setenv("HELM_REGISTRY_CONFIG", l.options.HelmRegistryConfig)
 			}
 
 			return nil
 		}).
-		Set(func(tl *TaskList) Job {
-			return JobSequence(
-				l.login(tl).Job(),
-			)
-		})
-}
-
-func (l *Login) login(tl *TaskList) *Task {
-	return tl.CreateTask("login", "container").
-		ShouldDisable(func(_ *Task) bool {
-			return len(l.Entries) == 0
-		}).
-		ShouldRunBefore(func(_ context.Context, t *Task) error {
-			for _, e := range l.Entries {
-				t.Plumber.AppendSecrets(e.Password)
-			}
-
-			return nil
-		}).
 		Set(func(_ context.Context, t *Task) error {
-			for _, e := range l.Entries {
+			for _, e := range l.options.Entries {
 				t.CreateCommand(
 					l.options.Command[0],
 					slices.Concat(l.options.Command[1:], []string{e.Uri, "--username", e.Username, "--password-stdin"})...,

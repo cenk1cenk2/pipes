@@ -12,19 +12,12 @@ import (
 	"gitlab.kilic.dev/devops/pipes/helm/publish"
 	"gitlab.kilic.dev/devops/pipes/helm/setup"
 	"gitlab.kilic.dev/devops/pipes/helm/test"
-	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
 var version = "latest"
 
 func main() {
 	NewPlumber(func(p *Plumber) *cli.Command {
-		container := registry.NewLogin(registry.LoginOptions{
-			Category: login.CategoryHelmRegistry,
-			Alias:    "HELM_CONTAINER_LOGIN",
-			Command:  []string{"helm", "registry", "login"},
-		})
-
 		return &cli.Command{
 			Name:        "pipe-helm",
 			Version:     version,
@@ -33,12 +26,11 @@ func main() {
 				{
 					Name:        "install",
 					Description: "Install Helm chart dependencies.",
-					Flags:       CombineFlags(setup.Flags, login.Flags, container.Flags, install.Flags),
+					Flags:       CombineFlags(setup.Flags, login.Flags, install.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
-							container.New(p),
 							install.New(p),
 						))
 					},
@@ -68,12 +60,11 @@ func main() {
 				{
 					Name:        "publish",
 					Description: "Publish Helm chart templates.",
-					Flags:       CombineFlags(setup.Flags, login.Flags, container.Flags, publish.Flags),
+					Flags:       CombineFlags(setup.Flags, login.Flags, publish.Flags),
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
 							login.New(p),
-							container.New(p),
 							publish.New(p),
 						))
 					},

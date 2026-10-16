@@ -46,7 +46,7 @@ spec:
         inputs:
           name: $[[inputs.name]]
           cwd: ./$[[inputs.dir]]
-          container-image-name: cenk1cenk2/pipe-$[[inputs.name]]
+          container-image-name: docker.io/cenk1cenk2/pipe-$[[inputs.name]]
           container-matrix: $[[inputs.container-matrix]]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"

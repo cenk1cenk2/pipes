@@ -38,10 +38,7 @@ Install Helm chart dependencies.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$HELM_LOGIN_REGISTRY_URI`<br/>`$HELM_REGISTRY_URI` | Helm registry URL to login to. | `string` | `"docker.io"` |
-| `$HELM_LOGIN_REGISTRY_USERNAME`<br/>`$HELM_REGISTRY_USERNAME` | Helm registry username for the given registry. | `string` |  |
-| `$HELM_LOGIN_REGISTRY_PASSWORD`<br/>`$HELM_REGISTRY_PASSWORD` | Helm registry password for the given registry. | `string` |  |
-| `$HELM_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
+| `$HELM_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 ### `pipe-helm lint`
 
@@ -129,10 +126,7 @@ Publish Helm chart templates.
 
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
-| `$HELM_LOGIN_REGISTRY_URI`<br/>`$HELM_REGISTRY_URI` | Helm registry URL to login to. | `string` | `"docker.io"` |
-| `$HELM_LOGIN_REGISTRY_USERNAME`<br/>`$HELM_REGISTRY_USERNAME` | Helm registry username for the given registry. | `string` |  |
-| `$HELM_LOGIN_REGISTRY_PASSWORD`<br/>`$HELM_REGISTRY_PASSWORD` | Helm registry password for the given registry. | `string` |  |
-| `$HELM_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
+| `$HELM_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 </details>
 

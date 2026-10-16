@@ -1,9 +1,6 @@
 package login
 
 import (
-	"bytes"
-	"fmt"
-
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
@@ -14,128 +11,42 @@ import (
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
-var _ = Describe("Container registry login", func() {
+var _ = Describe("Container registry login verification", func() {
 	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
-	run := func(runner *tests.TestingCommandRunner, pipe Pipe) error {
+	run := func(runner *tests.TestingCommandRunner, entries []registry.LoginEntry, image string) error {
 		GinkgoHelper()
 
-		*P = pipe
+		P.Container = entries
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-buildah",
-			CommandName: "login",
+			CommandName: "build",
 			TaskLists: []tests.TaskListFactory{
 				func(p *Plumber, _ *cli.Command) *TaskList {
-					return New(p, registry.NewLogin(registry.LoginOptions{}))
+					return New(p, image)
 				},
 			},
 		}).Run()
 	}
 
-	disabled := func(pipe Pipe, task func(*TaskList) *Task) bool {
-		GinkgoHelper()
+	// the verify is the only login call without credentials.
+	verifies := func(runner *tests.TestingCommandRunner) [][]string {
+		args := [][]string{}
+		for _, invocation := range runner.Invocations() {
+			if len(invocation.Args) == 2 {
+				args = append(args, invocation.Args)
+			}
+		}
 
-		*P = pipe
-
-		tl := &TaskList{}
-		tl.New(NewPlumber(func(_ *Plumber) *cli.Command {
-			return &cli.Command{Name: "test"}
-		}))
-
-		return task(tl).IsDisabled()
+		return args
 	}
-
-	credentials := func() Pipe {
-		return Pipe{Uri: "registry.example.com", Username: "user", Password: "secret"}
-	}
-
-	It("logs in to the registry the pipeline named", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, credentials())).To(Succeed())
-
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Name).To(Equal("buildah"))
-		Expect(invocation.Args).To(Equal([]string{
-			"login", "registry.example.com", "--username", "user", "--password-stdin",
-		}))
-	})
-
-	// an argument list shows up in a process listing and in the command trace log,
-	// which is exactly what the password has to stay out of.
-	It("hands the password over stdin rather than in the arguments", func() {
-		runner := fixtures.Runner()
-
-		Expect(run(runner, credentials())).To(Succeed())
-
-		invocation, ok := runner.LastInvocation()
-		Expect(ok).To(BeTrue())
-		Expect(invocation.Args).NotTo(ContainElement("secret"))
-
-		stdin, err := tests.ReadInvocationStdin(invocation)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(stdin).To(Equal("secret"))
-	})
-
-	// half a credential pair is not something to guess at, and a pipeline with
-	// neither is relying on an ambient login the pipe must not clobber.
-	DescribeTable(
-		"logs in only on a complete credential pair",
-		func(username, password string, expected bool) {
-			pipe := credentials()
-			pipe.Username = username
-			pipe.Password = password
-
-			Expect(disabled(pipe, login)).To(Equal(expected))
-		},
-		Entry("both set", "user", "secret", false),
-		Entry("no password", "user", "", true),
-		Entry("no username", "", "secret", true),
-		Entry("neither", "", "", true),
-	)
-
-	// the verify task is the inverse of the login, so exactly one of the two runs
-	// under the parent whichever way the pipeline is configured.
-	DescribeTable(
-		"verifies the ambient login only when there is nothing to log in with",
-		func(username, password string, expected bool) {
-			pipe := credentials()
-			pipe.Username = username
-			pipe.Password = password
-
-			Expect(disabled(pipe, func(tl *TaskList) *Task {
-				return loginVerify(tl, registry.NewLogin(registry.LoginOptions{}))
-			})).To(Equal(expected))
-		},
-		Entry("both set", "user", "secret", true),
-		Entry("no password", "user", "", false),
-		Entry("no username", "", "secret", false),
-		Entry("neither", "", "", false),
-	)
-
-	// a container login entry on the registry the images publish under already
-	// proves the login the verify would look for.
-	DescribeTable(
-		"skips the verify when the container login covers the registry",
-		func(uri string, expected bool) {
-			container := registry.NewLogin(registry.LoginOptions{})
-			container.Entries = []registry.LoginEntry{{Uri: uri, Username: "user", Password: "secret"}}
-
-			Expect(disabled(Pipe{Uri: "registry.example.com/group"}, func(tl *TaskList) *Task {
-				return loginVerify(tl, container)
-			})).To(Equal(expected))
-		},
-		Entry("the registry host", "registry.example.com", true),
-		Entry("another registry", "docker.io", false),
-	)
 
 	// a pipeline relying on an ambient login still has to prove it exists before
 	// the build spends time on an image it cannot push.
-	It("verifies the ambient login when the pipeline carries no credentials", func() {
+	It("verifies the ambient login on the registry of the image", func() {
 		runner := fixtures.Runner()
 
-		Expect(run(runner, Pipe{Uri: "registry.example.com"})).To(Succeed())
+		Expect(run(runner, nil, "registry.example.com/group/image")).To(Succeed())
 
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
@@ -143,30 +54,50 @@ var _ = Describe("Container registry login", func() {
 		Expect(invocation.Args).To(Equal([]string{"login", "registry.example.com"}))
 	})
 
-	// the password is the one value that must never reach a log line, and masking
-	// it here is what keeps every command the pipe runs after it from having to
-	// remember to.
-	It("keeps the password out of the log", func() {
-		var (
-			plumber *Plumber
-			output  = &bytes.Buffer{}
-		)
+	It("renders a templated image before reading its registry", func() {
+		runner := fixtures.Runner()
 
-		*P = credentials()
+		Expect(run(runner, nil, `{{ "registry.example.com/group/image" }}`)).To(Succeed())
 
-		Expect(fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
-			AppName:     "pipe-buildah",
-			CommandName: "login",
-			TaskLists: []tests.TaskListFactory{
-				func(p *Plumber, _ *cli.Command) *TaskList {
-					plumber = p.SetLoggerOutput(output)
+		Expect(verifies(runner)).To(Equal([][]string{{"login", "registry.example.com"}}))
+	})
 
-					return New(p, registry.NewLogin(registry.LoginOptions{}))
-				},
-			},
-		}).Run()).To(Succeed())
+	It("logs in with the container login before the verify", func() {
+		runner := fixtures.Runner()
 
-		plumber.Log.Info(fmt.Sprintf("logging in with %s", P.Password))
-		Expect(output.String()).NotTo(ContainSubstring("secret"))
+		Expect(run(runner, []registry.LoginEntry{{Uri: "docker.io", Username: "user", Password: "secret"}}, "registry.example.com/group/image")).To(Succeed())
+
+		invocations := runner.Invocations()
+		Expect(invocations).To(HaveLen(2))
+		Expect(invocations[0].Args).To(Equal([]string{"login", "docker.io", "--username", "user", "--password-stdin"}))
+		Expect(invocations[1].Args).To(Equal([]string{"login", "registry.example.com"}))
+	})
+
+	// a container login entry on the registry the image publishes under already
+	// proves the login the verify would look for.
+	DescribeTable(
+		"skips the verify when the container login covers the image",
+		func(uri string, expected [][]string) {
+			runner := fixtures.Runner()
+
+			Expect(run(runner, []registry.LoginEntry{{Uri: uri, Username: "user", Password: "secret"}}, "registry.example.com/group/image")).To(Succeed())
+			Expect(verifies(runner)).To(Equal(expected))
+		},
+		Entry("the registry host", "registry.example.com", [][]string{}),
+		Entry("the project path", "registry.example.com/group", [][]string{}),
+		Entry("another registry", "docker.io", [][]string{{"login", "registry.example.com"}}),
+		Entry("a sibling path", "registry.example.com/other", [][]string{{"login", "registry.example.com"}}),
+	)
+
+	It("verifies nothing without an image", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, nil, "")).To(Succeed())
+		Expect(runner.Invocations()).To(BeEmpty())
+	})
+
+	It("fails on an image name without the registry host", func() {
+		Expect(run(fixtures.Runner(), nil, "group/image")).
+			To(MatchError(ContainSubstring("Image name is not fully qualified")))
 	})
 })

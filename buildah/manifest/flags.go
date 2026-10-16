@@ -45,7 +45,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("BUILDAH_MANIFEST_TARGET"),
 				cli.EnvVar("CONTAINER_MANIFEST_TARGET"),
 			),
-			Usage:       "Target image names for patching the manifest. format(Template())",
+			Usage:       "Fully qualified target image name for patching the manifest, starting with the registry host. format(Template())",
 			Required:    false,
 			Destination: &P.Manifest.Target,
 		},

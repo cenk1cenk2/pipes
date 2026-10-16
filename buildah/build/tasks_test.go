@@ -15,7 +15,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	buildahmanifest "gitlab.kilic.dev/devops/pipes/buildah/manifest"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
@@ -26,7 +25,6 @@ func run(runner *tests.TestingCommandRunner, pipe Pipe, tasks ...func(*TaskList)
 
 	*P = pipe
 	*C = Ctx{}
-	login.P.Uri = ""
 
 	return fixtures.Cli(runner, tests.TaskListCli{
 		AppName:     "pipe-buildah",
@@ -51,29 +49,31 @@ func run(runner *tests.TestingCommandRunner, pipe Pipe, tasks ...func(*TaskList)
 }
 
 var _ = Describe("Container image tags", func() {
-	format := func(uri, name, tag string) string {
-		GinkgoHelper()
+	// the image name is the whole of where the image publishes, the login never names it.
+	It("tags the image under the name the pipeline gave verbatim", func() {
+		P.Image.Name = "registry.example.com:5000/group/image"
 
-		P.Image.Name = name
-		login.P.Uri = uri
-
-		return tagsCollector().Format(tag)
-	}
-
-	It("prefixes the image with the registry the login step authenticated against", func() {
-		Expect(format("registry.example.com", "group/image", "v1.0.0")).
-			To(Equal("registry.example.com/group/image:v1.0.0"))
+		Expect(tagsCollector().Format("v1.0.0")).To(Equal("registry.example.com:5000/group/image:v1.0.0"))
 	})
 
-	// a pipeline with no registry builds locally, where a prefix names nothing that is pushed.
-	It("leaves the image unprefixed without a registry", func() {
-		Expect(format("", "group/image", "v1.0.0")).To(Equal("group/image:v1.0.0"))
-	})
+	DescribeTable(
+		"refuses to build an image name without the registry host",
+		func(name string) {
+			*P = Pipe{Image: Image{Name: name, Format: "oci", StorageDriver: "vfs"}}
 
-	It("keeps a registry that already carries a port and a path", func() {
-		Expect(format("registry.example.com:5000/mirror", "image", "latest")).
-			To(Equal("registry.example.com:5000/mirror/image:latest"))
-	})
+			Expect(fixtures.Cli(fixtures.Runner(), tests.TaskListCli{
+				AppName:     "pipe-buildah",
+				CommandName: "build",
+				TaskLists: []tests.TaskListFactory{
+					func(p *Plumber, _ *cli.Command) *TaskList {
+						return New(p)
+					},
+				},
+			}).Run()).To(MatchError(ContainSubstring("Image name is not fully qualified")))
+		},
+		Entry("a docker hub shorthand", "cenk1cenk2/pipe-buildah"),
+		Entry("a bare name", "image"),
+	)
 })
 
 var _ = Describe("Container image tags task", func() {
