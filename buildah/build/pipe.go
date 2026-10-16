@@ -63,6 +63,7 @@ func New(p *Plumber) *TaskList {
 		}).
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
+				image(tl).Job(),
 				tags(tl).Job(),
 				build(tl).Job(),
 				push(tl).Job(),

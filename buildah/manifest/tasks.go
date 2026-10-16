@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
 // Every build job of the pipeline hands the images it pushed over in a dotenv
@@ -93,6 +94,10 @@ func manifest(tl *TaskList) *Task {
 			}
 
 			for target, images := range C.ManifestedImages {
+				if _, err := registry.ParseImage(target); err != nil {
+					return err
+				}
+
 				t.CreateSubtask(target).
 					Set(func(_ context.Context, t *Task) error {
 						t.

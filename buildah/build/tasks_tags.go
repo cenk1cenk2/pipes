@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
-	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	"gitlab.kilic.dev/devops/pipes/internal/versions"
 )
 
@@ -27,11 +26,7 @@ func tagsCollector() *versions.Collector {
 		Sanitize:  P.Image.TagsSanitize,
 
 		Format: func(tag string) string {
-			if login.P.Uri == "" {
-				return fmt.Sprintf("%s:%s", P.Image.Name, tag)
-			}
-
-			return fmt.Sprintf("%s/%s:%s", login.P.Uri, P.Image.Name, tag)
+			return fmt.Sprintf("%s:%s", P.Image.Name, tag)
 		},
 	}
 }

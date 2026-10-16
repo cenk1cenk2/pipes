@@ -53,7 +53,7 @@ var Flags = CombineFlags(
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_NAME"),
 				cli.EnvVar("CONTAINER_IMAGE_NAME"),
 			),
-			Usage:       "Image name for the container image to be built.",
+			Usage:       "Fully qualified image name for the container image to be built, starting with the registry host.",
 			Required:    true,
 			Destination: &P.Image.Name,
 		},

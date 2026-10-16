@@ -118,8 +118,10 @@ container:
     - job: lint
     - job: test
   variables:
-    CONTAINER_REGISTRY_USERNAME: $DOCKERHUB_USERNAME
-    CONTAINER_REGISTRY_PASSWORD: $DOCKERHUB_PASSWORD
+    CONTAINER_LOGIN: >-
+      - uri: docker.io
+        username: $DOCKERHUB_USERNAME
+        password: $DOCKERHUB_PASSWORD
     CONTAINER_FILE_CONTEXT: $[[inputs.cwd]]
     CONTAINER_IMAGE_NAME: $[[inputs.container-image-name]]
     # the version of a <pipe>@<version> tag is published next to the tags of the

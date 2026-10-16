@@ -7,7 +7,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
-	"gitlab.kilic.dev/devops/pipes/buildah/login"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
@@ -66,7 +65,6 @@ var _ = Describe("Container manifest", func() {
 			GinkgoHelper()
 
 			*P = pipe
-			login.P.Uri = ""
 
 			return fixtures.Cli(runner, tests.TaskListCli{
 				AppName:     "pipe-buildah",
@@ -95,8 +93,8 @@ var _ = Describe("Container manifest", func() {
 		}
 
 		It("manifests the images every build job handed over", func() {
-			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
-			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_ARM64_4E5F6A7B", `[{"target":"group/image:v1","images":["group/image:v1-arm64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"registry.example.com/group/image:v1","images":["registry.example.com/group/image:v1-amd64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_ARM64_4E5F6A7B", `[{"target":"registry.example.com/group/image:v1","images":["registry.example.com/group/image:v1-arm64"]}]`)
 			GinkgoT().Setenv("CONTAINER_MANIFEST_OTHER", "not a matrix")
 
 			runner := fixtures.Runner()
@@ -104,39 +102,50 @@ var _ = Describe("Container manifest", func() {
 			Expect(run(runner, published(Manifest{}))).To(Succeed())
 
 			Expect(commands(runner)).To(Equal([][]string{
-				{"manifest", "create", "group/image:v1"},
-				{"manifest", "add", "group/image:v1", "group/image:v1-amd64"},
-				{"manifest", "add", "group/image:v1", "group/image:v1-arm64"},
-				{"manifest", "push", "--rm", "group/image:v1"},
+				{"manifest", "create", "registry.example.com/group/image:v1"},
+				{"manifest", "add", "registry.example.com/group/image:v1", "registry.example.com/group/image:v1-amd64"},
+				{"manifest", "add", "registry.example.com/group/image:v1", "registry.example.com/group/image:v1-arm64"},
+				{"manifest", "push", "--rm", "registry.example.com/group/image:v1"},
 			}))
 		})
 
 		It("reads the variables under the prefix the pipeline asks for", func() {
-			GinkgoT().Setenv("PUBLISHED_BUILD_AMD64", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+			GinkgoT().Setenv("PUBLISHED_BUILD_AMD64", `[{"target":"registry.example.com/group/image:v1","images":["registry.example.com/group/image:v1-amd64"]}]`)
 
 			runner := fixtures.Runner()
 
 			Expect(run(runner, Pipe{Manifest: Manifest{PublishedPrefix: "PUBLISHED_"}})).To(Succeed())
 
-			Expect(commands(runner)).To(ContainElement([]string{"manifest", "add", "group/image:v1", "group/image:v1-amd64"}))
+			Expect(commands(runner)).To(ContainElement([]string{"manifest", "add", "registry.example.com/group/image:v1", "registry.example.com/group/image:v1-amd64"}))
 		})
 
 		It("adds an image handed over twice only once", func() {
-			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
-			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_4E5F6A7B", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"registry.example.com/group/image:v1","images":["registry.example.com/group/image:v1-amd64"]}]`)
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_4E5F6A7B", `[{"target":"registry.example.com/group/image:v1","images":["registry.example.com/group/image:v1-amd64"]}]`)
 
 			runner := fixtures.Runner()
 
 			Expect(run(runner, published(Manifest{
-				Target: "group/image:v1",
-				Images: []string{"group/image:v1-amd64"},
+				Target: "registry.example.com/group/image:v1",
+				Images: []string{"registry.example.com/group/image:v1-amd64"},
 			}))).To(Succeed())
 
 			Expect(commands(runner)).To(Equal([][]string{
-				{"manifest", "create", "group/image:v1"},
-				{"manifest", "add", "group/image:v1", "group/image:v1-amd64"},
-				{"manifest", "push", "--rm", "group/image:v1"},
+				{"manifest", "create", "registry.example.com/group/image:v1"},
+				{"manifest", "add", "registry.example.com/group/image:v1", "registry.example.com/group/image:v1-amd64"},
+				{"manifest", "push", "--rm", "registry.example.com/group/image:v1"},
 			}))
+		})
+
+		// the login no longer names the target, so one without its registry would
+		// leave buildah to guess where the manifest goes.
+		It("refuses a target without the registry host", func() {
+			GinkgoT().Setenv("CONTAINER_MANIFEST_PUBLISHED_BUILD_AMD64_0A1B2C3D", `[{"target":"group/image:v1","images":["group/image:v1-amd64"]}]`)
+
+			runner := fixtures.Runner()
+
+			Expect(run(runner, published(Manifest{}))).To(MatchError(ContainSubstring("Image name is not fully qualified")))
+			Expect(runner.Invocations()).To(BeEmpty())
 		})
 
 		It("reports a variable that does not hold a matrix", func() {
