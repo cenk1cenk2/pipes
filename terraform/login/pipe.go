@@ -7,12 +7,14 @@ import (
 )
 
 type (
-	Registry struct {
-		Credentials []TerraformRegistryCredentialsJson
+	// Login is one registry the providers and modules are fetched from.
+	Login struct {
+		Uri   string `yaml:"uri"   validate:"required"`
+		Token string `yaml:"token"`
 	}
 
 	Pipe struct {
-		Registry
+		Logins []Login `validate:"dive"`
 	}
 )
 

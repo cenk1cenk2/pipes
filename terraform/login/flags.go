@@ -10,14 +10,11 @@ const CategoryLogin = "Login"
 //revive:disable:line-length-limit
 
 var Flags = []cli.Flag{
-	flags.JSONFlag(&P.Registry.Credentials, &cli.StringFlag{
+	flags.YAMLFlag(&P.Logins, &cli.StringFlag{
 		Category: CategoryLogin,
-		Name:     "terraform.login.registry.credentials",
-		Sources: cli.NewValueSourceChain(
-			cli.EnvVar("TERRAFORM_LOGIN_REGISTRY_CREDENTIALS"),
-			cli.EnvVar("TF_REGISTRY_CREDENTIALS"),
-		),
-		Usage:    "Terraform registry credentials. format(json([]struct{ registry: string, token: string }))",
+		Name:     "terraform.login",
+		Sources:  cli.NewValueSourceChain(cli.EnvVar("TERRAFORM_LOGIN")),
+		Usage:    "Terraform registries to login to. format(yaml([]struct{ uri: string, token: string }))",
 		Required: false,
 	}),
 }

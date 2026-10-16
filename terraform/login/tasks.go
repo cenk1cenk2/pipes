@@ -12,13 +12,13 @@ import (
 func environmentCredentials(tl *TaskList) *Task {
 	return tl.CreateTask("environment", "credentials").
 		ShouldDisable(func(t *Task) bool {
-			return len(P.Registry.Credentials) == 0
+			return len(P.Logins) == 0
 		}).
 		Set(func(_ context.Context, t *Task) error {
-			for _, c := range P.Registry.Credentials {
-				t.Log.Info(fmt.Sprintf("Generating registry token: %s", c.Registry))
+			for _, c := range P.Logins {
+				t.Log.Info(fmt.Sprintf("Generating registry token: %s", c.Uri))
 
-				sanitized := strings.ReplaceAll(c.Registry, ".", "_")
+				sanitized := strings.ReplaceAll(c.Uri, ".", "_")
 				sanitized = strings.ReplaceAll(sanitized, "-", "__")
 
 				setup.C.Env["TF_TOKEN_"+sanitized] = c.Token
