@@ -7,14 +7,15 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
-func loginParent(tl *TaskList) *Task {
+func loginParent(tl *TaskList, container *registry.Login) *Task {
 	return tl.CreateTask("login", "parent").
 		SetJobWrapper(func(job Job, t *Task) Job {
 			return JobParallel(
 				login(tl).Job(),
-				loginVerify(tl).Job(),
+				loginVerify(tl, container).Job(),
 			)
 		})
 }
@@ -61,10 +62,11 @@ func login(tl *TaskList) *Task {
 
 // Proves that the ambient login a credential-less pipeline relies on actually
 // exists, before the build spends time on the image.
-func loginVerify(tl *TaskList) *Task {
+func loginVerify(tl *TaskList, container *registry.Login) *Task {
 	return tl.CreateTask("login", "verify").
 		ShouldDisable(func(_ *Task) bool {
-			return P.Username != "" && P.Password != ""
+			return P.Username != "" && P.Password != "" ||
+				container.Covers(P.Uri)
 		}).
 		Set(func(_ context.Context, t *Task) error {
 			t.CreateCommand(

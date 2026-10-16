@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/urfave/cli/v3"
 
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 	"gitlab.kilic.dev/devops/pipes/tests/fixtures"
 )
 
@@ -25,7 +26,7 @@ var _ = Describe("Container registry login", func() {
 			CommandName: "login",
 			TaskLists: []tests.TaskListFactory{
 				func(p *Plumber, _ *cli.Command) *TaskList {
-					return New(p)
+					return New(p, registry.NewLogin(registry.LoginOptions{}))
 				},
 			},
 		}).Run()
@@ -103,12 +104,30 @@ var _ = Describe("Container registry login", func() {
 			pipe.Username = username
 			pipe.Password = password
 
-			Expect(disabled(pipe, loginVerify)).To(Equal(expected))
+			Expect(disabled(pipe, func(tl *TaskList) *Task {
+				return loginVerify(tl, registry.NewLogin(registry.LoginOptions{}))
+			})).To(Equal(expected))
 		},
 		Entry("both set", "user", "secret", true),
 		Entry("no password", "user", "", false),
 		Entry("no username", "", "secret", false),
 		Entry("neither", "", "", false),
+	)
+
+	// a container login entry on the registry the images publish under already
+	// proves the login the verify would look for.
+	DescribeTable(
+		"skips the verify when the container login covers the registry",
+		func(uri string, expected bool) {
+			container := registry.NewLogin(registry.LoginOptions{})
+			container.Entries = []registry.LoginEntry{{Uri: uri, Username: "user", Password: "secret"}}
+
+			Expect(disabled(Pipe{Uri: "registry.example.com/group"}, func(tl *TaskList) *Task {
+				return loginVerify(tl, container)
+			})).To(Equal(expected))
+		},
+		Entry("the registry host", "registry.example.com", true),
+		Entry("another registry", "docker.io", false),
 	)
 
 	// a pipeline relying on an ambient login still has to prove it exists before
@@ -142,7 +161,7 @@ var _ = Describe("Container registry login", func() {
 				func(p *Plumber, _ *cli.Command) *TaskList {
 					plumber = p.SetLoggerOutput(output)
 
-					return New(p)
+					return New(p, registry.NewLogin(registry.LoginOptions{}))
 				},
 			},
 		}).Run()).To(Succeed())

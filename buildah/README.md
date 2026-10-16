@@ -40,6 +40,7 @@ Login to the given container registries.
 | `$BUILDAH_LOGIN_REGISTRY_URI`<br/>`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `"docker.io"` |
 | `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br/>`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` |  |
 | `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br/>`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` |  |
+| `$BUILDAH_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 ### `pipe-buildah build`
 
@@ -95,6 +96,7 @@ Build container images.
 | `$BUILDAH_LOGIN_REGISTRY_URI`<br/>`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `"docker.io"` |
 | `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br/>`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` |  |
 | `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br/>`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` |  |
+| `$BUILDAH_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 </details>
 
@@ -152,5 +154,6 @@ Update manifests of the container images.
 | `$BUILDAH_LOGIN_REGISTRY_URI`<br/>`$CONTAINER_REGISTRY_URI` | Container registry URL to login to. | `string` | `"docker.io"` |
 | `$BUILDAH_LOGIN_REGISTRY_USERNAME`<br/>`$CONTAINER_REGISTRY_USERNAME` | Container registry username for the given registry. | `string` |  |
 | `$BUILDAH_LOGIN_REGISTRY_PASSWORD`<br/>`$CONTAINER_REGISTRY_PASSWORD` | Container registry password for the given registry. | `string` |  |
+| `$BUILDAH_CONTAINER_LOGIN`<br/>`$CONTAINER_LOGIN` | Container registries to login to. | `string`<br/>`format(yaml([]struct{ uri: string, username: string, password: string }))` |  |
 
 </details>
