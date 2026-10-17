@@ -30,7 +30,7 @@ func main() {
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
-							login.New(p),
+							login.New(p, false),
 							install.New(p),
 						))
 					},
@@ -64,7 +64,7 @@ func main() {
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
-							login.New(p),
+							login.New(p, true),
 							publish.New(p),
 						))
 					},

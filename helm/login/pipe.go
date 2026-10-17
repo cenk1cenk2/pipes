@@ -11,13 +11,15 @@ type Pipe struct {
 
 var P = &Pipe{}
 
-// New is the login stage of every helm command that pulls a dependency or pushes a chart.
-func New(p *Plumber) *TaskList {
+// New is the login stage of every helm command that pulls a dependency or pushes a chart,
+// requiring the credentials of every entry for a command that pushes.
+func New(p *Plumber, required bool) *TaskList {
 	tl := &TaskList{}
 
 	container := registry.NewLogin(registry.LoginOptions{
-		Command: []string{"helm", "registry", "login"},
-		Entries: P.Container,
+		Command:  []string{"helm", "registry", "login"},
+		Entries:  P.Container,
+		Required: required,
 	})
 
 	return tl.New(p).

@@ -198,9 +198,52 @@ var _ = Describe("Container registry login", func() {
 				Expect(ok).To(BeTrue())
 				Expect(invocation.Args).To(Equal([]string{"registry", "login", entry.Uri, "--username", entry.Username, "--password-stdin"}))
 			},
-			Entry("no password", registry.LoginEntry{Uri: "docker.io", Username: "user"}),
 			Entry("an unexpanded variable reference", registry.LoginEntry{Uri: "docker.io", Username: "$DOCKERHUB_USERNAME", Password: "$DOCKERHUB_PASSWORD"}),
 		)
+
+		// a protected variable expands empty on an unprotected ref.
+		DescribeTable(
+			"skips an entry without credentials",
+			func(entry registry.LoginEntry) {
+				l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{entry, {Uri: "ghcr.io", Username: "other", Password: "token"}}})
+				runner := fixtures.Runner()
+
+				Expect(run(runner, l)).To(Succeed())
+
+				invocations := runner.Invocations()
+				Expect(invocations).To(HaveLen(1))
+				Expect(invocations[0].Args).To(Equal([]string{"registry", "login", "ghcr.io", "--username", "other", "--password-stdin"}))
+			},
+			Entry("no username", registry.LoginEntry{Uri: "docker.io", Password: "secret"}),
+			Entry("no password", registry.LoginEntry{Uri: "docker.io", Username: "user"}),
+			Entry("neither", registry.LoginEntry{Uri: "docker.io"}),
+		)
+
+		// a command that writes to the registry would only fail later at the push.
+		DescribeTable(
+			"fails on an entry without credentials when required",
+			func(entry registry.LoginEntry) {
+				l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Uri: "ghcr.io", Username: "other", Password: "token"}, entry}, Required: true})
+				runner := fixtures.Runner()
+
+				Expect(run(runner, l)).To(MatchError(ContainSubstring("Container registry has no credentials: docker.io")))
+				Expect(runner.Invocations()).To(BeEmpty())
+			},
+			Entry("no username", registry.LoginEntry{Uri: "docker.io", Password: "secret"}),
+			Entry("no password", registry.LoginEntry{Uri: "docker.io", Username: "user"}),
+			Entry("neither", registry.LoginEntry{Uri: "docker.io"}),
+		)
+
+		It("runs nothing when no entry has credentials", func() {
+			l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Uri: "docker.io"}}, HelmRegistryConfig: "/tmp/pipe/config.json"})
+			runner := fixtures.Runner()
+
+			Expect(run(runner, l)).To(Succeed())
+			Expect(runner.Invocations()).To(BeEmpty())
+
+			_, ok := os.LookupEnv("HELM_REGISTRY_CONFIG")
+			Expect(ok).To(BeFalse())
+		})
 
 		// the chart inflation runs helm with a temporary config home, so the login
 		// is only visible to it through a registry config pinned for the process.
@@ -244,6 +287,13 @@ var _ = Describe("Container registry login", func() {
 		Entry("a host sharing the prefix", "registry.example.com.evil/image", "registry.example.com", false),
 		Entry("a deeper path than the image", "registry.example.com/group", "registry.example.com/group/project", false),
 	)
+
+	It("does not cover an image with an entry without credentials", func() {
+		image, err := registry.ParseImage("docker.io/cenk1cenk2/pipe-buildah")
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Uri: "docker.io"}}}).Covers(image)).To(BeFalse())
+	})
 })
 
 var _ = Describe("Container image name", func() {

@@ -76,6 +76,18 @@ var _ = Describe("Container image tags", func() {
 	)
 })
 
+var _ = Describe("Container image push target", func() {
+	// a build that does not push has no registry login to prove.
+	DescribeTable(
+		"names the image only when the build pushes it",
+		func(push bool, expected string) {
+			Expect(Image{Name: "registry.example.com/group/image", Push: push}.PushTarget()).To(Equal(expected))
+		},
+		Entry("pushing", true, "registry.example.com/group/image"),
+		Entry("not pushing", false, ""),
+	)
+})
+
 var _ = Describe("Container image tags task", func() {
 	It("builds with the tags the user gave and the release handed over", func() {
 		GinkgoT().Setenv("SEMANTIC_RELEASE_TAG", "v1.0.0")

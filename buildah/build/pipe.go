@@ -55,6 +55,15 @@ var TL = TaskList{}
 var P = &Pipe{}
 var C = &Ctx{}
 
+// PushTarget is the image the build pushes, empty when it does not push.
+func (i Image) PushTarget() string {
+	if !i.Push {
+		return ""
+	}
+
+	return i.Name
+}
+
 func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).

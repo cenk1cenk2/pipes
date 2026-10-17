@@ -89,6 +89,14 @@ var _ = Describe("Container registry login verification", func() {
 		Entry("a sibling path", "registry.example.com/other", [][]string{{"login", "registry.example.com"}}),
 	)
 
+	It("verifies the ambient login when the entry of the image has no credentials", func() {
+		runner := fixtures.Runner()
+
+		Expect(run(runner, []registry.LoginEntry{{Uri: "registry.example.com"}}, "registry.example.com/group/image")).To(Succeed())
+		Expect(runner.Invocations()).To(HaveLen(1))
+		Expect(verifies(runner)).To(Equal([][]string{{"login", "registry.example.com"}}))
+	})
+
 	It("verifies nothing without an image", func() {
 		runner := fixtures.Runner()
 
