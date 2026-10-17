@@ -3,5 +3,8 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "internal": "workspace:*"
   }
 }
