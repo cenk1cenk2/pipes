@@ -39,7 +39,7 @@ func main() {
 					Action: func(_ context.Context, _ *cli.Command) error {
 						return p.RunJobs(CombineTaskLists(
 							setup.New(p),
-							login.New(p, build.P.Image.Name),
+							login.New(p, build.P.Image.PushTarget()),
 							build.New(p),
 						))
 					},
