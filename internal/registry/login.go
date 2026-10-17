@@ -67,13 +67,19 @@ func NewLogin(opts LoginOptions) *Login {
 	return &Login{options: opts}
 }
 
+// hasCredentials reports whether the entry has both a username and a password,
+// which a protected variable leaves empty on an unprotected ref.
+func (e LoginEntry) hasCredentials() bool {
+	return e.Username != "" && e.Password != ""
+}
+
 // Covers reports whether an entry logs in to the image, either the registry
 // host itself or a path the image lives under.
 func (l *Login) Covers(image *Image) bool {
 	target := image.String()
 
 	return slices.ContainsFunc(l.options.Entries, func(e LoginEntry) bool {
-		return target == e.Uri || strings.HasPrefix(target, e.Uri+"/")
+		return e.hasCredentials() && (target == e.Uri || strings.HasPrefix(target, e.Uri+"/"))
 	})
 }
 
@@ -93,7 +99,17 @@ func (l *Login) login(tl *TaskList) *Task {
 					return err
 				}
 
+				if !l.options.Entries[i].hasCredentials() {
+					t.Log.Warn(fmt.Sprintf("Container registry has no credentials, skipping the login: %s", l.options.Entries[i].Uri))
+
+					continue
+				}
+
 				t.Plumber.AppendSecrets(l.options.Entries[i].Password)
+			}
+
+			if !slices.ContainsFunc(l.options.Entries, LoginEntry.hasCredentials) {
+				return nil
 			}
 
 			// kustomize runs helm with a temporary HELM_CONFIG_HOME, which hides the
@@ -108,6 +124,10 @@ func (l *Login) login(tl *TaskList) *Task {
 		}).
 		Set(func(_ context.Context, t *Task) error {
 			for _, e := range l.options.Entries {
+				if !e.hasCredentials() {
+					continue
+				}
+
 				t.CreateCommand(
 					l.options.Command[0],
 					slices.Concat(l.options.Command[1:], []string{e.Uri, "--username", e.Username, "--password-stdin"})...,
