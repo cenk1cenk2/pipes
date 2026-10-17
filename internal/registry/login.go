@@ -36,6 +36,8 @@ type (
 		// Command is the login command of the pipe, called with the uri and the credentials.
 		Command []string
 		Entries []LoginEntry
+		// Required fails an entry without credentials instead of skipping it, for a command that writes to the registry.
+		Required bool
 		// HelmRegistryConfig pins HELM_REGISTRY_CONFIG for the process when it is unset.
 		HelmRegistryConfig string
 	}
@@ -100,7 +102,11 @@ func (l *Login) login(tl *TaskList) *Task {
 				}
 
 				if !l.options.Entries[i].hasCredentials() {
-					t.Log.Warn(fmt.Sprintf("Container registry has no credentials, skipping the login: %s", l.options.Entries[i].Uri))
+					if l.options.Required {
+						return fmt.Errorf("Container registry has no credentials: %s", l.options.Entries[i].Uri)
+					}
+
+					t.Log.Debug(fmt.Sprintf("Container registry has no credentials, skipping the login: %s", l.options.Entries[i].Uri))
 
 					continue
 				}

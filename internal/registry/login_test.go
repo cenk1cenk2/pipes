@@ -219,6 +219,21 @@ var _ = Describe("Container registry login", func() {
 			Entry("neither", registry.LoginEntry{Uri: "docker.io"}),
 		)
 
+		// a command that writes to the registry would only fail later at the push.
+		DescribeTable(
+			"fails on an entry without credentials when required",
+			func(entry registry.LoginEntry) {
+				l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Uri: "ghcr.io", Username: "other", Password: "token"}, entry}, Required: true})
+				runner := fixtures.Runner()
+
+				Expect(run(runner, l)).To(MatchError(ContainSubstring("Container registry has no credentials: docker.io")))
+				Expect(runner.Invocations()).To(BeEmpty())
+			},
+			Entry("no username", registry.LoginEntry{Uri: "docker.io", Password: "secret"}),
+			Entry("no password", registry.LoginEntry{Uri: "docker.io", Username: "user"}),
+			Entry("neither", registry.LoginEntry{Uri: "docker.io"}),
+		)
+
 		It("runs nothing when no entry has credentials", func() {
 			l := newLogin(registry.LoginOptions{Entries: []registry.LoginEntry{{Uri: "docker.io"}}, HelmRegistryConfig: "/tmp/pipe/config.json"})
 			runner := fixtures.Runner()
