@@ -181,6 +181,17 @@ var _ = Describe("UpdateReadme", func() {
 		Expect(err).To(MatchError(ContainSubstring("<html>bad gateway</html>")))
 	})
 
+	// the service answers a plain text body on a repository it does not know, which
+	// is the caller's to report rather than a response to decode.
+	It("keeps the status code of a repository that does not exist", func() {
+		answer = func(w http.ResponseWriter) {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("404 page not found"))
+		}
+
+		Expect(update()).To(Equal(Result{StatusCode: http.StatusNotFound}))
+	})
+
 	It("keeps the status code of a failure the caller has to decide on", func() {
 		answer = func(w http.ResponseWriter) {
 			w.WriteHeader(http.StatusForbidden)

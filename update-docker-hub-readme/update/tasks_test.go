@@ -116,6 +116,47 @@ var _ = Describe("Docker Hub readme", func() {
 			Expect(run(discover)).To(Succeed())
 			Expect(C.Readme).To(HaveLen(2))
 		})
+
+		// the image name the pipelines pass carries the registry host, while the
+		// service addresses a repository by its owner and name alone.
+		It("drops the Docker Hub host off the single repository", func() {
+			P.Readme = Readme{Repository: "docker.io/kilic/pipe", File: "README.md"}
+
+			Expect(run(discover)).To(Succeed())
+			Expect(C.Readme).To(Equal(map[string]ParsedReadme{
+				"kilic/pipe": {File: "README.md"},
+			}))
+		})
+
+		It("drops the Docker Hub host off every repository of the matrix", func() {
+			P.Readme = Readme{Matrix: []ReadmeMatrixJson{
+				{Repository: "docker.io/kilic/one", File: "one.md"},
+				{Repository: "kilic/two", File: "two.md"},
+			}}
+
+			Expect(run(discover)).To(Succeed())
+			Expect(C.Readme).To(Equal(map[string]ParsedReadme{
+				"kilic/one": {File: "one.md"},
+				"kilic/two": {File: "two.md"},
+			}))
+		})
+
+		It("rejects a single repository on another registry", func() {
+			P.Readme = Readme{Repository: "registry.example.com/kilic/pipe", File: "README.md"}
+
+			Expect(run(discover)).
+				To(MatchError(ContainSubstring("Repository is not on Docker Hub: registry.example.com/kilic/pipe")))
+		})
+
+		It("rejects a matrix repository on another registry", func() {
+			P.Readme = Readme{Matrix: []ReadmeMatrixJson{
+				{Repository: "kilic/one", File: "one.md"},
+				{Repository: "registry.example.com/kilic/two", File: "two.md"},
+			}}
+
+			Expect(run(discover)).
+				To(MatchError(ContainSubstring("Repository is not on Docker Hub: registry.example.com/kilic/two")))
+		})
 	})
 
 	Describe("update", func() {

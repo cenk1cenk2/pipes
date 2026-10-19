@@ -176,6 +176,11 @@ func (c *client) UpdateReadme(
 		return Result{}, err
 	}
 
+	// the service answers a plain text body on a repository it does not know.
+	if res.StatusCode == http.StatusNotFound {
+		return Result{StatusCode: res.StatusCode}, nil
+	}
+
 	response := updateResponse{}
 	// the repository payload carries far more than the fields above, so this decode
 	// stays lenient.

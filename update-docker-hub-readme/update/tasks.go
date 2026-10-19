@@ -7,6 +7,7 @@ import (
 	"os"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/registry"
 	"gitlab.kilic.dev/devops/pipes/update-docker-hub-readme/hub"
 )
 
@@ -35,7 +36,13 @@ func discover(tl *TaskList) *Task {
 	return tl.CreateTask("discover").
 		Set(func(_ context.Context, t *Task) error {
 			if P.Readme.Repository != "" {
-				C.Readme[P.Readme.Repository] = ParsedReadme{
+				repository, err := parseRepository(P.Readme.Repository)
+
+				if err != nil {
+					return err
+				}
+
+				C.Readme[repository] = ParsedReadme{
 					File:        P.Readme.File,
 					Description: P.Readme.Description,
 				}
@@ -43,7 +50,13 @@ func discover(tl *TaskList) *Task {
 
 			if len(P.Readme.Matrix) > 0 {
 				for _, readme := range P.Readme.Matrix {
-					C.Readme[readme.Repository] = ParsedReadme{
+					repository, err := parseRepository(readme.Repository)
+
+					if err != nil {
+						return err
+					}
+
+					C.Readme[repository] = ParsedReadme{
 						File:        readme.File,
 						Description: readme.Description,
 					}
@@ -52,6 +65,22 @@ func discover(tl *TaskList) *Task {
 
 			return nil
 		})
+}
+
+// parseRepository narrows an image name to the owner/name path the service addresses
+// a repository by. A name without a registry host already is that path.
+func parseRepository(name string) (string, error) {
+	image, err := registry.ParseImage(name)
+
+	if err != nil {
+		return name, nil
+	}
+
+	if image.Host != "docker.io" {
+		return "", fmt.Errorf("Repository is not on Docker Hub: %s", name)
+	}
+
+	return image.Path, nil
 }
 
 // verifyReadme decides whether the readme actually landed. The service answers 200
