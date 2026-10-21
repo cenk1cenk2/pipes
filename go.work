@@ -12,6 +12,7 @@ use (
 	./mise
 	./node
 	./pulumi
+	./python
 	./semantic-release
 	./terraform
 	./tests

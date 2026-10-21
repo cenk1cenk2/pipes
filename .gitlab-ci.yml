@@ -29,6 +29,7 @@ include:
   - local: mise/.gitlab-ci.yml
   - local: node/.gitlab-ci.yml
   - local: pulumi/.gitlab-ci.yml
+  - local: python/.gitlab-ci.yml
   - local: semantic-release/.gitlab-ci.yml
   - local: terraform/.gitlab-ci.yml
   - local: update-docker-hub-readme/.gitlab-ci.yml
@@ -360,6 +361,11 @@ update-docker-hub-readme:
           "repository": "cenk1cenk2/pipe-mise",
           "file": "./mise/README.md",
           "description": "mise tool installs for pipelines."
+        },
+        {
+          "repository": "cenk1cenk2/pipe-python",
+          "file": "./python/README.md",
+          "description": "Python operations with uv for pipelines."
         },
         {
           "repository": "cenk1cenk2/pipe-semantic-release",

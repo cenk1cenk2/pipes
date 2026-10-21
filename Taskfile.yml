@@ -7,8 +7,8 @@ vars:
   # every pipe module the fan-out tasks iterate, space separated. The template comes
   # first, so the scaffold breaks before the published pipes do.
   PACKAGES: >-
-    template buildah git github go helm kustomize mise node pulumi semantic-release
-    terraform update-docker-hub-readme
+    template buildah git github go helm kustomize mise node pulumi python
+    semantic-release terraform update-docker-hub-readme
 
 env:
   CGO_ENABLED: 0
@@ -56,6 +56,9 @@ includes:
     taskfile: ./Taskfile.pipe.yml
   pulumi:
     dir: ./pulumi
+    taskfile: ./Taskfile.pipe.yml
+  python:
+    dir: ./python
     taskfile: ./Taskfile.pipe.yml
   semantic-release:
     dir: ./semantic-release
