@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/pulumi/plugins"
 	"gitlab.kilic.dev/devops/pipes/pulumi/setup"
 )
 
@@ -50,6 +51,7 @@ func New(p *Plumber) *TaskList {
 				backend(tl).Job(),
 				restate(tl).Job(),
 				generate(tl).Job(),
+				plugins.Prune(tl).Job(),
 			)
 		})
 }

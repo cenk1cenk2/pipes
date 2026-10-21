@@ -6,6 +6,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
+	"gitlab.kilic.dev/devops/pipes/pulumi/plugins"
 )
 
 type (
@@ -50,6 +51,7 @@ func New(p *Plumber) *TaskList {
 		Set(func(tl *TaskList) Job {
 			return JobSequence(
 				plan(tl).Job(),
+				plugins.Prune(tl).Job(),
 				terraform.LogTask(tl, &C.Report).Job(),
 				terraform.SummaryTask(tl, &C.Report).Job(),
 				terraform.MergeRequestReportTask(tl, &C.Report).Job(),
