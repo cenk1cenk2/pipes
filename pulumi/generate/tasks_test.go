@@ -20,6 +20,8 @@ var _ = Describe("Pulumi generate tasks", func() {
 
 	BeforeEach(func() {
 		cwd = GinkgoT().TempDir()
+		// the plugin cache prune only runs with a Pulumi home, which the host may set.
+		GinkgoT().Setenv("PULUMI_HOME", "")
 		*setup.C = setup.Ctx{Cwd: cwd, Env: map[string]string{}}
 		*stack.P = stack.Pipe{Stack: "main"}
 		*C = Ctx{}
