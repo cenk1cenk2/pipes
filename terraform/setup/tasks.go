@@ -77,6 +77,8 @@ func environment(tl *TaskList) *Task {
 					return fmt.Errorf("Cannot create the plugin cache dir: %s -> %w", dir, err)
 				}
 
+				C.PluginCache = dir
+
 				t.Log.Debug(fmt.Sprintf("Plugin cache directory: %s", dir))
 			}
 

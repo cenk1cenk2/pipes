@@ -23,7 +23,9 @@ type (
 	Ctx struct {
 		Cwd     string
 		Version string
-		Env     map[string]string
+		// PluginCache is the resolved plugin cache directory, empty when none is configured.
+		PluginCache string
+		Env         map[string]string
 	}
 )
 
