@@ -7,7 +7,7 @@ require (
 	github.com/cenk1cenk2/plumber/v7 v7.2.9
 	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
-	github.com/pulumi/pulumi/sdk/v3 v3.270.0
+	github.com/pulumi/pulumi/sdk/v3 v3.271.0
 	github.com/urfave/cli/v3 v3.14.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
@@ -68,7 +68,7 @@ require (
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect
-	gitlab.com/gitlab-org/api/client-go/v3 v3.30.0 // indirect
+	gitlab.com/gitlab-org/api/client-go/v3 v3.30.1 // indirect
 	go.mongodb.org/mongo-driver v1.17.9 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.20.1 // indirect
@@ -84,7 +84,7 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0-rc.6 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
-	golang.org/x/net v0.59.0 // indirect
+	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect

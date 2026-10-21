@@ -7,7 +7,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.14.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.30.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.30.1
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 )
 
