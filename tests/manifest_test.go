@@ -18,6 +18,7 @@ var published = []ReadmeMatrixEntry{
 	{Repository: "cenk1cenk2/pipe-helm", File: "./helm/README.md", Description: "Helm operations for pipelines."},
 	{Repository: "cenk1cenk2/pipe-kustomize", File: "./kustomize/README.md", Description: "Kustomize operations for pipelines."},
 	{Repository: "cenk1cenk2/pipe-mise", File: "./mise/README.md", Description: "mise tool installs for pipelines."},
+	{Repository: "cenk1cenk2/pipe-python", File: "./python/README.md", Description: "Python operations with uv for pipelines."},
 	{Repository: "cenk1cenk2/pipe-semantic-release", File: "./semantic-release/README.md", Description: "semantic-release embedded inside a container for CI jobs."},
 	{Repository: "cenk1cenk2/pipe-terraform", File: "./terraform/README.md", Description: "Terraform helper pipe."},
 	{Repository: "cenk1cenk2/pipe-update-docker-hub-readme", File: "./update-docker-hub-readme/README.md", Description: "Updates the README on DockerHub for given repository."},

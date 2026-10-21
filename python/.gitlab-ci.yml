@@ -1,0 +1,28 @@
+---
+include:
+  - local: .gitlab-ci.trigger.yml
+    inputs:
+      name: python
+      dir: python
+      container-matrix:
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            PYTHON_VERSION: '{{ env "PYTHON_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "PYTHON_VERSION" }}
+          CONTAINER_IMAGE_TAGS_TEMPLATE: |-
+            - match: ^[^@]+@(.+)$
+              template: '{{ env "PYTHON_VERSION" }}-v{{ index $ 1 }}'
+          PYTHON_VERSION:
+            - "3.15"
+        - CONTAINER_IMAGE_BUILD_ARGS: |-
+            PYTHON_VERSION: '{{ env "PYTHON_VERSION" }}'
+          CONTAINER_IMAGE_TAGS: |-
+            {{ env "PYTHON_VERSION" }}
+          CONTAINER_IMAGE_TAGS_TEMPLATE: |-
+            - match: ^[^@]+@(.+)$
+              template: '{{ env "PYTHON_VERSION" }}-v{{ index $ 1 }}'
+          CONTAINER_IMAGE_TAGS_AS_LATEST: |-
+            - ^tags/python@
+            - ^heads/main$
+          PYTHON_VERSION:
+            - 3.15-alpine
