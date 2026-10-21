@@ -16,6 +16,11 @@ spec:
       type: array
       description: A matrix of containers for building images.
 ---
+include:
+  - project: devops/pipelines
+    ref: references@1.5.0
+    file: /references/workflow.gitlab-ci.yml
+
 stages:
   - build
   - container
