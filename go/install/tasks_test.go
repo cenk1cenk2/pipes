@@ -1,6 +1,9 @@
 package install
 
 import (
+	"os"
+	"path/filepath"
+
 	. "github.com/cenk1cenk2/plumber/v7"
 	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
@@ -12,22 +15,22 @@ import (
 )
 
 var _ = Describe("Go install", func() {
-	seed := func(pipe Pipe, workspace bool) {
+	seed := func(pipe Pipe, workspace bool, env map[string]string) {
 		GinkgoHelper()
 
 		*P = pipe
 		*setup.C = setup.Ctx{
 			Cwd:       "projects/api",
-			Env:       map[string]string{"GOPATH": "/cache"},
+			Env:       env,
 			Workspace: workspace,
 		}
 	}
 
 	// a package level flag reads its environment only on the first parse, so the pipe is seeded.
-	run := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool) error {
+	cached := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool, env map[string]string) error {
 		GinkgoHelper()
 
-		seed(pipe, workspace)
+		seed(pipe, workspace, env)
 
 		return fixtures.Cli(runner, tests.TaskListCli{
 			AppName:     "pipe-go",
@@ -42,6 +45,7 @@ var _ = Describe("Go install", func() {
 							return JobSequence(
 								vendor(tl).Job(),
 								verify(tl).Job(),
+								prune(tl).Job(),
 							)
 						})
 				},
@@ -49,10 +53,16 @@ var _ = Describe("Go install", func() {
 		}).Run()
 	}
 
+	run := func(runner *tests.TestingCommandRunner, pipe Pipe, workspace bool) error {
+		GinkgoHelper()
+
+		return cached(runner, pipe, workspace, map[string]string{"GOPATH": "/cache"})
+	}
+
 	disabled := func(workspace bool, task func(*TaskList) *Task) bool {
 		GinkgoHelper()
 
-		seed(Pipe{}, workspace)
+		seed(Pipe{}, workspace, map[string]string{})
 
 		tl := &TaskList{}
 		tl.New(NewPlumber(func(_ *Plumber) *cli.Command {
@@ -129,5 +139,141 @@ var _ = Describe("Go install", func() {
 		Expect(run(disabled, Pipe{}, false)).To(Succeed())
 
 		Expect(disabled.Invocations()).To(HaveLen(1))
+	})
+
+	// the cache holds what an older dependency graph fetched beside what this one
+	// selects, a replacement, the checksum database and a toolchain go switched to.
+	populate := func(download string) {
+		GinkgoHelper()
+
+		for _, file := range []string{
+			"golang.org/x/text/@v/list",
+			"golang.org/x/text/@v/v0.20.0.info",
+			"golang.org/x/text/@v/v0.20.0.mod",
+			"golang.org/x/text/@v/v0.20.0.zip",
+			"golang.org/x/text/@v/v0.20.0.ziphash",
+			"golang.org/x/text/@v/v0.20.0.lock",
+			"golang.org/x/text/@v/v0.21.0.info",
+			"golang.org/x/text/@v/v0.21.0.mod",
+			"golang.org/x/text/@v/v0.21.0.zip",
+			"golang.org/x/text/@v/v0.21.0.ziphash",
+			"golang.org/x/text/@v/v0.21.0.lock",
+			"github.com/!burnt!sushi/toml/@v/v1.4.0.zip",
+			"github.com/!burnt!sushi/toml/@v/v1.5.0.zip",
+			"example.com/fork/@v/v1.0.0.zip",
+			"example.com/upstream/@v/v1.0.0.zip",
+			"sumdb/sum.golang.org/lookup/golang.org/x/text@v0.20.0",
+			"golang.org/toolchain/@v/v0.0.1-go1.26.0.linux-amd64.zip",
+		} {
+			file = filepath.Join(download, filepath.FromSlash(file))
+
+			Expect(os.MkdirAll(filepath.Dir(file), 0o755)).To(Succeed())
+			Expect(os.WriteFile(file, []byte("cached"), 0o644)).To(Succeed())
+		}
+	}
+
+	listed := func(workspace bool) *tests.TestingCommandRunner {
+		GinkgoHelper()
+
+		return fixtures.Runner(
+			tests.TestingCommandResponse{Name: "go", Args: []string{"mod", "vendor"}},
+			tests.TestingCommandResponse{Name: "go", Args: []string{"work", "vendor"}},
+			tests.TestingCommandResponse{
+				Name: "go",
+				Args: []string{"list", "-mod=readonly", "-m", "-json", "all"},
+				Stdout: `{
+	"Path": "projects/api",
+	"Main": true,
+	"Dir": "/builds/projects/api"
+}
+{
+	"Path": "golang.org/x/text",
+	"Version": "v0.21.0"
+}
+{
+	"Path": "github.com/BurntSushi/toml",
+	"Version": "v1.5.0"
+}
+{
+	"Path": "example.com/upstream",
+	"Version": "v1.0.0",
+	"Replace": {
+		"Path": "example.com/fork",
+		"Version": "v1.0.0"
+	}
+}
+{
+	"Path": "example.com/local",
+	"Version": "v1.0.0",
+	"Replace": {
+		"Path": "../local",
+		"Dir": "/builds/projects/local"
+	}
+}
+`,
+			},
+		)
+	}
+
+	DescribeTable(
+		"prunes the cache it installed from",
+		func(workspace bool) {
+			cache := GinkgoT().TempDir()
+			download := filepath.Join(cache, "cache", "download")
+			populate(download)
+
+			runner := listed(workspace)
+
+			Expect(cached(runner, Pipe{}, workspace, map[string]string{"GOMODCACHE": cache})).To(Succeed())
+
+			invocation, ok := runner.LastInvocation()
+			Expect(ok).To(BeTrue())
+			Expect(invocation.Args).To(Equal([]string{"list", "-mod=readonly", "-m", "-json", "all"}))
+			Expect(invocation.Dir).To(Equal("projects/api"))
+			Expect(invocation.Env).To(ContainElement("GOMODCACHE=" + cache))
+
+			for _, file := range []string{
+				"golang.org/x/text/@v/v0.20.0.zip",
+				"golang.org/x/text/@v/v0.20.0.ziphash",
+				"golang.org/x/text/@v/v0.20.0.lock",
+				"github.com/!burnt!sushi/toml/@v/v1.4.0.zip",
+			} {
+				Expect(filepath.Join(download, filepath.FromSlash(file))).NotTo(BeAnExistingFile())
+			}
+
+			for _, file := range []string{
+				"golang.org/x/text/@v/list",
+				"golang.org/x/text/@v/v0.20.0.info",
+				"golang.org/x/text/@v/v0.20.0.mod",
+				"golang.org/x/text/@v/v0.21.0.zip",
+				"golang.org/x/text/@v/v0.21.0.ziphash",
+				"golang.org/x/text/@v/v0.21.0.lock",
+				"github.com/!burnt!sushi/toml/@v/v1.5.0.zip",
+				"example.com/fork/@v/v1.0.0.zip",
+				"example.com/upstream/@v/v1.0.0.zip",
+				"sumdb/sum.golang.org/lookup/golang.org/x/text@v0.20.0",
+				"golang.org/toolchain/@v/v0.0.1-go1.26.0.linux-amd64.zip",
+			} {
+				Expect(filepath.Join(download, filepath.FromSlash(file))).To(BeAnExistingFile())
+			}
+		},
+		Entry("module", false),
+		Entry("workspace", true),
+	)
+
+	It("finds nothing to prune in a cache nothing was downloaded into", func() {
+		runner := listed(false)
+
+		Expect(cached(runner, Pipe{}, false, map[string]string{"GOMODCACHE": GinkgoT().TempDir()})).To(Succeed())
+
+		Expect(runner.Invocations()).To(HaveLen(2))
+	})
+
+	It("leaves the cache of the environment alone", func() {
+		runner := fixtures.Runner()
+
+		Expect(cached(runner, Pipe{}, false, map[string]string{})).To(Succeed())
+
+		Expect(runner.Invocations()).To(HaveLen(1))
 	})
 })
