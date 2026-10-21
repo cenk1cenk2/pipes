@@ -27,6 +27,7 @@ func New(p *Plumber) *TaskList {
 			return JobSequence(
 				vendor(tl).Job(),
 				verify(tl).Job(),
+				prune(tl).Job(),
 			)
 		})
 }
