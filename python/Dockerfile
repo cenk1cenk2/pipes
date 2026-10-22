@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile-upstream:master-labs
 ARG PYTHON_VERSION
 
-FROM ghcr.io/astral-sh/uv:0.13.4 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.5 AS uv
 FROM docker.io/python:${PYTHON_VERSION}
 
 ARG BUILDOS
