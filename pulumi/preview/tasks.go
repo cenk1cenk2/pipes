@@ -58,10 +58,10 @@ func reportSource() terraform.Source {
 
 // The state is what turns a change into a comparison, but a report that only shows
 // what the plan carries beats no report, so failing to read it does not fail the job.
-func readStackState(ctx context.Context, t *Task) map[string]map[string]any {
+func readStackState(ctx context.Context, t *Task) map[string]stateResource {
 	data, err := exportStackState(ctx, setup.C.Cwd, stack.P.Stack)
 	if err == nil {
-		var state map[string]map[string]any
+		var state map[string]stateResource
 		if state, err = parseStackState(data); err == nil {
 			return state
 		}

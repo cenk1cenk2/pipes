@@ -50,22 +50,37 @@ func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terrafo
 			resource.PreviousName = change.PreviousAddress
 		}
 
+		details := []string{}
+		if change.DeposedKey != "" {
+			details = append(details, "deposed object "+change.DeposedKey)
+		}
+
 		switch {
 		case change.Change.Actions.DestroyBeforeCreate():
-			resource.Detail = "destroy before create"
+			details = append(details, "destroy before create")
 		case change.Change.Actions.CreateBeforeDestroy():
-			resource.Detail = "create before destroy"
+			details = append(details, "create before destroy")
+		}
+
+		if reason := actionReason(change); reason != "" {
+			details = append(details, reason)
 		}
 
 		// an import and a move are operations of their own on top of the change the
 		// actions carry, the way Terraform counts an import next to the update it
 		// brings; a resource that only moved or is only imported carries no-op actions.
-		if importing := change.Change.Importing; importing != nil {
-			resource.Detail = "imported from " + importing.ID
-			if importing.ID == "" {
-				resource.Detail = "imported by identity " + terraform.FormatValue(importing.Identity)
+		importing := change.Change.Importing
+		if importing != nil {
+			if importing.ID != "" {
+				details = append(details, "imported from "+importing.ID)
+			} else {
+				details = append(details, "imported by identity "+terraform.FormatValue(importing.Identity))
 			}
+		}
 
+		resource.Detail = strings.Join(details, ", ")
+
+		if importing != nil {
 			resources["import"] = append(resources["import"], resource)
 		}
 		if moved {
@@ -131,6 +146,40 @@ func terraformChangeAction(actions tfjson.Actions) string {
 	}
 
 	return strings.Join(names, "+")
+}
+
+// actionReason is the note Terraform prints under a resource it replaces or destroys
+// for a reason the attribute changes do not show.
+func actionReason(change *tfjson.ResourceChange) string {
+	switch change.ActionReason {
+	case tfjson.ActionReasonReplaceBecauseTainted:
+		return "tainted"
+	case tfjson.ActionReasonReplaceByRequest:
+		return "replaced as requested"
+	case tfjson.ActionReasonReplaceByTriggers:
+		return "replaced due to changes in replace_triggered_by"
+	case tfjson.ActionReasonDeleteBecauseNoResourceConfig:
+		return fmt.Sprintf("because %s.%s is not in configuration", change.Type, change.Name)
+	case tfjson.ActionReasonDeleteBecauseNoMoveTarget:
+		return fmt.Sprintf("because %s was moved to %s, which is not in configuration", change.PreviousAddress, change.Address)
+	case tfjson.ActionReasonDeleteBecauseNoModule:
+		return fmt.Sprintf("because %s is not in configuration", change.ModuleAddress)
+	case tfjson.ActionReasonDeleteBecauseWrongRepetition:
+		switch change.Index.(type) {
+		case nil:
+			return "because resource uses count or for_each"
+		case float64:
+			return "because resource does not use count"
+		case string:
+			return "because resource does not use for_each"
+		}
+	case tfjson.ActionReasonDeleteBecauseCountIndex:
+		return fmt.Sprintf("because index [%s] is out of range for count", terraform.FormatValue(change.Index))
+	case tfjson.ActionReasonDeleteBecauseEachKey:
+		return fmt.Sprintf("because key [%s] is not in for_each map", terraform.FormatValue(change.Index))
+	}
+
+	return ""
 }
 
 func mergeRequestReportActions(
