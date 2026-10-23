@@ -11,17 +11,23 @@ import (
 // The stack state as `pulumi stack export` writes it, as far as the report reads it:
 // the inputs each resource was last given. A preview plan only carries the values a
 // resource is going to be given, so these are what its diff compares them against.
-type stackState struct {
-	Deployment struct {
-		Resources []struct {
-			URN    string         `json:"urn"`
-			Inputs map[string]any `json:"inputs"`
-			// a resource that is pending deletion after a replacement shares its urn
-			// with the one that replaced it.
-			Delete bool `json:"delete"`
-		} `json:"resources"`
-	} `json:"deployment"`
-}
+type (
+	stackState struct {
+		Deployment struct {
+			Resources []stateResource `json:"resources"`
+		} `json:"deployment"`
+	}
+
+	stateResource struct {
+		URN    string         `json:"urn"`
+		Inputs map[string]any `json:"inputs"`
+		// a resource that is pending deletion after a replacement shares its urn
+		// with the one that replaced it.
+		Delete bool `json:"delete"`
+		// a delete leaves the resource in the cloud and only drops it from the stack.
+		RetainOnDelete bool `json:"retainOnDelete"`
+	}
+)
 
 // exportStackState reads the state of the stack the preview ran against, keeping it
 // in memory: it holds every value the stack carries, so it never reaches the disk
@@ -46,20 +52,20 @@ func exportStackState(ctx context.Context, cwd string, stack string) ([]byte, er
 	return out, nil
 }
 
-func parseStackState(data []byte) (map[string]map[string]any, error) {
+func parseStackState(data []byte) (map[string]stateResource, error) {
 	var state stackState
 	if err := json.Unmarshal(data, &state); err != nil {
 		return nil, fmt.Errorf("parse Pulumi stack state: %w", err)
 	}
 
-	inputs := make(map[string]map[string]any, len(state.Deployment.Resources))
+	resources := make(map[string]stateResource, len(state.Deployment.Resources))
 	for _, resource := range state.Deployment.Resources {
 		if resource.Delete {
 			continue
 		}
 
-		inputs[resource.URN] = resource.Inputs
+		resources[resource.URN] = resource
 	}
 
-	return inputs, nil
+	return resources, nil
 }

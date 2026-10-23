@@ -208,7 +208,8 @@ var _ = Describe("Terraform merge request report", func() {
 `))
 	})
 
-	DescribeTable("classifies every resource operation the plan carries",
+	DescribeTable(
+		"classifies every resource operation the plan carries",
 		func(change string, actions []string, detail string, summary terraform.Summary) {
 			report, err := parseTerraformShowPlan([]byte(`{
 				"format_version": "1.2",
@@ -251,7 +252,51 @@ var _ = Describe("Terraform merge request report", func() {
 			[]string{"read"}, "", terraform.Summary{}),
 		Entry("a forget", `"change": {"actions": ["forget"]}`,
 			[]string{"forget"}, "", terraform.Summary{}),
+		Entry("a delete of a deposed object", `"deposed": "00000001", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "deposed object 00000001", terraform.Summary{Delete: 1}),
+		Entry("a replacement of a tainted object", `"action_reason": "replace_because_tainted", "change": {"actions": ["create", "delete"]}`,
+			[]string{"replace"}, "create before destroy, tainted", terraform.Summary{Create: 1, Delete: 1}),
+		Entry("a replacement by request", `"action_reason": "replace_by_request", "change": {"actions": ["delete", "create"]}`,
+			[]string{"replace"}, "destroy before create, replaced as requested", terraform.Summary{Create: 1, Delete: 1}),
+		Entry("a replacement by triggers", `"action_reason": "replace_by_triggers", "change": {"actions": ["delete", "create"]}`,
+			[]string{"replace"}, "destroy before create, replaced due to changes in replace_triggered_by", terraform.Summary{Create: 1, Delete: 1}),
+		Entry("a replacement the provider cannot update in place", `"action_reason": "replace_because_cannot_update", "change": {"actions": ["delete", "create"]}`,
+			[]string{"replace"}, "destroy before create", terraform.Summary{Create: 1, Delete: 1}),
+		Entry(
+			"a delete of a resource not in configuration",
+			`"type": "aws_instance", "name": "web", "action_reason": "delete_because_no_resource_config", "change": {"actions": ["delete"]}`,
+			[]string{"delete"},
+			"because aws_instance.web is not in configuration",
+			terraform.Summary{Delete: 1},
+		),
+		Entry("a delete of a resource moved out of configuration",
+			`"previous_address": "aws_instance.old", "action_reason": "delete_because_no_move_target", "change": {"actions": ["delete"]}`,
+			[]string{"delete", "move"}, "because aws_instance.old was moved to aws_instance.web, which is not in configuration", terraform.Summary{Delete: 1}),
+		Entry("a delete of a module not in configuration", `"module_address": "module.app", "action_reason": "delete_because_no_module", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "because module.app is not in configuration", terraform.Summary{Delete: 1}),
+		Entry("a delete of an instance key from a resource without repetition", `"action_reason": "delete_because_wrong_repetition", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "because resource uses count or for_each", terraform.Summary{Delete: 1}),
+		Entry("a delete of a count index from a resource without count", `"index": 0, "action_reason": "delete_because_wrong_repetition", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "because resource does not use count", terraform.Summary{Delete: 1}),
+		Entry("a delete of a key from a resource without for_each", `"index": "a", "action_reason": "delete_because_wrong_repetition", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "because resource does not use for_each", terraform.Summary{Delete: 1}),
+		Entry("a delete of a count index out of range", `"index": 2, "action_reason": "delete_because_count_index", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, "because index [2] is out of range for count", terraform.Summary{Delete: 1}),
+		Entry("a delete of a key not in for_each", `"index": "a", "action_reason": "delete_because_each_key", "change": {"actions": ["delete"]}`,
+			[]string{"delete"}, `because key ["a"] is not in for_each map`, terraform.Summary{Delete: 1}),
 	)
+
+	It("tells a deposed object and the reason for a replacement or a delete apart in the report", func() {
+		report, err := parseTerraformShowPlan(readFixture("plan-reasons.json"), terraform.Metadata{Target: "production", JobName: "tf-plan"})
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{Create: 1, Update: 1, Delete: 4}))
+
+		body, err := terraform.RenderReport(report, terraform.DiffUnified)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(body).To(Equal(string(readFixture("report-reasons.md"))))
+	})
 
 	It("renders a plan without updates that change nothing as it always has", func() {
 		report, err := parseTerraformShowPlan(readFixture("plan.json"), terraform.Metadata{Target: "production", JobName: "tf-plan"})

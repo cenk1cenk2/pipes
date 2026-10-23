@@ -40,9 +40,18 @@ var pulumiPlanActionOrder = []string{
 	"remove-pending-replace",
 }
 
-// state holds the inputs the stack state last gave each resource by urn, and may be
-// nil when the state could not be read.
-func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadata terraform.Metadata) (terraform.Report, error) {
+// The steps the Pulumi CLI marks as retained for a resource that is retained on
+// delete, since each of them can leave the resource behind in the cloud.
+var retainedSteps = []string{
+	"delete",
+	"replace",
+	"create-replacement",
+	"delete-replaced",
+}
+
+// state holds what the stack state last gave each resource by urn, and may be nil
+// when the state could not be read.
+func parsePulumiPlanReport(data []byte, state map[string]stateResource, metadata terraform.Metadata) (terraform.Report, error) {
 	plan, planVersion, err := parsePulumiPlan(data)
 	if err != nil {
 		return terraform.Report{}, err
@@ -68,7 +77,8 @@ func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadat
 
 		// the plan never records the import step, so an import without changes carries
 		// no step at all.
-		if isImport(resource.Goal, state[string(urn)]) && !slices.Contains(steps, "import") {
+		old := state[string(urn)]
+		if isImport(resource.Goal, old.Inputs) && !slices.Contains(steps, "import") {
 			steps = slices.Insert(steps, 0, "import")
 		}
 
@@ -76,16 +86,26 @@ func parsePulumiPlanReport(data []byte, state map[string]map[string]any, metadat
 			continue
 		}
 
-		summary := resourceSummary(string(urn), resource, state[string(urn)])
+		summary := resourceSummary(string(urn), resource, old.Inputs)
 
+		details := []string{}
 		// the steps of a replacement come in the order they run, which is how a
 		// replacement that deletes first tells itself apart.
 		if created, deleted := slices.Index(steps, "create-replacement"), slices.Index(steps, "delete-replaced"); created >= 0 && deleted >= 0 {
-			summary.Detail = "create before delete"
 			if deleted < created {
-				summary.Detail = "delete before create"
+				details = append(details, "delete before create")
+			} else {
+				details = append(details, "create before delete")
 			}
 		}
+
+		if old.RetainOnDelete && slices.ContainsFunc(steps, func(action string) bool {
+			return slices.Contains(retainedSteps, action)
+		}) {
+			details = append(details, "retain on delete")
+		}
+
+		summary.Detail = strings.Join(details, ", ")
 
 		outputNames := resourceOutputNames(resource)
 

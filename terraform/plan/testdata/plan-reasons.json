@@ -1,0 +1,63 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.14.0",
+  "timestamp": "2026-10-23T12:00:00Z",
+  "resource_changes": [
+    {
+      "address": "aws_instance.web",
+      "type": "aws_instance",
+      "name": "web",
+      "change": {
+        "actions": ["update"],
+        "before": {"instance_type": "t3.micro"},
+        "after": {"instance_type": "t3.small"}
+      }
+    },
+    {
+      "address": "aws_instance.web",
+      "type": "aws_instance",
+      "name": "web",
+      "deposed": "00000001",
+      "change": {
+        "actions": ["delete"],
+        "before": {"instance_type": "t3.nano"},
+        "after": null
+      }
+    },
+    {
+      "address": "aws_db_instance.main",
+      "type": "aws_db_instance",
+      "name": "main",
+      "action_reason": "replace_because_tainted",
+      "change": {
+        "actions": ["create", "delete"],
+        "before": {"engine": "postgres"},
+        "after": {"engine": "postgres"}
+      }
+    },
+    {
+      "address": "aws_eip.ip[2]",
+      "type": "aws_eip",
+      "name": "ip",
+      "index": 2,
+      "action_reason": "delete_because_count_index",
+      "change": {
+        "actions": ["delete"],
+        "before": {"domain": "vpc"},
+        "after": null
+      }
+    },
+    {
+      "address": "aws_sqs_queue.jobs",
+      "previous_address": "aws_sqs_queue.legacy_jobs",
+      "type": "aws_sqs_queue",
+      "name": "jobs",
+      "action_reason": "delete_because_no_move_target",
+      "change": {
+        "actions": ["delete"],
+        "before": {"name": "jobs"},
+        "after": null
+      }
+    }
+  ]
+}

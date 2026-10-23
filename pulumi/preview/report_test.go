@@ -210,6 +210,50 @@ var _ = Describe("Pulumi plan merge request report", func() {
 		Entry("nothing to do", `["same"]`, []string{}, ""),
 	)
 
+	DescribeTable("marks the steps that leave a resource retained on delete behind",
+		func(steps string, detail string) {
+			urn := "urn:pulumi:dev::example::gitlab:index/project:Project::project"
+			report, err := parsePulumiPlanReport([]byte(`{
+				"manifest": {"time": "2026-05-31T12:00:00Z", "magic": "", "version": "3.187.0"},
+				"resourcePlans": {"`+urn+`": {"steps": `+steps+`}}
+			}`), map[string]stateResource{urn: {URN: urn, RetainOnDelete: true}}, metadata())
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(report.Actions).NotTo(BeEmpty())
+			for _, action := range report.Actions {
+				Expect(resource(action, urn).Detail).To(Equal(detail))
+			}
+		},
+		Entry("a delete", `["delete"]`, "retain on delete"),
+		Entry("a replacement that creates first", `["create-replacement", "replace", "delete-replaced"]`, "create before delete, retain on delete"),
+		Entry("a replacement that deletes first", `["delete-replaced", "replace", "create-replacement"]`, "delete before create, retain on delete"),
+		Entry("an update", `["update"]`, ""),
+	)
+
+	It("reports a delete that retains the resource apart from one that destroys it", func() {
+		retained := func(urns ...string) map[string]stateResource {
+			state := map[string]stateResource{}
+			for _, urn := range urns {
+				state[urn] = stateResource{URN: urn, Inputs: map[string]any{"name": "x"}, RetainOnDelete: true}
+			}
+
+			return state
+		}
+
+		report, err := parsePulumiPlanReport(readFixture("plan-retain.json"), retained(
+			"urn:pulumi:default::gitlab::gitlab:index/project:Project::project-265",
+			"urn:pulumi:default::gitlab::gitlab:index/tagProtection:TagProtection::tag-protection-265",
+			"urn:pulumi:default::gitlab::gitlab:index/branchProtection:BranchProtection::branch-protection-265",
+		), terraform.Metadata{Target: "default", JobName: "pulumi-preview"})
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(terraform.Summarize(report)).To(Equal(terraform.Summary{Create: 1, Delete: 4}))
+
+		body, err := terraform.RenderReport(report, terraform.DiffUnified)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(body).To(Equal(string(readFixture("plan-retain.md"))))
+	})
+
 	DescribeTable("renders a preview without updates that change nothing as it always has",
 		func(name string) {
 			report, err := parsePulumiPlanReport(readFixture(name+".json"), nil, terraform.Metadata{Target: "dev", JobName: "pulumi-preview"})
@@ -245,12 +289,12 @@ var _ = Describe("Pulumi plan merge request report", func() {
 					"steps": ["delete"]
 				}
 			}
-		}`), map[string]map[string]any{
-			"urn:pulumi:dev::example::kubernetes:core/v1:Secret::token": {"data": map[string]any{
+		}`), map[string]stateResource{
+			"urn:pulumi:dev::example::kubernetes:core/v1:Secret::token": {Inputs: map[string]any{"data": map[string]any{
 				"4dabf18193072939515e22adb298388d": "1b47061264138c4ac30d75fd1eb44270",
 				"ciphertext":                       "v1:secret-old-value",
-			}},
-			"urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings": {"level": "info"},
+			}}},
+			"urn:pulumi:dev::example::kubernetes:core/v1:ConfigMap::settings": {Inputs: map[string]any{"level": "info"}},
 		}, metadata())
 		Expect(err).NotTo(HaveOccurred())
 
@@ -275,7 +319,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 	})
 
 	It("reports an imported resource as an import with only the changes the update makes and leaves the default provider out", func() {
-		report, err := parsePulumiPlanReport(readFixture("plan-import.json"), map[string]map[string]any{}, terraform.Metadata{Target: "default", JobName: "pulumi-preview"})
+		report, err := parsePulumiPlanReport(readFixture("plan-import.json"), map[string]stateResource{}, terraform.Metadata{Target: "default", JobName: "pulumi-preview"})
 		Expect(err).NotTo(HaveOccurred())
 
 		names := []string{}
@@ -461,7 +505,7 @@ var _ = Describe("Pulumi plan merge request report", func() {
 })
 
 var _ = Describe("Pulumi stack state", func() {
-	It("reads the inputs of every resource by urn and skips the ones pending deletion", func() {
+	It("reads the inputs and retention of every resource by urn and skips the ones pending deletion", func() {
 		state, err := parseStackState([]byte(`{
 			"version": 3,
 			"deployment": {
@@ -469,15 +513,15 @@ var _ = Describe("Pulumi stack state", func() {
 				"resources": [
 					{"urn": "urn:a", "inputs": {"name": "new"}, "outputs": {"id": "1"}},
 					{"urn": "urn:a", "inputs": {"name": "old"}, "delete": true},
-					{"urn": "urn:b", "inputs": {"policy": "x"}}
+					{"urn": "urn:b", "inputs": {"policy": "x"}, "retainOnDelete": true}
 				]
 			}
 		}`))
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(state).To(Equal(map[string]map[string]any{
-			"urn:a": {"name": "new"},
-			"urn:b": {"policy": "x"},
+		Expect(state).To(Equal(map[string]stateResource{
+			"urn:a": {URN: "urn:a", Inputs: map[string]any{"name": "new"}},
+			"urn:b": {URN: "urn:b", Inputs: map[string]any{"policy": "x"}, RetainOnDelete: true},
 		}))
 	})
 
