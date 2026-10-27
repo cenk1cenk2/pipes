@@ -14,7 +14,7 @@ require (
 	github.com/onsi/gomega v1.44.0
 	github.com/stretchr/testify v1.12.1
 	github.com/urfave/cli/v3 v3.14.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.35.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.39.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	go.yaml.in/yaml/v4 v4.0.0-rc.6
 	golang.org/x/mod v0.42.0
