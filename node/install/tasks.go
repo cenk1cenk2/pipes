@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
@@ -71,6 +72,69 @@ func prune(tl *TaskList) *Task {
 			).
 				SetDir(P.Install.Cwd).
 				AppendDirectEnvironment(os.Environ()...).
+				AddSelfToTheTask()
+
+			home := os.Getenv("COREPACK_HOME")
+			if home == "" {
+				return nil
+			}
+
+			var version string
+
+			t.CreateCommand("pnpm", "--version").
+				SetDir(P.Install.Cwd).
+				AppendDirectEnvironment(os.Environ()...).
+				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+				SetIgnoreError().
+				CaptureStdout(&version).
+				ShouldRunAfter(func(_ context.Context, c *Command) error {
+					version = strings.TrimSpace(version)
+					if c.HasFailed() {
+						return nil
+					}
+
+					cacheDir := filepath.Join(home, "v1", "pnpm")
+					for _, dir := range []string{filepath.Clean(home), filepath.Join(home, "v1"), cacheDir} {
+						info, err := os.Lstat(dir)
+						if err != nil || !info.IsDir() {
+							return nil
+						}
+					}
+
+					entries, err := os.ReadDir(cacheDir)
+					if err != nil {
+						return nil
+					}
+
+					matched := false
+					for _, entry := range entries {
+						if entry.IsDir() && entry.Name() == version {
+							matched = true
+							break
+						}
+					}
+					if !matched {
+						return nil
+					}
+
+					var removed []string
+					for _, entry := range entries {
+						if !entry.IsDir() || entry.Name() == version {
+							continue
+						}
+
+						if err := os.RemoveAll(filepath.Join(cacheDir, entry.Name())); err != nil {
+							return err
+						}
+
+						removed = append(removed, entry.Name())
+					}
+					if len(removed) > 0 {
+						t.Log.Info(fmt.Sprintf("Pruned corepack pnpm versions: %s", strings.Join(removed, ", ")))
+					}
+
+					return nil
+				}).
 				AddSelfToTheTask()
 
 			return nil
