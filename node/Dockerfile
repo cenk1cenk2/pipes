@@ -12,7 +12,8 @@ ENV PATH="${PATH}:${PNPM_HOME}"
 RUN \
   unset NPM_CONFIG_USER && \
   (command -v corepack > /dev/null 2>&1 || npm install --global corepack@latest) && \
-  corepack enable && corepack prepare pnpm@latest --activate
+  corepack enable && corepack prepare pnpm@latest --activate && \
+  pnpm --version > /usr/local/share/pipe-node-pnpm-version
 
 COPY --chmod=777 ./dist/pipe-${BUILDOS}-${BUILDARCH} /usr/bin/pipe
 
