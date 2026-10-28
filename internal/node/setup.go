@@ -3,6 +3,7 @@ package node
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -83,22 +84,43 @@ func version(tl *TaskList, ctx *Ctx) *Task {
 				AddSelfToTheTask()
 
 			var packageManagerVersion string
+			var packageManagerStderr string
+			var imageVersion string
 
 			t.CreateCommand(
 				ctx.PackageManager.Exe,
 			).
-				Set(func(_ context.Context, c *Command) error {
+				Set(func(runCtx context.Context, c *Command) error {
 					c.AppendArgs(ctx.PackageManager.Commands.Version...)
+					if ctx.PackageManager.Exe == "pnpm" {
+						metadata := t.CreateCommand("cat", "/usr/local/share/pipe-node-pnpm-version").
+							SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
+							SetIgnoreError().
+							CaptureStdout(&imageVersion)
+						if err := metadata.Run(runCtx); err != nil || metadata.HasFailed() || imageVersion == "" {
+							imageVersion = "unknown"
+						} else {
+							imageVersion = "v" + imageVersion
+						}
+
+						t.Log.Info(fmt.Sprintf("pnpm available in image: %s", imageVersion))
+					}
 
 					return nil
 				}).
 				SetLogLevel(LogLevelDebug, LogLevelDebug, LogLevelDebug).
-				CaptureOutput(&packageManagerVersion).
+				SetIgnoreError().
+				CaptureStdout(&packageManagerVersion).
+				CaptureStderr(&packageManagerStderr).
 				ShouldRunAfter(func(_ context.Context, c *Command) error {
-					if packageManagerVersion == "" {
+					if c.HasFailed() || packageManagerVersion == "" {
 						t.Log.Debug("Can not fetch package manager version.")
 
 						return nil
+					}
+
+					if ctx.PackageManager.Exe == "pnpm" && strings.Contains(strings.ToLower(packageManagerStderr), "download") {
+						t.Log.Warn(fmt.Sprintf("Downloaded pnpm v%s during version check; image provides %s.", packageManagerVersion, imageVersion))
 					}
 
 					t.Log.Info(fmt.Sprintf("%s version: v%s", ctx.PackageManager.Exe, packageManagerVersion))
