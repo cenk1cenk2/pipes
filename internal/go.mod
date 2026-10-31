@@ -16,7 +16,7 @@ require (
 	github.com/urfave/cli/v3 v3.14.0
 	gitlab.com/gitlab-org/api/client-go/v3 v3.40.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
-	go.yaml.in/yaml/v4 v4.0.0-rc.6
+	go.yaml.in/yaml/v4 v4.0.0-rc.7
 	golang.org/x/mod v0.42.0
 )
 
