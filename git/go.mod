@@ -7,7 +7,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.14.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.40.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.40.2
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 )
 
@@ -55,7 +55,7 @@ require (
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	go.yaml.in/yaml/v4 v4.0.0-rc.7 // indirect
+	go.yaml.in/yaml/v4 v4.0.0-rc.8 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
 	golang.org/x/net v0.59.0 // indirect
