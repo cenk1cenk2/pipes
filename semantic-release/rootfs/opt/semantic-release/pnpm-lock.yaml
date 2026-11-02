@@ -723,8 +723,8 @@ packages:
     resolution: {integrity: sha512-2NxoveTT58mjYT4n3RPTEfCZGLMbidoO8XEieXfpSYxu+PQJ1qpx4ypwH6N+uF9twBPIvRRgvkvW5HUTYWENig==}
     engines: {node: '>= 20'}
 
-  http2-wrapper@2.2.1:
-    resolution: {integrity: sha512-V5nVw1PAOgfI3Lmeaj2Exmeg7fenjhRUgz1lPSezy1CuhPYbgQtbQj4jZfEAEMlaL+vupsvhjqCyjzob0yxsmQ==}
+  http2-wrapper@2.2.2:
+    resolution: {integrity: sha512-rwd+LcfKZAo4u1B3FABGKqOiBTnyunawZkaNqqZfOCK3JAaQVZdBYtm61a84X46uf+AeCIcaOLM05E4PgHtr+w==}
     engines: {node: '>=10.19.0'}
 
   https-proxy-agent@9.1.0:
@@ -2327,7 +2327,7 @@ snapshots:
       cacheable-request: 13.0.19
       decompress-response: 10.0.0
       form-data-encoder: 4.1.0
-      http2-wrapper: 2.2.1
+      http2-wrapper: 2.2.2
       keyv: 5.6.0
       lowercase-keys: 3.0.0
       p-cancelable: 4.0.1
@@ -2380,7 +2380,7 @@ snapshots:
       - kerberos
       - supports-color
 
-  http2-wrapper@2.2.1:
+  http2-wrapper@2.2.2:
     dependencies:
       quick-lru: 5.1.1
       resolve-alpn: 1.2.1
