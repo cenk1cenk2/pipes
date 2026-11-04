@@ -12,8 +12,8 @@ importers:
         specifier: ^4.6.1
         version: 4.6.2(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@cenk1cenk2/semantic-release-config':
-        specifier: ^6.1.2
-        version: 6.1.2(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        specifier: ^6.1.5
+        version: 6.1.5(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/changelog':
         specifier: ^7.0.0
         version: 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
@@ -80,8 +80,8 @@ packages:
     resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
     engines: {node: '>=6.9.0'}
 
-  '@cenk1cenk2/semantic-release-config@6.1.2':
-    resolution: {integrity: sha512-vg253BFewDWhwD7DFFsxrCwyWTMc+mcrNMRS47nSn5yWsa04M/qSLpjU2wC9vO1Qd09Lp77oyt8EIHgFXQnvXw==}
+  '@cenk1cenk2/semantic-release-config@6.1.5':
+    resolution: {integrity: sha512-xKc7uYX+wgl1s8vv4Cq6rKhntoTubsLbIW9nhUUjlHVLIWW6RYhq2fG4KR5nNc6/t+dlTiQyLoqRezwyqCSV5A==}
     peerDependencies:
       semantic-release: '>= 24'
 
@@ -316,6 +316,10 @@ packages:
 
   '@visulima/yaml@1.0.0':
     resolution: {integrity: sha512-06obI/5zlKRjScekXqHTtF06S5peqHE9J3AmEthJ5b40a4FuJAysbOJ9EVyznTpOVmy3IvL8cZu3QiNpgF/cbg==}
+    engines: {node: ^22.14.0 || >=24.10.0}
+
+  '@visulima/yaml@2.0.0':
+    resolution: {integrity: sha512-4/JYuxyzAhHmoI49qBqQ60WkX7mjUiNYv2Z4WvIaV6iVdNjLwq2Xq8MmF/bWagb4aDo4oQg6Uhenv4woItkmAg==}
     engines: {node: ^22.14.0 || >=24.10.0}
 
   agent-base@9.0.0:
@@ -1632,12 +1636,12 @@ snapshots:
       ini: 7.0.0
       ts-deepmerge: 8.0.0
 
-  '@anolilab/semantic-release-pnpm@8.1.37(@visulima/yaml@1.0.0)(json5@2.2.3)(supports-color@7.2.0)':
+  '@anolilab/semantic-release-pnpm@8.1.37(@visulima/yaml@2.0.0)(json5@2.2.3)(supports-color@7.2.0)':
     dependencies:
       '@actions/core': 3.0.1
       '@anolilab/rc': 4.0.9
       '@semantic-release/error': 4.0.0
-      '@visulima/fs': 7.0.0(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)
+      '@visulima/fs': 7.0.0(@visulima/yaml@2.0.0)(ini@7.0.0)(json5@2.2.3)
       '@visulima/package': 5.0.43(ini@7.0.0)
       '@visulima/path': 3.1.0
       debug: 4.4.3(supports-color@7.2.0)
@@ -1668,16 +1672,16 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@cenk1cenk2/semantic-release-config@6.1.2(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@cenk1cenk2/semantic-release-config@6.1.5(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
-      '@anolilab/semantic-release-pnpm': 8.1.37(@visulima/yaml@1.0.0)(json5@2.2.3)(supports-color@7.2.0)
+      '@anolilab/semantic-release-pnpm': 8.1.37(@visulima/yaml@2.0.0)(json5@2.2.3)(supports-color@7.2.0)
       '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
       '@semantic-release/commit-analyzer': 13.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/error': 4.0.0
       '@semantic-release/git': 11.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/npm': 13.2.0(semantic-release@25.0.9(supports-color@7.2.0))
       '@semantic-release/release-notes-generator': 14.1.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
-      '@visulima/yaml': 1.0.0
+      '@visulima/yaml': 2.0.0
       conventional-changelog-conventionalcommits: 9.3.1
       nerf-dart: 1.0.0
       rc: 1.2.8
@@ -1945,6 +1949,14 @@ snapshots:
       ini: 7.0.0
       json5: 2.2.3
 
+  '@visulima/fs@7.0.0(@visulima/yaml@2.0.0)(ini@7.0.0)(json5@2.2.3)':
+    dependencies:
+      '@visulima/path': 5.0.0
+    optionalDependencies:
+      '@visulima/yaml': 2.0.0
+      ini: 7.0.0
+      json5: 2.2.3
+
   '@visulima/package@5.0.43(ini@7.0.0)':
     dependencies:
       '@antfu/install-pkg': 2.1.0
@@ -1965,6 +1977,8 @@ snapshots:
   '@visulima/path@5.0.0': {}
 
   '@visulima/yaml@1.0.0': {}
+
+  '@visulima/yaml@2.0.0': {}
 
   agent-base@9.0.0: {}
 
