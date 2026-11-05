@@ -41,7 +41,7 @@ require (
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/xo/terminfo v1.0.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
-	go.yaml.in/yaml/v4 v4.0.0-rc.9 // indirect
+	go.yaml.in/yaml/v4 v4.0.0 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
 	golang.org/x/net v0.60.0 // indirect
