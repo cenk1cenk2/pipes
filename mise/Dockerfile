@@ -4,7 +4,7 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
 # renovate: datasource=github-releases depName=jdx/mise
-ARG MISE_VERSION=v2026.11.1
+ARG MISE_VERSION=v2026.11.2
 
 ARG BUILDOS
 ARG BUILDARCH
