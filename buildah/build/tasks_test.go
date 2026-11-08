@@ -13,6 +13,7 @@ import (
 	"github.com/cenk1cenk2/plumber/v7/tests"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/types"
 	"github.com/urfave/cli/v3"
 
 	buildahmanifest "gitlab.kilic.dev/devops/pipes/buildah/manifest"
@@ -73,6 +74,28 @@ var _ = Describe("Container image tags", func() {
 		},
 		Entry("a docker hub shorthand", "cenk1cenk2/pipe-buildah"),
 		Entry("a bare name", "image"),
+	)
+})
+
+var _ = Describe("Container image cache", func() {
+	DescribeTable(
+		"accepts only a fully qualified repository without a tag or digest",
+		func(cache string, expected types.GomegaMatcher) {
+			Expect(run(fixtures.Runner(), Pipe{Image: Image{
+				Name:  "registry.example.com/group/image",
+				Cache: cache,
+			}}, image)).To(expected)
+		},
+		Entry("a repository", "docker.io/cenk1cenk2/cache-image", Succeed()),
+		Entry("a repository on a registry port", "registry.example.com:5000/group/cache-image", Succeed()),
+		Entry("a local directory", "./.buildah", MatchError(ContainSubstring("Image cache has to be a fully qualified registry repository"))),
+		Entry("a repository without the registry host", "cenk1cenk2/cache-image", MatchError(ContainSubstring("Image cache has to be a fully qualified registry repository"))),
+		Entry("a tagged repository", "docker.io/cenk1cenk2/image:cache", MatchError(ContainSubstring("without a tag or digest"))),
+		Entry(
+			"a repository by digest",
+			"docker.io/cenk1cenk2/image@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			MatchError(ContainSubstring("without a tag or digest")),
+		),
 	)
 })
 

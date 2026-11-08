@@ -70,7 +70,7 @@ Build container images.
 | `$BUILDAH_BUILD_IMAGE_PUSH`<br/>`$CONTAINER_IMAGE_PUSH` | Push the image after building. | `bool` | `true` |
 | `$BUILDAH_BUILD_IMAGE_BUILD_ARGS`<br/>`$CONTAINER_IMAGE_BUILD_ARGS` | Pass in extra build arguments for image.<br/>You can use it as a template with environment variables as the context. | `string`<br/>`format(yaml(map[string]Template()))` |  |
 | `$BUILDAH_BUILD_IMAGE_LATEST_TAG`<br/>`$CONTAINER_IMAGE_LATEST_TAG` | Latest tag for the container image where it is marked as latest. | `string` | `"latest"` |
-| `$BUILDAH_BUILD_IMAGE_CACHE`<br/>`$CONTAINER_IMAGE_CACHE` | Specify the cache for the container image. | `string` |  |
+| `$BUILDAH_BUILD_IMAGE_CACHE`<br/>`$CONTAINER_IMAGE_CACHE` | Fully qualified repository, without a tag or digest, that buildah pulls and pushes the layer cache from, e.g. docker.io/cenk1cenk2/cache-image. | `string` |  |
 | `$BUILDAH_BUILD_IMAGE_FORMAT`<br/>`$CONTAINER_IMAGE_FORMAT` | Specify the format for Container Image. | `string`<br/>`format(enum("oci", "docker"))` | `"oci"` |
 | `$BUILDAH_BUILD_IMAGE_STORAGE_DRIVER`<br/>`$CONTAINER_IMAGE_STORAGE_DRIVER`<br/>`$BUILDAH_STORAGE_DRIVER` | Specify the storage driver for Buildah. | `string`<br/>`format(enum("overlay", "overlay2", "vfs"))` | `"vfs"` |
 
