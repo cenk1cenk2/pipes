@@ -99,6 +99,33 @@ var _ = Describe("Container image cache", func() {
 	)
 })
 
+var _ = Describe("Container image cache arguments", func() {
+	DescribeTable(
+		"reads the cache on every build and writes it only when the build pushes",
+		func(push bool, expected []string) {
+			runner := fixtures.Runner()
+
+			Expect(run(runner, Pipe{Image: Image{
+				Name:   "registry.example.com/group/image",
+				Tags:   []string{"latest"},
+				Cache:  "registry.example.com/group/cache-image",
+				Push:   push,
+				Format: "oci",
+			}, File: File{Context: ".", Name: "Dockerfile"}}, tags, build)).To(Succeed())
+
+			invocation, ok := runner.LastInvocation()
+			Expect(ok).To(BeTrue())
+			Expect(invocation.Args).To(ContainElements(expected))
+
+			if !push {
+				Expect(invocation.Args).NotTo(ContainElement("--cache-to"))
+			}
+		},
+		Entry("pushing", true, []string{"--layers", "--cache-from", "--cache-to", "registry.example.com/group/cache-image"}),
+		Entry("not pushing", false, []string{"--layers", "--cache-from", "registry.example.com/group/cache-image"}),
+	)
+})
+
 var _ = Describe("Container image push target", func() {
 	// a build that does not push has no registry login to prove.
 	DescribeTable(

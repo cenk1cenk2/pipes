@@ -56,13 +56,12 @@ func build(tl *TaskList) *Task {
 					c.AppendArgs("--format", P.Image.Format)
 
 					if P.Image.Cache != "" {
-						c.AppendArgs(
-							"--layers",
-							"--cache-from",
-							P.Image.Cache,
-							"--cache-to",
-							P.Image.Cache,
-						)
+						c.AppendArgs("--layers", "--cache-from", P.Image.Cache)
+
+						// a build that does not push, such as a merge request, has no registry login to write the cache with.
+						if P.Image.Push {
+							c.AppendArgs("--cache-to", P.Image.Cache)
+						}
 					}
 
 					for k, t := range P.Image.BuildArgs {
