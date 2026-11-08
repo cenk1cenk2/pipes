@@ -184,7 +184,7 @@ format(yaml(map[string]Template()))
 				cli.EnvVar("BUILDAH_BUILD_IMAGE_CACHE"),
 				cli.EnvVar("CONTAINER_IMAGE_CACHE"),
 			),
-			Usage:       "Specify the cache for the container image.",
+			Usage:       "Fully qualified repository, without a tag or digest, that buildah pulls and pushes the layer cache from, e.g. docker.io/cenk1cenk2/cache-image.",
 			Required:    false,
 			Value:       "",
 			Destination: &P.Image.Cache,

@@ -21,7 +21,7 @@ type (
 		Push                bool
 		BuildArgs           map[string]string
 		LatestTag           string
-		Cache               string `validate:"omitempty,dirpath"`
+		Cache               string
 		Format              string `validate:"oneof=oci docker"`
 		StorageDriver       string `validate:"oneof=overlay overlay2 vfs"`
 	}

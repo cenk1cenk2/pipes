@@ -4,6 +4,7 @@ go 1.27.0
 
 require (
 	github.com/cenk1cenk2/plumber/v7 v7.2.10
+	github.com/distribution/reference v0.6.0
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.14.0
@@ -36,6 +37,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
 	github.com/stretchr/testify v1.12.1 // indirect

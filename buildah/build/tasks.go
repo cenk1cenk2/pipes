@@ -5,15 +5,32 @@ import (
 	"fmt"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"github.com/distribution/reference"
 	"gitlab.kilic.dev/devops/pipes/internal/registry"
 )
 
 func image(tl *TaskList) *Task {
 	return tl.CreateTask("image").
 		Set(func(_ context.Context, _ *Task) error {
-			_, err := registry.ParseImage(P.Image.Name)
+			if _, err := registry.ParseImage(P.Image.Name); err != nil {
+				return err
+			}
 
-			return err
+			if P.Image.Cache == "" {
+				return nil
+			}
+
+			// buildah only takes a repository for its layer cache, never a directory, a tag or a digest.
+			cache, err := reference.ParseNamed(P.Image.Cache)
+			if err != nil {
+				return fmt.Errorf("Image cache has to be a fully qualified registry repository: %s -> %w", P.Image.Cache, err)
+			}
+
+			if !reference.IsNameOnly(cache) {
+				return fmt.Errorf("Image cache has to be a repository without a tag or digest: %s", P.Image.Cache)
+			}
+
+			return nil
 		})
 }
 
