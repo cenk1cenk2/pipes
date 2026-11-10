@@ -3,7 +3,7 @@ module gitlab.kilic.dev/devops/pipes/terraform
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.10
+	github.com/cenk1cenk2/plumber/v7 v7.2.11
 	github.com/hashicorp/terraform-json v0.29.0
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
@@ -14,7 +14,7 @@ require (
 
 require (
 	charm.land/glamour/v2 v2.0.1 // indirect
-	charm.land/lipgloss/v2 v2.0.6 // indirect
+	charm.land/lipgloss/v2 v2.1.0 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -58,7 +58,7 @@ require (
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect
-	gitlab.com/gitlab-org/api/client-go/v3 v3.46.0 // indirect
+	gitlab.com/gitlab-org/api/client-go/v3 v3.47.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	go.yaml.in/yaml/v4 v4.0.0 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
