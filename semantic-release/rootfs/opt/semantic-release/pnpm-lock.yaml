@@ -12,8 +12,8 @@ importers:
         specifier: ^4.6.3
         version: 4.6.3(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@cenk1cenk2/semantic-release-config':
-        specifier: ^6.1.5
-        version: 6.1.5(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
+        specifier: ^6.1.6
+        version: 6.1.6(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/changelog':
         specifier: ^7.0.0
         version: 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
@@ -80,8 +80,8 @@ packages:
     resolution: {integrity: sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==}
     engines: {node: '>=6.9.0'}
 
-  '@cenk1cenk2/semantic-release-config@6.1.5':
-    resolution: {integrity: sha512-xKc7uYX+wgl1s8vv4Cq6rKhntoTubsLbIW9nhUUjlHVLIWW6RYhq2fG4KR5nNc6/t+dlTiQyLoqRezwyqCSV5A==}
+  '@cenk1cenk2/semantic-release-config@6.1.6':
+    resolution: {integrity: sha512-wMokMPXSORVvU2oIjsO/wikurtEb7BE9MnV4Waz0ujf/i7J+6vsWx6U1yUOMsm+Ip4XrnOnI35848sSMz79YmA==}
     peerDependencies:
       semantic-release: '>= 24'
 
@@ -1672,7 +1672,7 @@ snapshots:
 
   '@babel/helper-validator-identifier@7.29.7': {}
 
-  '@cenk1cenk2/semantic-release-config@6.1.5(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
+  '@cenk1cenk2/semantic-release-config@6.1.6(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@anolilab/semantic-release-pnpm': 8.1.37(@visulima/yaml@2.0.0)(json5@2.2.3)(supports-color@7.2.0)
       '@semantic-release/changelog': 7.0.0(semantic-release@25.0.9(supports-color@7.2.0))
