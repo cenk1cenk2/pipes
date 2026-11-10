@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.5.0
-	github.com/cenk1cenk2/plumber/v7 v7.2.10
+	github.com/cenk1cenk2/plumber/v7 v7.2.11
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/pulumi/pulumi/sdk/v3 v3.274.1
@@ -15,7 +15,7 @@ require (
 
 require (
 	charm.land/glamour/v2 v2.0.1 // indirect
-	charm.land/lipgloss/v2 v2.0.6 // indirect
+	charm.land/lipgloss/v2 v2.1.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
@@ -68,7 +68,7 @@ require (
 	github.com/yuin/goldmark v1.7.13 // indirect
 	github.com/yuin/goldmark-emoji v1.0.6 // indirect
 	github.com/zclconf/go-cty v1.19.0 // indirect
-	gitlab.com/gitlab-org/api/client-go/v3 v3.46.0 // indirect
+	gitlab.com/gitlab-org/api/client-go/v3 v3.47.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.9 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.20.1 // indirect
