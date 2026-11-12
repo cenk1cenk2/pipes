@@ -272,8 +272,8 @@ packages:
       smol-toml:
         optional: true
 
-  '@visulima/fs@7.0.0':
-    resolution: {integrity: sha512-6XPkHW+d4t8jZjXl7a9r7DjvoMPjbzVbQVklmHQmvDYaSAYX5jEpBrAL4ZpuS9voSw2Mfzj8cccaZuGcMZYkyA==}
+  '@visulima/fs@7.0.1':
+    resolution: {integrity: sha512-lq+QZdatF55+O7DAmep48ofgE3+k9zVndXXHTlU1sz1Ps2RG1lw5+aPcG+1ty18mjy32lOMAzVk4qk1/Ygg0JQ==}
     engines: {node: ^22.14.0 || >=24.10.0}
     os: [darwin, linux, win32]
     peerDependencies:
@@ -1608,7 +1608,7 @@ snapshots:
   '@anolilab/multi-semantic-release@4.6.3(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
       '@semrel-extra/topo': 1.14.1
-      '@visulima/fs': 7.0.0(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)
+      '@visulima/fs': 7.0.1(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)
       '@visulima/path': 3.1.0
       cosmiconfig: 10.0.1
       debug: 4.4.3(supports-color@7.2.0)
@@ -1641,7 +1641,7 @@ snapshots:
       '@actions/core': 3.0.1
       '@anolilab/rc': 4.0.9
       '@semantic-release/error': 4.0.0
-      '@visulima/fs': 7.0.0(@visulima/yaml@2.0.0)(ini@7.0.0)(json5@2.2.3)
+      '@visulima/fs': 7.0.1(@visulima/yaml@2.0.0)(ini@7.0.0)(json5@2.2.3)
       '@visulima/package': 5.0.43(ini@7.0.0)
       '@visulima/path': 3.1.0
       debug: 4.4.3(supports-color@7.2.0)
@@ -1941,7 +1941,7 @@ snapshots:
       ini: 7.0.0
       json5: 2.2.3
 
-  '@visulima/fs@7.0.0(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)':
+  '@visulima/fs@7.0.1(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)':
     dependencies:
       '@visulima/path': 5.0.0
     optionalDependencies:
@@ -1949,7 +1949,7 @@ snapshots:
       ini: 7.0.0
       json5: 2.2.3
 
-  '@visulima/fs@7.0.0(@visulima/yaml@2.0.0)(ini@7.0.0)(json5@2.2.3)':
+  '@visulima/fs@7.0.1(@visulima/yaml@2.0.0)(ini@7.0.0)(json5@2.2.3)':
     dependencies:
       '@visulima/path': 5.0.0
     optionalDependencies:
