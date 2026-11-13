@@ -1,0 +1,35 @@
+{{- define "section" -}}
+{{ .Count }} file(s) changed.
+{{ range .Files }}
+`{{ .Name }}`
+
+{{ .Fence }}diff
+{{ .Diff }}{{ .Fence }}
+{{ end }}
+{{- if .More }}
+{{ .More }} more file(s) are not shown.
+{{ end }}
+{{- end -}}
+
+{{- template "header" . -}}
+{{- $branch := "the branch" -}}
+{{- with .Refs.Branch }}{{ $branch = printf "`%s`" . }}{{ end -}}
+{{- if not .Changed -}}
+No changes.
+{{ else if not .Split -}}
+{{ template "section" .Files }}
+{{- else -}}
+### Not yet generated on {{ $branch }}
+
+{{ if .Pending.Count -}}
+{{ template "section" .Pending }}
+{{- else -}}
+No changes beyond what {{ $branch }} already carries.
+{{ end }}
+### Already generated on {{ $branch }}
+
+{{ template "section" .Generated }}
+{{- end }}
+{{- if .Truncated }}
+The diff is truncated, the full patch `{{ .Patch }}` is in {{ link "the artifacts of the job" (ternary (print .ReportMetadata.JobUrl "/artifacts/browse") "" (ne .ReportMetadata.JobUrl "")) }}.
+{{ end -}}

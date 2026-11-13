@@ -80,14 +80,21 @@ func stage(tl *TaskList) *Task {
 			}
 
 			// the branch of the pipeline can carry output an earlier sync merged into it,
-			// which only a checkout of the same project can tell apart from the rest.
-			if P.Target.Project != P.Project.Path {
+			// which only a checkout of the same project can tell apart from the rest. The
+			// sync branch carries all of it by construction, so its merge request is
+			// described the way a publish describes it.
+			if P.Target.Project != P.Project.Path || syncing() {
 				return nil
 			}
 
-			head, err := git.Repository{Dir: P.Project.Dir}.Head(ctx, t)
-			if err != nil {
-				return err
+			// a job that skipped checking out the working tree, so stale tracked files can
+			// not mix into its artifacts, has no head to resolve, only the commit fetched.
+			head := P.ReportMetadata.CommitSha
+			if head == "" {
+				head, err = git.Repository{Dir: P.Project.Dir}.Head(ctx, t)
+				if err != nil {
+					return err
+				}
 			}
 
 			changed, err := C.Repository.Changed(ctx, t, head, C.Destinations)
@@ -107,7 +114,12 @@ func stage(tl *TaskList) *Task {
 func log(tl *TaskList) *Task {
 	return tl.CreateTask("log").
 		Set(func(_ context.Context, t *Task) error {
-			return markdown.Log(t.Log, render())
+			body, err := render()
+			if err != nil {
+				return err
+			}
+
+			return markdown.Log(t.Log, body)
 		})
 }
 
@@ -128,7 +140,37 @@ func report(tl *TaskList) *Task {
 				return nil
 			}
 
-			body := render()
+			body, err := render()
+			if err != nil {
+				return err
+			}
+
+			// the merge request of the sync branch is the one a publish opened, which
+			// carries the sync in its description instead of in a note next to it.
+			if syncing() {
+				mergeRequests, err := newMergeRequests(gitlab.MergeRequestConfig{
+					Token:  P.MergeRequestReport.Token,
+					ApiUrl: P.MergeRequestReport.ApiUrl,
+				})
+				if err != nil {
+					return err
+				}
+
+				for _, target := range targets {
+					if _, _, err := mergeRequests.UpdateMergeRequest(
+						target.ProjectId,
+						target.MergeRequestIid,
+						&clientgitlab.UpdateMergeRequestOptions{Description: new(body)},
+						clientgitlab.WithContext(ctx),
+					); err != nil {
+						return fmt.Errorf("update GitLab merge request %d: %w", target.MergeRequestIid, err)
+					}
+
+					t.Log.Info(fmt.Sprintf("Merge request description updated: %s!%d", target.ProjectId, target.MergeRequestIid))
+				}
+
+				return nil
+			}
 
 			for _, target := range targets {
 				config := P.MergeRequestReport
@@ -155,18 +197,8 @@ func report(tl *TaskList) *Task {
 
 func publish(tl *TaskList) *Task {
 	return tl.CreateTask("publish").
-		ShouldDisable(func(t *Task) bool {
-			if P.Mode != ModePublish {
-				return true
-			}
-
-			if C.Diff == "" {
-				t.Log.Info("Skipping the publish, since there is nothing to commit.")
-
-				return true
-			}
-
-			return false
+		ShouldDisable(func(_ *Task) bool {
+			return P.Mode != ModePublish
 		}).
 		Set(func(ctx context.Context, t *Task) error {
 			head, err := git.Repository{Dir: P.Project.Dir, Token: P.Token}.Lease(ctx, t, remote(P.Project.Path), P.Project.DefaultBranch)
@@ -178,6 +210,17 @@ func publish(tl *TaskList) *Task {
 			// not a branch that moved.
 			if head == "" {
 				return fmt.Errorf("Can not find the head of the default branch: %s", P.Project.DefaultBranch)
+			}
+
+			if C.Diff == "" {
+				// the newer pipeline cleans up after itself, from what it generated.
+				if head != P.ReportMetadata.CommitSha {
+					t.Log.Info(fmt.Sprintf("Skipping the cleanup, since the commit of the pipeline is no longer the head of %s.", P.Project.DefaultBranch))
+
+					return nil
+				}
+
+				return clean(ctx, t)
 			}
 
 			// a newer pipeline on the default branch publishes the newer result, and this
@@ -195,12 +238,7 @@ func publish(tl *TaskList) *Task {
 				return fmt.Errorf("Can not commit the changes: %w", err)
 			}
 
-			lease, err := C.Repository.Lease(ctx, t, C.Remote, P.Branch)
-			if err != nil {
-				return err
-			}
-
-			if err := C.Repository.Push(ctx, t, C.Remote, P.Branch, lease); err != nil {
+			if err := C.Repository.Push(ctx, t, C.Remote, P.Branch); err != nil {
 				return err
 			}
 
@@ -245,12 +283,54 @@ func commit(t *Task) *Command {
 		})
 }
 
-// Another run creating the merge request between the listing and the creation makes
-// GitLab refuse the second one, which then only has to update what the other opened.
-func upsertMergeRequest(ctx context.Context, t *Task) (*gitlab.MergeRequestResult, error) {
+// The target already matches what the job generates, so the merge request of an
+// earlier sync is told so and closed, and the sync branch it came from is deleted.
+func clean(ctx context.Context, t *Task) error {
+	config := mergeRequestConfig()
+
+	mergeRequests, err := newMergeRequests(config)
+	if err != nil {
+		return err
+	}
+
+	comment, err := renderClose()
+	if err != nil {
+		return err
+	}
+
+	closed, err := gitlab.CloseMergeRequests(ctx, mergeRequests, config, comment)
+	if err != nil {
+		return err
+	}
+
+	for _, iid := range closed {
+		t.Log.Info(fmt.Sprintf("Merge request closed, since there are no changes anymore: %s!%d", P.Target.Project, iid))
+	}
+
+	lease, err := C.Repository.Lease(ctx, t, C.Remote, P.Branch)
+	if err != nil {
+		return err
+	}
+
+	if lease == "" {
+		t.Log.Info("Nothing to clean up, since there is nothing to commit.")
+
+		return nil
+	}
+
+	if err := C.Repository.Delete(ctx, t, C.Remote, P.Branch); err != nil {
+		return err
+	}
+
+	t.Log.Info(fmt.Sprintf("Deleted the sync branch, since there are no changes anymore: %s", P.Branch))
+
+	return nil
+}
+
+func mergeRequestConfig() gitlab.MergeRequestConfig {
 	subject, _, _ := strings.Cut(P.CommitMessage, "\n")
 
-	config := gitlab.MergeRequestConfig{
+	return gitlab.MergeRequestConfig{
 		Token:        P.Token,
 		ApiUrl:       P.MergeRequestReport.ApiUrl,
 		ProjectId:    P.Target.Project,
@@ -260,13 +340,28 @@ func upsertMergeRequest(ctx context.Context, t *Task) (*gitlab.MergeRequestResul
 		Assignees:    P.Assignees,
 		Reviewers:    P.Reviewers,
 	}
+}
+
+// The pipeline of the sync branch itself, which runs for the merge request a publish
+// opened from it.
+func syncing() bool {
+	return P.Target.Project == P.Project.Path && P.Refs.Branch == P.Branch
+}
+
+// Another run creating the merge request between the listing and the creation makes
+// GitLab refuse the second one, which then only has to update what the other opened.
+func upsertMergeRequest(ctx context.Context, t *Task) (*gitlab.MergeRequestResult, error) {
+	config := mergeRequestConfig()
 
 	mergeRequests, err := newMergeRequests(config)
 	if err != nil {
 		return nil, err
 	}
 
-	body := render()
+	body, err := render()
+	if err != nil {
+		return nil, err
+	}
 
 	result, err := gitlab.UpsertMergeRequest(ctx, mergeRequests, config, body)
 	if clientgitlab.HasStatusCode(err, http.StatusConflict) {

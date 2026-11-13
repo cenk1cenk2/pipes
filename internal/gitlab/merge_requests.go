@@ -6,10 +6,11 @@ import (
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 )
 
-// The merge request calls the upsert makes and the user lookup that resolves its
-// assignees and reviewers, narrowed from the client so the bookkeeping can be driven
-// without a GitLab to talk to. Signatures mirror clientgitlab.MergeRequestsService
-// and clientgitlab.UsersService exactly.
+// The merge request calls the upsert and the close make, the note the close leaves
+// and the user lookup that resolves assignees and reviewers, narrowed from the client
+// so the bookkeeping can be driven without a GitLab to talk to. Signatures mirror
+// clientgitlab.MergeRequestsService, clientgitlab.NotesService and
+// clientgitlab.UsersService exactly.
 type MergeRequestsAdapter interface {
 	ListProjectMergeRequests(
 		pid any,
@@ -27,6 +28,12 @@ type MergeRequestsAdapter interface {
 		opt *clientgitlab.UpdateMergeRequestOptions,
 		options ...clientgitlab.RequestOptionFunc,
 	) (*clientgitlab.MergeRequest, *clientgitlab.Response, error)
+	CreateMergeRequestNote(
+		pid any,
+		mergeRequest int64,
+		opt *clientgitlab.CreateMergeRequestNoteOptions,
+		options ...clientgitlab.RequestOptionFunc,
+	) (*clientgitlab.Note, *clientgitlab.Response, error)
 	ListUsers(
 		opt *clientgitlab.ListUsersOptions,
 		options ...clientgitlab.RequestOptionFunc,
@@ -35,6 +42,7 @@ type MergeRequestsAdapter interface {
 
 type mergeRequests struct {
 	clientgitlab.MergeRequestsServiceInterface
+	clientgitlab.NotesServiceInterface
 	clientgitlab.UsersServiceInterface
 }
 
@@ -55,6 +63,7 @@ func NewMergeRequests(config MergeRequestConfig) (MergeRequestsAdapter, error) {
 
 	return &mergeRequests{
 		MergeRequestsServiceInterface: client.MergeRequests,
+		NotesServiceInterface:         client.Notes,
 		UsersServiceInterface:         client.Users,
 	}, nil
 }

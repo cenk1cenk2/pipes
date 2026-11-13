@@ -1,0 +1,12 @@
+{{- define "header" -}}
+{{- $m := .ReportMetadata -}}
+{{- $metadata := list -}}
+{{- if $m.JobName }}{{ $metadata = append $metadata (printf "Job: %s" (link $m.JobName $m.JobUrl)) }}{{ end -}}
+{{- if $m.PipelineId }}{{ $metadata = append $metadata (printf "Pipeline: %s" (link (print "#" $m.PipelineId) $m.PipelineUrl)) }}{{ end -}}
+{{- if $m.CommitShortSha }}{{ $metadata = append $metadata (printf "Commit: `%s`" $m.CommitShortSha) }}{{ end -}}
+## Sync into `{{ .Target.Project }}@{{ .Target.Branch }}`
+
+{{ with $metadata }}{{ join " | " . }}
+
+{{ end }}
+{{- end -}}
