@@ -66,6 +66,8 @@ type fakeMergeRequests struct {
 	listed   []*clientgitlab.ListProjectMergeRequestsOptions
 	created  []*clientgitlab.CreateMergeRequestOptions
 	updated  []*clientgitlab.UpdateMergeRequestOptions
+	comments map[int64]string
+	closed   []int64
 	users    map[string]int64
 	conflict bool
 }
@@ -121,7 +123,23 @@ func (f *fakeMergeRequests) UpdateMergeRequest(
 ) (*clientgitlab.MergeRequest, *clientgitlab.Response, error) {
 	f.updated = append(f.updated, opt)
 
+	if opt.StateEvent != nil && *opt.StateEvent == "close" {
+		f.closed = append(f.closed, mergeRequest)
+		f.open = slices.DeleteFunc(f.open, func(open *clientgitlab.BasicMergeRequest) bool { return open.IID == mergeRequest })
+	}
+
 	return &clientgitlab.MergeRequest{BasicMergeRequest: clientgitlab.BasicMergeRequest{IID: mergeRequest}}, nil, nil
+}
+
+func (f *fakeMergeRequests) CreateMergeRequestNote(
+	_ any,
+	mergeRequest int64,
+	opt *clientgitlab.CreateMergeRequestNoteOptions,
+	_ ...clientgitlab.RequestOptionFunc,
+) (*clientgitlab.Note, *clientgitlab.Response, error) {
+	f.comments[mergeRequest] = *opt.Body
+
+	return &clientgitlab.Note{ID: mergeRequest}, nil, nil
 }
 
 // runs every command for real and records it, with a hook to act on the remote
@@ -211,6 +229,17 @@ var _ = Describe("Git sync tasks", func() {
 		return sha
 	}
 
+	// a newer commit lands on the default branch after the pipeline started.
+	advance := func() {
+		GinkgoHelper()
+
+		newer := filepath.Join(GinkgoT().TempDir(), "newer")
+		invoke(base, "clone", "--quiet", "--branch", "main", remote("group/project"), newer)
+		write(filepath.Join(newer, "README.md"), "newer")
+		invoke(newer, "commit", "--quiet", "--all", "--message", "newer")
+		invoke(newer, "push", "--quiet", "origin", "main")
+	}
+
 	BeforeEach(func() {
 		// a git hook runs with the variables that locate the repository it fired in,
 		// which every git call of a spec would otherwise act on instead of its own.
@@ -235,7 +264,7 @@ var _ = Describe("Git sync tasks", func() {
 
 		runner = &passthrough{}
 		notes = &fakeNotes{bodies: map[int64]string{}}
-		mergeRequests = &fakeMergeRequests{}
+		mergeRequests = &fakeMergeRequests{comments: map[int64]string{}}
 
 		previousNotes, previousMergeRequests := newNotes, newMergeRequests
 		newNotes = func(_ gitlab.MergeRequestReportConfig) (gitlab.NotesAdapter, error) { return notes, nil }
@@ -331,6 +360,7 @@ var _ = Describe("Git sync tasks", func() {
 			p := pipe(ModeReport)
 			p.Refs.Branch = "feature"
 			p.MergeRequestReport.MergeRequestIid = 7
+			p.ReportMetadata.CommitSha = invoke(checkout, "rev-parse", "HEAD")
 
 			Expect(run(p)).To(Succeed())
 
@@ -350,6 +380,7 @@ var _ = Describe("Git sync tasks", func() {
 			p := pipe(ModeReport)
 			p.Refs.Branch = "feature"
 			p.MergeRequestReport.MergeRequestIid = 7
+			p.ReportMetadata.CommitSha = invoke(checkout, "rev-parse", "HEAD")
 
 			Expect(run(p)).To(Succeed())
 
@@ -357,6 +388,48 @@ var _ = Describe("Git sync tasks", func() {
 				"### Not yet generated on `feature`\n\nNo changes beyond what `feature` already carries.\n" +
 					"\n### Already generated on `feature`\n\n2 file(s) changed.\n",
 			))
+		})
+
+		// a job that does not check the working tree out only has the commit of the
+		// pipeline fetched, so what the branch carries comes from that commit.
+		It("tells what the branch already generated apart without a checked out working tree", func() {
+			write(filepath.Join(checkout, "out", "kept.txt"), "changed")
+			invoke(checkout, "add", "--all")
+			invoke(checkout, "commit", "--quiet", "--message", "generated")
+			invoke(checkout, "push", "--quiet", "origin", "HEAD:refs/heads/feature")
+
+			bare := filepath.Join(base, "fetched")
+			invoke(base, "init", "--quiet", bare)
+			invoke(bare, "fetch", "--quiet", remote("group/project"), "refs/heads/feature")
+
+			p := pipe(ModeReport)
+			p.Project.Dir = bare
+			p.Refs.Branch = "feature"
+			p.MergeRequestReport.MergeRequestIid = 7
+			p.ReportMetadata.CommitSha = invoke(checkout, "rev-parse", "HEAD")
+
+			Expect(run(p)).To(Succeed())
+
+			Expect(notes.bodies[7]).To(ContainSubstring(
+				"### Not yet generated on `feature`\n\nNo changes beyond what `feature` already carries.\n",
+			))
+		})
+
+		// the merge request of the sync branch is the one a publish opened, whose
+		// description is the report.
+		It("updates the description of the merge request of the sync branch instead of commenting", func() {
+			p := pipe(ModeReport)
+			p.Refs.Branch = p.Branch
+			p.MergeRequestReport.MergeRequestIid = 7
+
+			Expect(run(p)).To(Succeed())
+
+			Expect(notes.bodies).To(BeEmpty())
+			Expect(mergeRequests.updated).To(HaveLen(1))
+			Expect(*mergeRequests.updated[0].Description).To(ContainSubstring("\n2 file(s) changed.\n"))
+			Expect(*mergeRequests.updated[0].Description).To(ContainSubstring("+changed"))
+			Expect(*mergeRequests.updated[0].Description).NotTo(ContainSubstring("###"))
+			Expect(runner.ran("push")).To(BeFalse())
 		})
 
 		It("clones a target in another project with only the destinations", func() {
@@ -426,7 +499,7 @@ var _ = Describe("Git sync tasks", func() {
 		})
 	})
 
-	It("reports no changes and leaves the merge request alone when the target already matches", func() {
+	It("reports no changes and opens nothing when the target already matches", func() {
 		write(filepath.Join(source, "kept.txt"), "kept")
 		write(filepath.Join(source, "removed.txt"), "removed")
 
@@ -438,7 +511,8 @@ var _ = Describe("Git sync tasks", func() {
 		Expect(notes.bodies[7]).To(ContainSubstring("No changes."))
 		Expect(runner.ran("commit")).To(BeFalse())
 		Expect(runner.ran("push")).To(BeFalse())
-		Expect(mergeRequests.listed).To(BeEmpty())
+		Expect(mergeRequests.created).To(BeEmpty())
+		Expect(mergeRequests.comments).To(BeEmpty())
 	})
 
 	Describe("publish", func() {
@@ -483,9 +557,7 @@ var _ = Describe("Git sync tasks", func() {
 			Expect(*mergeRequests.updated[0].Description).To(ContainSubstring("+changed again"))
 		})
 
-		// another run pushing between the lease and the push moves the branch off the
-		// lease, and what that run pushed is what has to survive.
-		It("refuses to overwrite a branch another run pushed to in the meantime", func() {
+		It("force pushes over whatever another run pushed to the branch in the meantime", func() {
 			p := pipe(ModePublish)
 			racer := filepath.Join(GinkgoT().TempDir(), "racer")
 
@@ -500,10 +572,57 @@ var _ = Describe("Git sync tasks", func() {
 				invoke(racer, "push", "--quiet", "origin", "HEAD:"+p.Branch)
 			}
 
-			Expect(run(p)).To(MatchError(ContainSubstring("Can not push the branch")))
+			Expect(run(p)).To(Succeed())
 
-			Expect(head("group/project", p.Branch)).To(Equal(invoke(racer, "rev-parse", "HEAD")))
-			Expect(mergeRequests.created).To(BeEmpty())
+			pushed := head("group/project", p.Branch)
+			Expect(pushed).NotTo(Equal(invoke(racer, "rev-parse", "HEAD")))
+			invoke(checkout, "fetch", "--quiet", "origin", p.Branch)
+			Expect(invoke(checkout, "show", "FETCH_HEAD:out/kept.txt")).To(Equal("changed"))
+			Expect(mergeRequests.created).To(HaveLen(1))
+		})
+
+		Describe("once the target already matches", func() {
+			// an earlier run left its branch and merge request behind, which this run finds.
+			published := func() {
+				GinkgoHelper()
+
+				Expect(run(pipe(ModePublish))).To(Succeed())
+				Expect(head("group/project", "sync/group-project-generate")).NotTo(BeEmpty())
+
+				write(filepath.Join(source, "kept.txt"), "kept")
+				write(filepath.Join(source, "removed.txt"), "removed")
+				*C = Ctx{}
+				runner = &passthrough{}
+			}
+
+			It("comments on and closes the merge request and deletes the sync branch", func() {
+				published()
+
+				Expect(run(pipe(ModePublish))).To(Succeed())
+
+				Expect(mergeRequests.closed).To(Equal([]int64{1}))
+				Expect(mergeRequests.comments[1]).To(Equal(
+					"## Sync into `group/project@next`\n\nJob: generate\n\n" +
+						"No changes. `group/project@next` already matches what the job generates, " +
+						"so this merge request is closed and `sync/group-project-generate` is deleted.\n",
+				))
+				Expect(head("group/project", "sync/group-project-generate")).To(BeEmpty())
+				Expect(head("group/project", "next")).NotTo(BeEmpty())
+				Expect(runner.ran("commit")).To(BeFalse())
+			})
+
+			It("leaves the cleanup to the newer pipeline once the commit is no longer the head", func() {
+				published()
+
+				p := pipe(ModePublish)
+				advance()
+
+				Expect(run(p)).To(Succeed())
+
+				Expect(mergeRequests.closed).To(BeEmpty())
+				Expect(mergeRequests.comments).To(BeEmpty())
+				Expect(head("group/project", "sync/group-project-generate")).NotTo(BeEmpty())
+			})
 		})
 
 		It("opens the merge request with the configured assignees and reviewers", func() {
@@ -532,8 +651,8 @@ var _ = Describe("Git sync tasks", func() {
 
 		It("fails the publish once the commit of the pipeline is no longer the head of the default branch", func() {
 			p := pipe(ModePublish)
-			p.ReportMetadata.CommitSha = strings.Repeat("0", 40)
 			p.MergeRequestReport.MergeRequestIid = 7
+			advance()
 
 			Expect(run(p)).To(MatchError(ContainSubstring("no longer the head")))
 
@@ -567,7 +686,7 @@ var _ = Describe("Git sync tasks", func() {
 				Expect(*mergeRequests.created[0].Description).NotTo(ContainSubstring("###"))
 			})
 
-			It("publishes nothing once the merged merge request regenerates unchanged", func() {
+			It("publishes nothing and deletes the sync branch once the merged merge request regenerates unchanged", func() {
 				first := self()
 				first.MergeRequestReport.Enabled = false
 
@@ -578,7 +697,7 @@ var _ = Describe("Git sync tasks", func() {
 
 				*C = Ctx{}
 				runner = &passthrough{}
-				mergeRequests = &fakeMergeRequests{}
+				mergeRequests = &fakeMergeRequests{comments: map[int64]string{}}
 
 				second := self()
 				second.MergeRequestReport.MergeRequestIid = 7
@@ -587,13 +706,14 @@ var _ = Describe("Git sync tasks", func() {
 
 				Expect(notes.bodies[7]).To(ContainSubstring("No changes."))
 				Expect(runner.ran("commit")).To(BeFalse())
-				Expect(runner.ran("push")).To(BeFalse())
-				Expect(mergeRequests.listed).To(BeEmpty())
+				Expect(runner.ran("push", "--force")).To(BeFalse())
+				Expect(mergeRequests.created).To(BeEmpty())
+				Expect(head("group/project", second.Branch)).To(BeEmpty())
 			})
 
 			It("fails the publish once a newer commit landed on the branch the pipeline runs on", func() {
 				p := self()
-				p.ReportMetadata.CommitSha = strings.Repeat("0", 40)
+				advance()
 
 				Expect(run(p)).To(MatchError(ContainSubstring("no longer the head")))
 

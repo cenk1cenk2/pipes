@@ -234,30 +234,38 @@ var _ = Describe("Repository", func() {
 			run(repository.Dir, "commit", "--quiet", "--all", "--message", content)
 		}
 
-		It("creates the branch on an empty lease", func(ctx SpecContext) {
+		It("creates a branch the remote does not have", func(ctx SpecContext) {
 			repository := clone(ctx, "out")
 			commit(repository, "first")
 
-			Expect(repository.Push(ctx, fixtures.Task(), remote, "sync/branch", "")).To(Succeed())
+			Expect(repository.Push(ctx, fixtures.Task(), remote, "sync/branch")).To(Succeed())
 			Expect(repository.Lease(ctx, fixtures.Task(), remote, "sync/branch")).
 				To(Equal(run(repository.Dir, "rev-parse", "HEAD")))
 		})
 
-		// another run pushing in between moves the branch off the lease, and its result
-		// is the one that has to survive.
-		It("refuses to overwrite a branch that moved off the lease", func(ctx SpecContext) {
+		// the second commit does not descend from the first, so only a force push lands it.
+		It("overwrites whatever the branch carried before", func(ctx SpecContext) {
 			first := clone(ctx, "out")
 			commit(first, "first")
-			Expect(first.Push(ctx, fixtures.Task(), remote, "sync/branch", "")).To(Succeed())
+			Expect(first.Push(ctx, fixtures.Task(), remote, "sync/branch")).To(Succeed())
 
 			second := clone(ctx, "out")
 			commit(second, "second")
-			Expect(second.Push(ctx, fixtures.Task(), remote, "sync/branch", "")).NotTo(Succeed())
+			Expect(second.Push(ctx, fixtures.Task(), remote, "sync/branch")).To(Succeed())
 
-			lease, err := second.Lease(ctx, fixtures.Task(), remote, "sync/branch")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(second.Push(ctx, fixtures.Task(), remote, "sync/branch", lease)).To(Succeed())
+			Expect(second.Lease(ctx, fixtures.Task(), remote, "sync/branch")).
+				To(Equal(run(second.Dir, "rev-parse", "HEAD")))
 		})
+	})
+
+	It("deletes the branch from the remote", func(ctx SpecContext) {
+		repository := clone(ctx, "out")
+		Expect(repository.Push(ctx, fixtures.Task(), remote, "sync/branch")).To(Succeed())
+
+		Expect(repository.Delete(ctx, fixtures.Task(), remote, "sync/branch")).To(Succeed())
+
+		Expect(repository.Lease(ctx, fixtures.Task(), remote, "sync/branch")).To(BeEmpty())
+		Expect(repository.Lease(ctx, fixtures.Task(), remote, "next")).NotTo(BeEmpty())
 	})
 
 	Describe("credentials", func() {
@@ -278,7 +286,8 @@ var _ = Describe("Repository", func() {
 			Expect(repository.Clone(ctx, t, remote, "next", []string{"out"})).To(MatchError(Not(ContainSubstring("job-secret"))))
 			_, err := repository.Lease(ctx, t, remote, "sync/branch")
 			Expect(err).To(HaveOccurred())
-			Expect(repository.Push(ctx, t, remote, "sync/branch", "")).NotTo(Succeed())
+			Expect(repository.Push(ctx, t, remote, "sync/branch")).NotTo(Succeed())
+			Expect(repository.Delete(ctx, t, remote, "sync/branch")).NotTo(Succeed())
 
 			Expect(runner.Invocations()).To(BeEmpty())
 		})
@@ -310,13 +319,14 @@ var _ = Describe("Repository", func() {
 		Expect(err).NotTo(HaveOccurred())
 		_, err = repository.Lease(ctx, t, "origin", "sync/branch")
 		Expect(err).NotTo(HaveOccurred())
-		Expect(repository.Push(ctx, t, "origin", "sync/branch", "")).To(Succeed())
+		Expect(repository.Push(ctx, t, "origin", "sync/branch")).To(Succeed())
+		Expect(repository.Delete(ctx, t, "origin", "sync/branch")).To(Succeed())
 		Expect(repository.Stage(ctx, t, []string{"out"})).To(Succeed())
 		Expect(repository.Patch(ctx, t, filepath.Join(GinkgoT().TempDir(), "changes.patch"))).To(Succeed())
 
 		encoded := base64.StdEncoding.EncodeToString([]byte("oauth2:" + token))
 		invocations := runner.Invocations()
-		Expect(invocations).To(HaveLen(8))
+		Expect(invocations).To(HaveLen(9))
 
 		for _, invocation := range invocations {
 			Expect(invocation.Name).To(Equal("git"))

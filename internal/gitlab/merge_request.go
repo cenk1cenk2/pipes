@@ -35,7 +35,8 @@ func (r MergeRequestResult) Action() string {
 
 // GitLab allows a single open merge request per source and target branch pair, so
 // the pair alone identifies the merge request to update. A merged or closed one is
-// never listed and gets a fresh merge request instead of an update.
+// never listed and gets a fresh merge request instead of an update. An update
+// replaces the title and the description, so both always describe the latest run.
 //
 // Configured assignees and reviewers replace whatever the merge request has on every
 // run, while an empty list leaves them as they are.
@@ -73,6 +74,7 @@ func UpsertMergeRequest(
 			config.ProjectId,
 			existing[0].IID,
 			&clientgitlab.UpdateMergeRequestOptions{
+				Title:       new(config.Title),
 				Description: new(description),
 				AssigneeIDs: assignees,
 				ReviewerIDs: reviewers,
@@ -110,6 +112,53 @@ func UpsertMergeRequest(
 		WebUrl:          created.WebURL,
 		Created:         true,
 	}, nil
+}
+
+// Leaves the comment on every merge request open from the source onto the target
+// branch and closes it, and returns the ones it closed.
+func CloseMergeRequests(
+	ctx context.Context,
+	mergeRequests MergeRequestsAdapter,
+	config MergeRequestConfig,
+	comment string,
+) ([]int64, error) {
+	existing, _, err := mergeRequests.ListProjectMergeRequests(
+		config.ProjectId,
+		&clientgitlab.ListProjectMergeRequestsOptions{
+			State:        new("opened"),
+			SourceBranch: new(config.SourceBranch),
+			TargetBranch: new(config.TargetBranch),
+		},
+		clientgitlab.WithContext(ctx),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("list GitLab merge requests: %w", err)
+	}
+
+	closed := []int64{}
+	for _, mergeRequest := range existing {
+		if _, _, err := mergeRequests.CreateMergeRequestNote(
+			config.ProjectId,
+			mergeRequest.IID,
+			&clientgitlab.CreateMergeRequestNoteOptions{Body: new(comment)},
+			clientgitlab.WithContext(ctx),
+		); err != nil {
+			return nil, fmt.Errorf("comment on GitLab merge request %d: %w", mergeRequest.IID, err)
+		}
+
+		if _, _, err := mergeRequests.UpdateMergeRequest(
+			config.ProjectId,
+			mergeRequest.IID,
+			&clientgitlab.UpdateMergeRequestOptions{StateEvent: new("close")},
+			clientgitlab.WithContext(ctx),
+		); err != nil {
+			return nil, fmt.Errorf("close GitLab merge request %d: %w", mergeRequest.IID, err)
+		}
+
+		closed = append(closed, mergeRequest.IID)
+	}
+
+	return closed, nil
 }
 
 // GitLab matches the username exactly, so anything but a hit is a username that does

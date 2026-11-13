@@ -4,13 +4,13 @@
 package terraform
 
 import (
-	"bytes"
 	"cmp"
 	_ "embed"
-	"fmt"
 	"slices"
 	"strings"
 	"text/template"
+
+	. "github.com/cenk1cenk2/plumber/v7"
 )
 
 //go:embed assets/report.md.gotmpl
@@ -161,19 +161,12 @@ type (
 )
 
 func RenderReport(report Report, layout DiffLayout) (string, error) {
-	tmpl, err := template.New("report.md.gotmpl").
-		Funcs(template.FuncMap{"cell": cell}).
-		Parse(reportTemplate)
+	body, err := InlineTemplate(reportTemplate, newReportView(report, layout), template.FuncMap{"cell": cell})
 	if err != nil {
-		return "", fmt.Errorf("parse report template: %w", err)
+		return "", err
 	}
 
-	var body bytes.Buffer
-	if err := tmpl.Execute(&body, newReportView(report, layout)); err != nil {
-		return "", fmt.Errorf("render report template: %w", err)
-	}
-
-	return strings.TrimRight(body.String(), "\n") + "\n", nil
+	return strings.TrimRight(body, "\n") + "\n", nil
 }
 
 func newReportView(report Report, layout DiffLayout) reportView {

@@ -11,6 +11,15 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
+func rendered() string {
+	GinkgoHelper()
+
+	body, err := render()
+	Expect(err).NotTo(HaveOccurred())
+
+	return body
+}
+
 var _ = Describe("Report", func() {
 	readFixture := func(name string) string {
 		GinkgoHelper()
@@ -38,7 +47,7 @@ var _ = Describe("Report", func() {
 
 	It("points back at the job and the pipeline", func() {
 		Expect(
-			render(),
+			rendered(),
 		).To(ContainSubstring("Job: [generate](https://gitlab.test/group/project/-/jobs/1) | Pipeline: [#2](https://gitlab.test/group/project/-/pipelines/2) | Commit: `abcdef01`"))
 	})
 
@@ -48,11 +57,11 @@ var _ = Describe("Report", func() {
 		})
 
 		It("renders every file as a section of its own under its name", func() {
-			Expect(render()).To(Equal(readFixture("files.md")))
+			Expect(rendered()).To(Equal(readFixture("files.md")))
 		})
 
 		It("leaves out the header lines the name above the section already says", func() {
-			body := render()
+			body := rendered()
 
 			Expect(body).NotTo(ContainSubstring("diff --git "))
 			Expect(body).NotTo(MatchRegexp(`(?m)^index `))
@@ -61,20 +70,20 @@ var _ = Describe("Report", func() {
 		})
 
 		It("keeps the rename lines git marks under the name the file ends up with", func() {
-			Expect(render()).To(ContainSubstring(
+			Expect(rendered()).To(ContainSubstring(
 				"\n`system/namespace-legacy.yaml`\n\n```diff\n" +
 					"similarity index 100%\nrename from system/namespace.yaml\nrename to system/namespace-legacy.yaml\n```\n",
 			))
 		})
 
 		It("keeps the binary patch of a binary file under its name", func() {
-			Expect(render()).To(ContainSubstring("\n`system/logo.png`\n\n```diff\nnew file mode 100644\nGIT binary patch\nliteral 10\n"))
+			Expect(rendered()).To(ContainSubstring("\n`system/logo.png`\n\n```diff\nnew file mode 100644\nGIT binary patch\nliteral 10\n"))
 		})
 
 		// a context line of a changed markdown file is indented by a single space, which
 		// still closes a fence of the same length.
 		It("fences the diff of a file longer than any fence it carries", func() {
-			Expect(render()).To(ContainSubstring("\n`README.md`\n\n`````diff\n@@ -1,5 +1,5 @@\n"))
+			Expect(rendered()).To(ContainSubstring("\n`README.md`\n\n`````diff\n@@ -1,5 +1,5 @@\n"))
 		})
 	})
 
@@ -90,11 +99,11 @@ var _ = Describe("Report", func() {
 		})
 
 		It("shows the files that fit, cuts the next one at a line and counts the rest", func() {
-			Expect(render()).To(Equal(readFixture("cap.md")))
+			Expect(rendered()).To(Equal(readFixture("cap.md")))
 		})
 
 		It("points at the full patch in the artifacts of the job", func() {
-			Expect(render()).To(HaveSuffix(
+			Expect(rendered()).To(HaveSuffix(
 				"\n2 more file(s) are not shown.\n" +
 					"\nThe diff is truncated, the full patch `git-sync.patch` is in [the artifacts of the job](https://gitlab.test/group/project/-/jobs/1/artifacts/browse).\n",
 			))
@@ -114,7 +123,7 @@ var _ = Describe("Report", func() {
 				C.Diff = diff
 				C.Pending = pending
 
-				Expect(render()).To(HaveSuffix(expected))
+				Expect(rendered()).To(HaveSuffix(expected))
 			},
 			Entry("leading with what the branch still lacks", a+b, map[string]bool{"b": true},
 				"### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`b`\n\n```diff\n+b\n```\n"+
@@ -145,8 +154,8 @@ var _ = Describe("Report", func() {
 			C.Diff = a + b
 			C.Pending = map[string]bool{"b": true}
 
-			Expect(render()).To(ContainSubstring("### Not yet generated on the branch\n"))
-			Expect(render()).To(ContainSubstring("### Already generated on the branch\n"))
+			Expect(rendered()).To(ContainSubstring("### Not yet generated on the branch\n"))
+			Expect(rendered()).To(ContainSubstring("### Already generated on the branch\n"))
 		})
 
 		Context("past the limit", func() {
@@ -163,13 +172,13 @@ var _ = Describe("Report", func() {
 			It("gives what the branch lacks the limit first and counts the rest of each group", func() {
 				C.Pending = map[string]bool{"many/file-1.yaml": true}
 
-				Expect(render()).To(Equal(readFixture("cap-groups.md")))
+				Expect(rendered()).To(Equal(readFixture("cap-groups.md")))
 			})
 
 			It("shows nothing of what the branch already generated once what it lacks is cut", func() {
 				C.Pending = map[string]bool{"many/file-1.yaml": true, "many/file-2.yaml": true, "many/file-3.yaml": true}
 
-				body := render()
+				body := rendered()
 
 				Expect(body).To(ContainSubstring("\n### Already generated on `feature`\n\n2 file(s) changed.\n\n2 more file(s) are not shown.\n"))
 				Expect(body).NotTo(ContainSubstring("`many/file-4.yaml`"))
@@ -179,7 +188,7 @@ var _ = Describe("Report", func() {
 			It("points at the full patch once only what the branch already generated is cut", func() {
 				C.Pending = map[string]bool{"many/file-1.yaml": true}
 
-				body := render()
+				body := rendered()
 
 				Expect(body).To(ContainSubstring("### Not yet generated on `feature`\n\n1 file(s) changed.\n\n`many/file-1.yaml`\n"))
 				Expect(
@@ -194,7 +203,7 @@ var _ = Describe("Report", func() {
 			line := "+" + strings.Repeat("x", 99) + "\n"
 			C.Diff = "diff --git a/a b/a\n" + strings.Repeat(line, reportDiffLimit/len(line)+10) + "diff --git a/b b/b\n+b\n"
 
-			body := render()
+			body := rendered()
 
 			Expect(len(body)).To(BeNumerically("<", 1_000_000))
 			Expect(body).To(ContainSubstring(line + "```\n"))
@@ -205,7 +214,7 @@ var _ = Describe("Report", func() {
 		It("counts the sections of many small files against the limit", func() {
 			C.Diff = strings.Repeat("diff --git a/file b/file\n+x\n", reportDiffLimit/16)
 
-			body := render()
+			body := rendered()
 
 			Expect(len(body)).To(BeNumerically("<", 1_000_000))
 			Expect(body).To(MatchRegexp(`\n\d+ more file\(s\) are not shown\.\n`))

@@ -80,6 +80,17 @@ func (f *fakeMergeRequests) CreateMergeRequest(
 	}, nil, nil
 }
 
+func (f *fakeMergeRequests) CreateMergeRequestNote(
+	_ any,
+	_ int64,
+	_ *clientgitlab.CreateMergeRequestNoteOptions,
+	_ ...clientgitlab.RequestOptionFunc,
+) (*clientgitlab.Note, *clientgitlab.Response, error) {
+	Fail("the upsert never comments")
+
+	return nil, nil, nil
+}
+
 func (f *fakeMergeRequests) UpdateMergeRequest(
 	_ any,
 	mergeRequest int64,
@@ -142,7 +153,7 @@ var _ = Describe("Merge request upsert", func() {
 		Expect(mergeRequests.updated).To(BeEmpty())
 	})
 
-	It("updates the description of the open merge request", func() {
+	It("updates the title and the description of the open merge request", func() {
 		mergeRequests.open = []*clientgitlab.BasicMergeRequest{mergeRequest(7, "opened")}
 
 		result, err := upsert()
@@ -151,6 +162,7 @@ var _ = Describe("Merge request upsert", func() {
 		Expect(result.Created).To(BeFalse())
 		Expect(result.Action()).To(Equal("updated"))
 		Expect(mergeRequests.updated).To(HaveKey(int64(7)))
+		Expect(*mergeRequests.updated[7].Title).To(Equal(config.Title))
 		Expect(*mergeRequests.updated[7].Description).To(Equal("sync body"))
 		Expect(mergeRequests.created).To(BeEmpty())
 	})

@@ -2,13 +2,24 @@ package sync
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 
+	. "github.com/cenk1cenk2/plumber/v7"
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+)
+
+var (
+	//go:embed assets/header.md.gotmpl
+	headerTemplate string
+	//go:embed assets/report.md.gotmpl
+	reportTemplate string
+	//go:embed assets/close.md.gotmpl
+	closeTemplate string
 )
 
 // GitLab refuses a note or a description past a million characters, and the rest of
@@ -28,33 +39,34 @@ type reportTarget struct {
 	MergeRequestIid int64
 }
 
-func render() string {
-	body := &strings.Builder{}
-
-	fmt.Fprintf(body, "## Sync into `%s@%s`\n\n", P.Target.Project, P.Target.Branch)
-
-	metadata := []string{}
-	if m := P.ReportMetadata; m.JobName != "" {
-		metadata = append(metadata, fmt.Sprintf("Job: %s", link(m.JobName, m.JobUrl)))
+type (
+	// What the report and the close templates render: the pipe, with the changes split
+	// into the sections the limit lets through.
+	reportView struct {
+		*Pipe
+		Changed   bool
+		Split     bool
+		Files     sectionView
+		Pending   sectionView
+		Generated sectionView
+		Truncated bool
 	}
 
-	if m := P.ReportMetadata; m.PipelineId != "" {
-		metadata = append(metadata, fmt.Sprintf("Pipeline: %s", link("#"+m.PipelineId, m.PipelineUrl)))
+	sectionView struct {
+		Count int
+		Files []fileView
+		More  int
 	}
 
-	if m := P.ReportMetadata; m.CommitShortSha != "" {
-		metadata = append(metadata, fmt.Sprintf("Commit: `%s`", m.CommitShortSha))
+	fileView struct {
+		Name  string
+		Diff  string
+		Fence string
 	}
+)
 
-	if len(metadata) > 0 {
-		fmt.Fprintf(body, "%s\n\n", strings.Join(metadata, " | "))
-	}
-
-	if C.Diff == "" {
-		body.WriteString("No changes.\n")
-
-		return body.String()
-	}
+func render() (string, error) {
+	view := reportView{Pipe: P, Changed: C.Diff != ""}
 
 	files := []string{}
 	for diff := C.Diff; diff != ""; {
@@ -79,51 +91,40 @@ func render() string {
 		}
 	}
 
-	truncated := false
 	if len(generated) == 0 {
-		_, truncated = sections(body, files, reportDiffLimit)
+		view.Files, _, view.Truncated = sections(files, reportDiffLimit)
 	} else {
-		branch := "the branch"
-		if P.Refs.Branch != "" {
-			branch = fmt.Sprintf("`%s`", P.Refs.Branch)
-		}
-
 		// what the branch still lacks is what the next sync brings, so it leads and gets
 		// the limit first, while what the branch already carries only gets the rest.
-		limit := reportDiffLimit
-		fmt.Fprintf(body, "### Not yet generated on %s\n\n", branch)
-		if len(pending) == 0 {
-			fmt.Fprintf(body, "No changes beyond what %s already carries.\n", branch)
-		} else {
-			limit, truncated = sections(body, pending, limit)
-		}
+		view.Split = true
 
-		fmt.Fprintf(body, "\n### Already generated on %s\n\n", branch)
-		_, cut := sections(body, generated, limit)
-		truncated = truncated || cut
+		var limit int
+		var cut bool
+		view.Pending, limit, view.Truncated = sections(pending, reportDiffLimit)
+		view.Generated, _, cut = sections(generated, limit)
+		view.Truncated = view.Truncated || cut
 	}
 
-	if truncated {
-		artifacts := "the artifacts of the job"
-		if P.ReportMetadata.JobUrl != "" {
-			artifacts = link(artifacts, P.ReportMetadata.JobUrl+"/artifacts/browse")
-		}
-
-		fmt.Fprintf(body, "\nThe diff is truncated, the full patch `%s` is in %s.\n", P.Patch, artifacts)
-	}
-
-	return body.String()
+	return template(reportTemplate, view)
 }
 
-// Renders the files as one section each within the limit, and returns what is left of
+// The comment left on the merge request a sync closes once the target already matches.
+func renderClose() (string, error) {
+	return template(closeTemplate, reportView{Pipe: P})
+}
+
+func template(body string, view reportView) (string, error) {
+	return InlineTemplate(headerTemplate+body, view, map[string]any{"link": link})
+}
+
+// Takes the files into one section each within the limit, and returns what is left of
 // it together with whether any file did not fit. A file cut at a line ends the diff,
 // so nothing after it can make it look complete.
-func sections(body *strings.Builder, files []string, limit int) (int, bool) {
-	fmt.Fprintf(body, "%d file(s) changed.\n", len(files))
+func sections(files []string, limit int) (sectionView, int, bool) {
+	section := sectionView{Count: len(files)}
 
 	// the name and the fences of every file count against the limit as well, which a
 	// diff of many small files would otherwise outgrow.
-	shown := 0
 	cut := false
 	for _, file := range files {
 		name := filename(file)
@@ -144,9 +145,8 @@ func sections(body *strings.Builder, files []string, limit int) (int, bool) {
 			cut = true
 		}
 
-		fmt.Fprintf(body, "\n`%s`\n\n%sdiff\n%s%s\n", name, marker, diff, marker)
+		section.Files = append(section.Files, fileView{Name: name, Diff: diff, Fence: marker})
 		limit -= overhead + len(diff)
-		shown++
 
 		if cut {
 			limit = 0
@@ -155,11 +155,9 @@ func sections(body *strings.Builder, files []string, limit int) (int, bool) {
 		}
 	}
 
-	if more := len(files) - shown; more > 0 {
-		fmt.Fprintf(body, "\n%d more file(s) are not shown.\n", more)
-	}
+	section.More = len(files) - len(section.Files)
 
-	return limit, cut || shown < len(files)
+	return section, limit, cut || section.More > 0
 }
 
 // The name a file carries after the change, which is the one a rename ends up with.

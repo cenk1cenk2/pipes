@@ -87,18 +87,32 @@ func (r Repository) Lease(ctx context.Context, t *Task, remote string, branch st
 	return sha, nil
 }
 
-// Push overwrites the branch only while it still points at the lease, so a run that
-// raced another one fails instead of discarding what the other pushed.
-func (r Repository) Push(ctx context.Context, t *Task, remote string, branch string, lease string) error {
+// Push force pushes the head onto the branch, so the branch always carries what the
+// latest run generated, whatever was pushed to it before.
+func (r Repository) Push(ctx context.Context, t *Task, remote string, branch string) error {
 	if err := ensureNoCredentials(remote); err != nil {
 		return err
 	}
 
 	ref := fmt.Sprintf("refs/heads/%s", branch)
 
-	if err := r.command(t, r.Dir, "push", fmt.Sprintf("--force-with-lease=%s:%s", ref, lease), remote, fmt.Sprintf("HEAD:%s", ref)).
+	if err := r.command(t, r.Dir, "push", "--force", remote, fmt.Sprintf("HEAD:%s", ref)).
 		Run(ctx); err != nil {
 		return fmt.Errorf("Can not push the branch: %s -> %w", branch, err)
+	}
+
+	return nil
+}
+
+// Delete removes the branch from the remote.
+func (r Repository) Delete(ctx context.Context, t *Task, remote string, branch string) error {
+	if err := ensureNoCredentials(remote); err != nil {
+		return err
+	}
+
+	if err := r.command(t, r.Dir, "push", "--delete", remote, fmt.Sprintf("refs/heads/%s", branch)).
+		Run(ctx); err != nil {
+		return fmt.Errorf("Can not delete the branch: %s -> %w", branch, err)
 	}
 
 	return nil
