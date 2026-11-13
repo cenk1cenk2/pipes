@@ -7,7 +7,7 @@ require (
 	github.com/cenk1cenk2/plumber/v7 v7.2.11
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
-	github.com/pulumi/pulumi/sdk/v3 v3.274.1
+	github.com/pulumi/pulumi/sdk/v3 v3.276.0
 	github.com/urfave/cli/v3 v3.14.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
@@ -53,7 +53,6 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.8 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
-	github.com/klauspost/compress v1.19.0 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
