@@ -57,7 +57,9 @@ build:
 
 container:
   stage: container
-  image: quay.io/buildah/stable:latest
+  # Keep the builder on the same compatible release as buildah/Dockerfile.
+  # https://github.com/podman-container-tools/buildah/issues/6910
+  image: quay.io/buildah/stable:v1.43.5
   variables:
     CONTAINER_IMAGE_TAGS: bootstrap
     CONTAINER_LOGIN: >-
@@ -77,8 +79,6 @@ container:
           GO_VERSION: 1.27-alpine
       - CONTAINER_FILE_CONTEXT: ./buildah
         CONTAINER_IMAGE_NAME: docker.io/cenk1cenk2/pipe-buildah
-        CONTAINER_IMAGE_BUILD_ARGS: |-
-          BUILDAH_VERSION: latest
       - CONTAINER_FILE_CONTEXT: ./semantic-release
         CONTAINER_IMAGE_NAME: docker.io/cenk1cenk2/pipe-semantic-release
         CONTAINER_IMAGE_BUILD_ARGS: |-
