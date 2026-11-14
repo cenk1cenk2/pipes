@@ -88,5 +88,53 @@ func NewFlags(opts Options) []cli.Flag {
 			Value:       "",
 			Destination: &opts.Destination.Identifier,
 		},
+
+		&cli.StringFlag{
+			Category: CategoryGitLabMergeRequestReport,
+			Name:     "gitlab-mr-report.branch",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("CI_COMMIT_BRANCH"),
+			),
+			Usage:       "Branch of the pipeline, whose merge requests merged into the commit are reported on when it is the default branch.",
+			Required:    false,
+			Value:       "",
+			Destination: &opts.Destination.Branch,
+		},
+
+		&cli.StringFlag{
+			Category: CategoryGitLabMergeRequestReport,
+			Name:     "gitlab-mr-report.default-branch",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("CI_DEFAULT_BRANCH"),
+			),
+			Usage:       "Default branch of the project, the only branch whose pipelines report on the merge requests merged into the commit.",
+			Required:    false,
+			Value:       "",
+			Destination: &opts.Destination.DefaultBranch,
+		},
+
+		&cli.StringFlag{
+			Category: CategoryGitLabMergeRequestReport,
+			Name:     "gitlab-mr-report.deploy-job",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("GITLAB_MR_REPORT_DEPLOY_JOB"),
+			),
+			Usage:       "Name of the job in the pipeline that applies the plan, which the plan report on the merge requests merged into the commit links to run. Links the pipeline when empty or not found.",
+			Required:    false,
+			Value:       "",
+			Destination: &opts.Destination.DeployJob,
+		},
+
+		&cli.StringFlag{
+			Category: CategoryGitLabMergeRequestReport,
+			Name:     "gitlab-mr-report.plan-job",
+			Sources: cli.NewValueSourceChain(
+				cli.EnvVar("GITLAB_MR_REPORT_PLAN_JOB"),
+			),
+			Usage:       "Name of the job in the pipeline that planned what is applied, which the deploy report on the merge requests merged into the commit links to. Links the pipeline when empty or not found.",
+			Required:    false,
+			Value:       "",
+			Destination: &opts.Destination.PlanJob,
+		},
 	}
 }

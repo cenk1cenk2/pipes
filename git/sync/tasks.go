@@ -270,13 +270,9 @@ func announce(tl *TaskList) *Task {
 				return err
 			}
 
-			listed, _, err := mergeRequests.ListMergeRequestsByCommit(
-				P.MergeRequestReport.ProjectId,
-				P.ReportMetadata.CommitSha,
-				clientgitlab.WithContext(ctx),
-			)
+			listed, err := gitlab.MergedMergeRequests(ctx, mergeRequests, P.MergeRequestReport.ProjectId, P.ReportMetadata.CommitSha, P.Project.DefaultBranch)
 			if err != nil {
-				return fmt.Errorf("list GitLab merge requests of the commit %s: %w", P.ReportMetadata.CommitSha, err)
+				return err
 			}
 
 			body, err := renderMerged()
@@ -287,7 +283,7 @@ func announce(tl *TaskList) *Task {
 			// a merged sync merge request is what brought the output in, and is not told
 			// about the sync it already is.
 			for _, mergeRequest := range listed {
-				if mergeRequest.State != "merged" || mergeRequest.TargetBranch != P.Project.DefaultBranch || mergeRequest.SourceBranch == P.Branch {
+				if mergeRequest.SourceBranch == P.Branch {
 					continue
 				}
 

@@ -150,6 +150,10 @@ Plan terraform project.
 | `$CI_PROJECT_ID` | GitLab project id for merge request report notes. | `string` |  |
 | `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `0` |
 | `$GITLAB_MR_REPORT_IDENTIFIER` | Hidden marker identifier for merge request report notes. Defaults to the job name combined with the stack or state under report. | `string` |  |
+| `$CI_COMMIT_BRANCH` | Branch of the pipeline, whose merge requests merged into the commit are reported on when it is the default branch. | `string` |  |
+| `$CI_DEFAULT_BRANCH` | Default branch of the project, the only branch whose pipelines report on the merge requests merged into the commit. | `string` |  |
+| `$GITLAB_MR_REPORT_DEPLOY_JOB` | Name of the job in the pipeline that applies the plan, which the plan report on the merge requests merged into the commit links to run. Links the pipeline when empty or not found. | `string` |  |
+| `$GITLAB_MR_REPORT_PLAN_JOB` | Name of the job in the pipeline that planned what is applied, which the deploy report on the merge requests merged into the commit links to. Links the pipeline when empty or not found. | `string` |  |
 
 **GitLab Pipeline**
 
@@ -246,6 +250,38 @@ Apply terraform project.
 | Flag / Environment | Description | Type | Default |
 | --- | --- | --- | --- |
 | `$TERRAFORM_LOG_LEVEL`<br/>`$TF_LOG_LEVEL`<br/>`$TF_LOG` | Terraform log level. | `string`<br/>`format(enum("trace", "debug", "info", "warn", "error"))` |  |
+
+</details>
+
+<details>
+<summary>GitLab Merge Request Report</summary>
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$GITLAB_MR_REPORT_ENABLED` | Enable GitLab merge request report note on the given merge request. | `bool` | `false` |
+| `$GL_PIPES_TOKEN` | GitLab API token for merge request report notes. | `string` |  |
+| `$CI_API_V4_URL` | GitLab API URL for merge request report notes. | `string` |  |
+| `$CI_PROJECT_ID` | GitLab project id for merge request report notes. | `string` |  |
+| `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `0` |
+| `$GITLAB_MR_REPORT_IDENTIFIER` | Hidden marker identifier for merge request report notes. Defaults to the job name combined with the stack or state under report. | `string` |  |
+| `$CI_COMMIT_BRANCH` | Branch of the pipeline, whose merge requests merged into the commit are reported on when it is the default branch. | `string` |  |
+| `$CI_DEFAULT_BRANCH` | Default branch of the project, the only branch whose pipelines report on the merge requests merged into the commit. | `string` |  |
+| `$GITLAB_MR_REPORT_DEPLOY_JOB` | Name of the job in the pipeline that applies the plan, which the plan report on the merge requests merged into the commit links to run. Links the pipeline when empty or not found. | `string` |  |
+| `$GITLAB_MR_REPORT_PLAN_JOB` | Name of the job in the pipeline that planned what is applied, which the deploy report on the merge requests merged into the commit links to. Links the pipeline when empty or not found. | `string` |  |
+
+</details>
+
+<details>
+<summary>GitLab Pipeline</summary>
+
+| Flag / Environment | Description | Type | Default |
+| --- | --- | --- | --- |
+| `$CI_JOB_NAME` | GitLab CI job name to include in the plan report metadata. | `string` |  |
+| `$CI_JOB_URL` | GitLab CI job URL to include in the plan report metadata. | `string` |  |
+| `$CI_PIPELINE_ID` | GitLab CI pipeline id to include in the plan report metadata. | `string` |  |
+| `$CI_PIPELINE_URL` | GitLab CI pipeline URL to include in the plan report metadata. | `string` |  |
+| `$CI_COMMIT_SHA` | Git commit sha to include in the plan report metadata. | `string` |  |
+| `$CI_COMMIT_SHORT_SHA` | Short git commit sha to include in the plan report metadata. | `string` |  |
 
 </details>
 

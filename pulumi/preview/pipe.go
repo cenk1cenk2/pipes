@@ -44,7 +44,7 @@ func New(p *Plumber) *TaskList {
 				return err
 			}
 
-			C.Report = reportSource()
+			C.Report = ReportSource(*P)
 
 			return nil
 		}).
@@ -55,6 +55,7 @@ func New(p *Plumber) *TaskList {
 				terraform.LogTask(tl, &C.Report).Job(),
 				terraform.SummaryTask(tl, &C.Report).Job(),
 				terraform.MergeRequestReportTask(tl, &C.Report).Job(),
+				terraform.DeployReportTask(tl, &C.Report).Job(),
 			)
 		})
 }

@@ -22,6 +22,8 @@ type Source struct {
 	Cwd           string
 	MergeRequest  gitlab.MergeRequestReportConfig
 	Notes         gitlab.NotesFactory
+	// looks up the merge requests merged into the commit a deploy reports back to.
+	MergeRequests gitlab.MergeRequestsFactory
 	// names what this job reports on, so concurrent report jobs on one merge
 	// request do not overwrite each other's note.
 	Discriminators func() []string

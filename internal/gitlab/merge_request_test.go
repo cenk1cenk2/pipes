@@ -25,6 +25,17 @@ type fakeMergeRequests struct {
 
 var _ MergeRequestsAdapter = (*fakeMergeRequests)(nil)
 
+func (f *fakeMergeRequests) ListPipelineJobs(
+	_ any,
+	_ int64,
+	_ *clientgitlab.ListJobsOptions,
+	_ ...clientgitlab.RequestOptionFunc,
+) ([]*clientgitlab.Job, *clientgitlab.Response, error) {
+	Fail("the upsert and the close never list the jobs of a pipeline")
+
+	return nil, nil, nil
+}
+
 func (f *fakeMergeRequests) ListMergeRequestsByCommit(
 	_ any,
 	_ string,

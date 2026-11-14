@@ -40,6 +40,10 @@ Sync the paths a job generated into a branch of a GitLab project. Replaces every
 | `$CI_PROJECT_ID` | GitLab project id for merge request report notes. | `string` |  |
 | `$CI_MERGE_REQUEST_IID` | GitLab merge request iid for merge request report notes. | `int` | `0` |
 | `$GITLAB_MR_REPORT_IDENTIFIER` | Hidden marker identifier for merge request report notes. Defaults to the job name combined with the stack or state under report. | `string` |  |
+| `$CI_COMMIT_BRANCH` | Branch of the pipeline, whose merge requests merged into the commit are reported on when it is the default branch. | `string` |  |
+| `$CI_DEFAULT_BRANCH` | Default branch of the project, the only branch whose pipelines report on the merge requests merged into the commit. | `string` |  |
+| `$GITLAB_MR_REPORT_DEPLOY_JOB` | Name of the job in the pipeline that applies the plan, which the plan report on the merge requests merged into the commit links to run. Links the pipeline when empty or not found. | `string` |  |
+| `$GITLAB_MR_REPORT_PLAN_JOB` | Name of the job in the pipeline that planned what is applied, which the deploy report on the merge requests merged into the commit links to. Links the pipeline when empty or not found. | `string` |  |
 
 **GitLab Pipeline**
 

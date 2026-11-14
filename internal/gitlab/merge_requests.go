@@ -7,10 +7,11 @@ import (
 )
 
 // The merge request calls the upsert and the close make, the note the close leaves,
-// the user lookup that resolves assignees and reviewers and the merge requests a
-// commit came from, narrowed from the client so the bookkeeping can be driven without
-// a GitLab to talk to. Signatures mirror clientgitlab.MergeRequestsService,
-// clientgitlab.NotesService, clientgitlab.UsersService and clientgitlab.CommitsService
+// the user lookup that resolves assignees and reviewers, the merge requests a commit
+// came from and the jobs of a pipeline, narrowed from the client so the bookkeeping
+// can be driven without a GitLab to talk to. Signatures mirror
+// clientgitlab.MergeRequestsService, clientgitlab.NotesService,
+// clientgitlab.UsersService, clientgitlab.CommitsService and clientgitlab.JobsService
 // exactly.
 type MergeRequestsAdapter interface {
 	ListProjectMergeRequests(
@@ -44,6 +45,12 @@ type MergeRequestsAdapter interface {
 		sha string,
 		options ...clientgitlab.RequestOptionFunc,
 	) ([]*clientgitlab.BasicMergeRequest, *clientgitlab.Response, error)
+	ListPipelineJobs(
+		pid any,
+		pipelineID int64,
+		opts *clientgitlab.ListJobsOptions,
+		options ...clientgitlab.RequestOptionFunc,
+	) ([]*clientgitlab.Job, *clientgitlab.Response, error)
 }
 
 type mergeRequests struct {
@@ -51,6 +58,7 @@ type mergeRequests struct {
 	clientgitlab.NotesServiceInterface
 	clientgitlab.UsersServiceInterface
 	clientgitlab.CommitsServiceInterface
+	clientgitlab.JobsServiceInterface
 }
 
 var _ MergeRequestsAdapter = (*mergeRequests)(nil)
@@ -73,5 +81,6 @@ func NewMergeRequests(config MergeRequestConfig) (MergeRequestsAdapter, error) {
 		NotesServiceInterface:         client.Notes,
 		UsersServiceInterface:         client.Users,
 		CommitsServiceInterface:       client.Commits,
+		JobsServiceInterface:          client.Jobs,
 	}, nil
 }
