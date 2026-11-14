@@ -25,6 +25,16 @@ type fakeMergeRequests struct {
 
 var _ MergeRequestsAdapter = (*fakeMergeRequests)(nil)
 
+func (f *fakeMergeRequests) ListMergeRequestsByCommit(
+	_ any,
+	_ string,
+	_ ...clientgitlab.RequestOptionFunc,
+) ([]*clientgitlab.BasicMergeRequest, *clientgitlab.Response, error) {
+	Fail("the upsert and the close never look a commit up")
+
+	return nil, nil, nil
+}
+
 // answers the username filter the way the API does, with an empty list for a
 // username nobody has.
 func (f *fakeMergeRequests) ListUsers(

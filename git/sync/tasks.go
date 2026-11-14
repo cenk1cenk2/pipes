@@ -242,12 +242,71 @@ func publish(tl *TaskList) *Task {
 				return err
 			}
 
-			result, err := upsertMergeRequest(ctx, t)
+			C.MergeRequest, err = upsertMergeRequest(ctx, t)
 			if err != nil {
 				return err
 			}
 
-			t.Log.Info(fmt.Sprintf("Merge request %s: %s", result.Action(), result.WebUrl))
+			t.Log.Info(fmt.Sprintf("Merge request %s: %s", C.MergeRequest.Action(), C.MergeRequest.WebUrl))
+
+			return nil
+		})
+}
+
+// The merge requests merged into the commit of the pipeline only ever saw the sync of
+// their own branch, so each is told where the sync of the merged result went, in a
+// note of its own next to that report.
+func announce(tl *TaskList) *Task {
+	return tl.CreateTask("announce").
+		ShouldDisable(func(_ *Task) bool {
+			return P.Mode != ModePublish || !P.MergeRequestReport.Enabled || P.MergeRequestReport.ProjectId == ""
+		}).
+		Set(func(ctx context.Context, t *Task) error {
+			mergeRequests, err := newMergeRequests(gitlab.MergeRequestConfig{
+				Token:  P.MergeRequestReport.Token,
+				ApiUrl: P.MergeRequestReport.ApiUrl,
+			})
+			if err != nil {
+				return err
+			}
+
+			listed, _, err := mergeRequests.ListMergeRequestsByCommit(
+				P.MergeRequestReport.ProjectId,
+				P.ReportMetadata.CommitSha,
+				clientgitlab.WithContext(ctx),
+			)
+			if err != nil {
+				return fmt.Errorf("list GitLab merge requests of the commit %s: %w", P.ReportMetadata.CommitSha, err)
+			}
+
+			body, err := renderMerged()
+			if err != nil {
+				return err
+			}
+
+			// a merged sync merge request is what brought the output in, and is not told
+			// about the sync it already is.
+			for _, mergeRequest := range listed {
+				if mergeRequest.State != "merged" || mergeRequest.TargetBranch != P.Project.DefaultBranch || mergeRequest.SourceBranch == P.Branch {
+					continue
+				}
+
+				config := P.MergeRequestReport
+				config.MergeRequestIid = mergeRequest.IID
+				config.Identifier = gitlab.ResolveReportIdentifier(config.Identifier, P.ReportMetadata.JobName, P.Target.Project, P.Target.Branch) + ":merged"
+
+				notes, err := newNotes(config)
+				if err != nil {
+					return err
+				}
+
+				result, err := gitlab.UpsertMergeRequestReport(ctx, notes, config, body)
+				if err != nil {
+					return err
+				}
+
+				t.Log.Info(fmt.Sprintf("Merged merge request note %s: %s!%d -> %d", result.Action(), config.ProjectId, mergeRequest.IID, result.NoteId))
+			}
 
 			return nil
 		})

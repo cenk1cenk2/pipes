@@ -1,0 +1,6 @@
+{{- template "header" . -}}
+{{- with .MergeRequest -}}
+Merged into `{{ $.Project.DefaultBranch }}`, and synced in {{ link (printf "%s!%d" $.Target.Project .MergeRequestIid) .WebUrl }}.
+{{ else -}}
+Merged into `{{ $.Project.DefaultBranch }}` with no changes. `{{ .Target.Project }}@{{ .Target.Branch }}` already matches what the job generates.
+{{ end -}}

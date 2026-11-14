@@ -70,9 +70,21 @@ type fakeMergeRequests struct {
 	closed   []int64
 	users    map[string]int64
 	conflict bool
+	merged   []*clientgitlab.BasicMergeRequest
+	commits  []string
 }
 
 var _ gitlab.MergeRequestsAdapter = (*fakeMergeRequests)(nil)
+
+func (f *fakeMergeRequests) ListMergeRequestsByCommit(
+	_ any,
+	sha string,
+	_ ...clientgitlab.RequestOptionFunc,
+) ([]*clientgitlab.BasicMergeRequest, *clientgitlab.Response, error) {
+	f.commits = append(f.commits, sha)
+
+	return f.merged, &clientgitlab.Response{}, nil
+}
 
 func (f *fakeMergeRequests) ListUsers(
 	opt *clientgitlab.ListUsersOptions,
@@ -637,6 +649,62 @@ var _ = Describe("Git sync tasks", func() {
 			Expect(mergeRequests.created).To(HaveLen(1))
 			Expect(*mergeRequests.created[0].AssigneeIDs).To(Equal([]int64{11}))
 			Expect(*mergeRequests.created[0].ReviewerIDs).To(Equal([]int64{13}))
+		})
+
+		Describe("on the merge requests merged into the commit", func() {
+			// only the one merged into the default branch from a branch other than the
+			// sync branch is the change the pipeline publishes.
+			BeforeEach(func() {
+				mergeRequests.merged = []*clientgitlab.BasicMergeRequest{
+					{IID: 5, State: "merged", SourceBranch: "feature", TargetBranch: "main"},
+					{IID: 6, State: "merged", SourceBranch: "sync/group-project-generate", TargetBranch: "main"},
+					{IID: 8, State: "merged", SourceBranch: "feature", TargetBranch: "next"},
+					{IID: 9, State: "opened", SourceBranch: "other", TargetBranch: "main"},
+				}
+			})
+
+			It("links the merge request the publish opened", func() {
+				p := pipe(ModePublish)
+
+				Expect(run(p)).To(Succeed())
+
+				Expect(mergeRequests.commits).To(Equal([]string{p.ReportMetadata.CommitSha}))
+				Expect(notes.bodies).To(HaveLen(1))
+				Expect(notes.bodies[5]).To(Equal(
+					"## Sync into `group/project@next`\n\nJob: generate\n\n" +
+						"Merged into `main`, and synced in [group/project!1](https://gitlab.test/-/merge_requests/1).\n" +
+						"\n<!-- gitlab-pipes:mr-report:generate:group/project:next:merged -->",
+				))
+			})
+
+			It("says there are no changes once the target already matches", func() {
+				write(filepath.Join(source, "kept.txt"), "kept")
+				write(filepath.Join(source, "removed.txt"), "removed")
+
+				Expect(run(pipe(ModePublish))).To(Succeed())
+
+				Expect(notes.bodies).To(HaveLen(1))
+				Expect(notes.bodies[5]).To(HavePrefix(
+					"## Sync into `group/project@next`\n\nJob: generate\n\n" +
+						"Merged into `main` with no changes. `group/project@next` already matches what the job generates.\n",
+				))
+			})
+
+			It("leaves them alone once a newer commit publishes the newer result", func() {
+				p := pipe(ModePublish)
+				advance()
+
+				Expect(run(p)).To(MatchError(ContainSubstring("no longer the head")))
+
+				Expect(mergeRequests.commits).To(BeEmpty())
+				Expect(notes.bodies).To(BeEmpty())
+			})
+
+			It("leaves them alone in report mode", func() {
+				Expect(run(pipe(ModeReport))).To(Succeed())
+
+				Expect(mergeRequests.commits).To(BeEmpty())
+			})
 		})
 
 		It("updates the merge request another run opened between the listing and the creation", func() {

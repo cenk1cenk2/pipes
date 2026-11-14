@@ -20,6 +20,8 @@ var (
 	reportTemplate string
 	//go:embed assets/close.md.gotmpl
 	closeTemplate string
+	//go:embed assets/merged.md.gotmpl
+	mergedTemplate string
 )
 
 // GitLab refuses a note or a description past a million characters, and the rest of
@@ -50,6 +52,9 @@ type (
 		Pending   sectionView
 		Generated sectionView
 		Truncated bool
+		// the merge request a publish opened or updated, which only the note on the
+		// merged merge requests names.
+		MergeRequest *gitlab.MergeRequestResult
 	}
 
 	sectionView struct {
@@ -111,6 +116,11 @@ func render() (string, error) {
 // The comment left on the merge request a sync closes once the target already matches.
 func renderClose() (string, error) {
 	return template(closeTemplate, reportView{Pipe: P})
+}
+
+// The note left on the merge requests merged into the commit a publish ran for.
+func renderMerged() (string, error) {
+	return template(mergedTemplate, reportView{Pipe: P, MergeRequest: C.MergeRequest})
 }
 
 func template(body string, view reportView) (string, error) {
