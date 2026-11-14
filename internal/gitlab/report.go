@@ -21,6 +21,14 @@ type MergeRequestReportConfig struct {
 	ProjectId       string `validate:"required_with=MergeRequestIid"`
 	MergeRequestIid int64  `validate:"omitempty,gt=0"`
 	Identifier      string `validate:"omitempty,printascii,excludes=-->"`
+	// a pipeline of the default branch reports on the merge requests merged into its
+	// commit instead, since it has none of its own.
+	Branch        string
+	DefaultBranch string
+	// the jobs of the pipeline that plan and apply, which the reports on the merged
+	// merge requests link to each other.
+	PlanJob   string
+	DeployJob string
 	// markers of earlier identifier schemes, so a note already posted under one of
 	// them is adopted instead of orphaned next to a duplicate.
 	LegacyIdentifiers []string

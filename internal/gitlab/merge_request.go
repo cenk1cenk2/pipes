@@ -161,6 +161,30 @@ func CloseMergeRequests(
 	return closed, nil
 }
 
+// The merge requests that brought the commit into the target branch, which a pipeline
+// of that branch reports back to once it acted on what they merged.
+func MergedMergeRequests(
+	ctx context.Context,
+	mergeRequests MergeRequestsAdapter,
+	project string,
+	sha string,
+	target string,
+) ([]*clientgitlab.BasicMergeRequest, error) {
+	listed, _, err := mergeRequests.ListMergeRequestsByCommit(project, sha, clientgitlab.WithContext(ctx))
+	if err != nil {
+		return nil, fmt.Errorf("list GitLab merge requests of the commit %s: %w", sha, err)
+	}
+
+	merged := []*clientgitlab.BasicMergeRequest{}
+	for _, mergeRequest := range listed {
+		if mergeRequest.State == "merged" && mergeRequest.TargetBranch == target {
+			merged = append(merged, mergeRequest)
+		}
+	}
+
+	return merged, nil
+}
+
 // GitLab matches the username exactly, so anything but a hit is a username that does
 // not exist and fails the upsert instead of opening the merge request without it.
 func resolveUsers(

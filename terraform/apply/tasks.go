@@ -33,6 +33,6 @@ func apply(tl *TaskList) *Task {
 			return nil
 		}).
 		ShouldRunAfter(func(ctx context.Context, t *Task) error {
-			return t.RunCommandJobAsJobSequence(ctx)
+			return C.Report.Apply(ctx, t, t.RunCommandJobAsJobSequence)
 		})
 }

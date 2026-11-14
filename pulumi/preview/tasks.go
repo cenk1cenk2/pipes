@@ -26,14 +26,16 @@ func pulumiReportDiscriminators() []string {
 	return discriminators
 }
 
-func reportSource() terraform.Source {
-	metadata := P.ReportMetadata
+// ReportSource reads the saved plan back out, for the preview that saved it and the up
+// that applies it alike.
+func ReportSource(p Pipe) terraform.Source {
+	metadata := p.ReportMetadata
 	metadata.Target = stack.P.Stack
 	metadata.Cwd = setup.C.Cwd
 
 	return terraform.Source{
 		Read: func(ctx context.Context, t *Task) (terraform.Report, error) {
-			planPath := P.Plan
+			planPath := p.Plan
 			if !filepath.IsAbs(planPath) {
 				planPath = filepath.Join(setup.C.Cwd, planPath)
 			}
@@ -46,13 +48,14 @@ func reportSource() terraform.Source {
 			return parsePulumiPlanReport(data, readStackState(ctx, t), metadata)
 		},
 		Summary:        terraform.Summarize,
-		SummaryOutput:  P.Summary.Output,
+		SummaryOutput:  p.Summary.Output,
 		Cwd:            setup.C.Cwd,
-		MergeRequest:   P.MergeRequestReport,
+		MergeRequest:   p.MergeRequestReport,
 		Notes:          gitlab.NewNotes,
+		MergeRequests:  gitlab.NewMergeRequests,
 		Discriminators: pulumiReportDiscriminators,
 		Metadata:       metadata,
-		Log:            P.ReportLog,
+		Log:            p.ReportLog,
 	}
 }
 

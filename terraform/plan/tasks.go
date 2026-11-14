@@ -40,21 +40,23 @@ func terraformReportDiscriminators() []string {
 	return discriminators
 }
 
-func reportSource() terraform.Source {
-	metadata := P.ReportMetadata
+// ReportSource reads the saved plan back out, for the plan that saved it and the apply
+// that applies it alike.
+func ReportSource(p Pipe) terraform.Source {
+	metadata := p.ReportMetadata
 	metadata.Target = terraformStateName()
 	metadata.Cwd = setup.C.Cwd
 
 	// terraform show reads the plan back out of the file terraform plan wrote, so
 	// without one there is nothing to summarize.
-	summaryOutput := P.Summary.Output
-	if P.Plan.Output == "" {
+	summaryOutput := p.Summary.Output
+	if p.Plan.Output == "" {
 		summaryOutput = ""
 	}
 
 	return terraform.Source{
 		Read: func(ctx context.Context, t *Task) (terraform.Report, error) {
-			if P.Plan.Output == "" {
+			if p.Plan.Output == "" {
 				return terraform.Report{}, fmt.Errorf("terraform plan output is required for the plan report")
 			}
 
@@ -64,7 +66,7 @@ func reportSource() terraform.Source {
 				"terraform",
 				"show",
 				"-json",
-				P.Plan.Output,
+				p.Plan.Output,
 			).
 				SetDir(setup.C.Cwd).
 				AppendEnvironment(setup.C.Env).
@@ -80,11 +82,12 @@ func reportSource() terraform.Source {
 		Summary:        terraform.Summarize,
 		SummaryOutput:  summaryOutput,
 		Cwd:            setup.C.Cwd,
-		MergeRequest:   P.MergeRequestReport,
+		MergeRequest:   p.MergeRequestReport,
 		Notes:          gitlab.NewNotes,
+		MergeRequests:  gitlab.NewMergeRequests,
 		Discriminators: terraformReportDiscriminators,
 		Metadata:       metadata,
-		Log:            P.ReportLog,
+		Log:            p.ReportLog,
 	}
 }
 

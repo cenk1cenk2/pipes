@@ -76,6 +76,17 @@ type fakeMergeRequests struct {
 
 var _ gitlab.MergeRequestsAdapter = (*fakeMergeRequests)(nil)
 
+func (f *fakeMergeRequests) ListPipelineJobs(
+	_ any,
+	_ int64,
+	_ *clientgitlab.ListJobsOptions,
+	_ ...clientgitlab.RequestOptionFunc,
+) ([]*clientgitlab.Job, *clientgitlab.Response, error) {
+	Fail("a sync never lists the jobs of a pipeline")
+
+	return nil, nil, nil
+}
+
 func (f *fakeMergeRequests) ListMergeRequestsByCommit(
 	_ any,
 	sha string,
