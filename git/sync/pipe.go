@@ -65,6 +65,9 @@ type (
 		// the paths the output still changes against the checkout of the pipeline, and
 		// nil when the target is another project, which the checkout says nothing about.
 		Pending map[string]bool
+		// the merge request a publish opened or updated, and nil when it had nothing to
+		// commit.
+		MergeRequest *gitlab.MergeRequestResult
 	}
 )
 
@@ -140,6 +143,7 @@ func New(p *Plumber) *TaskList {
 				log(tl).Job(),
 				report(tl).Job(),
 				publish(tl).Job(),
+				announce(tl).Job(),
 			)
 		})
 }
