@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
@@ -318,7 +319,9 @@ func commit(t *Task) *Command {
 		}
 	}
 
-	args := []string{"commit", "--quiet", "--message", P.CommitMessage}
+	// the sync branch only exists to be merged, so neither its push nor its merge
+	// request runs a pipeline of its own.
+	args := []string{"commit", "--quiet", "--message", P.CommitMessage, "--message", "[skip ci]"}
 
 	// the one who triggered the generation is credited without being the author, which
 	// stays the identity that opens the merge request.
@@ -403,6 +406,14 @@ func syncing() bool {
 	return P.Target.Project == P.Project.Path && P.Refs.Branch == P.Branch
 }
 
+// GitLab can answer a merge request on a branch pushed a moment ago with a source
+// branch that does not exist yet, until it has processed the push; the specs shorten
+// the wait.
+var (
+	sourceBranchAttempts = 5
+	sourceBranchDelay    = 2 * time.Second
+)
+
 // Another run creating the merge request between the listing and the creation makes
 // GitLab refuse the second one, which then only has to update what the other opened.
 func upsertMergeRequest(ctx context.Context, t *Task) (*gitlab.MergeRequestResult, error) {
@@ -418,12 +429,24 @@ func upsertMergeRequest(ctx context.Context, t *Task) (*gitlab.MergeRequestResul
 		return nil, err
 	}
 
-	result, err := gitlab.UpsertMergeRequest(ctx, mergeRequests, config, body)
-	if clientgitlab.HasStatusCode(err, http.StatusConflict) {
-		t.Log.Warn("Merge request was opened by another run in the meantime, updating it instead.")
+	for attempt := 1; ; attempt++ {
+		result, err := gitlab.UpsertMergeRequest(ctx, mergeRequests, config, body)
+		if clientgitlab.HasStatusCode(err, http.StatusConflict) {
+			t.Log.Warn("Merge request was opened by another run in the meantime, updating it instead.")
 
-		return gitlab.UpsertMergeRequest(ctx, mergeRequests, config, body)
+			return gitlab.UpsertMergeRequest(ctx, mergeRequests, config, body)
+		}
+
+		if attempt >= sourceBranchAttempts || !clientgitlab.HasStatusCode(err, http.StatusBadRequest) || !strings.Contains(err.Error(), "source_branch") {
+			return result, err
+		}
+
+		t.Log.Warn(fmt.Sprintf("GitLab does not know the pushed branch yet, retrying: %s (%d/%d)", P.Branch, attempt, sourceBranchAttempts))
+
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(sourceBranchDelay):
+		}
 	}
-
-	return result, err
 }
