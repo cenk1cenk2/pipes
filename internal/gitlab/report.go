@@ -32,8 +32,6 @@ type MergeRequestReportConfig struct {
 	// markers of earlier identifier schemes, so a note already posted under one of
 	// them is adopted instead of orphaned next to a duplicate.
 	LegacyIdentifiers []string
-	// a report with nothing to say updates its earlier note but never opens a new one.
-	UpdateOnly bool
 }
 
 type MergeRequestReportResult struct {
@@ -43,7 +41,6 @@ type MergeRequestReportResult struct {
 	// set when the note was found under an earlier identifier scheme rather than the
 	// current one, which is the only signal that a marker migration took effect.
 	AdoptedLegacy bool
-	Skipped       bool
 }
 
 // Reads as the past tense of what happened to the note, for the job log.
@@ -53,8 +50,6 @@ func (r MergeRequestReportResult) Action() string {
 		return "created"
 	case r.AdoptedLegacy:
 		return "adopted"
-	case r.Skipped:
-		return "skipped"
 	}
 
 	return "updated"
@@ -183,13 +178,6 @@ func UpsertMergeRequestReport(
 			NoteId:        updated.ID,
 			Identifier:    config.Identifier,
 			AdoptedLegacy: !strings.Contains(note.Body, marker),
-		}, nil
-	}
-
-	if config.UpdateOnly {
-		return &MergeRequestReportResult{
-			Identifier: config.Identifier,
-			Skipped:    true,
 		}, nil
 	}
 

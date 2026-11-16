@@ -33,5 +33,5 @@ func renderOverlay(root string, p *Pipe) OverlayResult {
 
 	y, err := m.AsYaml()
 
-	return OverlayResult{Overlay: root, Yaml: y, DocCount: len(m.Resources()), Err: err}
+	return OverlayResult{Overlay: root, Yaml: y, Resources: m.ToRNodeSlice(), DocCount: len(m.Resources()), Err: err}
 }

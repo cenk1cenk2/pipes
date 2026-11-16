@@ -221,37 +221,4 @@ var _ = Describe("Merge request report upsert", func() {
 		_, err := upsert()
 		Expect(err).To(MatchError(ContainSubstring("create GitLab merge request report note")))
 	})
-
-	Context("update-only", func() {
-		upsert := func() (*MergeRequestReportResult, error) {
-			updateOnly := config
-			updateOnly.UpdateOnly = true
-
-			return UpsertMergeRequestReport(context.Background(), notes, updateOnly, "report body")
-		}
-
-		It("skips the report when no note carries the marker", func() {
-			listing([]*clientgitlab.Note{note(1, "unrelated")})
-
-			result, err := upsert()
-			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Skipped).To(BeTrue())
-			Expect(result.NoteId).To(BeZero())
-			Expect(result.Identifier).To(Equal("plan:cache"))
-			Expect(result.Action()).To(Equal("skipped"))
-			notes.AssertNotCalled(GinkgoT(), "CreateMergeRequestNote", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
-		})
-
-		It("still updates the note already carrying the marker", func() {
-			listing([]*clientgitlab.Note{note(7, "stale\n"+marker)})
-			updating()
-
-			result, err := upsert()
-			Expect(err).NotTo(HaveOccurred())
-			Expect(result.Skipped).To(BeFalse())
-			Expect(result.NoteId).To(Equal(int64(7)))
-			Expect(result.Action()).To(Equal("updated"))
-			Expect(updatedNote).To(Equal(int64(7)))
-		})
-	})
 })
