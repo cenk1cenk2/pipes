@@ -211,6 +211,67 @@ var _ = Describe("Repository", func() {
 		Expect(run(worktree.Dir, "rev-parse", "HEAD")).To(Equal(run(checkout, "rev-parse", "origin/next")))
 	})
 
+	Describe("Detach", func() {
+		var checkout git.Repository
+		var older string
+		var head string
+
+		// a shallow checkout of two commits, which has only the newer one, against a
+		// remote that serves a commit by its sha.
+		BeforeEach(func() {
+			base := GinkgoT().TempDir()
+			bare := filepath.Join(base, "remote.git")
+			seed := filepath.Join(base, "seed")
+
+			run(base, "init", "--quiet", "--bare", "--initial-branch", "next", bare)
+			run(bare, "config", "uploadpack.allowAnySHA1InWant", "true")
+			run(base, "init", "--quiet", "--initial-branch", "next", seed)
+
+			write(filepath.Join(seed, "out", "kept.txt"), "older")
+			run(seed, "add", "--all")
+			run(seed, "commit", "--quiet", "--message", "older")
+			older = run(seed, "rev-parse", "HEAD")
+
+			write(filepath.Join(seed, "out", "kept.txt"), "head")
+			run(seed, "commit", "--quiet", "--all", "--message", "head")
+			head = run(seed, "rev-parse", "HEAD")
+			run(seed, "push", "--quiet", bare, "next")
+
+			checkout = git.Repository{Dir: filepath.Join(base, "checkout")}
+			run(base, "clone", "--quiet", "--depth", "1", "file://"+bare, checkout.Dir)
+
+			command := exec.Command("git", "cat-file", "-e", older+"^{commit}")
+			command.Dir = checkout.Dir
+			Expect(command.Run()).NotTo(Succeed())
+		})
+
+		It("checks out a commit the checkout already has", func(ctx SpecContext) {
+			worktree, err := checkout.Detach(ctx, fixtures.Task(), head, filepath.Join(GinkgoT().TempDir(), "worktree"))
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(run(worktree.Dir, "rev-parse", "HEAD")).To(Equal(head))
+			Expect(read(filepath.Join(worktree.Dir, "out", "kept.txt"))).To(Equal("head"))
+		})
+
+		It("fetches a commit the shallow checkout does not have", func(ctx SpecContext) {
+			worktree, err := checkout.Detach(ctx, fixtures.Task(), older, filepath.Join(GinkgoT().TempDir(), "worktree"))
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(run(worktree.Dir, "rev-parse", "HEAD")).To(Equal(older))
+			Expect(read(filepath.Join(worktree.Dir, "out", "kept.txt"))).To(Equal("older"))
+		})
+
+		It("removes the worktree again", func(ctx SpecContext) {
+			worktree, err := checkout.Detach(ctx, fixtures.Task(), head, filepath.Join(GinkgoT().TempDir(), "worktree"))
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(checkout.Remove(ctx, fixtures.Task(), worktree.Dir)).To(Succeed())
+
+			Expect(worktree.Dir).NotTo(BeADirectory())
+			Expect(run(checkout.Dir, "worktree", "list", "--porcelain")).NotTo(ContainSubstring(worktree.Dir))
+		})
+	})
+
 	Describe("Lease", func() {
 		It("is empty for a branch the remote does not have", func(ctx SpecContext) {
 			repository := clone(ctx, "out")

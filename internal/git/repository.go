@@ -66,6 +66,36 @@ func (r Repository) Worktree(ctx context.Context, t *Task, remote string, branch
 	return Repository{Dir: path, Token: r.Token}, nil
 }
 
+// Detach checks rev out next to the checkout, fetching it only when a shallow
+// checkout does not have it already.
+func (r Repository) Detach(ctx context.Context, t *Task, rev string, path string) (Repository, error) {
+	if err := r.command(t, r.Dir, "cat-file", "-e", fmt.Sprintf("%s^{commit}", rev)).
+		SetLogLevel(LogLevelDebug, LogLevelWarn, LogLevelDebug).
+		Run(ctx); err != nil {
+		if err := r.command(t, r.Dir, "fetch", "--no-tags", "--depth", "1", "origin", rev).
+			Run(ctx); err != nil {
+			return Repository{}, fmt.Errorf("Can not fetch the commit: %s -> %w", rev, err)
+		}
+	}
+
+	if err := r.command(t, r.Dir, "worktree", "add", "--detach", path, rev).
+		Run(ctx); err != nil {
+		return Repository{}, fmt.Errorf("Can not add a worktree for the commit: %s -> %w", rev, err)
+	}
+
+	return Repository{Dir: path, Token: r.Token}, nil
+}
+
+// Remove drops the worktree at path, along with whatever it has not committed.
+func (r Repository) Remove(ctx context.Context, t *Task, path string) error {
+	if err := r.command(t, r.Dir, "worktree", "remove", "--force", path).
+		Run(ctx); err != nil {
+		return fmt.Errorf("Can not remove the worktree: %s -> %w", path, err)
+	}
+
+	return nil
+}
+
 // Lease is the commit the branch points at on the remote, or empty when it does not
 // exist yet, which a push leased on it reads as "must still not exist".
 func (r Repository) Lease(ctx context.Context, t *Task, remote string, branch string) (string, error) {
