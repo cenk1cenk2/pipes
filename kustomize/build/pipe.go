@@ -1,6 +1,7 @@
 package build
 
 import (
+	"cmp"
 	"context"
 
 	. "github.com/cenk1cenk2/plumber/v7"
@@ -19,6 +20,8 @@ type (
 		// the commit the overlays are rendered on again, so the merge request report
 		// shows what the change does to the rendered manifests.
 		DiffBase           string
+		TargetBranchSha    string
+		DiffBaseSha        string
 		MergeRequestReport gitlab.MergeRequestReportConfig
 		ReportMetadata     terraform.Metadata
 		ReportLog          terraform.LogConfig
@@ -53,6 +56,8 @@ func New(p *Plumber) *TaskList {
 			if !P.MergeRequestReport.Enabled {
 				P.MergeRequestReport.MergeRequestIid = 0
 			}
+
+			P.DiffBase = cmp.Or(P.DiffBase, P.TargetBranchSha, P.DiffBaseSha)
 
 			return p.Validate(P)
 		}).

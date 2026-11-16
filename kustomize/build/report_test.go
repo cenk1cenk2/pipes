@@ -64,6 +64,7 @@ var _ = Describe("merge request report", func() {
 	var mergeRequestIid int64
 	var diffBase func() string
 	var logEnabled bool
+	var targetBranchSha string
 
 	git := func(args ...string) string {
 		GinkgoHelper()
@@ -104,6 +105,7 @@ var _ = Describe("merge request report", func() {
 		mergeRequestIid = 7
 		diffBase = func() string { return base }
 		logEnabled = true
+		targetBranchSha = ""
 
 		git("init", "-q", "-b", "main")
 		write("app/kustomization.yaml", "resources:\n  - kept.yaml\n  - removed.yaml\n")
@@ -123,7 +125,10 @@ var _ = Describe("merge request report", func() {
 
 		*P = Pipe{
 			LoadRestrictor: string(LoadRestrictorNone),
-			DiffBase:       diffBase(),
+			// the pipe sees both shas of a detached merge request pipeline, the target
+			// branch one set but empty.
+			TargetBranchSha: targetBranchSha,
+			DiffBaseSha:     diffBase(),
 		}
 		P.ReportLog.Enabled = logEnabled
 		P.MergeRequestReport = gitlab.MergeRequestReportConfig{
@@ -229,6 +234,20 @@ var _ = Describe("merge request report", func() {
 		Expect(notes.created).To(BeEmpty())
 		Expect(notes.updated).To(BeEmpty())
 		Expect(git("worktree", "list", "--porcelain")).NotTo(ContainSubstring("kustomize-base-"))
+	})
+
+	It("diffs a merged results pipeline against the target branch", func() {
+		write("app/kept.yaml", configMap("kept", "after"))
+		target := commit()
+		write("app/kept.yaml", configMap("kept", "later"))
+		commit()
+		targetBranchSha = target
+
+		Expect(run("app")).To(Succeed())
+
+		Expect(notes.created).To(HaveLen(1))
+		Expect(notes.created[0]).To(ContainSubstring("## Rendered manifests against `" + target[:8] + "`"))
+		Expect(notes.created[0]).To(ContainSubstring("-  value: after\n+  value: later\n"))
 	})
 
 	It("stays out of a pipeline that has no base to diff against", func() {

@@ -92,13 +92,34 @@ var Flags = CombineFlags(
 			Name:     "kustomize.build.diff-base",
 			Sources: cli.NewValueSourceChain(
 				cli.EnvVar("KUSTOMIZE_BUILD_DIFF_BASE"),
-				cli.EnvVar("CI_MERGE_REQUEST_TARGET_BRANCH_SHA"),
-				cli.EnvVar("CI_MERGE_REQUEST_DIFF_BASE_SHA"),
 			),
-			Usage:       "Commit the overlays are rendered on again for the merge request report, which diffs the rendered manifests against it. A merged results pipeline compares against the target branch, any other merge request pipeline against the merge base.",
+			Usage:       "Commit the overlays are rendered on again for the merge request report, which diffs the rendered manifests against it. Defaults to the target branch of a merged results pipeline, else the merge base of the merge request.",
 			Required:    false,
 			Value:       "",
 			Destination: &P.DiffBase,
+		},
+
+		// GitLab sets both in every merge request pipeline, the target branch one empty
+		// unless it is a merged results pipeline, and a source chain stops at the first
+		// variable that is set, so they can not share one flag.
+		&cli.StringFlag{
+			Category:    CategoryKustomizeBuild,
+			Name:        "kustomize.build.target-branch-sha",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_MERGE_REQUEST_TARGET_BRANCH_SHA")),
+			Usage:       "Head of the target branch a merged results pipeline merged into, which the report diffs against.",
+			Required:    false,
+			Value:       "",
+			Destination: &P.TargetBranchSha,
+		},
+
+		&cli.StringFlag{
+			Category:    CategoryKustomizeBuild,
+			Name:        "kustomize.build.diff-base-sha",
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("CI_MERGE_REQUEST_DIFF_BASE_SHA")),
+			Usage:       "Merge base of the merge request, which the report diffs against in any other merge request pipeline.",
+			Required:    false,
+			Value:       "",
+			Destination: &P.DiffBaseSha,
 		},
 	},
 	gitlab.NewFlags(gitlab.Options{Destination: &P.MergeRequestReport}),
