@@ -118,7 +118,8 @@ func Diff(ctx context.Context, t *Task, groups []Group) (Result, error) {
 	for _, command := range []*Command{
 		git("init", "--quiet", "--initial-branch", "main"),
 		git("add", "-A"),
-		git("-c", "commit.gpgsign=false", "commit", "--quiet", "--allow-empty", "--message", "base"),
+		// no detached maintenance run, which would outlive the scratch repository.
+		git("-c", "commit.gpgsign=false", "-c", "maintenance.auto=false", "commit", "--quiet", "--allow-empty", "--message", "base"),
 	} {
 		if err := command.Run(ctx); err != nil {
 			return Result{}, fmt.Errorf("Can not commit the base side: %w", err)

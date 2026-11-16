@@ -68,7 +68,9 @@ var _ = Describe("merge request report", func() {
 	git := func(args ...string) string {
 		GinkgoHelper()
 
-		cmd := exec.Command("git", append([]string{"-c", "commit.gpgsign=false", "-c", "user.name=spec", "-c", "user.email=spec@test"}, args...)...)
+		// a commit otherwise detaches a maintenance run, which can still be writing into
+		// the repository when the temporary directory is removed.
+		cmd := exec.Command("git", append([]string{"-c", "commit.gpgsign=false", "-c", "maintenance.auto=false", "-c", "user.name=spec", "-c", "user.email=spec@test"}, args...)...)
 		cmd.Dir = repo
 		out, err := cmd.CombinedOutput()
 		Expect(err).NotTo(HaveOccurred(), string(out))
