@@ -1,0 +1,43 @@
+{{- define "metadata" -}}
+{{- $m := .ReportMetadata -}}
+{{- $metadata := list -}}
+{{- if $m.JobName }}{{ $metadata = append $metadata (printf "Job: %s" (link $m.JobName $m.JobUrl)) }}{{ end -}}
+{{- if $m.PipelineId }}{{ $metadata = append $metadata (printf "Pipeline: %s" (link (print "#" $m.PipelineId) $m.PipelineUrl)) }}{{ end -}}
+{{- if $m.CommitShortSha }}{{ $metadata = append $metadata (printf "Commit: `%s`" $m.CommitShortSha) }}{{ end -}}
+{{ with $metadata }}{{ join " | " . }}
+
+{{ end }}
+{{- end -}}
+
+## Rendered manifests against `{{ .Base }}`
+
+{{ template "metadata" . -}}
+| Overlay | Added | Changed | Removed |
+| --- | --- | --- | --- |
+{{ range .Overlays -}}
+| `{{ .Name }}` | {{ if .Err }}can not render the base{{ else }}{{ .Counts.Added }} | {{ .Counts.Changed }} | {{ .Counts.Removed }}{{ end }} |
+{{ end }}
+{{- range .Overlays }}{{ if .Err }}
+`{{ .Name }}` can not be rendered on the base, so it is left out of the diff:
+
+```text
+{{ .Err }}
+```
+{{ end }}{{ end }}
+{{- if not .Files.Count }}
+No changes.
+{{ else }}
+{{ .Files.Count }} manifest(s) changed.
+{{ range .Files.Files }}
+`{{ .Name }}`
+
+{{ .Fence }}diff
+{{ .Diff }}{{ .Fence }}
+{{ end }}
+{{- if .Files.More }}
+{{ .Files.More }} more manifest(s) are not shown.
+{{ end }}
+{{- end }}
+{{- if .Truncated }}
+The diff is truncated to fit in a note.
+{{ end -}}

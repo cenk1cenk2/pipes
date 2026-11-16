@@ -56,14 +56,19 @@ func build(tl *TaskList) *Task {
 		})
 }
 
-func writeOverlay(overlay string, result OverlayResult) error {
+// The overlay path flattened into one file or directory name.
+func overlayName(overlay string) string {
 	name := strings.ReplaceAll(filepath.Clean(overlay), string(os.PathSeparator), "_")
 	name = strings.Trim(name, "._")
 	if name == "" {
 		name = "root"
 	}
 
-	output := filepath.Join(P.Output, fmt.Sprintf("%s.yaml", name))
+	return name
+}
+
+func writeOverlay(overlay string, result OverlayResult) error {
+	output := filepath.Join(P.Output, fmt.Sprintf("%s.yaml", overlayName(overlay)))
 	if err := os.WriteFile(output, result.Yaml, 0o644); err != nil {
 		return fmt.Errorf("Can not write rendered Kustomize overlay: %s: %w", output, err)
 	}
