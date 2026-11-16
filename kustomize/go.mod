@@ -3,11 +3,11 @@ module gitlab.kilic.dev/devops/pipes/kustomize
 go 1.27.0
 
 require (
-	github.com/cenk1cenk2/plumber/v7 v7.2.11
+	github.com/cenk1cenk2/plumber/v7 v7.2.12
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/urfave/cli/v3 v3.14.0
-	gitlab.com/gitlab-org/api/client-go/v3 v3.50.0
+	gitlab.com/gitlab-org/api/client-go/v3 v3.51.0
 	gitlab.kilic.dev/devops/pipes/internal v0.0.0
 	gitlab.kilic.dev/devops/pipes/tests v0.0.0
 	sigs.k8s.io/kustomize/api v0.21.2
@@ -16,7 +16,7 @@ require (
 
 require (
 	charm.land/glamour/v2 v2.0.1 // indirect
-	charm.land/lipgloss/v2 v2.1.0 // indirect
+	charm.land/lipgloss/v2 v2.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.5.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
