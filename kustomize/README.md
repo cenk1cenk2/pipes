@@ -71,7 +71,9 @@ Build and validate Kustomize overlays.
 | `$KUSTOMIZE_BUILD_LOAD_RESTRICTOR`<br/>`$KUSTOMIZE_LOAD_RESTRICTOR` | Restricts which files Kustomize may load, where lifting the restriction matches the behaviour of ArgoCD. | `string`<br/>`format(enum("rootOnly", "none"))` | `"none"` |
 | `$KUSTOMIZE_BUILD_KUBE_VERSION`<br/>`$KUSTOMIZE_KUBE_VERSION`<br/>`$KUBERNETES_VERSION` | Kubernetes version passed to the Helm chart inflation generator. | `string` |  |
 | `$KUSTOMIZE_BUILD_OUTPUT` | Output directory to write the rendered manifests per overlay. Leave empty to skip writing. | `string` |  |
-| `$KUSTOMIZE_BUILD_DIFF_BASE`<br/>`$CI_MERGE_REQUEST_TARGET_BRANCH_SHA`<br/>`$CI_MERGE_REQUEST_DIFF_BASE_SHA` | Commit the overlays are rendered on again for the merge request report, which diffs the rendered manifests against it. A merged results pipeline compares against the target branch, any other merge request pipeline against the merge base. | `string` |  |
+| `$KUSTOMIZE_BUILD_DIFF_BASE` | Commit the overlays are rendered on again for the merge request report, which diffs the rendered manifests against it. Defaults to the target branch of a merged results pipeline, else the merge base of the merge request. | `string` |  |
+| `$CI_MERGE_REQUEST_TARGET_BRANCH_SHA` | Head of the target branch a merged results pipeline merged into, which the report diffs against. | `string` |  |
+| `$CI_MERGE_REQUEST_DIFF_BASE_SHA` | Merge base of the merge request, which the report diffs against in any other merge request pipeline. | `string` |  |
 
 **Plan Report**
 
