@@ -4,13 +4,13 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
+	"gitlab.kilic.dev/devops/pipes/internal/report/patch"
 )
 
 var (
@@ -34,8 +34,6 @@ const (
 	openMergeRequestsLimit = 4
 )
 
-var fenceRun = regexp.MustCompile("`{3,}")
-
 type reportTarget struct {
 	ProjectId       string
 	MergeRequestIid int64
@@ -48,48 +46,27 @@ type (
 		*Pipe
 		Changed   bool
 		Split     bool
-		Files     sectionView
-		Pending   sectionView
-		Generated sectionView
+		Files     patch.Section
+		Pending   patch.Section
+		Generated patch.Section
 		Truncated bool
 		// the merge request a publish opened or updated, which only the note on the
 		// merged merge requests names.
 		MergeRequest *gitlab.MergeRequestResult
-	}
-
-	sectionView struct {
-		Count int
-		Files []fileView
-		More  int
-	}
-
-	fileView struct {
-		Name  string
-		Diff  string
-		Fence string
 	}
 )
 
 func render() (string, error) {
 	view := reportView{Pipe: P, Changed: C.Diff != ""}
 
-	files := []string{}
-	for diff := C.Diff; diff != ""; {
-		end := len(diff)
-		if i := strings.Index(diff, "\ndiff --git "); i >= 0 {
-			end = i + 1
-		}
-
-		files = append(files, diff[:end])
-		diff = diff[end:]
-	}
+	files := patch.Split(C.Diff)
 
 	// git quotes an unusual name differently in the header than in the list of changed
 	// paths, so such a file can not be matched and stays with what the branch lacks.
 	pending := []string{}
 	generated := []string{}
 	for _, file := range files {
-		if C.Pending == nil || strings.HasPrefix(file, "diff --git \"") || C.Pending[filename(file)] || C.Pending[previous(file)] {
+		if C.Pending == nil || strings.HasPrefix(file, "diff --git \"") || C.Pending[patch.Filename(file)] || C.Pending[patch.Previous(file)] {
 			pending = append(pending, file)
 		} else {
 			generated = append(generated, file)
@@ -97,7 +74,7 @@ func render() (string, error) {
 	}
 
 	if len(generated) == 0 {
-		view.Files, _, view.Truncated = sections(files, reportDiffLimit)
+		view.Files, _, view.Truncated = patch.Sections(files, reportDiffLimit)
 	} else {
 		// what the branch still lacks is what the next sync brings, so it leads and gets
 		// the limit first, while what the branch already carries only gets the rest.
@@ -105,8 +82,8 @@ func render() (string, error) {
 
 		var limit int
 		var cut bool
-		view.Pending, limit, view.Truncated = sections(pending, reportDiffLimit)
-		view.Generated, _, cut = sections(generated, limit)
+		view.Pending, limit, view.Truncated = patch.Sections(pending, reportDiffLimit)
+		view.Generated, _, cut = patch.Sections(generated, limit)
 		view.Truncated = view.Truncated || cut
 	}
 
@@ -125,107 +102,6 @@ func renderMerged() (string, error) {
 
 func template(body string, view reportView) (string, error) {
 	return InlineTemplate(headerTemplate+body, view, map[string]any{"link": link})
-}
-
-// Takes the files into one section each within the limit, and returns what is left of
-// it together with whether any file did not fit. A file cut at a line ends the diff,
-// so nothing after it can make it look complete.
-func sections(files []string, limit int) (sectionView, int, bool) {
-	section := sectionView{Count: len(files)}
-
-	// the name and the fences of every file count against the limit as well, which a
-	// diff of many small files would otherwise outgrow.
-	cut := false
-	for _, file := range files {
-		name := filename(file)
-		diff := hunks(file)
-		marker := fence(diff)
-		overhead := len(name) + 2*len(marker) + len("\n``\n\ndiff\n\n")
-		if overhead >= limit {
-			break
-		}
-
-		if len(diff) > limit-overhead {
-			end := strings.LastIndex(diff[:limit-overhead], "\n") + 1
-			if end == 0 {
-				break
-			}
-
-			diff = diff[:end]
-			cut = true
-		}
-
-		section.Files = append(section.Files, fileView{Name: name, Diff: diff, Fence: marker})
-		limit -= overhead + len(diff)
-
-		if cut {
-			limit = 0
-
-			break
-		}
-	}
-
-	section.More = len(files) - len(section.Files)
-
-	return section, limit, cut || section.More > 0
-}
-
-// The name a file carries after the change, which is the one a rename ends up with.
-func filename(diff string) string {
-	header, _, _ := strings.Cut(diff, "\n")
-	header = strings.TrimPrefix(header, "diff --git ")
-	if i := strings.LastIndex(header, " b/"); i >= 0 {
-		return header[i+len(" b/"):]
-	}
-
-	return header
-}
-
-// The name a file carries before the change, which a rename leaves behind.
-func previous(diff string) string {
-	header, _, _ := strings.Cut(diff, "\n")
-	header = strings.TrimPrefix(header, "diff --git a/")
-	if i := strings.LastIndex(header, " b/"); i >= 0 {
-		return header[:i]
-	}
-
-	return header
-}
-
-// The name above the section already says which file it is, so only what git marks
-// beyond that stays: the hunks, and the mode, rename and binary lines of the header.
-func hunks(diff string) string {
-	body := &strings.Builder{}
-	header := true
-	for i, line := range strings.SplitAfter(diff, "\n") {
-		if i == 0 {
-			continue
-		}
-
-		if strings.HasPrefix(line, "@@") || line == "GIT binary patch\n" {
-			header = false
-		}
-
-		if header && (strings.HasPrefix(line, "index ") || strings.HasPrefix(line, "--- ") || strings.HasPrefix(line, "+++ ")) {
-			continue
-		}
-
-		body.WriteString(line)
-	}
-
-	return body.String()
-}
-
-// A diff of a markdown file can carry a fence of its own, which would close this one.
-func fence(diff string) string {
-	fence := "```"
-	for _, run := range fenceRun.FindAllString(diff, -1) {
-		if len(run) >= len(fence) {
-			fence = strings.Repeat("`", len(run)+1)
-		}
-	}
-
-	return fence
 }
 
 func link(text string, url string) string {
