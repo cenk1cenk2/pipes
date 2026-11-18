@@ -48,20 +48,29 @@ bootstrap:
     include:
       - local: .gitlab-ci.bootstrap.yml
   rules:
+    # the :bootstrap images are rebuilt and pushed only when what goes into them changes:
+    # their Dockerfiles, the plugin manifest, the code of their own pipes, and the build
+    # arguments and builder pin in the child pipeline.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         paths:
           - .gitlab-ci.bootstrap.yml
-          # bootstrap vendors and verifies every module and lints with the shared
-          # configuration, so those break it as much as what goes into its images.
+          - "{go,buildah,semantic-release}/**/*.go"
+          - "{go,buildah,semantic-release}/Dockerfile"
+          - semantic-release/rootfs/**/*
+      variables:
+        BOOTSTRAP_CONTAINER: "true"
+    # bootstrap vendors and verifies every module and lints with the shared configuration,
+    # so those break it as much as what goes into its images; they run the verification
+    # without publishing an image.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
           - .golangci.yml
           - go.work
           - go.work.sum
           - "*/go.{mod,sum}"
           - internal/**/*
-          - "{go,buildah,semantic-release}/**/*.go"
-          - "{go,buildah,semantic-release}/Dockerfile"
-          - semantic-release/rootfs/**/*
 
 install:
   stage: install
