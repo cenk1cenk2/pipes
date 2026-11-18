@@ -74,11 +74,16 @@ install:
     expire_in: 1 week
     paths:
       - vendor/
+  variables:
+    # the module archives are uploaded whole on every save, so only the default branch
+    # saves them and every other pipeline, the tag pipelines of a release included, reads.
+    GO_MOD_CACHE_POLICY: pull
   cache:
     # vendoring only reads the module cache; the build cache belongs to go-build. The
     # vendor tree itself is never cached: it belongs to the dependency graph that
     # produced it, and go refuses to read an inconsistent one.
     - key: go-mod
+      policy: $GO_MOD_CACHE_POLICY
       paths:
         # the downloaded archives alone; go extracts the modules from them when it vendors.
         - .go/pkg/mod/cache/download/
@@ -86,6 +91,8 @@ install:
   # any of them could, and a tag of internal has no pipe to build.
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        GO_MOD_CACHE_POLICY: pull-push
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       interruptible: true
     - if: $CI_COMMIT_TAG && $CI_COMMIT_TAG !~ /^internal@/
