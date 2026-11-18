@@ -83,6 +83,9 @@ container:
         CONTAINER_IMAGE_NAME: docker.io/cenk1cenk2/pipe-semantic-release
         CONTAINER_IMAGE_BUILD_ARGS: |-
           NODE_VERSION: 26-alpine
+  rules:
+    # set by the trigger job only for a change to what goes into the images.
+    - if: $BOOTSTRAP_CONTAINER == "true"
   tags:
     - amd64
     - docker

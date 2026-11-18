@@ -74,6 +74,10 @@ lint:
     - pipeline: $CI_PARENT_PIPELINE_ID
       job: install
       artifacts: true
+  variables:
+    # only a pipeline of the default branch saves the linter cache, so merge requests and
+    # release tags read it without uploading it again.
+    LINT_CACHE_POLICY: pull
   cache:
     - key: go-build-$[[inputs.name]]
       fallback_keys:
@@ -82,11 +86,15 @@ lint:
       paths:
         - .go/cache/
     - key: lint-$[[inputs.name]]
+      policy: $LINT_CACHE_POLICY
       paths:
         - .go/golangci-lint/
   script:
     - pipe lint
   rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        LINT_CACHE_POLICY: pull-push
     - when: always
   tags:
     - amd64
