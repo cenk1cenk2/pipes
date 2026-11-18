@@ -279,18 +279,18 @@ docs:
     - task docs
     - |-
       git diff --exit-code -- '**/README.md' || (echo "readmes are stale, run: task docs" && exit 1)
+  # compiling every pipe for its readme is the heaviest job here, so it runs only where a
+  # stale readme can still be fixed before it lands.
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes: &docs-paths
-        - "**/*.go"
-        - "**/go.mod"
-        - "**/README.md"
-        - Taskfile.yml
-        - Taskfile.pipe.yml
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       interruptible: true
       changes:
-        paths: *docs-paths
+        paths:
+          - "**/*.go"
+          - "**/go.mod"
+          - "**/README.md"
+          - Taskfile.yml
+          - Taskfile.pipe.yml
         compare_to: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
   tags:
     - amd64
