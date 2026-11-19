@@ -24,7 +24,7 @@ importers:
         specifier: ^11.0.1
         version: 11.0.1(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/github':
-        specifier: ^12.0.10
+        specifier: ^12.0.11
         version: 12.0.11(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/gitlab':
         specifier: ^13.3.3
