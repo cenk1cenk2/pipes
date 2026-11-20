@@ -27,7 +27,7 @@ importers:
         specifier: ^12.0.11
         version: 12.0.11(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/gitlab':
-        specifier: ^13.3.3
+        specifier: ^13.3.4
         version: 13.3.5(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)
       '@semantic-release/npm':
         specifier: ^13.2.0
