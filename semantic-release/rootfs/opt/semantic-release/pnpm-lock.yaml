@@ -1446,8 +1446,8 @@ packages:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
 
-  toposource@1.2.0:
-    resolution: {integrity: sha512-sb8zWvXUWJ+jqnHM/+ud7muOT3wi0lVL/DFHH+CxTViSngzhRrIm8nensUOcxuLUNAMdsfE9DxZjLX3GhCTJKg==}
+  toposource@1.2.2:
+    resolution: {integrity: sha512-sJ8fFfFduWGjaL67VSG8f3NtR/tTcU6EPBDzDNWi6BKkFeDnpgJalQLV3bwdSPV8iRMd3rdyUsHr2sReEXV7cw==}
 
   traverse@0.6.8:
     resolution: {integrity: sha512-aXJDbk6SnumuaZSANd21XAo15ucCDE38H4fkqiGsc3MhCK+wOlZvLP9cB/TvpHT0mOyWgC4Z8EwRlzqYSUzdsA==}
@@ -1919,7 +1919,7 @@ snapshots:
     dependencies:
       fast-glob: 3.3.3
       js-yaml: 4.3.2
-      toposource: 1.2.0
+      toposource: 1.2.2
 
   '@simple-libs/stream-utils@1.2.0': {}
 
@@ -3007,7 +3007,7 @@ snapshots:
     dependencies:
       is-number: 7.0.0
 
-  toposource@1.2.0: {}
+  toposource@1.2.2: {}
 
   traverse@0.6.8: {}
 
