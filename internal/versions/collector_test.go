@@ -172,12 +172,17 @@ var _ = Describe("Collector", func() {
 			Expect(out).To(Equal([]string{"v1.2.3", "main"}))
 		})
 
-		It("refuses an empty value the user gave", func() {
-			out := []string{}
-
-			Expect(run(&versions.Collector{Name: "tags", FromUser: []string{"latest", ""}}, &out)).
-				To(MatchError(ContainSubstring("Can not add empty tag to list.")))
-		})
+		// a pipeline names the branch and the tag at once, and only one of them is set
+		// on any run.
+		DescribeTable(
+			"skips an empty value the user gave",
+			func(given []string, expected []string) {
+				Expect(collect(&versions.Collector{Name: "tags", FromUser: given})).To(Equal(expected))
+			},
+			Entry("on a branch run", []string{"main", ""}, []string{"main"}),
+			Entry("on a tag run", []string{"", "v1.2.3"}, []string{"v1.2.3"}),
+			Entry("between two of the same value", []string{"main", "", "main"}, []string{"main"}),
+		)
 
 		Describe("from the environment", func() {
 			It("collects the value of a variable named", func() {
