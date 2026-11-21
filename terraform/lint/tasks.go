@@ -4,6 +4,7 @@ import (
 	"context"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
@@ -29,7 +30,12 @@ func lintFmt(tl *TaskList) *Task {
 			).
 				Set(func(_ context.Context, c *Command) error {
 					if P.Lint.FormatCheckArgs != "" {
-						c.AppendArgs(P.Lint.FormatCheckArgs)
+						args, err := shell.Split(P.Lint.FormatCheckArgs)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil
@@ -54,7 +60,12 @@ func lintValidate(tl *TaskList) *Task {
 			).
 				Set(func(_ context.Context, c *Command) error {
 					if P.Lint.ValidateArgs != "" {
-						c.AppendArgs(P.Lint.ValidateArgs)
+						args, err := shell.Split(P.Lint.ValidateArgs)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil

@@ -3,10 +3,10 @@ package tool
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 )
 
 func tool(tl *TaskList) *Task {
@@ -23,7 +23,14 @@ func tool(tl *TaskList) *Task {
 
 					c.AppendArgs(P.Tool)
 
-					c.AppendArgs(strings.Split(P.Args, " ")...)
+					args, err := shell.Split(P.Args)
+					if err != nil {
+						return err
+					}
+
+					c.AppendArgs(args...)
+
+					c.AppendArgs(P.Command...)
 
 					return nil
 				}).

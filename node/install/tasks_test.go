@@ -70,6 +70,20 @@ var _ = Describe("Node install", func() {
 		Expect(invocation.Dir).To(Equal("projects/web"))
 	})
 
+	It("appends no empty argument when the pipeline set no install arguments", func() {
+		runner := fixtures.Runner()
+
+		p := pipe()
+		p.Install.UseLockFile = true
+		p.Install.Args = ""
+
+		Expect(run(runner, p, "pnpm")).To(Succeed())
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).To(Equal([]string{"i", "--frozen-lockfile"}))
+	})
+
 	It("installs without the lockfile when the pipeline asked for it", func() {
 		runner := fixtures.Runner()
 

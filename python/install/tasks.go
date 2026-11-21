@@ -2,9 +2,9 @@ package install
 
 import (
 	"context"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/python/setup"
 )
 
@@ -27,7 +27,12 @@ func install(tl *TaskList) *Task {
 					}
 
 					if P.Args != "" {
-						c.AppendArgs(strings.Split(P.Args, " ")...)
+						args, err := shell.Split(P.Args)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil

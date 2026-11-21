@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
@@ -31,7 +32,12 @@ func install(tl *TaskList) *Task {
 					}
 
 					if P.Install.Args != "" {
-						c.AppendArgs(P.Install.Args)
+						args, err := shell.Split(P.Install.Args)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil

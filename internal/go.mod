@@ -9,6 +9,7 @@ require (
 	github.com/cenk1cenk2/plumber/v7 v7.2.12
 	github.com/charmbracelet/colorprofile v0.4.3
 	github.com/go-playground/validator/v10 v10.30.6
+	github.com/mattn/go-shellwords v1.0.17
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0

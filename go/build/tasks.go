@@ -9,6 +9,7 @@ import (
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 )
 
 func build(tl *TaskList) *Task {
@@ -83,7 +84,12 @@ func build(tl *TaskList) *Task {
 										c.AppendArgs("-tags", strings.Join(P.BuildTags, ","))
 									}
 
-									c.AppendArgs(strings.Split(P.Args, " ")...)
+									args, err := shell.Split(P.Args)
+									if err != nil {
+										return err
+									}
+
+									c.AppendArgs(args...)
 
 									c.AppendArgs(
 										"-o",

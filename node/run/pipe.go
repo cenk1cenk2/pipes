@@ -21,6 +21,7 @@ type (
 	Ctx struct {
 		Script     string
 		ScriptArgs string
+		Args       []string
 	}
 )
 
@@ -35,7 +36,7 @@ func New(p *Plumber) *TaskList {
 		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
 			if P.Run.Script == "" {
 				C.Script = P.Command[0]
-				C.ScriptArgs = strings.Join(P.Command[1:], " ")
+				C.Args = P.Command[1:]
 			} else {
 				C.Script, C.ScriptArgs, _ = strings.Cut(P.Run.Script, " ")
 			}

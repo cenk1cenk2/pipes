@@ -4,6 +4,7 @@ import (
 	"context"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
@@ -23,7 +24,12 @@ func add(tl *TaskList) *Task {
 					c.AppendArgs(packageManager.Commands.Add...)
 
 					if P.Add.ScriptArgs != "" {
-						c.AppendArgs(P.Add.ScriptArgs)
+						args, err := shell.Split(P.Add.ScriptArgs)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					c.AppendArgs(P.Add.Packages...)

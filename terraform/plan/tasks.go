@@ -9,6 +9,7 @@ import (
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 	"gitlab.kilic.dev/devops/pipes/terraform/state"
 )
@@ -105,7 +106,12 @@ func plan(tl *TaskList) *Task {
 					}
 
 					if P.Plan.Args != "" {
-						c.AppendArgs(P.Plan.Args)
+						args, err := shell.Split(P.Plan.Args)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					if P.Plan.PreviewForMergeRequests && P.Plan.PipelineSource == "merge_request_event" {

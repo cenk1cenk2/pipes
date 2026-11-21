@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
@@ -30,7 +31,12 @@ func install(tl *TaskList) *Task {
 						t.Log.Info("Installing dependencies without a lockfile.")
 					}
 
-					c.AppendArgs(strings.Split(P.Install.Args, " ")...)
+					args, err := shell.Split(P.Install.Args)
+					if err != nil {
+						return err
+					}
+
+					c.AppendArgs(args...)
 
 					if P.Install.Cache {
 						cacheDir := fmt.Sprintf(".%s", packageManager.Exe)

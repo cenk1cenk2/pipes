@@ -4,6 +4,7 @@ import (
 	"context"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/terraform/setup"
 )
 
@@ -21,7 +22,12 @@ func apply(tl *TaskList) *Task {
 					}
 
 					if P.Apply.Args != "" {
-						c.AppendArgs(P.Apply.Args)
+						args, err := shell.Split(P.Apply.Args)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil

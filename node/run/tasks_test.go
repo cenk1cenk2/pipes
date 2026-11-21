@@ -55,6 +55,16 @@ var _ = Describe("Node run", func() {
 		Expect(invocation.Dir).To(Equal("."))
 	})
 
+	It("keeps every argument after the double dash whole", func() {
+		runner := fixtures.Runner()
+
+		Expect(runScript(runner, Pipe{Run: Run{Cwd: "."}}, "--", "tsc", "--define", "name=two words")).To(Succeed())
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).To(Equal([]string{"run", "tsc", "--define", "name=two words"}))
+	})
+
 	// the script flag is one string holding both halves, so the pipe has to cut it
 	// where the arguments would otherwise have arrived already separated.
 	It("cuts the script flag into the script and its arguments", func() {

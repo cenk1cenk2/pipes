@@ -8,9 +8,9 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/mise/setup"
 )
 
@@ -71,7 +71,12 @@ func install(tl *TaskList) *Task {
 					t.Log.Info(fmt.Sprintf("Installing tools: in %s", setup.C.Cwd))
 
 					if P.Args != "" {
-						c.AppendArgs(strings.Split(P.Args, " ")...)
+						args, err := shell.Split(P.Args)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil
