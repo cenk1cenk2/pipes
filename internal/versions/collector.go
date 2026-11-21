@@ -44,14 +44,18 @@ type Collector struct {
 	Format func(string) string
 }
 
-// UserTask collects what the pipeline named on the command line.
+// UserTask collects what the pipeline named on the command line. An empty value is
+// skipped, so a pipeline can name references that are only set on some of its runs,
+// like the branch and the tag at once.
 func (c *Collector) UserTask(tl *TaskList, out *[]string) *Task {
 	return tl.CreateTask(c.Name, "user").
 		ShouldDisable(func(_ *Task) bool {
 			return len(c.FromUser) == 0
 		}).
 		Set(func(ctx context.Context, t *Task) error {
-			for _, v := range slices.Compact(slices.Clone(c.FromUser)) {
+			for _, v := range slices.Compact(slices.DeleteFunc(slices.Clone(c.FromUser), func(v string) bool {
+				return v == ""
+			})) {
 				if err := c.add(ctx, t, out, v); err != nil {
 					return err
 				}
