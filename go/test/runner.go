@@ -1,7 +1,7 @@
 package test
 
 import (
-	"strings"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 )
 
 type Runner string
@@ -11,7 +11,12 @@ const (
 	RunnerGo     Runner = "go"
 )
 
-func command() (string, []string) {
+func command() (string, []string, error) {
+	extra, err := shell.Split(P.Args)
+	if err != nil {
+		return "", nil, err
+	}
+
 	switch Runner(P.Runner) {
 	case RunnerGo:
 		args := []string{"test"}
@@ -26,17 +31,15 @@ func command() (string, []string) {
 
 		args = append(args, "-v", "-failfast")
 
-		if P.Args != "" {
-			args = append(args, strings.Split(P.Args, " ")...)
-		}
+		args = append(args, extra...)
 
 		args = append(args, "./...")
 
 		if P.JUnit != "" {
-			return "gotestsum", args
+			return "gotestsum", args, nil
 		}
 
-		return "go", args
+		return "go", args, nil
 	case RunnerGinkgo:
 		fallthrough
 	default:
@@ -51,10 +54,8 @@ func command() (string, []string) {
 
 		args = append(args, "-vv", "--silence-skips", "--fail-fast", "-r")
 
-		if P.Args != "" {
-			args = append(args, strings.Split(P.Args, " ")...)
-		}
+		args = append(args, extra...)
 
-		return "go", append(args, "./...")
+		return "go", append(args, "./..."), nil
 	}
 }

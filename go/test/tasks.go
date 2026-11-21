@@ -28,7 +28,10 @@ func testModule(tl *TaskList) *Task {
 			return setup.C.Workspace
 		}).
 		Set(func(_ context.Context, t *Task) error {
-			name, args := command()
+			name, args, err := command()
+			if err != nil {
+				return err
+			}
 
 			t.CreateCommand(name, args...).
 				SetLogLevel(LogLevelDefault, LogLevelDefault, LogLevelDebug).
@@ -65,7 +68,10 @@ func testWorkspace(tl *TaskList) *Task {
 				}
 			}
 
-			name, args := command()
+			name, args, err := command()
+			if err != nil {
+				return err
+			}
 
 			for _, module := range setup.C.Modules {
 				t.CreateCommand(name, args...).

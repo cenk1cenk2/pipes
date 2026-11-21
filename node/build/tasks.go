@@ -5,6 +5,7 @@ import (
 	"os"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
@@ -36,7 +37,12 @@ func build(tl *TaskList) *Task {
 							return err
 						}
 
-						c.AppendArgs(tmpl)
+						args, err := shell.Split(tmpl)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					c.SetDir(P.Build.Cwd)

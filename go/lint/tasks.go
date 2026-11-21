@@ -2,10 +2,10 @@ package lint
 
 import (
 	"context"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	"gitlab.kilic.dev/devops/pipes/go/setup"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 )
 
 // Only one of the lint tasks fires, since the gates below are the two halves of
@@ -37,7 +37,12 @@ func lintModule(tl *TaskList) *Task {
 				SetDir(setup.C.Cwd).
 				Set(func(_ context.Context, c *Command) error {
 					if P.Args != "" {
-						c.AppendArgs(strings.Split(P.Args, " ")...)
+						args, err := shell.Split(P.Args)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
 
 					return nil
@@ -72,7 +77,12 @@ func lintWorkspace(tl *TaskList) *Task {
 					SetDir(module).
 					Set(func(_ context.Context, c *Command) error {
 						if P.Args != "" {
-							c.AppendArgs(strings.Split(P.Args, " ")...)
+							args, err := shell.Split(P.Args)
+							if err != nil {
+								return err
+							}
+
+							c.AppendArgs(args...)
 						}
 
 						c.AppendArgs("./...")

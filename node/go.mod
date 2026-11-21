@@ -35,6 +35,7 @@ require (
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
+	github.com/mattn/go-shellwords v1.0.17 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/nochso/gomd v0.0.0-20160625161351-1785d26cc410 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect

@@ -87,6 +87,21 @@ var _ = Describe("Node build", func() {
 		invocation, ok := runner.LastInvocation()
 		Expect(ok).To(BeTrue())
 		Expect(invocation.Args).
-			To(Equal([]string{"run", "build:production", "--url https://api.example.com"}))
+			To(Equal([]string{"run", "build:production", "--url", "https://api.example.com"}))
+	})
+
+	// ng reads a single "-c staging" argument as a bundle of short flags and fails on it.
+	It("passes every script argument separately and keeps a quoted one whole", func() {
+		runner := fixtures.Runner()
+
+		p := pipe()
+		p.Build.ScriptArgs = `-c staging --define "name=two words"`
+
+		Expect(run(runner, p, "npm")).To(Succeed())
+
+		invocation, ok := runner.LastInvocation()
+		Expect(ok).To(BeTrue())
+		Expect(invocation.Args).
+			To(Equal([]string{"run", "build", "--", "-c", "staging", "--define", "name=two words"}))
 	})
 })

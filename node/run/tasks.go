@@ -4,6 +4,7 @@ import (
 	"context"
 
 	. "github.com/cenk1cenk2/plumber/v7"
+	"gitlab.kilic.dev/devops/pipes/internal/shell"
 	"gitlab.kilic.dev/devops/pipes/node/setup"
 )
 
@@ -35,8 +36,21 @@ func run(tl *TaskList) *Task {
 							return err
 						}
 
-						c.AppendArgs(tmpl)
+						args, err := shell.Split(tmpl)
+						if err != nil {
+							return err
+						}
+
+						c.AppendArgs(args...)
 					}
+
+					// arguments after the double dash reach the pipe already separated, so each one is rendered on its own.
+					args, err := InlineTemplates[any](C.Args, nil)
+					if err != nil {
+						return err
+					}
+
+					c.AppendArgs(args...)
 
 					c.SetDir(P.Run.Cwd)
 

@@ -2,8 +2,6 @@ package tool
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 )
@@ -24,13 +22,9 @@ func New(p *Plumber) *TaskList {
 	return TL.New(p).
 		SetRuntimeDepth(3).
 		ShouldRunBefore(func(_ context.Context, tl *TaskList) error {
-			if len(P.Command) > 0 {
-				if P.Tool == "" {
-					P.Tool = P.Command[0]
-					P.Args = fmt.Sprintf("%s %s", P.Args, strings.Join(P.Command[1:], " "))
-				} else {
-					P.Args = fmt.Sprintf("%s %s", P.Args, strings.Join(P.Command, " "))
-				}
+			if len(P.Command) > 0 && P.Tool == "" {
+				P.Tool = P.Command[0]
+				P.Command = P.Command[1:]
 			}
 
 			return p.Validate(P)
