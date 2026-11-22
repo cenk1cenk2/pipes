@@ -225,8 +225,8 @@ packages:
     peerDependencies:
       semantic-release: '>=20.1.0'
 
-  '@semrel-extra/topo@1.14.1':
-    resolution: {integrity: sha512-V7hlOQoBXgqLSa4ai9S0LGOO7cKTqRu5dh0T83xfE+VqZQmDkuRm956ooJ2/M8y62kWIxS2VEfePnEoB74x6fg==}
+  '@semrel-extra/topo@1.14.2':
+    resolution: {integrity: sha512-hmzt8ZMptbyaf+QDbYRXtO4+febOb4Uf9bIAfsW3XosJDa2Ucum3QytW+ogaI1+m9SiCxuNJbLIhjidSH4RFuA==}
 
   '@simple-libs/stream-utils@1.2.0':
     resolution: {integrity: sha512-KxXvfapcixpz6rVEB6HPjOUZT22yN6v0vI0urQSk1L8MlEWPDFCZkhw2xmkyoTGYeFw7tWTZd7e3lVzRZRN/EA==}
@@ -1607,7 +1607,7 @@ snapshots:
 
   '@anolilab/multi-semantic-release@4.6.3(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)(semantic-release@25.0.9(supports-color@7.2.0))(supports-color@7.2.0)':
     dependencies:
-      '@semrel-extra/topo': 1.14.1
+      '@semrel-extra/topo': 1.14.2
       '@visulima/fs': 7.0.1(@visulima/yaml@1.0.0)(ini@7.0.0)(json5@2.2.3)
       '@visulima/path': 3.1.0
       cosmiconfig: 10.0.1
@@ -1915,7 +1915,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@semrel-extra/topo@1.14.1':
+  '@semrel-extra/topo@1.14.2':
     dependencies:
       fast-glob: 3.3.3
       js-yaml: 4.3.2
