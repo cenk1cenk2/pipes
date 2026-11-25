@@ -120,6 +120,7 @@ var _ = ginkgo.Describe("Deploy report", func() {
 				return mergeRequests, nil
 			},
 			Discriminators: func() []string { return []string{"production"} },
+			Labels:         Labels{Target: "Stack", Apply: "Pulumi up"},
 			Metadata: Metadata{
 				Target:      "production",
 				JobName:     job,
@@ -141,8 +142,16 @@ var _ = ginkgo.Describe("Deploy report", func() {
 		Expect(mergeRequests.commits).To(Equal([]string{"abc"}))
 		Expect(notes.bodies).To(HaveLen(1))
 		Expect(notes.bodies[5]).To(HavePrefix(
-			"Merged into `main`. [Job `plan`](https://gitlab.test/-/jobs/1) planned the changes below for `production`, " +
-				"which [the deploy job `deploy`](https://gitlab.test/-/jobs/2) applies once it is run.\n\n## Pulumi preview report\n",
+			"## Pulumi up ready on `main` for `production`\n\n" +
+				"| Field | Value |\n| --- | --- |\n" +
+				"| Status | Waiting for the deploy job to run |\n" +
+				"| Branch | `main` |\n" +
+				"| Stack | `production` |\n" +
+				"| Plan job | [`plan`](https://gitlab.test/-/jobs/1) |\n" +
+				"| Deploy job | [`deploy`](https://gitlab.test/-/jobs/2) |\n" +
+				"| Pipeline | [pipeline #42](https://gitlab.test/-/pipelines/42) |\n" +
+				"| Commit | `abc` |\n" +
+				"\n## Pulumi preview report\n",
 		))
 		Expect(notes.bodies[5]).To(HaveSuffix("<!-- gitlab-pipes:mr-report:plan:production:deploy-planned -->"))
 	})
@@ -153,7 +162,7 @@ var _ = ginkgo.Describe("Deploy report", func() {
 		Expect(plan(source("plan"))).To(Succeed())
 
 		Expect(notes.bodies[5]).To(ContainSubstring(
-			"which the deploy job of [pipeline #42](https://gitlab.test/-/pipelines/42) applies once it is run.",
+			"| Deploy job | In [pipeline #42](https://gitlab.test/-/pipelines/42) |\n",
 		))
 	})
 
@@ -183,8 +192,15 @@ var _ = ginkgo.Describe("Deploy report", func() {
 
 			Expect(notes.bodies).To(HaveLen(1))
 			Expect(notes.bodies[5]).To(Equal(
-				"Deployed what was merged into `main`. [Job `deploy`](https://gitlab.test/-/jobs/2) applied the plan of " +
-					"[the plan job `plan`](https://gitlab.test/-/jobs/1) for `production`.\n" +
+				"## Pulumi up succeeded on `main` for `production`\n\n" +
+					"| Field | Value |\n| --- | --- |\n" +
+					"| Status | Applied |\n" +
+					"| Branch | `main` |\n" +
+					"| Stack | `production` |\n" +
+					"| Plan job | [`plan`](https://gitlab.test/-/jobs/1) |\n" +
+					"| Deploy job | [`deploy`](https://gitlab.test/-/jobs/2) |\n" +
+					"| Pipeline | [pipeline #42](https://gitlab.test/-/pipelines/42) |\n" +
+					"| Commit | `abc` |\n" +
 					"\n<!-- gitlab-pipes:mr-report:deploy:production:deploy -->",
 			))
 		})
@@ -192,10 +208,8 @@ var _ = ginkgo.Describe("Deploy report", func() {
 		ginkgo.It("reports the failed deploy and fails with the apply", func() {
 			Expect(apply(source("deploy"), fmt.Errorf("apply failed"))).To(MatchError("apply failed"))
 
-			Expect(notes.bodies[5]).To(HavePrefix(
-				"Deploying what was merged into `main` failed. [Job `deploy`](https://gitlab.test/-/jobs/2) failed while applying the plan of " +
-					"[the plan job `plan`](https://gitlab.test/-/jobs/1) for `production`, so it may be applied only in part.\n",
-			))
+			Expect(notes.bodies[5]).To(HavePrefix("## Pulumi up failed on `main` for `production`\n"))
+			Expect(notes.bodies[5]).To(ContainSubstring("| Status | Failed, so the plan may be applied only in part |\n"))
 		})
 
 		ginkgo.It("never fails the deploy with its report", func() {

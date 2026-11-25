@@ -31,6 +31,8 @@ type (
 		Target      string
 		Outputs     string
 		ToolVersion string
+		// the step that applies the plan, which titles the deploy notes.
+		Apply string
 	}
 
 	Metadata struct {

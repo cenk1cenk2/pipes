@@ -1,14 +1,34 @@
 package terraform
 
 import (
+	"cmp"
 	"context"
+	_ "embed"
 	"fmt"
 	"strconv"
+	"text/template"
 
 	. "github.com/cenk1cenk2/plumber/v7"
 	clientgitlab "gitlab.com/gitlab-org/api/client-go/v3"
 	"gitlab.kilic.dev/devops/pipes/internal/gitlab"
 )
+
+//go:embed assets/deploy.md.gotmpl
+var deployTemplate string
+
+// What the deploy table on top of either note renders, with the job cells already
+// written as links.
+type deployView struct {
+	Title     string
+	Status    string
+	Branch    string
+	Labels    Labels
+	Target    string
+	PlanJob   string
+	DeployJob string
+	Pipeline  string
+	Commit    string
+}
 
 // DeployReportTask leaves the plan of the default branch on the merge requests merged
 // into its commit, with the job that deploys it, since their own report was planned
@@ -40,20 +60,17 @@ func DeployReportTask(tl *TaskList, src *Source) *Task {
 				return err
 			}
 
+			table, err := src.deployTable("ready", "Waiting for the deploy job to run", src.job(), src.other(deploy))
+			if err != nil {
+				return err
+			}
+
 			body, err := RenderReport(report, DiffUnified)
 			if err != nil {
 				return err
 			}
 
-			lead := fmt.Sprintf(
-				"Merged into `%s`. %s planned the changes below%s, which %s applies once it is run.",
-				src.MergeRequest.DefaultBranch,
-				src.job("plan"),
-				src.target(),
-				src.other(deploy, "the deploy job"),
-			)
-
-			return src.announce(ctx, t, mergeRequests, lead+"\n\n"+body, ":deploy-planned")
+			return src.announce(ctx, t, mergeRequests, table+"\n"+body, ":deploy-planned")
 		})
 }
 
@@ -78,21 +95,14 @@ func (s *Source) Apply(ctx context.Context, t *Task, apply func(context.Context)
 			return err
 		}
 
-		body := fmt.Sprintf(
-			"Deployed what was merged into `%s`. %s applied the plan of %s%s.\n",
-			s.MergeRequest.DefaultBranch,
-			s.job("deploy"),
-			s.other(plan, "the plan job"),
-			s.target(),
-		)
+		outcome, status := "succeeded", "Applied"
 		if applied != nil {
-			body = fmt.Sprintf(
-				"Deploying what was merged into `%s` failed. %s failed while applying the plan of %s%s, so it may be applied only in part.\n",
-				s.MergeRequest.DefaultBranch,
-				s.job("deploy"),
-				s.other(plan, "the plan job"),
-				s.target(),
-			)
+			outcome, status = "failed", "Failed, so the plan may be applied only in part"
+		}
+
+		body, err := s.deployTable(outcome, status, s.other(plan), s.job())
+		if err != nil {
+			return err
 		}
 
 		// a retried deploy replaces the outcome of the one before it.
@@ -196,22 +206,40 @@ func (s *Source) announce(ctx context.Context, t *Task, mergeRequests gitlab.Mer
 	return nil
 }
 
-func (s *Source) job(fallback string) string {
-	name := "The " + fallback + " job"
+func (s *Source) deployTable(outcome string, status string, planJob string, deployJob string) (string, error) {
+	view := deployView{
+		Title:     fmt.Sprintf("%s %s on %s%s", s.Labels.Apply, outcome, code(s.MergeRequest.DefaultBranch), s.target()),
+		Status:    status,
+		Branch:    s.MergeRequest.DefaultBranch,
+		Labels:    s.Labels,
+		Target:    s.Metadata.Target,
+		PlanJob:   planJob,
+		DeployJob: deployJob,
+		Commit:    cmp.Or(s.Metadata.CommitShortSha, s.Metadata.CommitSha),
+	}
+	if s.Metadata.PipelineId != "" || s.Metadata.PipelineUrl != "" {
+		view.Pipeline = s.pipeline()
+	}
+
+	return InlineTemplate(deployTemplate, view, template.FuncMap{"cell": cell})
+}
+
+func (s *Source) job() string {
+	name := "This job"
 	if s.Metadata.JobName != "" {
-		name = "Job " + code(s.Metadata.JobName)
+		name = code(s.Metadata.JobName)
 	}
 
 	return link(name, s.Metadata.JobUrl)
 }
 
-// The job the note links next to its own, or the pipeline when it was not found.
-func (s *Source) other(job *clientgitlab.Job, kind string) string {
+// The other job of the pipeline the note links to, or the pipeline when it was not found.
+func (s *Source) other(job *clientgitlab.Job) string {
 	if job == nil {
-		return kind + " of " + s.pipeline()
+		return "In " + s.pipeline()
 	}
 
-	return link(kind+" "+code(job.Name), job.WebURL)
+	return link(code(job.Name), job.WebURL)
 }
 
 // The stack or state the plan is for, which tells the notes of several apart.

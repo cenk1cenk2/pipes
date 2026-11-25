@@ -13,6 +13,13 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
+var reportLabels = terraform.Labels{
+	Target:      "Stack",
+	Outputs:     "Output properties",
+	ToolVersion: "Pulumi version",
+	Apply:       "Pulumi up",
+}
+
 type (
 	actionAccumulator struct {
 		Action      string
@@ -129,12 +136,8 @@ func parsePulumiPlanReport(data []byte, state map[string]stateResource, metadata
 	}
 
 	return terraform.Report{
-		Title: "Pulumi preview report",
-		Labels: terraform.Labels{
-			Target:      "Stack",
-			Outputs:     "Output properties",
-			ToolVersion: "Pulumi version",
-		},
+		Title:    "Pulumi preview report",
+		Labels:   reportLabels,
 		Metadata: metadata,
 		Actions:  buildPulumiPlanActions(accumulators),
 	}, nil

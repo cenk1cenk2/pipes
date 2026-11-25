@@ -55,6 +55,7 @@ func ReportSource(p Pipe) terraform.Source {
 		MergeRequests:  gitlab.NewMergeRequests,
 		Discriminators: pulumiReportDiscriminators,
 		Metadata:       metadata,
+		Labels:         reportLabels,
 		Log:            p.ReportLog,
 	}
 }
