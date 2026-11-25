@@ -11,6 +11,13 @@ import (
 	"gitlab.kilic.dev/devops/pipes/internal/report/terraform"
 )
 
+var reportLabels = terraform.Labels{
+	Target:      "State",
+	Outputs:     "Outputs",
+	ToolVersion: "Terraform version",
+	Apply:       "Terraform apply",
+}
+
 var mergeRequestReportActionOrder = []string{
 	"create",
 	"update",
@@ -107,12 +114,8 @@ func parseTerraformShowPlan(output []byte, metadata terraform.Metadata) (terrafo
 	}
 
 	return terraform.Report{
-		Title: "Terraform plan report",
-		Labels: terraform.Labels{
-			Target:      "State",
-			Outputs:     "Outputs",
-			ToolVersion: "Terraform version",
-		},
+		Title:    "Terraform plan report",
+		Labels:   reportLabels,
 		Metadata: metadata,
 		Actions:  mergeRequestReportActions(resources, outputs),
 	}, nil

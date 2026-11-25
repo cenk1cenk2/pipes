@@ -88,6 +88,7 @@ func ReportSource(p Pipe) terraform.Source {
 		MergeRequests:  gitlab.NewMergeRequests,
 		Discriminators: terraformReportDiscriminators,
 		Metadata:       metadata,
+		Labels:         reportLabels,
 		Log:            p.ReportLog,
 	}
 }

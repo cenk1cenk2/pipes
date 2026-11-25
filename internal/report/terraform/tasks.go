@@ -28,7 +28,9 @@ type Source struct {
 	// request do not overwrite each other's note.
 	Discriminators func() []string
 	Metadata       Metadata
-	Log            LogConfig
+	// the deploy report on an apply never reads the plan, so it takes them from here.
+	Labels Labels
+	Log    LogConfig
 
 	// held between the tasks below, since reaching for the plan runs a command for one
 	// of the pipes and they run in sequence anyway.

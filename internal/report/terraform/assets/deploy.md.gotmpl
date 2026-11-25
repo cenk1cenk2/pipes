@@ -1,0 +1,17 @@
+## {{ .Title }}
+
+| Field | Value |
+| --- | --- |
+| Status | {{ .Status }} |
+| Branch | `{{ .Branch | cell }}` |
+{{- if .Target }}
+| {{ .Labels.Target }} | `{{ .Target | cell }}` |
+{{- end }}
+| Plan job | {{ .PlanJob | cell }} |
+| Deploy job | {{ .DeployJob | cell }} |
+{{- if .Pipeline }}
+| Pipeline | {{ .Pipeline | cell }} |
+{{- end }}
+{{- if .Commit }}
+| Commit | `{{ .Commit | cell }}` |
+{{- end }}
