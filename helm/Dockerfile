@@ -2,7 +2,7 @@
 FROM docker.io/alpine/helm:4
 
 # renovate: datasource=github-releases depName=helm-unittest/helm-unittest
-ARG HELM_UNITTEST_VERSION=v1.2.1
+ARG HELM_UNITTEST_VERSION=v1.3.0
 
 ARG BUILDOS
 ARG BUILDARCH
